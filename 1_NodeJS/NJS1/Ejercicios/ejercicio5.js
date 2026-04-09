@@ -12,9 +12,7 @@ const server = createServer((req, res) => {
 
       <body class="p-4 text-center">
 
-        <div class="card text-bg-dark mb-4">
-
-        </div>
+        
 
         <h2 class="mb-4">Operaciones Matematicas Basicas</h2>
 

@@ -97,14 +97,16 @@ const server = createServer((req, res) => {
               <div class="card h-100">
                 <div class="card-header header-e2">Ejercicio 2: Operaciones Directas</div>
                 <div class="card-body p-0">
-                  <table class="table table-hover mb-0 text-center">
-                    <thead>
-                      <tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr>
-                    </thead>
-                    <tbody>
-                      ${e2_op.map((o) => `<tr><td>${o.op}</td><td>${o.a}</td><td>${o.b}</td><td class="result-badge">${o.res}</td></tr>`).join("")}
-                    </tbody>
-                  </table>
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-center">
+                      <thead>
+                        <tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr>
+                      </thead>
+                      <tbody>
+                        ${e2_op.map((o) => `<tr><td>${o.op}</td><td>${o.a}</td><td>${o.b}</td><td class="result-badge">${o.res}</td></tr>`).join("")}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -114,14 +116,16 @@ const server = createServer((req, res) => {
               <div class="card h-100">
                 <div class="card-header header-e3">Ejercicio 3: Funciones Internas</div>
                 <div class="card-body p-0">
-                  <table class="table table-hover mb-0 text-center">
-                    <thead>
-                      <tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr>
-                    </thead>
-                    <tbody>
-                      ${e3_op.map((o) => `<tr><td>${o.op}</td><td>${o.a}</td><td>${o.b}</td><td class="result-badge">${o.res}</td></tr>`).join("")}
-                    </tbody>
-                  </table>
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-center">
+                      <thead>
+                        <tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr>
+                      </thead>
+                      <tbody>
+                        ${e3_op.map((o) => `<tr><td>${o.op}</td><td>${o.a}</td><td>${o.b}</td><td class="result-badge">${o.res}</td></tr>`).join("")}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -131,14 +135,16 @@ const server = createServer((req, res) => {
               <div class="card">
                 <div class="card-header header-e4">Ejercicio 4: Módulo Externo (calculos.js)</div>
                 <div class="card-body p-0">
-                  <table class="table table-hover mb-0 text-center">
-                    <thead>
-                      <tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr>
-                    </thead>
-                    <tbody>
-                      ${e4_op.map((o) => `<tr><td>${o.op}</td><td>${o.a}</td><td>${o.b}</td><td class="result-badge">${o.res}</td></tr>`).join("")}
-                    </tbody>
-                  </table>
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-center">
+                      <thead>
+                        <tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr>
+                      </thead>
+                      <tbody>
+                        ${e4_op.map((o) => `<tr><td>${o.op}</td><td>${o.a}</td><td>${o.b}</td><td class="result-badge">${o.res}</td></tr>`).join("")}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>

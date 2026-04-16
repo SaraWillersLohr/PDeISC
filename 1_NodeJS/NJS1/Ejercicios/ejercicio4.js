@@ -24,15 +24,17 @@ const server = createServer((req, res) => {
           <div class="card shadow">
             <div class="card-header bg-info text-dark fw-bold">Ejercicio 4: Módulo calculos.js</div>
             <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead><tr><th>Función</th><th>a</th><th>b</th><th>Resultado</th></tr></thead>
-                <tbody>
-                  <tr><td>suma</td><td>5</td><td>3</td><td>${s}</td></tr>
-                  <tr><td>resta</td><td>8</td><td>6</td><td>${r}</td></tr>
-                  <tr><td>multiplicacion</td><td>3</td><td>11</td><td>${m}</td></tr>
-                  <tr><td>division</td><td>30</td><td>5</td><td>${d}</td></tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead><tr><th>Función</th><th>a</th><th>b</th><th>Resultado</th></tr></thead>
+                  <tbody>
+                    <tr><td>suma</td><td>5</td><td>3</td><td>${s}</td></tr>
+                    <tr><td>resta</td><td>8</td><td>6</td><td>${r}</td></tr>
+                    <tr><td>multiplicacion</td><td>3</td><td>11</td><td>${m}</td></tr>
+                    <tr><td>division</td><td>30</td><td>5</td><td>${d}</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

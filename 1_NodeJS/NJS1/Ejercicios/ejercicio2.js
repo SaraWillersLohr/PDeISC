@@ -23,15 +23,17 @@ const server = createServer((req, res) => {
           <div class="card shadow">
             <div class="card-header bg-success text-white">Ejercicio 2: Operaciones Directas</div>
             <div class="card-body p-0">
-              <table class="table table-hover mb-0">
-                <thead><tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr></thead>
-                <tbody>
-                  <tr><td>Suma</td><td>4</td><td>5</td><td>${s}</td></tr>
-                  <tr><td>Resta</td><td>3</td><td>6</td><td>${r}</td></tr>
-                  <tr><td>Mult</td><td>2</td><td>7</td><td>${m}</td></tr>
-                  <tr><td>Div</td><td>20</td><td>4</td><td>${d}</td></tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead><tr><th>Operación</th><th>a</th><th>b</th><th>Resultado</th></tr></thead>
+                  <tbody>
+                    <tr><td>Suma</td><td>4</td><td>5</td><td>${s}</td></tr>
+                    <tr><td>Resta</td><td>3</td><td>6</td><td>${r}</td></tr>
+                    <tr><td>Mult</td><td>2</td><td>7</td><td>${m}</td></tr>
+                    <tr><td>Div</td><td>20</td><td>4</td><td>${d}</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

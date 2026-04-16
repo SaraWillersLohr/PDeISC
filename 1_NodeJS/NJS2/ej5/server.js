@@ -3,15 +3,11 @@ import fs from "fs";
 import url from "url";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getMenu } from "./modules/menu.mjs";
-import { getClimaMDP } from "../ej1/modules/clima.mjs";
-import {
-  sumar,
-  restar,
-  multiplicar,
-  dividir,
-} from "../ej1/modules/calculo.mjs";
-import { upperCase } from "upper-case";
+import { getMenu } from "./modules/menu.js";
+import { getClimaMDP } from "../ej1/modules/clima.js";
+import { sumar, restar, multiplicar, dividir } from "../ej1/modules/calculo.js";
+import { convertirAMayusculas } from "../ej4/modules/texto.js";
+import { analizarYMostrarURL } from "../ej3/modules/analizador.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,20 +61,21 @@ const server = http.createServer(async (req, res) => {
         `;
   } else if (pathname === "/ej3") {
     fileName = "ej3.html";
+    const myUrl = analizarYMostrarURL(req);
     contentToInject = `
             <div class="bg-dark text-success p-4 rounded-3 font-monospace small shadow">
-                <p class="mb-1">--- Tarea 3: Modulo URL (Simulado) ---</p>
-                <p class="mb-1">Host: localhost:3005</p>
-                <p class="mb-1">Pathname: /ej3</p>
-                <p class="mb-1">Search: null</p>
-                <p class="mb-0 text-white-50">// Revisa la terminal de Node para ver los logs reales.</p>
+                <p class="mb-1">--- Tarea 3: Modulo URL (Analisis Real) ---</p>
+                <p class="mb-1">Host: ${myUrl.host}</p>
+                <p class="mb-1">Pathname: ${myUrl.pathname}</p>
+                <p class="mb-1">Search: ${myUrl.search || 'ninguno'}</p>
+                <p class="mb-0 text-white-50">// Revisa la terminal de Node para ver los logs en tiempo real.</p>
             </div>
-            <div class="mt-4 alert alert-warning">Como el Ejercicio 3 responde en blanco, aqui simulamos su salida de consola.</div>
+            <div class="mt-4 alert alert-warning">En el ejercicio original la pantalla queda en blanco, pero aqui te mostramos el analisis que el modulo realiza.</div>
         `;
   } else if (pathname === "/ej4") {
     fileName = "ej4.html";
     const originalText = "hola mundo desde el portfolio!";
-    const processed = upperCase(originalText);
+    const processed = convertirAMayusculas(originalText);
     contentToInject = `
             <div class="card border-0 bg-light p-4 shadow-sm">
                 <p class="text-muted small mb-1">Original:</p>
@@ -86,6 +83,13 @@ const server = http.createServer(async (req, res) => {
                 <hr>
                 <p class="text-muted small mb-1">Procesado con <strong>upper-case</strong>:</p>
                 <p class="display-6 text-primary fw-bold">"${processed}"</p>
+            </div>
+        `;
+  } else if (pathname === "/acerca") {
+    fileName = "acerca.html";
+    contentToInject = `
+            <div class="alert alert-info">
+                <p class="mb-0">Este proyecto fue desarrollado utilizando Node.js, modulos ES6 y Bootstrap 5.</p>
             </div>
         `;
   } else if (pathname !== "/") {

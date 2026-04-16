@@ -1,6 +1,6 @@
 import http from "http";
-import { getClimaMDP } from "./modules/clima.mjs";
-import { sumar, restar, multiplicar, dividir } from "./modules/calculo.mjs";
+import { getClimaMDP } from "./modules/clima.js";
+import { sumar, restar, multiplicar, dividir } from "./modules/calculo.js";
 
 const server = http.createServer(async (req, res) => {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });

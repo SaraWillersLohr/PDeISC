@@ -1,11 +1,11 @@
 import http from "http";
-import { upperCase } from "upper-case";
+import { convertirAMayusculas } from "./modules/texto.js";
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
 
   const textToProcess = "hola mundo desde node con upper-case!";
-  const processedText = upperCase(textToProcess);
+  const processedText = convertirAMayusculas(textToProcess);
 
   const html = `
     <!DOCTYPE html>

@@ -1,13 +1,8 @@
 import http from "http";
+import { analizarYMostrarURL } from "./modules/analizador.js";
 
 const server = http.createServer((req, res) => {
-  const myUrl = new URL(req.url, `http://${req.headers.host}`);
-
-  console.log("--- Tarea 3: Modulo URL (Servidor Escuchando) ---");
-  console.log("Host:", myUrl.host);
-  console.log("Pathname:", myUrl.pathname);
-  console.log("Search:", myUrl.search);
-  console.log("Query Params:", Object.fromEntries(myUrl.searchParams));
+  analizarYMostrarURL(req);
 
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("");

@@ -16,6 +16,7 @@ export function getMenu() {
                         <li class="nav-item"><a class="nav-link px-3" href="/ej2">Ejercicio 2</a></li>
                         <li class="nav-item"><a class="nav-link px-3" href="/ej3">Ejercicio 3</a></li>
                         <li class="nav-item"><a class="nav-link px-3" href="/ej4">Ejercicio 4</a></li>
+                        <li class="nav-item"><a class="nav-link px-3" href="/acerca">Acerca de</a></li>
                     </ul>
                 </div>
             </div>

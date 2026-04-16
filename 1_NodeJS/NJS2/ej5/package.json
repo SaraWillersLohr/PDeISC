@@ -2,7 +2,7 @@
   "name": "ej5",
   "version": "1.0.0",
   "type": "module",
-  "main": "server.mjs",
+  "main": "server.js",
   "dependencies": {
     "upper-case": "^2.0.2"
   }

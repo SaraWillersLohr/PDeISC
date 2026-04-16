@@ -29,7 +29,8 @@ const server = http.createServer(async (req, res) => {
     } else {
       climaHTML = `
                 <div class="card bg-primary text-white text-center p-4 shadow mb-4">
-                    <h3 class="display-6">${clima.lugar}</h3>
+                    <h3 class="display-6">Clima API</h3>
+                    <p class="mb-2 opacity-75">${clima.lugar}</p>
                     <div class="display-2 mb-2">${clima.temperatura}C</div>
                     <p class="h4 mb-0">Humedad: ${clima.humedad}% | Viento: ${clima.viento}km/h</p>
                 </div>
@@ -38,7 +39,7 @@ const server = http.createServer(async (req, res) => {
 
     const calcHTML = `
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-dark text-white fw-bold">Resultados de Calculos</div>
+                <div class="card-header bg-dark text-white fw-bold">Calculos Matematicos</div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between">Suma (10+5) <span class="badge bg-success">${sumar(10, 5)}</span></li>
                     <li class="list-group-item d-flex justify-content-between">Resta (20-8) <span class="badge bg-danger">${restar(20, 8)}</span></li>
@@ -67,7 +68,7 @@ const server = http.createServer(async (req, res) => {
                 <p class="mb-1">--- Tarea 3: Modulo URL (Analisis Real) ---</p>
                 <p class="mb-1">Host: ${myUrl.host}</p>
                 <p class="mb-1">Pathname: ${myUrl.pathname}</p>
-                <p class="mb-1">Search: ${myUrl.search || 'ninguno'}</p>
+                <p class="mb-1">Search: ${myUrl.search || "ninguno"}</p>
                 <p class="mb-0 text-white-50">// Revisa la terminal de Node para ver los logs en tiempo real.</p>
             </div>
             <div class="mt-4 alert alert-warning">En el ejercicio original la pantalla queda en blanco, pero aqui te mostramos el analisis que el modulo realiza.</div>

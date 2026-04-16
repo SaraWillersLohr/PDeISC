@@ -20,9 +20,10 @@ const server = http.createServer(async (req, res) => {
     climaContent = `
             <div class="card shadow-lg mb-5" style="max-width: 400px; margin: 0 auto;">
                 <div class="card-header ${bgColor} text-center">
-                    <h3 class="mb-0">${clima.lugar}</h3>
+                    <h3 class="mb-0">Clima API</h3>
                 </div>
                 <div class="card-body text-center">
+                    <h5 class="text-muted mb-3">${clima.lugar}</h5>
                     <div class="display-1 mb-3">${clima.temperatura}C</div>
                     <p class="card-text text-muted text-uppercase fw-bold">${clima.resumen}</p>
                     <hr>

@@ -1,11 +1,9 @@
 import { createServer } from "node:http";
 import { suma, resta, multiplicacion, division } from "./calculos.js";
 
-// Ejercicio 1 (Valores fijos)
 const e1_linea1 = "Hola mundo desde Node.js";
 const e1_linea2 = "Fin";
 
-// Ejercicio 2 (Operaciones directas)
 const e2_op = [
   { op: "Suma", a: 4, b: 5, res: 4 + 5 },
   { op: "Resta", a: 3, b: 6, res: 3 - 6 },
@@ -13,7 +11,6 @@ const e2_op = [
   { op: "División", a: 20, b: 4, res: 20 / 4 },
 ];
 
-// Ejercicio 3 (Utilizando funciones locales)
 function sumarE3(a, b) {
   return a + b;
 }
@@ -34,7 +31,6 @@ const e3_op = [
   { op: "Dividir", a: 20, b: 4, res: divE3(20, 4) },
 ];
 
-// Ejercicio 4 (Utilizando el módulo externo calculos.js)
 const e4_op = [
   { op: "suma", a: 5, b: 3, res: suma(5, 3) },
   { op: "resta", a: 8, b: 6, res: resta(8, 6) },
@@ -42,7 +38,6 @@ const e4_op = [
   { op: "division", a: 30, b: 5, res: division(30, 5) },
 ];
 
-// Consola
 console.log("=== Resultados de Ejercicios 1-4 ===");
 console.log("Ej 1:", e1_linea1, "-", e1_linea2);
 console.log(

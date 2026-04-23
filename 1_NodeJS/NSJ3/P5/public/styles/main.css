@@ -1,17 +1,20 @@
+/* 
+  Estilo unificado para la tienda TechStore.
+*/
 :root {
-  --primary: #2ecc71;
-  --secondary: #27ae60;
-  --bg: #f5f6fa;
-  --text: #2f3640;
-  --card-bg: #ffffff;
-  --accent: #e74c3c;
+  --color-principal: #2ecc71;
+  --color-secundario: #27ae60;
+  --fondo: #f5f6fa;
+  --texto: #2f3640;
+  --blanco: #ffffff;
+  --rojo: #e74c3c;
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   margin: 0;
-  background-color: var(--bg);
-  color: var(--text);
+  background-color: var(--fondo);
+  color: var(--texto);
 }
 
 header {
@@ -25,22 +28,25 @@ main {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
-  display: grid;
-  grid-template-columns: 1fr 350px;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
-@media (max-width: 992px) {
+@media (min-width: 992px) {
   main {
-    grid-template-columns: 1fr;
+    flex-direction: row;
+    align-items: flex-start;
   }
+  .catalog-section { flex: 1; }
+  .cart-section { width: 350px; position: sticky; top: 2rem; }
 }
 
-.catalog-section h2,
-.cart-section h2 {
-  margin-top: 0;
-  border-bottom: 2px solid #dcdde1;
-  padding-bottom: 0.5rem;
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
 .product-grid {
@@ -53,15 +59,11 @@ main {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
   text-align: center;
-  position: relative;
   transition: transform 0.2s;
 }
-
-.product-card:hover {
-  transform: translateY(-5px);
-}
+.product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
 .category-tag {
   font-size: 0.7rem;
@@ -75,28 +77,19 @@ main {
 .product-price {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--secondary);
+  color: var(--color-secundario);
   margin: 1rem 0;
 }
 
-.btn-add {
+button {
   width: 100%;
-  background: var(--primary);
+  background: var(--color-principal);
   color: white;
   border: none;
   padding: 0.75rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-}
-
-.cart-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 2rem;
 }
 
 .cart-item {
@@ -107,17 +100,14 @@ main {
   border-bottom: 1px solid #f1f2f6;
 }
 
-.item-price {
-  font-weight: 600;
-}
-
 .btn-remove {
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--rojo);
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 0 0.5rem;
+  width: auto;
+  padding: 0 5px;
 }
 
 .cart-footer {
@@ -130,8 +120,19 @@ main {
   font-weight: 800;
 }
 
-.empty-msg {
-  text-align: center;
-  color: #7f8c8d;
-  font-style: italic;
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
 }
+.toast {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  margin-top: 10px;
+  border-left: 5px solid var(--color-principal);
+}
+.toast.success { border-left-color: var(--color-principal); }
+.toast.error { border-left-color: var(--rojo); }

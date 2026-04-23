@@ -1,65 +1,85 @@
+/* 
+  Este archivo maneja la creación y cambio de enlaces 
+  en tiempo real. ¡Todo sin recargar la página!
+*/
 import { nodeManager } from "../modules/nodes.js";
+import { Notificador } from "../modules/notifications.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("link-container");
-  const log = document.getElementById("event-log");
-  const btnModify = document.getElementById("btn-modify-all");
-  const btnStyle = document.getElementById("btn-change-style");
+  const contenedor = document.getElementById("link-container");
+  const monitor = document.getElementById("event-log");
+  const btnModificar = document.getElementById("btn-modify-all");
+  const btnEstilo = document.getElementById("btn-change-style");
 
-  const logChange = (message) => {
-    if (log.innerHTML.includes("Esperando")) log.innerHTML = "";
-    const entry = document.createElement("div");
-    entry.className = "log-entry";
-    entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
-    log.prepend(entry);
+  // Función para escribir en la "pantalla verde" (monitor)
+  const escribirEnMonitor = (mensaje) => {
+    // Si es el primer mensaje, limpiamos el texto de espera
+    if (monitor.innerHTML.includes("Esperando")) monitor.innerHTML = "";
+    
+    const linea = document.createElement("div");
+    linea.className = "log-entry";
+    const ahora = new Date().toLocaleTimeString();
+    linea.innerHTML = `[${ahora}] ${mensaje}`;
+    
+    // Lo ponemos arriba de todo
+    monitor.prepend(linea);
   };
 
-  const sites = [
-    { name: "Google", url: "https://google.com" },
-    { name: "GitHub", url: "https://github.com" },
-    { name: "MDN Web Docs", url: "https://developer.mozilla.org" },
-    { name: "Wikipedia", url: "https://wikipedia.org" },
-    { name: "StackOverflow", url: "https://stackoverflow.com" },
+  // Datos de los sitios que vamos a crear
+  const sitios = [
+    { nombre: "Google", url: "https://google.com" },
+    { nombre: "GitHub", url: "https://github.com" },
+    { nombre: "MDN Web", url: "https://developer.mozilla.org" },
+    { nombre: "Wikipedia", url: "https://wikipedia.org" },
+    { nombre: "StackOverflow", url: "https://stackoverflow.com" }
   ];
 
-  sites.forEach((site, index) => {
-    const btn = document.getElementById(`btn-create-${index + 1}`);
+  // Preparamos los botones para crear cada link
+  sitios.forEach((sitio, indice) => {
+    const btn = document.getElementById(`btn-create-${indice + 1}`);
     btn.addEventListener("click", () => {
-      const a = nodeManager.createAnchor(site.name, site.url);
-      container.appendChild(a);
-      logChange(
-        `Nodo <span class="highlight">&lt;a&gt;</span> creado: <span class="value">${site.name}</span> apuntando a <span class="value">${site.url}</span>`,
-      );
-
-      // Habilitar botones de modificación
-      if (container.children.length > 0) {
-        btnModify.disabled = false;
-        btnStyle.disabled = false;
+      // Creamos el enlace usando nuestro módulo
+      const enlace = nodeManager.createAnchor(sitio.nombre, sitio.url);
+      contenedor.appendChild(enlace);
+      
+      escribirEnMonitor(`Creado: <strong>${sitio.nombre}</strong> &rarr; ${sitio.url}`);
+      Notificador.exito(`¡Link a ${sitio.nombre} creado!`);
+      
+      // Si ya hay links, dejamos usar los botones de modificación
+      if (contenedor.children.length > 0) {
+        btnModificar.disabled = false;
+        btnEstilo.disabled = false;
       }
     });
   });
 
-  btnModify.addEventListener("click", () => {
-    const links = container.querySelectorAll("a");
-    const newUrl = "https://youtube.com";
-
-    links.forEach((a) => {
-      const { oldValue } = nodeManager.modifyAttribute(a, "href", newUrl);
-      logChange(
-        `Atributo <span class="highlight">href</span> modificado en "${a.textContent}": <span class="value">${oldValue}</span> &rarr; <span class="value">${newUrl}</span>`,
-      );
+  // Botón para cambiar todos los destinos a YouTube
+  btnModificar.addEventListener("click", () => {
+    const enlaces = contenedor.querySelectorAll("a");
+    const nuevaUrl = "https://youtube.com";
+    
+    enlaces.forEach(a => {
+      const { oldValue } = nodeManager.modifyAttribute(a, "href", nuevaUrl);
+      escribirEnMonitor(`Cambiamos destino de "${a.textContent}": era <u>${oldValue}</u> y ahora es <u>${nuevaUrl}</u>`);
     });
+    
+    Notificador.mostrar("¡Todos los links ahora van a YouTube!");
   });
 
-  btnStyle.addEventListener("click", () => {
-    const links = container.querySelectorAll("a");
-    links.forEach((a) => {
-      const newTarget = a.target === "_blank" ? "_self" : "_blank";
-      nodeManager.modifyAttribute(a, "target", newTarget);
-      logChange(
-        `Atributo <span class="highlight">target</span> modificado en "${a.textContent}" a <span class="value">${newTarget}</span>`,
-      );
-      a.style.border = "2px solid red";
+  // Botón para cambiar cómo se abren los links (misma ventana o nueva)
+  btnEstilo.addEventListener("click", () => {
+    const enlaces = contenedor.querySelectorAll("a");
+    enlaces.forEach(a => {
+      const nuevoTarget = a.target === "_blank" ? "_self" : "_blank";
+      nodeManager.modifyAttribute(a, "target", nuevoTarget);
+      
+      const modo = nuevoTarget === "_blank" ? "ventana nueva" : "misma ventana";
+      escribirEnMonitor(`"${a.textContent}" ahora se abre en: <b>${modo}</b>`);
+      
+      // Le ponemos un borde rojo para que se note el cambio
+      a.style.borderColor = "red";
     });
+    
+    Notificador.mostrar("Cambiamos el modo de apertura de los links");
   });
 });

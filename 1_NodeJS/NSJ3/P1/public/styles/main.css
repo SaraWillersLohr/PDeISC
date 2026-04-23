@@ -1,41 +1,46 @@
+/* 
+  Estilo unificado para todos los proyectos.
+  Hecho para que se vea bien en celulares y computadoras.
+*/
 :root {
-  --primary: #4361ee;
-  --secondary: #3f37c9;
-  --bg: #f8f9fa;
-  --text: #2b2d42;
-  --card-bg: #ffffff;
-  --error: #e63946;
-  --success: #2a9d8f;
-  --dark-bg: #1a1a1a;
-  --dark-text: #f8f9fa;
-  --dark-card: #2d2d2d;
+  --color-principal: #4361ee;
+  --color-secundario: #3f37c9;
+  --fondo: #f8f9fa;
+  --texto: #2b2d42;
+  --blanco: #ffffff;
+  --rojo: #e63946;
+  --verde: #2a9d8f;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {
   font-family:
     "Inter",
-    system-ui,
     -apple-system,
+    BlinkMacSystemFont,
     sans-serif;
   margin: 0;
   padding: 0;
-  background-color: var(--bg);
-  color: var(--text);
+  background-color: var(--fondo);
+  color: var(--texto);
   line-height: 1.6;
 }
 
 header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(
+    135deg,
+    var(--color-principal),
+    var(--color-secundario)
+  );
   color: white;
   padding: 2rem 1rem;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
 }
 
 h1 {
   margin: 0;
-  font-weight: 800;
+  font-size: 1.8rem;
 }
 
 main {
@@ -44,80 +49,114 @@ main {
   padding: 0 1rem;
 }
 
+/* Tarjetas para el contenido */
 .card {
-  background: var(--card-bg);
-  padding: 2rem;
+  background: var(--blanco);
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  box-shadow: var(--sombra);
+  margin-bottom: 1.5rem;
 }
 
+/* Botones con un toque moderno */
 button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border: none;
   border-radius: 8px;
-  background-color: var(--primary);
+  background-color: var(--color-principal);
   color: white;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 button:hover {
-  background-color: var(--secondary);
-  transform: translateY(-1px);
+  background-color: var(--color-secundario);
+  transform: translateY(-2px);
 }
 
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Estilos para inputs y selects */
 input,
 select {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #e9ecef;
   border-radius: 8px;
+  box-sizing: border-box;
   margin-top: 0.5rem;
-  transition: border-color 0.2s;
+  font-size: 1rem;
 }
 
-input:focus,
-select:focus {
+input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--color-principal);
 }
 
+/* Registro de eventos lateral o inferior */
 .event-log {
   background: #f1f3f5;
   padding: 1rem;
   border-radius: 8px;
-  max-height: 300px;
+  max-height: 250px;
   overflow-y: auto;
+  border: 1px solid #dee2e6;
 }
 
 .event-item {
   padding: 0.5rem;
   border-bottom: 1px solid #dee2e6;
-  font-family: "Courier New", Courier, monospace;
-  font-size: 0.9rem;
-  color: #495057;
-}
-
-.error {
-  color: var(--error);
+  font-family: monospace;
   font-size: 0.85rem;
-  margin-top: 0.25rem;
 }
 
-/* Dark Mode Helper Classes */
-body.dark {
-  background-color: var(--dark-bg);
-  color: var(--dark-text);
+/* Notificaciones personalizadas (Toasts) */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
 }
 
-body.dark .card {
-  background-color: var(--dark-card);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+.toast {
+  background: var(--blanco);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+  border-left: 5px solid var(--color-principal);
+  animation: slideIn 0.3s ease-out;
 }
 
-body.dark h2,
-body.dark label {
-  color: var(--dark-text);
+.toast.success {
+  border-left-color: var(--verde);
+}
+.toast.error {
+  border-left-color: var(--rojo);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsividad para pantallas chicas */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  .card {
+    padding: 1rem;
+  }
 }

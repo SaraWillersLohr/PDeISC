@@ -1,18 +1,23 @@
+/* 
+  Este módulo se encarga de "dibujar" los productos 
+  y el carrito en la pantalla.
+*/
 export const renderer = {
+  // Dibuja los productos que hay para vender
   renderCatalog(products, containerId, onAdd) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
 
-    products.forEach((product) => {
+    products.forEach(product => {
       const card = document.createElement("div");
       card.className = "product-card";
-
-      const title = document.createElement("h3");
-      title.textContent = product.name;
 
       const category = document.createElement("p");
       category.textContent = product.category;
       category.className = "category-tag";
+
+      const title = document.createElement("h3");
+      title.textContent = product.name;
 
       const price = document.createElement("p");
       price.className = "product-price";
@@ -20,7 +25,6 @@ export const renderer = {
 
       const addBtn = document.createElement("button");
       addBtn.textContent = "Añadir al Carrito";
-      addBtn.className = "btn-add";
       addBtn.onclick = () => onAdd(product);
 
       card.appendChild(category);
@@ -31,19 +35,21 @@ export const renderer = {
     });
   },
 
+  // Dibuja la lista de cosas que el usuario ya eligió
   renderCart(items, containerId, totalId, onRemove) {
     const container = document.getElementById(containerId);
     const totalContainer = document.getElementById(totalId);
     container.innerHTML = "";
 
+    // Si no hay nada, avisamos
     if (items.length === 0) {
       container.innerHTML = '<p class="empty-msg">Tu carrito está vacío.</p>';
       totalContainer.textContent = "$0";
       return;
     }
 
-    let total = 0;
-    items.forEach((item) => {
+    let totalAcumulado = 0;
+    items.forEach(item => {
       const row = document.createElement("div");
       row.className = "cart-item";
 
@@ -63,10 +69,10 @@ export const renderer = {
       row.appendChild(price);
       row.appendChild(removeBtn);
       container.appendChild(row);
-
-      total += item.price * item.quantity;
+      
+      totalAcumulado += item.price * item.quantity;
     });
 
-    totalContainer.textContent = `$${total}`;
+    totalContainer.textContent = `$${totalAcumulado}`;
   },
 };

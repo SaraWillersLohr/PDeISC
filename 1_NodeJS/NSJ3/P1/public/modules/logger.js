@@ -1,22 +1,27 @@
-/**
- * Módulo para registrar eventos en la interfaz de usuario de forma segura.
- */
+/* 
+  Este módulo sirve para escribir mensajes en la pantalla 
+  y que el usuario sepa qué está pasando en tiempo real.
+*/
 export const uiLogger = {
-    log(message, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+  log(mensaje, containerId) {
+    const contenedor = document.getElementById(containerId);
+    if (!contenedor) return;
 
-        // Limpiar el mensaje inicial si existe
-        if (container.querySelector('p') && container.children.length === 1) {
-            container.innerHTML = '';
-        }
-
-        const logItem = document.createElement('div');
-        logItem.className = 'event-item';
-        
-        // Uso seguro de textContent para evitar vulnerabilidades XSS
-        logItem.textContent = `Evento: ${message} - ${new Date().toLocaleTimeString()}`;
-        
-        container.prepend(logItem);
+    // Si es el primer mensaje, limpiamos el texto de espera
+    const mensajeInicial = contenedor.querySelector(".event-item");
+    if (mensajeInicial && mensajeInicial.textContent.includes("Esperando")) {
+      contenedor.innerHTML = "";
     }
+
+    // Creamos un nuevo renglón para el historial
+    const item = document.createElement("div");
+    item.className = "event-item";
+
+    // Le ponemos la hora actual para que se vea prolijo
+    const ahora = new Date().toLocaleTimeString();
+    item.textContent = `[${ahora}] ${mensaje}`;
+
+    // Lo ponemos al principio de la lista
+    contenedor.prepend(item);
+  },
 };

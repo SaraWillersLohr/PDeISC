@@ -4,30 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P1 - DHTML Básico</title>
+    <title>P1 - Manipulación DHTML</title>
     <link rel="stylesheet" href="../styles/main.css">
 </head>
 
 <body>
     <header>
-        <h1>Proyecto 1: Interacción DHTML</h1>
-        <p>Registro de eventos y manipulación del DOM en tiempo real</p>
+        <h1>Consola DHTML Dinámica</h1>
+        <p>Control total sobre los elementos del DOM mediante eventos</p>
     </header>
     <main>
         <section class="card">
-            <h2>Acciones</h2>
+            <h2>Panel de Control</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                <!-- Controles para H1 -->
+                <button id="btn-add-h1">Agregar H1</button>
+                <button id="btn-change-text" disabled>Cambiar Texto H1</button>
+                <button id="btn-change-color" disabled>Cambiar Color H1</button>
+            </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="btn-click">Click Principal</button>
-                <button id="btn-hover">Hover sobre mí</button>
-                <input type="text" id="input-text" placeholder="Escribe algo aquí..."
-                    style="flex: 1; min-width: 200px;">
+                <!-- Controles para Imagen -->
+                <button id="btn-add-img">Agregar Imagen</button>
+                <button id="btn-change-img" disabled>Cambiar Imagen</button>
+                <button id="btn-resize-img" disabled>Cambiar Tamaño</button>
             </div>
         </section>
 
         <section class="card">
-            <h2>Registro de Eventos</h2>
+            <h2>Visualización del DOM</h2>
+            <div id="display-container"
+                style="min-height: 200px; border: 2px dashed #dee2e6; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+                <p id="empty-msg" style="color: #adb5bd;">Los componentes aparecerán aquí...</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Registro de Eventos</h3>
             <div id="log-container" class="event-log">
-                <p class="event-item">Esperando acciones del usuario...</p>
+                <p class="event-item">Esperando interacciones...</p>
             </div>
         </section>
     </main>

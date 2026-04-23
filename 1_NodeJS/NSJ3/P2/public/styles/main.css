@@ -1,39 +1,35 @@
+/* 
+  Estilo unificado para todos los proyectos.
+  Mismas variables y diseño responsive.
+*/
 :root {
-  --primary: #4361ee;
-  --secondary: #3f37c9;
-  --bg: #f8f9fa;
-  --text: #2b2d42;
-  --card-bg: #ffffff;
-  --error: #e63946;
-  --success: #2a9d8f;
-  --dark-bg: #1a1a1a;
-  --dark-text: #f8f9fa;
-  --dark-card: #2d2d2d;
+  --color-principal: #4361ee;
+  --color-secundario: #3f37c9;
+  --fondo: #f8f9fa;
+  --texto: #2b2d42;
+  --blanco: #ffffff;
+  --rojo: #e63946;
+  --verde: #2a9d8f;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: 'Inter', sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: var(--bg);
-  color: var(--text);
+  background-color: var(--fondo);
+  color: var(--texto);
 }
 
 header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
   color: white;
-  padding: 1.5rem 1rem;
+  padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 nav {
   background-color: #2b2d42;
-  padding: 0.75rem;
+  padding: 0.5rem;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -45,102 +41,102 @@ nav ul {
   margin: 0;
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 nav a {
-  color: #edf2f4;
+  color: #fff;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  transition: all 0.2s;
+  font-size: 0.9rem;
 }
 
-nav a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-nav a.active {
-  background-color: var(--primary);
-}
+nav a.active { background-color: var(--color-principal); }
 
 main {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 2rem auto;
   padding: 0 1rem;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-@media (max-width: 768px) {
+/* En pantallas grandes, mostramos el log al costado */
+@media (min-width: 800px) {
   main {
-    grid-template-columns: 1fr;
+    flex-direction: row;
+    align-items: flex-start;
   }
+  .card-main { flex: 1; }
+  .card-sidebar { width: 300px; }
 }
 
 .card {
-  background: var(--card-bg);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  min-height: 300px;
-}
-
-.event-sidebar {
-  background: var(--card-bg);
+  background: var(--blanco);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  height: fit-content;
+  box-shadow: var(--sombra);
 }
 
 .event-log {
-  background: #f8f9fa;
-  padding: 0.75rem;
+  background: #f1f3f5;
+  padding: 1rem;
   border-radius: 8px;
-  height: 400px;
+  height: 350px;
   overflow-y: auto;
-  border: 1px solid #e9ecef;
+  border: 1px solid #dee2e6;
 }
 
 .event-item {
-  padding: 0.5rem;
-  border-bottom: 1px solid #e9ecef;
-  font-family: "Courier New", monospace;
-  font-size: 0.85rem;
-  color: #495057;
+  padding: 0.4rem;
+  border-bottom: 1px solid #dee2e6;
+  font-family: monospace;
+  font-size: 0.8rem;
 }
 
 .interactive-box {
-  width: 150px;
-  height: 150px;
-  background: #f1f3f5;
-  border: 3px dashed var(--primary);
+  width: 120px;
+  height: 120px;
+  background: #e9ecef;
+  border: 3px dashed var(--color-principal);
   border-radius: 12px;
   margin: 2rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.interactive-box:hover {
-  background: #e7f5ff;
-  transform: scale(1.05);
 }
 
 button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  background-color: var(--primary);
+  background-color: var(--color-principal);
   color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  background: var(--blanco);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  margin-top: 10px;
+  border-left: 5px solid var(--color-principal);
+  animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }

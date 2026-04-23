@@ -1,3 +1,7 @@
+/* 
+  Este módulo se encarga de revisar que los datos 
+  que pone el usuario tengan sentido.
+*/
 const API_KEY =
   "ea4ce909ad82d0126f571fa852ae1a41a2c1eff83fd7d98d45799187ffe0ce8c";
 
@@ -6,63 +10,72 @@ export const validator = {
     return value.trim().length > 0;
   },
 
+  /**
+   * Revisamos si el nombre parece real.
+   * Usamos reglas propias y también una API externa.
+   */
   async isRealName(value) {
-    const trimmed = value.trim();
-    const nameParts = trimmed.split(/\s+/);
-    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-    const vowelRegex = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
-    const repeatedCharRegex = /(.)\1\1/;
+    const limpio = value.trim();
+    const partes = limpio.split(/\s+/);
+    const letrasSolo = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    const vocales = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
+    const repetidas = /(.)\1\1/; // Detecta 3 letras iguales seguidas (ej: "aaa")
 
-    // 1. Validaciones básicas locales (FILTRO ESTRICTO)
-    if (nameParts.length < 2)
-      return {
-        valid: false,
-        message: "Ingresa al menos un nombre y un apellido.",
-      };
-    if (!nameRegex.test(trimmed))
-      return { valid: false, message: "El nombre solo debe contener letras." };
-    if (repeatedCharRegex.test(trimmed))
-      return { valid: false, message: "Demasiadas letras repetidas." };
+    // --- Validaciones Rápidas Locales ---
+    if (partes.length < 2)
+      return { valid: false, message: "Poné tu nombre y apellido, por favor." };
 
-    for (const part of nameParts) {
-      // Un nombre real razonable debe tener al menos 2 letras (ej: "Jo")
-      // pero para evitar "sd" o "ds", pediremos que tenga al menos una vocal
-      if (part.length < 2)
+    if (!letrasSolo.test(limpio))
+      return { valid: false, message: "Usá solo letras, por favor." };
+
+    if (repetidas.test(limpio))
+      return { valid: false, message: "Hay demasiadas letras repetidas." };
+
+    // Revisamos cada palabra
+    for (const palabra of partes) {
+      if (palabra.length < 2)
         return {
           valid: false,
-          message: "Cada parte del nombre debe ser más larga.",
+          message: "Cada palabra debe tener al menos 2 letras.",
         };
-      if (!vowelRegex.test(part))
+
+      if (!vocales.test(palabra))
         return {
           valid: false,
-          message:
-            "Ingresa un nombre y apellido que parezca real (debe contener vocales).",
+          message: "Eso no parece un nombre (falta alguna vocal).",
         };
     }
 
-    const firstName = nameParts[0];
+    const primerNombre = partes[0];
 
-    // 2. Validación con API Externa (Gender-API)
+    // --- Consulta a la API Externa ---
     try {
-      const response = await fetch(
-        `https://gender-api.com/get?name=${firstName}&key=${API_KEY}`,
+      // Le preguntamos a la API de género si conoce este nombre
+      const respuesta = await fetch(
+        `https://gender-api.com/get?name=${primerNombre}&key=${API_KEY}`,
       );
-      if (!response.ok) throw new Error("Error en API");
+      if (!respuesta.ok) throw new Error("API caída");
 
-      const data = await response.json();
+      const datos = await respuesta.json();
 
-      // Si la API no reconoce el nombre
-      if (data.gender === "unknown" || (data.accuracy && data.accuracy < 60)) {
+      // Si la API no tiene idea de qué nombre es ese
+      if (
+        datos.gender === "unknown" ||
+        (datos.accuracy && datos.accuracy < 60)
+      ) {
         return {
           valid: false,
-          message: "Ese nombre no parece ser un nombre real registrado.",
+          message: "Mmm, ese nombre no me suena. ¿Está bien escrito?",
         };
       }
 
       return { valid: true };
     } catch (error) {
-      console.warn("API Error, continuando con validación local:", error);
-      // Si la API falla pero pasó los filtros locales estrictos, lo dejamos pasar
+      console.warn(
+        "Hubo un problema con la API, pero confío en tus datos locales.",
+        error,
+      );
+      // Si la API falla, dejamos pasar al usuario para no trabarlo
       return { valid: true };
     }
   },

@@ -1,53 +1,73 @@
-import { formValidator } from '../modules/form-validator.js';
-import { resultRenderer } from '../modules/result-renderer.js';
+/* 
+  Este archivo maneja el envío del formulario,
+  mostrando errores o el resumen final.
+*/
+import { formValidator } from "../modules/form-validator.js";
+import { resultRenderer } from "../modules/result-renderer.js";
+import { Notificador } from "../modules/notifications.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('event-form');
-    const formSection = document.getElementById('form-section');
-    const resultSection = document.getElementById('result-section');
-    const btnBack = document.getElementById('btn-back');
-    const btnSubmit = document.getElementById('btn-submit');
+document.addEventListener("DOMContentLoaded", () => {
+  const formulario = document.getElementById("event-form");
+  const seccionForm = document.getElementById("form-section");
+  const seccionResultado = document.getElementById("result-section");
+  const btnVolver = document.getElementById("btn-back");
+  const btnEnviar = document.getElementById("btn-submit");
 
-    const clearErrors = () => {
-        document.querySelectorAll('.error').forEach(el => el.textContent = '');
-    };
+  // Función para borrar los mensajes de error anteriores
+  const limpiarErrores = () => {
+    document.querySelectorAll(".error").forEach(el => (el.textContent = ""));
+  };
 
-    const showErrors = (errors) => {
-        for (const [field, message] of Object.entries(errors)) {
-            const errEl = document.getElementById(`err-${field}`);
-            if (errEl) errEl.textContent = message;
-        }
-    };
+  // Función para mostrar los errores donde corresponden
+  const mostrarErrores = (errores) => {
+    for (const [campo, mensaje] of Object.entries(errores)) {
+      const elError = document.getElementById(`err-${campo}`);
+      if (elError) elError.textContent = mensaje;
+    }
+    Notificador.error("Revisá los campos marcados en rojo.");
+  };
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        clearErrors();
+  // Cuando el usuario hace clic en "Inscribirme"
+  formulario.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Evitamos que la página se recargue
+    limpiarErrores();
 
-        // UI Feedback durante validación asíncrona
-        btnSubmit.disabled = true;
-        const originalText = btnSubmit.textContent;
-        btnSubmit.textContent = 'Verificando datos...';
+    // Ponemos el botón en modo "espera"
+    btnEnviar.disabled = true;
+    const textoOriginal = btnEnviar.textContent;
+    btnEnviar.textContent = "Verificando datos...";
 
-        const formData = new FormData(form);
-        const errors = await formValidator.validate(formData);
+    // Recogemos todos los datos del formulario
+    const datosForm = new FormData(formulario);
+    
+    // Le pedimos al validador que los revise (incluye la API de nombres)
+    const errores = await formValidator.validate(datosForm);
 
-        if (Object.keys(errors).length === 0) {
-            const data = Object.fromEntries(formData.entries());
-            resultRenderer.render(data, 'result-data');
-            formSection.classList.add('hidden');
-            resultSection.classList.remove('hidden');
-        } else {
-            showErrors(errors);
-        }
+    if (Object.keys(errores).length === 0) {
+      // Si no hay errores, mostramos el resumen
+      const datosFinales = Object.fromEntries(datosForm.entries());
+      resultRenderer.render(datosFinales, "result-data");
+      
+      seccionForm.classList.add("hidden");
+      seccionResultado.classList.remove("hidden");
+      
+      Notificador.exito("¡Te anotaste correctamente!");
+    } else {
+      // Si hay errores, los mostramos
+      mostrarErrores(errores);
+    }
 
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = originalText;
-    });
+    // Restauramos el botón
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = textoOriginal;
+  });
 
-    btnBack.addEventListener('click', () => {
-        resultSection.classList.add('hidden');
-        formSection.classList.remove('hidden');
-        form.reset();
-        clearErrors();
-    });
+  // Botón para volver atrás y anotar a otra persona
+  btnVolver.addEventListener("click", () => {
+    seccionResultado.classList.add("hidden");
+    seccionForm.classList.remove("hidden");
+    formulario.reset();
+    limpiarErrores();
+    Notificador.mostrar("Formulario reiniciado");
+  });
 });

@@ -1,0 +1,12 @@
+{
+  "name": "p6-formulario-validado",
+  "version": "1.0.0",
+  "description": "Proyecto 6: Formulario con validación y renderizado dinámico",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

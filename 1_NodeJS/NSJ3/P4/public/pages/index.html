@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P4 - Manipulación de Nodos</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>Consola de Manipulación de DOM</h1>
+        <p>Generación de nodos y edición de atributos en tiempo real</p>
+    </header>
+
+    <main>
+        <section class="controls">
+            <div class="card">
+                <h2>1. Crear Nodos</h2>
+                <p>Crea al menos 5 enlaces dinámicos.</p>
+                <button id="btn-create-1">Crear Link Google</button>
+                <button id="btn-create-2">Crear Link GitHub</button>
+                <button id="btn-create-3">Crear Link MDN</button>
+                <button id="btn-create-4">Crear Link Wikipedia</button>
+                <button id="btn-create-5">Crear Link StackOverflow</button>
+            </div>
+
+            <div class="card">
+                <h2>2. Modificar Atributos</h2>
+                <p>Cambia el destino de los enlaces creados.</p>
+                <button id="btn-modify-all" disabled>Redirigir todos a YouTube</button>
+                <button id="btn-change-style" disabled>Cambiar Estilos (Target)</button>
+            </div>
+
+            <div class="card">
+                <h2>Nodos Generados</h2>
+                <div id="link-container" class="link-container">
+                    <!-- Los enlaces aparecerán aquí -->
+                </div>
+            </div>
+        </section>
+
+        <aside>
+            <div class="card">
+                <h3>Monitor de Cambios</h3>
+                <div id="event-log" class="event-log">
+                    <div class="log-entry">Esperando creación de nodos...</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "p4-componentes-reutilizables",
+  "version": "1.0.0",
+  "description": "Proyecto 4: Componentes reutilizables DHTML",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

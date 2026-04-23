@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P1 - DHTML Básico</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>Proyecto 1: Interacción DHTML</h1>
+        <p>Registro de eventos y manipulación del DOM en tiempo real</p>
+    </header>
+    <main>
+        <section class="card">
+            <h2>Acciones</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="btn-click">Click Principal</button>
+                <button id="btn-hover">Hover sobre mí</button>
+                <input type="text" id="input-text" placeholder="Escribe algo aquí..."
+                    style="flex: 1; min-width: 200px;">
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Registro de Eventos</h2>
+            <div id="log-container" class="event-log">
+                <p class="event-item">Esperando acciones del usuario...</p>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

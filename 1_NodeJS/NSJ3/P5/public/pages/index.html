@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P5 - TechStore Carrito</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>TechStore 2026</h1>
+        <p>Tu tienda de tecnología modular</p>
+    </header>
+
+    <main>
+        <section class="catalog-section">
+            <h2>Catálogo de Productos</h2>
+            <div id="product-list" class="product-grid">
+                <!-- Productos dinámicos -->
+                <p class="empty-msg">Cargando catálogo...</p>
+            </div>
+        </section>
+
+        <section class="cart-section">
+            <div class="cart-card">
+                <h2>Tu Carrito</h2>
+                <div id="cart-items">
+                    <p class="empty-msg">Tu carrito está vacío.</p>
+                </div>
+                <div class="cart-footer">
+                    <span>Total:</span>
+                    <span id="cart-total">$0</span>
+                </div>
+                <button id="btn-checkout" class="btn-add" style="margin-top: 1rem;">Finalizar Compra</button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

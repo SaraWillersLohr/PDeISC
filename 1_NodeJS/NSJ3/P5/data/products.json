@@ -1,0 +1,30 @@
+[
+  { "id": 1, "name": "Laptop Gamer", "price": 1500, "category": "Computación" },
+  { "id": 2, "name": "Smartphone Pro", "price": 999, "category": "Telefonía" },
+  {
+    "id": 3,
+    "name": "Auriculares Bluetooth",
+    "price": 199,
+    "category": "Audio"
+  },
+  {
+    "id": 4,
+    "name": "Monitor Curvo 27\"",
+    "price": 350,
+    "category": "Computación"
+  },
+  {
+    "id": 5,
+    "name": "Teclado Mecánico RGB",
+    "price": 120,
+    "category": "Periféricos"
+  },
+  {
+    "id": 6,
+    "name": "Mouse Inalámbrico",
+    "price": 80,
+    "category": "Periféricos"
+  },
+  { "id": 7, "name": "Silla Ergonómica", "price": 250, "category": "Muebles" },
+  { "id": 8, "name": "Tablet 10\"", "price": 400, "category": "Computación" }
+]

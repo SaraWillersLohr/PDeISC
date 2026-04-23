@@ -1,0 +1,109 @@
+:root {
+  --primary: #4361ee;
+  --secondary: #3f37c9;
+  --bg: #f8f9fa;
+  --text: #2b2d42;
+  --card-bg: #ffffff;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  margin: 0;
+  background-color: var(--bg);
+}
+
+header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.link-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+  min-height: 100px;
+  border: 2px dashed #e9ecef;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.dynamic-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #e7f5ff;
+  color: #228be6;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.dynamic-link:hover {
+  background: #d0ebff;
+}
+
+.event-log {
+  background: #1a1a1a;
+  color: #00ff00;
+  padding: 1rem;
+  border-radius: 8px;
+  height: 400px;
+  overflow-y: auto;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.85rem;
+}
+
+.log-entry {
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.25rem;
+}
+
+.highlight {
+  color: #ff00ff;
+}
+.value {
+  color: #ffff00;
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

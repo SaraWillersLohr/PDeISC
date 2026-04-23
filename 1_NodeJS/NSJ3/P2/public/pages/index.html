@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2 - Navegación DHTML</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>Explorador de Secciones</h1>
+        <p>Navegación dinámica y registro de eventos</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#" data-page="inicio" class="active">Inicio</a></li>
+            <li><a href="#" data-page="perfil">Perfil</a></li>
+            <li><a href="#" data-page="config">Configuración</a></li>
+            <li><a href="#" data-page="stats">Estadísticas</a></li>
+            <li><a href="#" data-page="ayuda">Ayuda</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="content" class="card">
+            <!-- El contenido se cargará dinámicamente aquí -->
+        </section>
+
+        <aside class="event-sidebar">
+            <h3>Historial de Eventos</h3>
+            <div id="log-container" class="event-log">
+                <p class="event-item">Esperando interacciones...</p>
+            </div>
+        </aside>
+    </main>
+
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

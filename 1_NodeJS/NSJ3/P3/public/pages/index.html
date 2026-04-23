@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html id="html-root" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P3 - Registro con Estado</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>Asistente de Registro</h1>
+        <p id="step-indicator">Paso 1 de 3</p>
+    </header>
+
+    <main>
+        <div id="wizard-card" class="card">
+            <!-- Paso 1: Información Personal -->
+            <section id="step-1" class="step active">
+                <h2>Información Personal</h2>
+                <div class="field">
+                    <label for="name">Nombre y Apellido Real:</label>
+                    <input type="text" id="name" placeholder="Ej: Juan Pérez">
+                    <span class="error" id="error-name"></span>
+                </div>
+
+                <!-- Consigna: Ver hijos de un elemento -->
+                <div class="field" id="children-demo">
+                    <p>Este contenedor tiene elementos hijos.</p>
+                    <button type="button" id="btn-count-children" class="btn-secondary">¿Cuántos hijos tiene este
+                        div?</button>
+                    <div id="children-result" class="children-info"></div>
+                </div>
+
+                <div class="actions">
+                    <button id="next-1" class="btn-primary">Siguiente</button>
+                </div>
+            </section>
+
+            <!-- Paso 2: Preferencias -->
+            <section id="step-2" class="step">
+                <h2>Preferencias</h2>
+                <div class="field">
+                    <label for="theme">Tema de Interfaz:</label>
+                    <select id="theme">
+                        <option value="light">Modo Claro</option>
+                        <option value="dark">Modo Oscuro</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="prev-2" class="btn-secondary">Anterior</button>
+                    <button id="next-2" class="btn-primary">Siguiente</button>
+                </div>
+            </section>
+
+            <!-- Paso 3: Resumen -->
+            <section id="step-3" class="step">
+                <h2>Resumen</h2>
+                <div id="summary-content"></div>
+                <div class="actions">
+                    <button id="prev-3" class="btn-secondary">Anterior</button>
+                    <button id="finish" class="btn-primary">Finalizar</button>
+                </div>
+            </section>
+
+            <!-- Final -->
+            <section id="step-final" class="step">
+                <h2>¡Completado!</h2>
+                <p>Tu registro ha sido procesado exitosamente.</p>
+                <button id="restart" class="btn-primary">Reiniciar Proceso</button>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

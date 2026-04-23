@@ -1,0 +1,12 @@
+{
+  "name": "p2-navegacion-dhtml",
+  "version": "1.0.0",
+  "description": "Proyecto 2: Navegación y eventos DHTML",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P6 - Registro Tech</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+    <header>
+        <h1>Inscripción al Evento 2026</h1>
+        <p>Valida tus datos y confirma tu lugar</p>
+    </header>
+
+    <main>
+        <section id="form-section" class="card">
+            <form id="event-form" novalidate>
+                <div class="form-group">
+                    <label for="fullname">Nombre y Apellido:</label>
+                    <input type="text" id="fullname" name="fullname" placeholder="Ej: Juan Pérez">
+                    <span class="error" id="err-fullname"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Corporativo:</label>
+                    <input type="email" id="email" name="email" placeholder="juan@empresa.com">
+                    <span class="error" id="err-email"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Edad (18-100):</label>
+                    <input type="number" id="age" name="age" placeholder="25">
+                    <span class="error" id="err-age"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="workshop">Selecciona un Taller:</label>
+                    <select id="workshop" name="workshop">
+                        <option value="">-- Elige una opción --</option>
+                        <option value="Node.js">Node.js Avanzado</option>
+                        <option value="React">React Architecture</option>
+                        <option value="DevOps">DevOps & Cloud</option>
+                    </select>
+                    <span class="error" id="err-workshop"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Nivel de Experiencia:</label>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="level" value="Junior"> Junior</label>
+                        <label class="radio-option"><input type="radio" name="level" value="Senior"> Senior</label>
+                        <label class="radio-option"><input type="radio" name="level" value="Expert"> Expert</label>
+                    </div>
+                    <span class="error" id="err-level"></span>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="terms" name="terms">
+                    <label for="terms">Acepto el código de conducta</label>
+                    <span class="error" id="err-terms"></span>
+                </div>
+
+                <button type="submit" id="btn-submit">Confirmar Registro</button>
+            </form>
+        </section>
+
+        <section id="result-section" class="card hidden">
+            <h2>¡Registro Confirmado!</h2>
+            <p>A continuación los detalles de tu inscripción:</p>
+            <div id="result-data">
+                <!-- Resumen dinámico -->
+            </div>
+            <button id="btn-back" class="btn-back">Registrar a otra persona</button>
+        </section>
+    </main>
+
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

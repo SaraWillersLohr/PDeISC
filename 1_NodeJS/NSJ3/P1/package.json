@@ -1,0 +1,12 @@
+{
+  "name": "p1-dhtml-basico",
+  "version": "1.0.0",
+  "description": "Proyecto 1: DHTML Básico con eventos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

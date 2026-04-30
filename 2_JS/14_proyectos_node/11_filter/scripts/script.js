@@ -64,6 +64,7 @@ dom.btnFilterNums.onclick = () => {
   dom.displayResult1.className =
     "array-display result-display mb-4 animate__animated animate__fadeIn";
   dom.displayResult1.textContent = `Filtrados: [${mayoresADiez.join(", ")}]`;
+  dom.btnFilterNums.disabled = true; // Deshabilitar después de filtrar
 };
 
 // 2. Dado un array de palabras, filtra las que tengan más de 5 letras
@@ -74,6 +75,7 @@ dom.btnFilterWords.onclick = () => {
   dom.displayResult2.className =
     "array-display result-display mb-4 animate__animated animate__fadeIn";
   dom.displayResult2.textContent = `Filtrados: ["${largas.join('", "')}"]`;
+  dom.btnFilterWords.disabled = true; // Deshabilitar después de filtrar
 };
 
 // 3. Filtra los usuarios activos de un array de objetos {nombre, activo}
@@ -84,6 +86,7 @@ dom.btnFilterActive.onclick = () => {
   dom.displayResult3.className =
     "array-display result-display mb-4 animate__animated animate__fadeIn";
   dom.displayResult3.textContent = `Filtrados: [${activos.map((u) => u.nombre).join(", ")}]`;
+  dom.btnFilterActive.disabled = true; // Deshabilitar después de filtrar
 };
 
 // --- RESET ---
@@ -92,6 +95,11 @@ dom.btnReset.onclick = () => {
   numeros = [...INICIAL_NUMEROS];
   palabras = [...INICIAL_PALABRAS];
   usuarios = [...INICIAL_USUARIOS];
+
+  // Habilitar botones
+  dom.btnFilterNums.disabled = false;
+  dom.btnFilterWords.disabled = false;
+  dom.btnFilterActive.disabled = false;
 
   // Limpiar resultados
   [dom.displayResult1, dom.displayResult2, dom.displayResult3].forEach((el) => {

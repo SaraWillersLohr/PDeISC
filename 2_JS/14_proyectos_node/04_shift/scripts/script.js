@@ -1,146 +1,108 @@
 /**
- * Proyecto: 04 - shift() "Extracción Maestra" (Versión Académica Literal)
- * Objetivo: Demostrar 3 casos de uso de shift() requeridos por la consigna.
+ * Proyecto: 04 - shift() "Extracción del Inicio"
+ * Objetivo: Demostrar shift() mediante 3 casos literales e independientes.
  */
 
 // --- DATOS INICIALES ---
-const NUMEROS_DATA = [10, 20, 30, 40, 50];
-const CHAT_DATA = [
-  "Hola!",
-  "¿Cómo estás?",
-  "Todo bien por aquí",
-  "Genial!",
-  "Nos vemos.",
-];
-const COLA_DATA = [
-  "Carlos Ruiz",
-  "Marta Gómez",
-  "Pedro Sanz",
-  "Lucía Fernández",
-];
+const INICIAL_ENTEROS = [10, 20, 30, 40, 50];
+const INICIAL_MENSAJES = ["Hola", "¿Qué tal?", "Todo bien", "Adiós"];
+const INICIAL_COLA = ["Carlos", "Marta", "Pedro", "Lucía"];
 
-// --- ESTADOS ---
-let numeros = [...NUMEROS_DATA];
-let mensajes = [...CHAT_DATA];
-let cola = [...COLA_DATA];
+// --- ESTADO ---
+let enteros = [...INICIAL_ENTEROS];
+let mensajes = [...INICIAL_MENSAJES];
+let cola = [...INICIAL_COLA];
 
 // --- DOM ---
 const dom = {
+  // Ejercicio 1
   listaNum: document.getElementById("listaNum"),
-  contNum: document.getElementById("contNum"),
   btnNum: document.getElementById("btnNum"),
 
+  // Ejercicio 2
   listaMsg: document.getElementById("listaMsg"),
-  contMsg: document.getElementById("contMsg"),
   btnMsg: document.getElementById("btnMsg"),
 
+  // Ejercicio 3
   listaCola: document.getElementById("listaCola"),
-  contCola: document.getElementById("contCola"),
   btnCola: document.getElementById("btnCola"),
   resCola: document.getElementById("resCola"),
 
+  // Global
   btnReset: document.getElementById("btnReset"),
 };
 
 // --- RENDERERS ---
 
-const renderNum = () => {
-  dom.listaNum.innerHTML = numeros
+const renderArray = (arr, elementId) => {
+  const container = dom[elementId];
+  container.innerHTML = arr
     .map(
-      (n, i) => `
-    <div class="item-card animate__animated animate__fadeIn">
-      <span class="badge bg-primary me-2">Index ${i}</span>
-      <span class="fw-bold">${n}</span>
-    </div>
-  `,
+      (item) => `
+        <span class="array-item animate__animated animate__fadeIn">
+            ${item}
+        </span>
+    `,
     )
     .join("");
-  dom.contNum.textContent = `${numeros.length} ITEMS`;
 };
 
-const renderMsg = () => {
-  dom.listaMsg.innerHTML = mensajes
-    .map(
-      (m, i) => `
-    <div class="item-card animate__animated animate__fadeInLeft">
-      <div class="d-flex align-items-center gap-2">
-        <i class="fas fa-comment-dots text-success"></i>
-        <span class="small">${m}</span>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contMsg.textContent = `${mensajes.length} ITEMS`;
+const updateUI = () => {
+  renderArray(enteros, "listaNum");
+  renderArray(mensajes, "listaMsg");
+  renderArray(cola, "listaCola");
+
+  // Deshabilitar botones si el array está vacío
+  dom.btnNum.disabled = enteros.length === 0;
+  dom.btnMsg.disabled = mensajes.length === 0;
+  dom.btnCola.disabled = cola.length === 0;
 };
 
-const renderCola = () => {
-  dom.listaCola.innerHTML = cola
-    .map(
-      (c, i) => `
-    <div class="item-card animate__animated animate__fadeInRight">
-      <div class="d-flex align-items-center gap-2">
-        <div class="icon-wrapper bg-warning bg-opacity-10 text-warning" style="width: 30px; height: 30px; font-size: 0.8rem;">
-          <i class="fas fa-user"></i>
-        </div>
-        <span class="fw-bold small">${c}</span>
-        <span class="badge bg-light text-dark ms-auto" style="font-size: 0.6rem;">Pos ${i + 1}</span>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contCola.textContent = `${cola.length} ITEMS`;
-};
+// --- LÓGICA DE EJERCICIOS ---
 
-// --- LÓGICA ---
-
-// 1. Quitar el primer número
+// 1. Quita el primer número de un array de enteros
 dom.btnNum.onclick = () => {
-  if (numeros.length === 0) return;
-
-  // MÉTODO ARRAY: shift() literal
-  numeros.shift();
-
-  renderNum();
-};
-
-// 2. Eliminar el primer mensaje
-dom.btnMsg.onclick = () => {
-  if (mensajes.length === 0) return;
-
-  // MÉTODO ARRAY: shift() literal
-  mensajes.shift();
-
-  renderMsg();
-};
-
-// 3. Simular cola de atención al cliente
-dom.btnCola.onclick = () => {
-  if (cola.length === 0) {
-    dom.resCola.textContent = "¡No hay clientes en espera!";
-    return;
+  if (enteros.length > 0) {
+    // MÉTODO ARRAY: shift() - Ejercicio 1
+    enteros.shift();
+    updateUI();
   }
-
-  // MÉTODO ARRAY: shift() literal
-  const atendido = cola.shift();
-
-  dom.resCola.innerHTML = `Llamando a: <span class="text-warning">${atendido}</span>`;
-  renderCola();
 };
+
+// 2. Elimina el primer mensaje de un array de mensajes de chat
+dom.btnMsg.onclick = () => {
+  if (mensajes.length > 0) {
+    // MÉTODO ARRAY: shift() - Ejercicio 2
+    mensajes.shift();
+    updateUI();
+  }
+};
+
+// 3. Usa shift() para simular una cola de atención al cliente
+dom.btnCola.onclick = () => {
+  if (cola.length > 0) {
+    // MÉTODO ARRAY: shift() - Ejercicio 3
+    const cliente = cola.shift();
+
+    dom.resCola.className =
+      "feedback-box mt-3 feedback-success animate__animated animate__bounceIn";
+    dom.resCola.innerHTML = `<i class="fas fa-headset me-2"></i>Atendiendo a: <strong>${cliente}</strong>`;
+    updateUI();
+  }
+};
+
+// --- RESET ---
 
 dom.btnReset.onclick = () => {
-  numeros = [...NUMEROS_DATA];
-  mensajes = [...CHAT_DATA];
-  cola = [...COLA_DATA];
-  dom.resCola.textContent = "";
-  init();
+  enteros = [...INICIAL_ENTEROS];
+  mensajes = [...INICIAL_MENSAJES];
+  cola = [...INICIAL_COLA];
+
+  dom.resCola.className = "feedback-box mt-3 feedback-waiting";
+  dom.resCola.textContent = "Esperando...";
+
+  updateUI();
 };
 
-const init = () => {
-  renderNum();
-  renderMsg();
-  renderCola();
-};
-
-window.addEventListener("load", init);
+// --- INIT ---
+window.addEventListener("DOMContentLoaded", updateUI);

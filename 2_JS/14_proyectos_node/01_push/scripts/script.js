@@ -1,145 +1,99 @@
 /**
- * Proyecto: 01 - push() "Adición Maestra" (Versión Académica Literal)
- * Objetivo: Demostrar 3 casos de uso de push() requeridos por la consigna.
+ * Proyecto: 01 - push() "Inserción Maestra"
+ * Objetivo: Demostrar push() mediante 3 casos literales e independientes.
  */
 
 // --- DATOS INICIALES ---
-const FRUTAS_POOL = [
-  "🍎 Manzana",
-  "🍌 Banana",
-  "🍇 Uva",
-  "🥝 Kiwi",
-  "🍓 Frutilla",
-  "🍊 Naranja",
-];
-const AMIGOS_POOL = ["Alex", "Marcos", "Lucía", "Elena", "Javier", "Sofía"];
+const FRUTAS_POOL = ["🍎 Manzana", "🍌 Banana", "🍇 Uva"];
+const AMIGOS_POOL = ["Alex", "Marcos", "Lucía"];
 
-// --- ESTADOS ---
-let frutas = []; // 1. Array vacío
-let amigos = ["Juan"]; // 2. Array existente
-let numeros = [10]; // 3. Array de números
+// --- ESTADO ---
+let frutas = [];
+let amigos = ["Juan"];
+let numeros = [10];
 
 // --- DOM ---
 const dom = {
-  listaFrutas: document.getElementById("listaFrutas"),
-  contFrutas: document.getElementById("contFrutas"),
-  btnFrutas: document.getElementById("btnFrutas"),
+    listaFrutas: document.getElementById('listaFrutas'),
+    btnFrutas: document.getElementById('btnFrutas'),
+    
+    listaAmigos: document.getElementById('listaAmigos'),
+    btnAmigos: document.getElementById('btnAmigos'),
+    
+    listaNums: document.getElementById('listaNums'),
+    inputNum: document.getElementById('inputNum'),
+    btnNum: document.getElementById('btnNum'),
+    resNum: document.getElementById('resNum'),
 
-  listaAmigos: document.getElementById("listaAmigos"),
-  contAmigos: document.getElementById("contAmigos"),
-  btnAmigos: document.getElementById("btnAmigos"),
-
-  listaNums: document.getElementById("listaNums"),
-  contNums: document.getElementById("contNums"),
-  inputNum: document.getElementById("inputNum"),
-  btnNum: document.getElementById("btnNum"),
-  resNum: document.getElementById("resNum"),
-
-  btnReset: document.getElementById("btnReset"),
+    btnReset: document.getElementById('btnReset')
 };
 
 // --- RENDERERS ---
 
-const renderFrutas = () => {
-  dom.listaFrutas.innerHTML = frutas
-    .map(
-      (f) => `
-    <div class="item-card animate__animated animate__fadeInLeft">
-      <span class="fw-bold">${f}</span>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contFrutas.textContent = `${frutas.length} ITEMS`;
+const renderArray = (arr, elementId) => {
+    const container = dom[elementId];
+    container.innerHTML = arr.map(item => `
+        <span class="array-item animate__animated animate__fadeInRight">
+            ${item}
+        </span>
+    `).join('');
 };
 
-const renderAmigos = () => {
-  dom.listaAmigos.innerHTML = amigos
-    .map(
-      (a) => `
-    <div class="item-card animate__animated animate__fadeInLeft">
-      <div class="d-flex align-items-center gap-2">
-        <i class="fas fa-user-circle text-success"></i>
-        <span class="fw-bold">${a}</span>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contAmigos.textContent = `${amigos.length} ITEMS`;
-};
-
-const renderNums = () => {
-  dom.listaNums.innerHTML = numeros
-    .map(
-      (n) => `
-    <div class="item-card animate__animated animate__fadeIn">
-      <span class="badge bg-warning text-dark me-2">Num</span>
-      <span class="fw-800">${n}</span>
-    </div>
-  `,
-    )
-    .reverse()
-    .join(""); // Mostrar último arriba
-  dom.contNums.textContent = `${numeros.length} ITEMS`;
+const updateUI = () => {
+    renderArray(frutas, 'listaFrutas');
+    renderArray(amigos, 'listaAmigos');
+    renderArray(numeros, 'listaNums');
+    
+    // Deshabilitar si ya se cumplió la consigna literal
+    dom.btnFrutas.disabled = frutas.length >= 3;
+    dom.btnAmigos.disabled = amigos.length >= 4;
 };
 
 // --- LÓGICA ---
 
-// 1. Agregar 3 frutas al array vacío
+// 1. Crea un array vacío y agrega tres frutas usando push()
 dom.btnFrutas.onclick = () => {
-  if (frutas.length >= 6) return;
-
-  // Usamos push literal
-  frutas.push(FRUTAS_POOL[0], FRUTAS_POOL[1], FRUTAS_POOL[2]);
-
-  renderFrutas();
-  dom.btnFrutas.disabled = true;
+    if (frutas.length === 0) {
+        frutas.push(...FRUTAS_POOL);
+        updateUI();
+    }
 };
 
-// 2. Agregar 3 amigos al array existente
+// 2. Agrega los nombres de tus 3 amigos a un array existente llamado amigos
 dom.btnAmigos.onclick = () => {
-  if (amigos.length > 1) return;
-
-  // Usamos push literal
-  amigos.push("Alex", "Marcos", "Lucía");
-
-  renderAmigos();
-  dom.btnAmigos.disabled = true;
+    if (amigos.length === 1) {
+        amigos.push(...AMIGOS_POOL);
+        updateUI();
+    }
 };
 
-// 3. Agregar número solo si es mayor al último
+// 3. Dado un array de números, agrega un nuevo número solo si es mayor que el último número
 dom.btnNum.onclick = () => {
-  const val = parseInt(dom.inputNum.value);
-  if (isNaN(val)) return;
+    const val = parseInt(dom.inputNum.value);
+    if (isNaN(val)) return;
 
-  const ultimo = numeros[numeros.length - 1];
+    const ultimo = numeros[numeros.length - 1];
 
-  if (val > ultimo) {
-    // MÉTODO ARRAY: push() condicional
-    numeros.push(val);
-    dom.resNum.innerHTML = `<span class="text-success">¡Agregado! ${val} > ${ultimo}</span>`;
-    renderNums();
-  } else {
-    dom.resNum.innerHTML = `<span class="text-danger">Error: ${val} no es mayor a ${ultimo}</span>`;
-  }
-  dom.inputNum.value = "";
+    if (val > ultimo) {
+        numeros.push(val);
+        dom.resNum.className = "feedback-box mt-3 feedback-success animate__animated animate__bounceIn";
+        dom.resNum.innerHTML = `<i class="fas fa-check me-2"></i>${val} es mayor que ${ultimo}. Agregado.`;
+    } else {
+        dom.resNum.className = "feedback-box mt-3 feedback-danger animate__animated animate__shakeX";
+        dom.resNum.innerHTML = `<i class="fas fa-times me-2"></i>${val} NO es mayor que ${ultimo}.`;
+    }
+    dom.inputNum.value = "";
+    updateUI();
 };
 
 dom.btnReset.onclick = () => {
-  frutas = [];
-  amigos = ["Juan"];
-  numeros = [10];
-  dom.btnFrutas.disabled = false;
-  dom.btnAmigos.disabled = false;
-  dom.resNum.textContent = "";
-  init();
+    frutas = [];
+    amigos = ["Juan"];
+    numeros = [10];
+    dom.resNum.className = "feedback-box mt-3 feedback-waiting";
+    dom.resNum.textContent = "Esperando...";
+    updateUI();
 };
 
-const init = () => {
-  renderFrutas();
-  renderAmigos();
-  renderNums();
-};
-
-window.addEventListener("load", init);
+// Init
+window.addEventListener('DOMContentLoaded', updateUI);

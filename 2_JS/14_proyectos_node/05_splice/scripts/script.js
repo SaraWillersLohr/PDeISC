@@ -1,135 +1,106 @@
 /**
- * Proyecto: 05 - splice() "Manipulación Maestra" (Versión Académica Literal)
- * Objetivo: Demostrar 3 casos de uso de splice() requeridos por la consigna.
+ * Proyecto: 05 - splice() "Cirugía de Arrays"
+ * Objetivo: Demostrar splice() mediante 3 casos literales e independientes.
  */
 
 // --- DATOS INICIALES ---
-const LETRAS_DATA = ["A", "B", "C", "D", "E", "F"];
-const NOMBRES_DATA = ["Juan", "María", "Pedro"];
-const REEMPLAZO_DATA = ["Item 1", "Item 2", "Item 3", "Item 4"];
+const INICIAL_LETRAS = ["A", "B", "C", "D", "E", "F"];
+const INICIAL_NOMBRES = ["Juan", "María", "Pedro"];
+const INICIAL_REEMPLAZO = ["Item 1", "Item 2", "Item 3", "Item 4"];
 
-// --- ESTADOS ---
-let letras = [...LETRAS_DATA];
-let nombres = [...NOMBRES_DATA];
-let reemplazo = [...REEMPLAZO_DATA];
+// --- ESTADO ---
+let letras = [...INICIAL_LETRAS];
+let nombres = [...INICIAL_NOMBRES];
+let reemplazo = [...INICIAL_REEMPLAZO];
 
 // --- DOM ---
 const dom = {
+  // Ejercicio 1
   listaLet: document.getElementById("listaLet"),
-  contLet: document.getElementById("contLet"),
   btnLet: document.getElementById("btnLet"),
 
+  // Ejercicio 2
   listaNom: document.getElementById("listaNom"),
-  contNom: document.getElementById("contNom"),
   inputNom: document.getElementById("inputNom"),
   btnNom: document.getElementById("btnNom"),
 
+  // Ejercicio 3
   listaRep: document.getElementById("listaRep"),
-  contRep: document.getElementById("contRep"),
   btnRep: document.getElementById("btnRep"),
 
+  // Global
   btnReset: document.getElementById("btnReset"),
 };
 
 // --- RENDERERS ---
 
-const renderLetras = () => {
-  dom.listaLet.innerHTML = letras
+const renderArray = (arr, elementId, isGrid = false) => {
+  const container = dom[elementId];
+  container.innerHTML = arr
     .map(
-      (l, i) => `
-    <div class="cuadro-mosaico animate__animated animate__zoomIn" style="background: var(--primary)">
-      <span class="fw-bold">${l}</span>
-      <small class="position-absolute top-0 start-0 m-1 text-white" style="font-size: 0.5rem;">${i}</small>
-    </div>
-  `,
+      (item, idx) => `
+        <span class="array-item animate__animated animate__zoomIn ${isGrid ? "grid-item" : ""}">
+            <small class="idx">${idx}</small>
+            ${item}
+        </span>
+    `,
     )
     .join("");
-  dom.contLet.textContent = `${letras.length} ITEMS`;
 };
 
-const renderNombres = () => {
-  dom.listaNom.innerHTML = nombres
-    .map(
-      (n, i) => `
-    <div class="item-card animate__animated animate__fadeIn">
-      <div class="d-flex align-items-center gap-2">
-        <i class="fas fa-user text-success"></i>
-        <span class="small fw-bold">${n}</span>
-        <span class="badge bg-light text-dark ms-auto" style="font-size: 0.6rem;">Idx ${i}</span>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contNom.textContent = `${nombres.length} ITEMS`;
+const updateUI = () => {
+  renderArray(letras, "listaLet", true);
+  renderArray(nombres, "listaNom");
+  renderArray(reemplazo, "listaRep");
 };
 
-const renderReemplazo = () => {
-  dom.listaRep.innerHTML = reemplazo
-    .map(
-      (r, i) => `
-    <div class="item-card animate__animated animate__fadeIn">
-      <div class="d-flex align-items-center gap-2">
-        <i class="fas ${r.includes("NUEVO") ? "fa-star text-warning" : "fa-circle text-muted"}"></i>
-        <span class="small fw-bold ${r.includes("NUEVO") ? "text-warning" : ""}">${r}</span>
-        <span class="badge bg-light text-dark ms-auto" style="font-size: 0.6rem;">Idx ${i}</span>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contRep.textContent = `${reemplazo.length} ITEMS`;
-};
+// --- LÓGICA DE EJERCICIOS ---
 
-// --- LÓGICA ---
-
-// 1. Elimina dos elementos desde la posición 1
+// 1. Elimina dos elementos desde la posición 1 de un array de letras
 dom.btnLet.onclick = () => {
-  if (letras.length < 2) return;
-
-  // MÉTODO ARRAY: splice(index, deleteCount) literal
-  letras.splice(1, 2);
-
-  renderLetras();
-  dom.btnLet.disabled = true;
+  if (letras.length > 1) {
+    // MÉTODO ARRAY: splice(inicio, cantidad) - Ejercicio 1
+    letras.splice(1, 2);
+    updateUI();
+    dom.btnLet.disabled = true; // Deshabilitar después de la operación literal
+  }
 };
 
-// 2. Inserta un nuevo nombre en la segunda posición (índice 1) sin eliminar nada
+// 2. Inserta un nuevo nombre en la segunda posición sin eliminar nada
 dom.btnNom.onclick = () => {
   const val = dom.inputNom.value.trim();
   if (!val) return;
 
-  // MÉTODO ARRAY: splice(index, 0, item) literal
+  // MÉTODO ARRAY: splice(inicio, 0, nuevoItem) - Ejercicio 2
   nombres.splice(1, 0, val);
 
   dom.inputNom.value = "";
-  renderNombres();
+  updateUI();
 };
 
-// 3. Reemplaza dos elementos por otros nuevos desde una posición determinada (pos 1)
+// 3. Reemplaza dos elementos por otros nuevos desde una posición determinada
 dom.btnRep.onclick = () => {
-  if (reemplazo.length < 2) return;
-
-  // MÉTODO ARRAY: splice(index, deleteCount, ...items) literal
-  reemplazo.splice(1, 2, "NUEVO 1", "NUEVO 2");
-
-  renderReemplazo();
-  dom.btnRep.disabled = true;
+  if (reemplazo.length > 2) {
+    // MÉTODO ARRAY: splice(inicio, cantidad, item1, item2) - Ejercicio 3
+    reemplazo.splice(1, 2, "🚀 NUEVO", "✨ NUEVO");
+    updateUI();
+    dom.btnRep.disabled = true; // Deshabilitar después de la operación literal
+  }
 };
+
+// --- RESET ---
 
 dom.btnReset.onclick = () => {
-  letras = [...LETRAS_DATA];
-  nombres = [...NOMBRES_DATA];
-  reemplazo = [...REEMPLAZO_DATA];
+  letras = [...INICIAL_LETRAS];
+  nombres = [...INICIAL_NOMBRES];
+  reemplazo = [...INICIAL_REEMPLAZO];
+
   dom.btnLet.disabled = false;
   dom.btnRep.disabled = false;
-  init();
+  dom.inputNom.value = "";
+
+  updateUI();
 };
 
-const init = () => {
-  renderLetras();
-  renderNombres();
-  renderReemplazo();
-};
-
-window.addEventListener("load", init);
+// --- INIT ---
+window.addEventListener("DOMContentLoaded", updateUI);

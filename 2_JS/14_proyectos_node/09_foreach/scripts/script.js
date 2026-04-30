@@ -89,6 +89,7 @@ dom.btnSaludar.onclick = () => {
   nombres.forEach((nombre) => {
     addLog("logSaludos", `¡Hola, ${nombre}! Bienvenido/a.`);
   });
+  dom.btnSaludar.disabled = true; // Deshabilitar después de ejecutar
 };
 
 // 2. Imprime el doble de cada número de un array con forEach()
@@ -98,6 +99,7 @@ dom.btnDoblar.onclick = () => {
   numeros.forEach((num) => {
     addLog("logDobles", `El doble de ${num} es ${num * 2}`);
   });
+  dom.btnDoblar.disabled = true; // Deshabilitar después de ejecutar
 };
 
 // 3. Dado un array de objetos {nombre, edad}, muestra cada nombre con su edad
@@ -110,6 +112,7 @@ dom.btnListar.onclick = () => {
       `Usuario: ${persona.nombre} | Edad: ${persona.edad} años`,
     );
   });
+  dom.btnListar.disabled = true; // Deshabilitar después de ejecutar
 };
 
 // --- RESET ---
@@ -118,6 +121,11 @@ dom.btnReset.onclick = () => {
   nombres = [...INICIAL_NOMBRES];
   numeros = [...INICIAL_NUMEROS];
   objetos = [...INICIAL_OBJETOS];
+
+  // Habilitar botones
+  dom.btnSaludar.disabled = false;
+  dom.btnDoblar.disabled = false;
+  dom.btnListar.disabled = false;
 
   // Limpiar logs
   [dom.logSaludos, dom.logDobles, dom.logObjetos].forEach(

@@ -1,155 +1,110 @@
 /**
- * Proyecto: 02 - pop() "Vaciado Maestro" (Versión Académica Literal)
- * Objetivo: Demostrar 3 casos de uso de pop() requeridos por la consigna.
+ * Proyecto: 02 - pop() "Extracción del Final"
+ * Objetivo: Demostrar pop() mediante 3 casos literales e independientes.
  */
 
 // --- DATOS INICIALES ---
-const ANIMALES_DATA = [
-  { i: "fa-dog", n: "Perro", c: "#ff5d73" },
-  { i: "fa-cat", n: "Gato", c: "#5b7cfa" },
-  { i: "fa-dragon", n: "Dragón", c: "#22c55e" },
-  { i: "fa-horse", n: "Caballo", c: "#fb923c" },
-];
+const INICIAL_ANIMALES = ["Perro", "Gato", "Loro", "Pez"];
+const INICIAL_COMPRAS = ["Leche", "Pan", "Frutas", "Café"];
+const INICIAL_VACIADO = ["A", "B", "C", "D", "E"];
 
-const COMPRAS_DATA = ["Leche", "Pan", "Huevos", "Café", "Azúcar"];
-const VACIADO_DATA = [
-  "Elemento 1",
-  "Elemento 2",
-  "Elemento 3",
-  "Elemento 4",
-  "Elemento 5",
-];
-
-// --- ESTADOS ---
-let animales = [...ANIMALES_DATA];
-let compras = [...COMPRAS_DATA];
-let vaciado = [...VACIADO_DATA];
+// --- ESTADO ---
+let animales = [...INICIAL_ANIMALES];
+let compras = [...INICIAL_COMPRAS];
+let vaciado = [...INICIAL_VACIADO];
 
 // --- DOM ---
 const dom = {
-  listaAni: document.getElementById("listaAni"),
-  contAni: document.getElementById("contAni"),
-  btnAni: document.getElementById("btnAni"),
+    // Ejercicio 1
+    listaAni: document.getElementById('listaAni'),
+    btnAni: document.getElementById('btnAni'),
+    
+    // Ejercicio 2
+    listaCom: document.getElementById('listaCom'),
+    btnCom: document.getElementById('btnCom'),
+    resCom: document.getElementById('resCom'),
 
-  listaCom: document.getElementById("listaCom"),
-  contCom: document.getElementById("contCom"),
-  btnCom: document.getElementById("btnCom"),
-  resCom: document.getElementById("resCom"),
+    // Ejercicio 3
+    listaVac: document.getElementById('listaVac'),
+    btnVac: document.getElementById('btnVac'),
 
-  listaVac: document.getElementById("listaVac"),
-  contVac: document.getElementById("contVac"),
-  btnVac: document.getElementById("btnVac"),
-
-  btnReset: document.getElementById("btnReset"),
+    // Global
+    btnReset: document.getElementById('btnReset')
 };
 
 // --- RENDERERS ---
 
-const renderAni = () => {
-  dom.listaAni.innerHTML = "";
-  dom.contAni.textContent = `${animales.length} ITEMS`;
-  animales.forEach((a) => {
-    const span = document.createElement("span");
-    span.className = "animal-item";
-    span.style.color = a.c;
-    span.innerHTML = `<i class="fas ${a.i}"></i>`;
-    dom.listaAni.appendChild(span);
-  });
+const renderArray = (arr, elementId) => {
+    const container = dom[elementId];
+    container.innerHTML = arr.map(item => `
+        <span class="array-item animate__animated animate__fadeIn">
+            ${item}
+        </span>
+    `).join('');
 };
 
-const renderCom = () => {
-  dom.listaCom.innerHTML = compras
-    .map(
-      (p) => `
-    <div class="item-card animate__animated animate__fadeIn">
-      <div class="d-flex align-items-center gap-2">
-        <i class="fas fa-bag-shopping text-success"></i>
-        <span>${p}</span>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contCom.textContent = `${compras.length} ITEMS`;
+const updateUI = () => {
+    renderArray(animales, 'listaAni');
+    renderArray(compras, 'listaCom');
+    renderArray(vaciado, 'listaVac');
+    
+    // Deshabilitar botones si el array está vacío
+    dom.btnAni.disabled = animales.length === 0;
+    dom.btnCom.disabled = compras.length === 0;
+    dom.btnVac.disabled = vaciado.length === 0;
 };
 
-const renderVac = () => {
-  dom.listaVac.innerHTML = vaciado
-    .map(
-      (v) => `
-    <div class="item-card animate__animated animate__fadeIn">
-      <span class="small fw-bold">${v}</span>
-    </div>
-  `,
-    )
-    .join("");
-  dom.contVac.textContent = `${vaciado.length} ITEMS`;
-};
+// --- LÓGICA DE EJERCICIOS ---
 
-// --- LÓGICA ---
-
-// 1. Eliminar el último elemento de animales
+// 1. Elimina el último elemento de un array de animales
 dom.btnAni.onclick = () => {
-  if (animales.length === 0) return;
-
-  const last = dom.listaAni.lastElementChild;
-  if (last) {
-    last.classList.add("removing");
-    setTimeout(() => {
-      // MÉTODO ARRAY: pop() - Ejercicio 1
-      animales.pop();
-      renderAni();
-    }, 300);
-  }
-};
-
-// 2. Quitar último producto y mostrar cuál fue eliminado
-dom.btnCom.onclick = () => {
-  if (compras.length === 0) {
-    dom.resCom.textContent = "¡Lista vacía!";
-    return;
-  }
-
-  // MÉTODO ARRAY: pop() - Ejercicio 2
-  const eliminado = compras.pop();
-
-  dom.resCom.innerHTML = `Eliminado: <span class="text-danger">${eliminado}</span>`;
-  renderCom();
-};
-
-// 3. Bucle while para vaciar array con pop()
-dom.btnVac.onclick = () => {
-  if (vaciado.length === 0) return;
-
-  dom.btnVac.disabled = true;
-
-  const interval = setInterval(() => {
-    // MÉTODO ARRAY: pop() dentro de bucle (simulado con interval para visualización)
-    if (vaciado.length > 0) {
-      vaciado.pop();
-      renderVac();
-    } else {
-      clearInterval(interval);
-      dom.btnVac.disabled = false;
+    if (animales.length > 0) {
+        // MÉTODO ARRAY: pop() - Ejercicio 1
+        animales.pop();
+        updateUI();
     }
-  }, 400);
-
-  // Lógica literal (aunque el interval es para el usuario vea el proceso):
-  // while(vaciado.length > 0) { vaciado.pop(); }
 };
+
+// 2. Quita el último producto de una lista de compras y muestra cuál fue eliminado
+dom.btnCom.onclick = () => {
+    if (compras.length > 0) {
+        // MÉTODO ARRAY: pop() - Ejercicio 2
+        const eliminado = compras.pop();
+        
+        dom.resCom.className = "feedback-box mt-3 feedback-danger animate__animated animate__bounceIn";
+        dom.resCom.innerHTML = `<i class="fas fa-trash me-2"></i>Eliminado: <strong>${eliminado}</strong>`;
+        updateUI();
+    }
+};
+
+// 3. Usa un bucle while para vaciar un array con pop()
+dom.btnVac.onclick = () => {
+    // LÓGICA LITERAL: while (vaciado.length > 0) { vaciado.pop(); }
+    // Usamos un pequeño delay para que el usuario vea el proceso académico
+    dom.btnVac.disabled = true;
+    const interval = setInterval(() => {
+        if (vaciado.length > 0) {
+            vaciado.pop();
+            renderArray(vaciado, 'listaVac');
+        } else {
+            clearInterval(interval);
+            updateUI();
+        }
+    }, 200);
+};
+
+// --- RESET ---
 
 dom.btnReset.onclick = () => {
-  animales = [...ANIMALES_DATA];
-  compras = [...COMPRAS_DATA];
-  vaciado = [...VACIADO_DATA];
-  dom.resCom.textContent = "";
-  init();
+    animales = [...INICIAL_ANIMALES];
+    compras = [...INICIAL_COMPRAS];
+    vaciado = [...INICIAL_VACIADO];
+    
+    dom.resCom.className = "feedback-box mt-3 feedback-waiting";
+    dom.resCom.textContent = "Esperando...";
+    
+    updateUI();
 };
 
-const init = () => {
-  renderAni();
-  renderCom();
-  renderVac();
-};
-
-window.addEventListener("load", init);
+// --- INIT ---
+window.addEventListener('DOMContentLoaded', updateUI);

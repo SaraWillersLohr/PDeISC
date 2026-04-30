@@ -1,115 +1,154 @@
 /**
- * Proyecto: 07 - indexOf() "Localización Maestra" (Versión Académica)
- * Objetivo: Demostrar indexOf() en 2 contextos independientes.
+ * Proyecto: 07 - indexOf() "Localizador Maestro"
+ * Objetivo: Demostrar indexOf() mediante 3 casos literales e independientes.
  */
 
-const DATA_LOC = [
-  "Perro",
-  "Gato",
-  "Madrid",
-  "Pizza",
-  "Sushi",
-  "JS",
-  "Python",
-  "100",
-];
-const DATA_DUP = ["🍎", "🍌", "🍎", "🍇", "🍌", "🍎"];
+// --- DATOS INICIALES ---
+const INICIAL_ANIMALES = ["gato", "perro", "pájaro", "conejo"];
+const INICIAL_NUMEROS = [10, 25, 50, 75, 100];
+const INICIAL_CIUDADES = ["Londres", "París", "Roma", "Madrid", "Berlín"];
 
-// --- ESTADOS ---
-let localizador = [...DATA_LOC];
-let duplicados = [...DATA_DUP];
+// --- ESTADO ---
+let animales = [...INICIAL_ANIMALES];
+let numeros = [...INICIAL_NUMEROS];
+let ciudades = [...INICIAL_CIUDADES];
 
 // --- DOM ---
 const dom = {
-  inputLoc: document.getElementById("inputLoc"),
-  listaLoc: document.getElementById("listaLoc"),
-  resLoc: document.getElementById("resLoc"),
-  contLoc: document.getElementById("contLoc"),
-  listaDup: document.getElementById("listaDup"),
-  resDup: document.getElementById("resDup"),
-  contDup: document.getElementById("contDup"),
+  // Ejercicio 1
+  displayOriginal1: document.getElementById("displayOriginal1"),
+  btnSearchPerro: document.getElementById("btnSearchPerro"),
+  resPerro: document.getElementById("resPerro"),
+
+  // Ejercicio 2
+  displayOriginal2: document.getElementById("displayOriginal2"),
+  btnSearch50: document.getElementById("btnSearch50"),
+  res50: document.getElementById("res50"),
+
+  // Ejercicio 3
+  displayOriginal3: document.getElementById("displayOriginal3"),
+  btnSearchMadrid: document.getElementById("btnSearchMadrid"),
+  resMadrid: document.getElementById("resMadrid"),
+
+  // Global
   btnReset: document.getElementById("btnReset"),
 };
 
 // --- RENDERERS ---
 
-const renderLoc = () => {
-  dom.listaLoc.innerHTML = localizador
+const renderArray = (arr, elementId) => {
+  const container = dom[elementId];
+  container.innerHTML = arr
     .map(
-      (it) => `
-    <div class="item-chip">${it}</div>
-  `,
+      (item, idx) => `
+        <span class="array-item animate__animated animate__fadeIn" id="${elementId}-item-${idx}">
+            ${item}
+        </span>
+    `,
     )
     .join("");
-  dom.contLoc.textContent = `${localizador.length} ITEMS`;
 };
 
-const renderDup = () => {
-  dom.listaDup.innerHTML = duplicados
-    .map(
-      (it, i) => `
-    <div class="item-chip clickable-chip" onclick="window.checkDup(${i})">${it}</div>
-  `,
-    )
-    .join("");
-  dom.contDup.textContent = `${duplicados.length} ITEMS`;
+const updateUI = () => {
+  renderArray(animales, "displayOriginal1");
+  renderArray(numeros, "displayOriginal2");
+  renderArray(ciudades, "displayOriginal3");
 };
 
-// --- LÓGICA ---
+const highlightItem = (elementId, index, type) => {
+  // Limpiar otros highlights del mismo contenedor
+  const container = dom[elementId];
+  container.querySelectorAll(".array-item").forEach((el) => {
+    el.style.border = "1px solid rgba(0,0,0,0.05)";
+    el.style.backgroundColor = "white";
+  });
 
-dom.inputLoc.addEventListener("input", (e) => {
-  const val = e.target.value.trim();
-  const chips = dom.listaLoc.querySelectorAll(".item-chip");
-  chips.forEach((c) => c.classList.remove("highlight"));
-
-  if (!val) {
-    dom.resLoc.classList.add("d-none");
-    return;
+  if (index !== -1) {
+    const item = document.getElementById(`${elementId}-item-${index}`);
+    if (item) {
+      item.style.borderColor = `var(--${type})`;
+      item.style.backgroundColor = `var(--${type}-soft)`;
+      item.classList.add("animate__animated", "animate__pulse");
+    }
   }
+};
 
+// --- LÓGICA DE EJERCICIOS ---
+
+// 1. Encuentra la posición de la palabra "perro" en un array
+dom.btnSearchPerro.onclick = () => {
   // MÉTODO ARRAY: indexOf() - Ejercicio 1
-  const idx = localizador.indexOf(val);
+  const idx = animales.indexOf("perro");
 
-  dom.resLoc.classList.remove("d-none");
-  if (idx !== -1) {
-    chips[idx].classList.add("highlight");
-    dom.resLoc.innerHTML = `Encontrado en índice: <span class="badge-premium">${idx}</span>`;
-    dom.resLoc.style.borderColor = "var(--primary)";
-  } else {
-    dom.resLoc.innerHTML = `No encontrado en el array.`;
-    dom.resLoc.style.borderColor = "var(--danger)";
-  }
-});
+  highlightItem("displayOriginal1", idx, "primary");
 
-window.checkDup = (i) => {
-  const val = duplicados[i];
-  // MÉTODO ARRAY: indexOf() vs lastIndexOf() - Ejercicio 2
-  const first = duplicados.indexOf(val);
-  const last = duplicados.lastIndexOf(val);
+  dom.resPerro.className =
+    "feedback-box mt-3 feedback-success animate__animated animate__fadeIn";
+  dom.resPerro.innerHTML = `<i class="fas fa-search me-2"></i>"perro" encontrado en el índice: <strong>${idx}</strong>`;
 
-  if (first !== last) {
-    dom.resDup.innerHTML = `"${val}" es DUPLICADO. <br><small>Primero: ${first} | Último: ${last}</small>`;
-    dom.resDup.className =
-      "p-3 bg-warning bg-opacity-10 rounded-4 text-center fw-bold text-warning animate__animated animate__pulse";
-  } else {
-    dom.resDup.innerHTML = `"${val}" es ÚNICO. <br><small>Índice: ${first}</small>`;
-    dom.resDup.className =
-      "p-3 bg-success bg-opacity-10 rounded-4 text-center fw-bold text-success";
-  }
+  dom.btnSearchPerro.disabled = true;
 };
+
+// 2. Verifica si el número 50 está en un array y en qué posición
+dom.btnSearch50.onclick = () => {
+  // MÉTODO ARRAY: indexOf() - Ejercicio 2
+  const idx = numeros.indexOf(50);
+
+  highlightItem("displayOriginal2", idx, "success");
+
+  if (idx !== -1) {
+    dom.res50.className =
+      "feedback-box mt-3 feedback-success animate__animated animate__fadeIn";
+    dom.res50.innerHTML = `<i class="fas fa-check-circle me-2"></i>El 50 existe en la posición: <strong>${idx}</strong>`;
+  } else {
+    dom.res50.className =
+      "feedback-box mt-3 feedback-danger animate__animated animate__fadeIn";
+    dom.res50.textContent = "El número 50 no está en el array.";
+  }
+
+  dom.btnSearch50.disabled = true;
+};
+
+// 3. Dado un array de ciudades, muestra el índice de "Madrid" o un mensaje si no está
+dom.btnSearchMadrid.onclick = () => {
+  // MÉTODO ARRAY: indexOf() - Ejercicio 3
+  const idx = ciudades.indexOf("Madrid");
+
+  highlightItem("displayOriginal3", idx, "warning");
+
+  if (idx !== -1) {
+    dom.resMadrid.className =
+      "feedback-box mt-3 feedback-success animate__animated animate__fadeIn";
+    dom.resMadrid.innerHTML = `<i class="fas fa-map-pin me-2"></i>Madrid se encuentra en el índice: <strong>${idx}</strong>`;
+  } else {
+    dom.resMadrid.className =
+      "feedback-box mt-3 feedback-danger animate__animated animate__fadeIn";
+    dom.resMadrid.textContent = "Madrid no se encuentra en la lista.";
+  }
+
+  dom.btnSearchMadrid.disabled = true;
+};
+
+// --- RESET ---
 
 dom.btnReset.onclick = () => {
-  dom.inputLoc.value = "";
-  dom.resLoc.classList.add("d-none");
-  dom.resDup.textContent = "Haz clic en un elemento";
-  dom.resDup.className =
-    "p-3 bg-light rounded-4 text-center fw-bold text-success";
-  renderLoc();
-  renderDup();
+  animales = [...INICIAL_ANIMALES];
+  numeros = [...INICIAL_NUMEROS];
+  ciudades = [...INICIAL_CIUDADES];
+
+  // Limpiar feedbacks
+  [dom.resPerro, dom.res50, dom.resMadrid].forEach((el) => {
+    el.className = "feedback-box mt-3 feedback-waiting";
+    el.textContent = "Esperando...";
+  });
+
+  // Habilitar botones
+  [dom.btnSearchPerro, dom.btnSearch50, dom.btnSearchMadrid].forEach(
+    (btn) => (btn.disabled = false),
+  );
+
+  updateUI();
 };
 
-// Init
-window.addEventListener("load", () => {
-  renderLoc();
-  renderDup();
-});
+// --- INIT ---
+window.addEventListener("DOMContentLoaded", updateUI);

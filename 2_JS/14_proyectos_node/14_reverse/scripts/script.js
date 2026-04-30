@@ -1,69 +1,95 @@
-/**
- * Proyecto: 14 - reverse() "Inversión Maestra" (Versión Académica)
- * Objetivo: Demostrar reverse() en 2 contextos independientes.
- */
+// proyecto 14_reverse
 
-// --- DATOS ---
-const DATA_LETRAS = ["J", "A", "V", "A", "S", "C", "R", "I", "P", "T"];
-const DATA_TASKS = ["Desayunar", "Programar", "Almorzar", "Entrenar", "Dormir"];
+// constantes
+const INICIAL_LETRAS = ["A", "B", "C", "D", "E"];
+const INICIAL_NUMEROS = [1, 2, 3, 4, 5, 6];
 
-// --- ESTADOS ---
-let letras = [...DATA_LETRAS];
-let tasks = [...DATA_TASKS];
+// --- ESTADO ---
+let letras = [...INICIAL_LETRAS];
+let numeros = [...INICIAL_NUMEROS];
 
-// --- DOM ---
+// elementos del html
 const dom = {
-  contLetras: document.getElementById('contLetras'),
-  btnRevLet: document.getElementById('btnRevLet'),
-  listaTask: document.getElementById('listaTask'),
-  btnRevTask: document.getElementById('btnRevTask'),
-  btnReset: document.getElementById('btnReset')
+  // Ejercicio 1
+  displayOriginal1: document.getElementById("displayOriginal1"),
+  btnRevLetters: document.getElementById("btnRevLetters"),
+
+  // Ejercicio 2
+  displayOriginal2: document.getElementById("displayOriginal2"),
+  btnRevNums: document.getElementById("btnRevNums"),
+
+  // Ejercicio 3
+  inputString: document.getElementById("inputString"),
+  displayResult3: document.getElementById("displayResult3"),
+  btnRevString: document.getElementById("btnRevString"),
+
+  // Global
+  btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// funciones para dibujar en pantalla
 
-const renderLetras = () => {
-  dom.contLetras.innerHTML = letras.map((l, i) => `
-    <div class="letra-box animate__animated animate__zoomIn" style="animation-delay: ${i * 0.05}s">${l}</div>
-  `).join('');
+const updateUI = () => {
+  dom.displayOriginal1.textContent = `[${letras.map((l) => '"' + l + '"').join(", ")}]`;
+  dom.displayOriginal2.textContent = `[${numeros.join(", ")}]`;
 };
 
-const renderTasks = () => {
-  dom.listaTask.innerHTML = tasks.map((t, i) => `
-    <div class="item-card animate__animated animate__fadeInRight">
-      <span class="fw-bold">${t}</span>
-      <small class="text-muted">Pos: ${i}</small>
-    </div>
-  `).join('');
+// --- LÓGICA DE EJERCICIOS ---
+
+// 1. Invierte un array de letras
+dom.btnRevLetters.onclick = () => {
+  // usamos el metodo  reverse() - Ejercicio 1
+  letras.reverse();
+
+  dom.displayOriginal1.className =
+    "array-display mb-4 animate__animated animate__flipInX";
+  updateUI();
 };
 
-// --- LÓGICA ---
+// 2. Invierte el orden de un array de números
+dom.btnRevNums.onclick = () => {
+  // usamos el metodo  reverse() - Ejercicio 2
+  numeros.reverse();
 
-dom.btnRevLet.onclick = () => {
-  const boxes = dom.contLetras.querySelectorAll('.letra-box');
-  boxes.forEach(b => b.classList.add('reversing'));
-  setTimeout(() => {
-    // MÉTODO ARRAY: reverse() - Ejercicio 1
-    letras.reverse();
-    renderLetras();
-  }, 600);
+  dom.displayOriginal2.className =
+    "array-display mb-4 animate__animated animate__flipInY";
+  updateUI();
 };
 
-dom.btnRevTask.onclick = () => {
-  // MÉTODO ARRAY: reverse() - Ejercicio 2
-  tasks.reverse();
-  renderTasks();
+// 3. Dado un string, conviertelo en array y revierte el texto
+dom.btnRevString.onclick = () => {
+  const originalText = dom.inputString.value;
+
+  // usamos el metodo  reverse() - Ejercicio 3
+  // Lógica: String -> Array -> Reverse -> String
+  const reversedText = originalText.split("").reverse().join("");
+
+  dom.displayResult3.className =
+    "array-display mb-4 animate__animated animate__bounceIn";
+  dom.displayResult3.textContent = reversedText;
 };
+
+// --- RESET ---
 
 dom.btnReset.onclick = () => {
-  letras = [...DATA_LETRAS];
-  tasks = [...DATA_TASKS];
-  renderLetras();
-  renderTasks();
+  letras = [...INICIAL_LETRAS];
+  numeros = [...INICIAL_NUMEROS];
+  dom.inputString.value = "Hola Mundo";
+  dom.displayResult3.textContent = "odnuM aloH";
+
+  // Limpiar animaciones
+  [dom.displayOriginal1, dom.displayOriginal2, dom.displayResult3].forEach(
+    (el) => {
+      el.className = "array-display mb-4";
+    },
+  );
+
+  updateUI();
 };
 
-// Init
-window.addEventListener('load', () => {
-  renderLetras();
-  renderTasks();
+// --- INIT ---
+window.addEventListener("DOMContentLoaded", () => {
+  updateUI();
+  // Revertir el string inicial para mostrar el ejemplo
+  dom.btnRevString.click();
 });

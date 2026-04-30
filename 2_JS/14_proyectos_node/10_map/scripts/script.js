@@ -52,6 +52,7 @@ dom.btnMapX3.onclick = () => {
   dom.displayResult1.className =
     "array-display result-display mb-4 animate__animated animate__pulse";
   dom.displayResult1.textContent = `Resultado: [${triplicados.join(", ")}]`;
+  dom.btnMapX3.disabled = true; // Deshabilitar después de transformar
 };
 
 // 2. Convierte un array de nombres en mayúsculas
@@ -62,6 +63,7 @@ dom.btnMapUpper.onclick = () => {
   dom.displayResult2.className =
     "array-display result-display mb-4 animate__animated animate__pulse";
   dom.displayResult2.textContent = `Resultado: ["${mayusculas.join('", "')}"]`;
+  dom.btnMapUpper.disabled = true; // Deshabilitar después de transformar
 };
 
 // 3. A un array de precios, agrégale el 21% de IVA y crea un nuevo array
@@ -75,6 +77,7 @@ dom.btnMapIVA.onclick = () => {
   dom.displayResult3.className =
     "array-display result-display mb-4 animate__animated animate__pulse";
   dom.displayResult3.textContent = `Resultado: [${preciosConIVA.map((p) => "$" + p).join(", ")}]`;
+  dom.btnMapIVA.disabled = true; // Deshabilitar después de transformar
 };
 
 // --- RESET ---
@@ -83,6 +86,11 @@ dom.btnReset.onclick = () => {
   numeros = [...INICIAL_NUMEROS];
   nombres = [...INICIAL_NOMBRES];
   precios = [...INICIAL_PRECIOS];
+
+  // Habilitar botones
+  dom.btnMapX3.disabled = false;
+  dom.btnMapUpper.disabled = false;
+  dom.btnMapIVA.disabled = false;
 
   // Limpiar resultados
   [dom.displayResult1, dom.displayResult2, dom.displayResult3].forEach((el) => {

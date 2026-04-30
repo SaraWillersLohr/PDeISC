@@ -11,77 +11,83 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- CSS Propio -->
     <link rel="stylesheet" href="../styles/style.css">
 </head>
 
 <body>
-    <div class="container py-5">
-        <header class="text-center mb-5">
+    <div class="container-fluid py-4 py-md-5">
+        <header class="text-center mb-5 animate__animated animate__fadeIn">
             <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>sort()</code></h1>
             <p class="text-muted lead mx-auto" style="max-width: 600px;">
-                Organización de datos mediante 3 ejercicios independientes con diferentes criterios de ordenación.
+                Organización de datos mediante 3 demostraciones literales e independientes.
             </p>
         </header>
 
-        <div class="row g-4">
-            <!-- EJERCICIO 1: ALFABÉTICO -->
-            <div class="col-xl-4 col-md-6">
+        <div class="row g-4 justify-content-center">
+            <!-- ejercicio 1: números ascendente -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
                 <div class="card-premium h-100">
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <h4 class="section-title"><i class="fas fa-sort-alpha-down text-primary"></i> 1. Alfabético</h4>
-                        <span id="badgeAlpha" class="badge-premium">5 ITEMS</span>
+                    <div class="card-icon bg-primary-soft text-primary">
+                        <i class="fas fa-sort-numeric-down"></i>
                     </div>
-                    <p class="small text-muted mb-4">Ordena un array de strings (Nombres).</p>
+                    <h2 class="section-title">1. Números (Menor a Mayor)</h2>
+                    <p class="text-muted small mb-4">Ordena numéricamente de forma ascendente.</p>
 
-                    <div class="items-container mb-4" id="contAlpha"></div>
+                    <div id="displayOriginal1" class="array-display mb-4">Array: [40, 100, 1, 5, 25]</div>
 
-                    <div class="d-flex gap-2">
-                        <button id="btnAlphaAsc" class="btn-modern btn-primary-modern flex-grow-1">A-Z</button>
-                        <button id="btnAlphaDesc" class="btn-modern btn-primary-modern flex-grow-1">Z-A</button>
+                    <div class="d-grid gap-2">
+                        <button id="btnSortNums" class="btn-modern btn-primary-modern">
+                            <i class="fas fa-sort-amount-down-alt me-2"></i>Ordenar Números
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- EJERCICIO 2: NUMÉRICO -->
-            <div class="col-xl-4 col-md-6">
+            <!-- ejercicio 2: palabras alfabético -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
                 <div class="card-premium h-100">
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <h4 class="section-title"><i class="fas fa-sort-numeric-down text-success"></i> 2. Numérico</h4>
-                        <span id="badgeNum" class="badge-premium">5 ITEMS</span>
+                    <div class="card-icon bg-success-soft text-success">
+                        <i class="fas fa-sort-alpha-down"></i>
                     </div>
-                    <p class="small text-muted mb-4">Ordena números (0-100) correctamente.</p>
+                    <h2 class="section-title">2. Palabras (Alfabético)</h2>
+                    <p class="text-muted small mb-4">Ordena el array de strings de la A a la Z.</p>
 
-                    <div class="items-container mb-4" id="contNum"></div>
+                    <div id="displayOriginal2" class="array-display mb-4">Array: ["Zapato", "Avión", "Mesa"]</div>
 
-                    <div class="d-flex gap-2">
-                        <button id="btnNumAsc" class="btn-modern btn-primary-modern flex-grow-1">1-100</button>
-                        <button id="btnNumDesc" class="btn-modern btn-primary-modern flex-grow-1">100-1</button>
+                    <div class="d-grid gap-2">
+                        <button id="btnSortWords" class="btn-modern btn-success-modern">
+                            <i class="fas fa-font me-2"></i>Ordenar Palabras
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- EJERCICIO 3: OBJETOS -->
-            <div class="col-xl-4 col-md-12">
+            <!-- ejercicio 3: objetos por edad -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
                 <div class="card-premium h-100">
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <h4 class="section-title"><i class="fas fa-trophy text-warning"></i> 3. Ranking</h4>
-                        <span id="badgeObj" class="badge-premium">5 ITEMS</span>
+                    <div class="card-icon bg-warning-soft text-warning">
+                        <i class="fas fa-user-clock"></i>
                     </div>
-                    <p class="small text-muted mb-4">Ordena objetos por puntaje de mayor a menor.</p>
+                    <h2 class="section-title">3. Objetos por Edad</h2>
+                    <p class="text-muted small mb-4">Ordena los usuarios según su edad (ascendente).</p>
 
-                    <div class="items-container mb-4" id="contObj"></div>
+                    <div id="displayOriginal3" class="array-display mb-4">[{Ana, 25}, {Leo, 18}]</div>
 
-                    <button id="btnObjSort" class="btn-modern btn-primary-modern w-100">
-                        <i class="fas fa-medal"></i> Ordenar por Puntos
-                    </button>
+                    <div class="d-grid gap-2">
+                        <button id="btnSortObj" class="btn-modern btn-warning-modern">
+                            <i class="fas fa-users me-2"></i>Ordenar por Edad
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-5 text-center">
+        <footer class="mt-5 text-center animate__animated animate__fadeIn">
             <button id="btnReset" class="btn-modern btn-outline-modern px-5">
-                <i class="fas fa-sync"></i> Reiniciar Todos los Ordenamientos
+                <i class="fas fa-sync-alt me-2"></i>Reiniciar Todo
             </button>
         </footer>
     </div>

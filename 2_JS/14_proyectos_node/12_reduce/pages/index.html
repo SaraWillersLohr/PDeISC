@@ -11,67 +11,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- CSS Propio -->
     <link rel="stylesheet" href="../styles/style.css">
 </head>
 
 <body>
-    <div class="container py-5">
-        <header class="text-center mb-5">
+    <div class="container-fluid py-4 py-md-5">
+        <header class="text-center mb-5 animate__animated animate__fadeIn">
             <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>reduce()</code></h1>
             <p class="text-muted lead mx-auto" style="max-width: 600px;">
-                Condensación de datos mediante 2 demostraciones independientes de acumulación.
+                Condensación de datos mediante 3 demostraciones literales e independientes.
             </p>
         </header>
 
-        <div class="row g-4">
-            <!-- EJERCICIO 1: TOTALIZADOR -->
-            <div class="col-lg-6">
+        <div class="row g-4 justify-content-center">
+            <!-- ejercicio 1: suma total -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
                 <div class="card-premium h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="section-title"><i class="fas fa-shopping-basket text-primary"></i> 1. Totalizador
-                        </h2>
-                        <div id="contCar" class="badge-premium">5 ITEMS</div>
+                    <div class="card-icon bg-primary-soft text-primary">
+                        <i class="fas fa-plus-square"></i>
                     </div>
-                    <p class="text-muted small">Suma todos los precios en un único valor final usando
-                        <code>reduce()</code>.</p>
+                    <h2 class="section-title">1. Suma de Elementos</h2>
+                    <p class="text-muted small mb-4">Calcula la suma total de todos los números del array.</p>
 
-                    <div id="listaCar" class="carrito-lista mb-4"></div>
+                    <div id="displayOriginal1" class="array-display mb-4">Array: [5, 10, 15, 20]</div>
 
-                    <button id="btnTotal" class="btn-modern btn-primary-modern w-100 mb-3">
-                        <i class="fas fa-calculator"></i> Aplicar reduce(suma)
-                    </button>
-
-                    <div class="total-display p-3 text-center">
-                        <div id="resTotal" class="h2 fw-800 mb-0">$ 0</div>
+                    <div class="d-grid gap-2">
+                        <button id="btnSum" class="btn-modern btn-primary-modern">
+                            <i class="fas fa-plus me-2"></i>Calcular Suma
+                        </button>
                     </div>
+                    <div id="resSum" class="result-box mt-3">Resultado: 0</div>
                 </div>
             </div>
 
-            <!-- EJERCICIO 2: AGRUPADOR -->
-            <div class="col-lg-6">
+            <!-- ejercicio 2: multiplicación -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
                 <div class="card-premium h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="section-title"><i class="fas fa-layer-group text-success"></i> 2. Agrupador</h2>
-                        <div id="contAgr" class="badge-premium">6 ITEMS</div>
+                    <div class="card-icon bg-success-soft text-success">
+                        <i class="fas fa-times-square"></i>
                     </div>
-                    <p class="text-muted small">Cuenta cuántos elementos hay por categoría devolviendo un objeto
-                        <code>{ cat: cant }</code>.</p>
+                    <h2 class="section-title">2. Multiplicación</h2>
+                    <p class="text-muted small mb-4">Obtén el producto de todos los enteros del array.</p>
 
-                    <div id="listaAgr" class="items-container small mb-4" style="min-height: 150px;"></div>
+                    <div id="displayOriginal2" class="array-display mb-4">Array: [1, 2, 3, 4]</div>
 
-                    <button id="btnAgrupar" class="btn-modern btn-primary-modern w-100 mb-3">
-                        <i class="fas fa-project-diagram"></i> Aplicar reduce(objeto)
-                    </button>
+                    <div class="d-grid gap-2">
+                        <button id="btnMult" class="btn-modern btn-success-modern">
+                            <i class="fas fa-times me-2"></i>Calcular Producto
+                        </button>
+                    </div>
+                    <div id="resMult" class="result-box mt-3">Resultado: 0</div>
+                </div>
+            </div>
 
-                    <div id="resAgr" class="p-3 bg-light rounded-4 font-monospace small">Esperando proceso...</div>
+            <!-- ejercicio 3: total objetos -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-warning-soft text-warning">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h2 class="section-title">3. Total Precios (Obj)</h2>
+                    <p class="text-muted small mb-4">Suma los precios de un array de objetos {precio}.</p>
+
+                    <div id="displayOriginal3" class="array-display mb-4">[{100}, {250}, {500}]</div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnTotalObj" class="btn-modern btn-warning-modern">
+                            <i class="fas fa-calculator me-2"></i>Total Carrito
+                        </button>
+                    </div>
+                    <div id="resTotalObj" class="result-box mt-3">Resultado: $0</div>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-5 text-center">
+        <footer class="mt-5 text-center animate__animated animate__fadeIn">
             <button id="btnReset" class="btn-modern btn-outline-modern px-5">
-                <i class="fas fa-sync"></i> Reiniciar Ejercicios
+                <i class="fas fa-sync-alt me-2"></i>Reiniciar Cálculos
             </button>
         </footer>
     </div>

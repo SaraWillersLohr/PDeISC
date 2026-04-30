@@ -1,9 +1,6 @@
-/**
- * Proyecto: 06 - slice() "Segmentación Maestra" (Versión Académica Literal)
- * Objetivo: Demostrar 3 casos de uso de slice() requeridos por la consigna.
- */
+// proyecto 06_slice
 
-// --- DATOS INICIALES ---
+// constantes
 const NUMEROS_DATA = [10, 20, 30, 40, 50];
 const PELICULAS_DATA = [
   "Matrix",
@@ -24,7 +21,7 @@ let numCopia = [];
 let pelCopia = [];
 let letCopia = [];
 
-// --- DOM ---
+// elementos del html
 const dom = {
   listaNum: document.getElementById("listaNum"),
   contNum: document.getElementById("contNum"),
@@ -41,7 +38,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// funciones para dibujar en pantalla
 
 const renderNum = () => {
   dom.listaNum.innerHTML = numCopia
@@ -87,11 +84,11 @@ const renderUlt = () => {
   dom.contUlt.textContent = `${letCopia.length} ITEMS`;
 };
 
-// --- LÓGICA ---
+// botones y logica
 
 // 1. Copia los primeros 3 elementos
 dom.btnNum.onclick = () => {
-  // MÉTODO ARRAY: slice(start, end) literal
+  // usamos el metodo  slice(start, end) literal
   numCopia = numOriginal.slice(0, 3);
 
   renderNum();
@@ -100,7 +97,7 @@ dom.btnNum.onclick = () => {
 
 // 2. Copia parcial de películas desde pos 2 hasta la 4 (índice 2 al 5 exclusivo)
 dom.btnPel.onclick = () => {
-  // MÉTODO ARRAY: slice(2, 5) literal
+  // usamos el metodo  slice(2, 5) literal
   pelCopia = pelOriginal.slice(2, 5);
 
   renderPel();
@@ -109,7 +106,7 @@ dom.btnPel.onclick = () => {
 
 // 3. Crea array nuevo con los últimos 3 elementos
 dom.btnUlt.onclick = () => {
-  // MÉTODO ARRAY: slice(-3) literal
+  // usamos el metodo  slice(-3) literal
   letCopia = letOriginal.slice(-3);
 
   renderUlt();

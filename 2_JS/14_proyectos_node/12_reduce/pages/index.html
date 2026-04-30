@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: reduce() | Académicamente Correcto</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Propio -->
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>reduce()</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Condensación de datos mediante 2 demostraciones independientes de acumulación.
+            </p>
+        </header>
+
+        <div class="row g-4">
+            <!-- EJERCICIO 1: TOTALIZADOR -->
+            <div class="col-lg-6">
+                <div class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title"><i class="fas fa-shopping-basket text-primary"></i> 1. Totalizador
+                        </h2>
+                        <div id="contCar" class="badge-premium">5 ITEMS</div>
+                    </div>
+                    <p class="text-muted small">Suma todos los precios en un único valor final usando
+                        <code>reduce()</code>.</p>
+
+                    <div id="listaCar" class="carrito-lista mb-4"></div>
+
+                    <button id="btnTotal" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-calculator"></i> Aplicar reduce(suma)
+                    </button>
+
+                    <div class="total-display p-3 text-center">
+                        <div id="resTotal" class="h2 fw-800 mb-0">$ 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 2: AGRUPADOR -->
+            <div class="col-lg-6">
+                <div class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title"><i class="fas fa-layer-group text-success"></i> 2. Agrupador</h2>
+                        <div id="contAgr" class="badge-premium">6 ITEMS</div>
+                    </div>
+                    <p class="text-muted small">Cuenta cuántos elementos hay por categoría devolviendo un objeto
+                        <code>{ cat: cant }</code>.</p>
+
+                    <div id="listaAgr" class="items-container small mb-4" style="min-height: 150px;"></div>
+
+                    <button id="btnAgrupar" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-project-diagram"></i> Aplicar reduce(objeto)
+                    </button>
+
+                    <div id="resAgr" class="p-3 bg-light rounded-4 font-monospace small">Esperando proceso...</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 text-center">
+            <button id="btnReset" class="btn-modern btn-outline-modern px-5">
+                <i class="fas fa-sync"></i> Reiniciar Ejercicios
+            </button>
+        </footer>
+    </div>
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: splice() | Académico Premium</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container py-4 py-md-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>splice()</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Demostración literal de los 3 ejercicios requeridos para el método splice.
+            </p>
+        </header>
+
+        <div class="row g-4">
+            <!-- EJERCICIO 1: ELIMINAR LETRAS -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-eraser text-danger"></i> 1. Eliminar</h4>
+                        <span id="contLet" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Elimina 2 elementos desde la posición 1 usando
+                        <code>splice(1, 2)</code>.</p>
+
+                    <button id="btnLet" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-scissors"></i> Aplicar splice(1, 2)
+                    </button>
+
+                    <div id="listaLet" class="mosaico-container small-grid" style="min-height: 100px;"></div>
+                </section>
+            </div>
+
+            <!-- EJERCICIO 2: INSERTAR NOMBRE -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-plus-circle text-success"></i> 2. Insertar</h4>
+                        <span id="contNom" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Inserta un nombre en la posición 1 (segunda) sin eliminar nada.</p>
+
+                    <div class="input-group mb-3">
+                        <input type="text" id="inputNom" class="form-control-modern" placeholder="Nuevo nombre...">
+                        <button id="btnNom" class="btn-modern btn-primary-modern ms-2">Insertar</button>
+                    </div>
+
+                    <div id="listaNom" class="items-container"></div>
+                </section>
+            </div>
+
+            <!-- EJERCICIO 3: REEMPLAZAR -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-rotate text-warning"></i> 3. Reemplazar</h4>
+                        <span id="contRep" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Reemplaza 2 elementos por "NUEVO 1" y "NUEVO 2" desde la posición
+                        1.</p>
+
+                    <button id="btnRep" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-exchange-alt"></i> Aplicar Reemplazo
+                    </button>
+
+                    <div id="listaRep" class="items-container"></div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="mt-5 text-center">
+            <button id="btnReset" class="btn-modern btn-outline-modern px-5 w-100 w-sm-auto">
+                <i class="fas fa-sync"></i> Reiniciar Ejercicios
+            </button>
+        </footer>
+    </div>
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: push() | Académico Premium</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container py-4 py-md-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>push()</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Demostración literal de los 3 ejercicios requeridos para el método push.
+            </p>
+        </header>
+
+        <div class="row g-4">
+            <!-- EJERCICIO 1: FRUTAS -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-apple-whole text-primary"></i> 1. Frutas</h4>
+                        <span id="contFrutas" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Agrega 3 frutas al array vacío usando <code>push()</code>.</p>
+
+                    <button id="btnFrutas" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-plus"></i> Agregar 3 Frutas
+                    </button>
+
+                    <div id="listaFrutas" class="items-container"></div>
+                </section>
+            </div>
+
+            <!-- EJERCICIO 2: AMIGOS -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-user-group text-success"></i> 2. Amigos</h4>
+                        <span id="contAmigos" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Agrega 3 amigos al array existente usando <code>push()</code>.</p>
+
+                    <button id="btnAmigos" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-user-plus"></i> Invitar 3 Amigos
+                    </button>
+
+                    <div id="listaAmigos" class="items-container"></div>
+                </section>
+            </div>
+
+            <!-- EJERCICIO 3: NÚMERO MAYOR -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-arrow-up-9-1 text-warning"></i> 3. Condicional</h4>
+                        <span id="contNums" class="badge-premium">1 ITEM</span>
+                    </div>
+                    <p class="small text-muted mb-3">Agrega un número solo si es mayor al último elemento.</p>
+
+                    <div class="input-group mb-3">
+                        <input type="number" id="inputNum" class="form-control-modern"
+                            placeholder="Ingresa un número...">
+                        <button id="btnNum" class="btn-modern btn-primary-modern ms-2">Push</button>
+                    </div>
+
+                    <div id="resNum" class="mb-3 small fw-bold"></div>
+                    <div id="listaNums" class="items-container"></div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="mt-5 text-center">
+            <button id="btnReset" class="btn-modern btn-outline-modern px-5 w-100 w-sm-auto">
+                <i class="fas fa-sync"></i> Reiniciar Ejercicios
+            </button>
+        </footer>
+    </div>
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

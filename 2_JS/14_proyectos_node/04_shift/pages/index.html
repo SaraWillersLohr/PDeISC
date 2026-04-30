@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: shift() | Académico Premium</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container py-4 py-md-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>shift()</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Demostración literal de los 3 ejercicios requeridos para el método shift.
+            </p>
+        </header>
+
+        <div class="row g-4">
+            <!-- EJERCICIO 1: ENTEROS -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-list-ol text-primary"></i> 1. Enteros</h4>
+                        <span id="contNum" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Quita el primer número del array usando <code>shift()</code>.</p>
+
+                    <button id="btnNum" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-minus-circle"></i> Quitar Primero
+                    </button>
+
+                    <div id="listaNum" class="items-container"></div>
+                </section>
+            </div>
+
+            <!-- EJERCICIO 2: MENSAJES -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-message text-success"></i> 2. Mensajes</h4>
+                        <span id="contMsg" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Elimina el primer mensaje del chat usando <code>shift()</code>.</p>
+
+                    <button id="btnMsg" class="btn-modern btn-primary-modern w-100 mb-3">
+                        <i class="fas fa-eraser"></i> Limpiar Primero
+                    </button>
+
+                    <div id="listaMsg" class="items-container"></div>
+                </section>
+            </div>
+
+            <!-- EJERCICIO 3: COLA ATENCIÓN -->
+            <div class="col-12 col-lg-4">
+                <section class="card-premium h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h4 class="section-title"><i class="fas fa-people-line text-warning"></i> 3. Cola</h4>
+                        <span id="contCola" class="badge-premium">0 ITEMS</span>
+                    </div>
+                    <p class="small text-muted mb-3">Simula una cola de atención llamando al primero con
+                        <code>shift()</code>.</p>
+
+                    <button id="btnCola" class="btn-modern btn-danger-modern w-100 mb-3">
+                        <i class="fas fa-bullhorn"></i> Siguiente Cliente
+                    </button>
+
+                    <div id="resCola" class="mb-3 small fw-bold text-center text-primary" style="min-height: 20px;">
+                    </div>
+                    <div id="listaCola" class="items-container"></div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="mt-5 text-center">
+            <button id="btnReset" class="btn-modern btn-outline-modern px-5 w-100 w-sm-auto">
+                <i class="fas fa-sync"></i> Reiniciar Ejercicios
+            </button>
+        </footer>
+    </div>
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

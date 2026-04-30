@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: includes() | Académicamente Correcto</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- CSS Propio -->
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container-fluid py-4 py-md-5">
+        <header class="text-center mb-5 animate__animated animate__fadeIn">
+            <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>includes()</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Verificación de pertenencia mediante 3 demostraciones literales e independientes.
+            </p>
+        </header>
+
+        <div class="row g-4 justify-content-center">
+            <!-- EJERCICIO 1: BUSCAR "ADMIN" -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-primary-soft text-primary">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h2 class="section-title">1. Verificar "admin"</h2>
+                    <p class="text-muted small mb-4">Comprueba si el array de usuarios contiene la palabra clave.</p>
+
+                    <div id="displayUsers" class="array-display mb-4"></div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnCheckAdmin" class="btn-modern btn-primary-modern">
+                            <i class="fas fa-search me-2"></i>¿Existe "admin"?
+                        </button>
+                    </div>
+                    <div id="resAdmin" class="feedback-box mt-3">Esperando...</div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 2: BUSCAR "VERDE" -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-success-soft text-success">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h2 class="section-title">2. Buscar "verde"</h2>
+                    <p class="text-muted small mb-4">Determina si el color existe en la paleta actual.</p>
+
+                    <div id="displayColores" class="array-display mb-4"></div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnCheckVerde" class="btn-modern btn-success-modern">
+                            <i class="fas fa-eye me-2"></i>¿Está el verde?
+                        </button>
+                    </div>
+                    <div id="resVerde" class="feedback-box mt-3">Esperando...</div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 3: EVITAR DUPLICADOS -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-warning-soft text-warning">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h2 class="section-title">3. Sumar si no existe</h2>
+                    <p class="text-muted small mb-4">Verifica si el número está presente antes de agregarlo.</p>
+
+                    <div id="displayNumeros" class="array-display mb-4"></div>
+
+                    <div class="input-group mb-3">
+                        <input type="number" id="inputNumero" class="form-control-modern" placeholder="Número...">
+                        <button id="btnAddNumero" class="btn-modern btn-warning-modern ms-2">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="resNumero" class="feedback-box mt-3">Ingresa un número</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 text-center animate__animated animate__fadeIn">
+            <button id="btnReset" class="btn-modern btn-outline-modern px-5">
+                <i class="fas fa-sync-alt me-2"></i>Reiniciar Sistema
+            </button>
+        </footer>
+    </div>
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

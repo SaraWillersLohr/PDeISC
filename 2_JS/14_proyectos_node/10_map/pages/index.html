@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: map() | Académicamente Correcto</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- CSS Propio -->
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container-fluid py-4 py-md-5">
+        <header class="text-center mb-5 animate__animated animate__fadeIn">
+            <h1 class="display-4 fw-800 text-dark mb-2">Mastering <code>map()</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 600px;">
+                Transformación de colecciones mediante 3 demostraciones literales e independientes.
+            </p>
+        </header>
+
+        <div class="row g-4 justify-content-center">
+            <!-- EJERCICIO 1: MULTIPLICAR POR 3 -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-primary-soft text-primary">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <h2 class="section-title">1. Multiplicar x3</h2>
+                    <p class="text-muted small mb-4">Crea un nuevo array donde cada número es triplicado.</p>
+
+                    <div id="displayOriginal1" class="array-display mb-2">Original: [5, 10, 15]</div>
+                    <div id="displayResult1" class="array-display result-display mb-4">Resultado: []</div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnMapX3" class="btn-modern btn-primary-modern">
+                            <i class="fas fa-play me-2"></i>Aplicar map(x3)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 2: MAYÚSCULAS -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-success-soft text-success">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <h2 class="section-title">2. Mayúsculas</h2>
+                    <p class="text-muted small mb-4">Convierte todos los nombres a letras capitales.</p>
+
+                    <div id="displayOriginal2" class="array-display mb-2">Original: ["ana", "beto"]</div>
+                    <div id="displayResult2" class="array-display result-display mb-4">Resultado: []</div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnMapUpper" class="btn-modern btn-success-modern">
+                            <i class="fas fa-text-height me-2"></i>Aplicar map(UPPER)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 3: IVA 21% -->
+            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="card-premium h-100">
+                    <div class="card-icon bg-warning-soft text-warning">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h2 class="section-title">3. Agregar IVA 21%</h2>
+                    <p class="text-muted small mb-4">Añade el 21% de impuesto a cada precio del array.</p>
+
+                    <div id="displayOriginal3" class="array-display mb-2">Original: [100, 200, 300]</div>
+                    <div id="displayResult3" class="array-display result-display mb-4">Resultado: []</div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnMapIVA" class="btn-modern btn-warning-modern">
+                            <i class="fas fa-percentage me-2"></i>Calcular con IVA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 text-center animate__animated animate__fadeIn">
+            <button id="btnReset" class="btn-modern btn-outline-modern px-5">
+                <i class="fas fa-sync-alt me-2"></i>Reiniciar Sistemas
+            </button>
+        </footer>
+    </div>
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

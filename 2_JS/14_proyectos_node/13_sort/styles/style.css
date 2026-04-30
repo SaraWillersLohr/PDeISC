@@ -1,0 +1,114 @@
+:root {
+  --bg: #f4f7fb;
+  --card: rgba(255, 255, 255, 0.8);
+  --primary: #5b7cfa;
+  --secondary: #7dd3fc;
+  --danger: #ff5d73;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --text: #1e293b;
+  --muted: #64748b;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --radius: 24px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  background: linear-gradient(135deg, #f4f7fb 0%, #e0e7ff 100%);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+.card-premium {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 3rem;
+}
+
+.select-sort {
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  width: 100%;
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.select-sort:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 5px rgba(91, 124, 250, 0.1);
+  outline: none;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 2rem;
+  background: white;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-left: 5px solid transparent;
+}
+
+.ranking-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.posicion {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.ranking-item:nth-child(1) {
+  border-left-color: var(--warning);
+}
+.ranking-item:nth-child(1) .posicion {
+  background: var(--warning);
+  color: white;
+}
+
+.info-usuario {
+  flex: 1;
+}
+
+.puntos-badge {
+  background: var(--bg);
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  color: var(--primary);
+}

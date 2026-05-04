@@ -1,19 +1,16 @@
-/**
- * Proyecto: 10 - map() "Transformación Maestra"
- * Objetivo: Demostrar map() mediante 3 casos literales e independientes.
- */
+// proyecto 10_map
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_NUMEROS = [5, 10, 15, 20, 25];
 const INICIAL_NOMBRES = ["ana", "beto", "carla", "daniel"];
 const INICIAL_PRECIOS = [100, 250, 500, 1000];
 
-// --- ESTADO ---
+// las variables
 let numeros = [...INICIAL_NUMEROS];
 let nombres = [...INICIAL_NOMBRES];
 let precios = [...INICIAL_PRECIOS];
 
-// --- DOM ---
+// el html
 const dom = {
   // Ejercicio 1
   displayOriginal1: document.getElementById("displayOriginal1"),
@@ -34,7 +31,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const updateUI = () => {
   dom.displayOriginal1.textContent = `Original: [${numeros.join(", ")}]`;
@@ -80,7 +77,7 @@ dom.btnMapIVA.onclick = () => {
   dom.btnMapIVA.disabled = true; // Deshabilitar después de transformar
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   numeros = [...INICIAL_NUMEROS];
@@ -101,5 +98,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

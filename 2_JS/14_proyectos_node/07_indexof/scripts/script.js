@@ -1,19 +1,16 @@
-/**
- * Proyecto: 07 - indexOf() "Localizador Maestro"
- * Objetivo: Demostrar indexOf() mediante 3 casos literales e independientes.
- */
+// proyecto 07_indexof
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_ANIMALES = ["gato", "perro", "pájaro", "conejo"];
 const INICIAL_NUMEROS = [10, 25, 50, 75, 100];
 const INICIAL_CIUDADES = ["Londres", "París", "Roma", "Madrid", "Berlín"];
 
-// --- ESTADO ---
+// las variables
 let animales = [...INICIAL_ANIMALES];
 let numeros = [...INICIAL_NUMEROS];
 let ciudades = [...INICIAL_CIUDADES];
 
-// --- DOM ---
+// el html
 const dom = {
   // Ejercicio 1
   displayOriginal1: document.getElementById("displayOriginal1"),
@@ -34,7 +31,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
   const container = dom[elementId];
@@ -129,7 +126,7 @@ dom.btnSearchMadrid.onclick = () => {
   dom.btnSearchMadrid.disabled = true;
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   animales = [...INICIAL_ANIMALES];
@@ -150,5 +147,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

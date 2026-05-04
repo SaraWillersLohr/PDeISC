@@ -1,19 +1,16 @@
-/**
- * Proyecto: 08 - includes() "Pertenencia Maestra"
- * Objetivo: Demostrar includes() mediante 3 casos literales e independientes.
- */
+// proyecto 08_includes
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_USUARIOS = ["pepe", "admin", "maria", "lucas"];
 const INICIAL_COLORES = ["rojo", "azul", "amarillo", "blanco"];
 const INICIAL_NUMEROS = [10, 20, 30, 40];
 
-// --- ESTADO ---
+// las variables
 let usuarios = [...INICIAL_USUARIOS];
 let colores = [...INICIAL_COLORES];
 let numeros = [...INICIAL_NUMEROS];
 
-// --- DOM ---
+// el html
 const dom = {
     // Ejercicio 1
     displayUsers: document.getElementById('displayUsers'),
@@ -35,7 +32,7 @@ const dom = {
     btnReset: document.getElementById('btnReset')
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
     const container = dom[elementId];
@@ -101,7 +98,7 @@ dom.btnAddNumero.onclick = () => {
     }
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
     usuarios = [...INICIAL_USUARIOS];
@@ -123,5 +120,6 @@ dom.btnReset.onclick = () => {
     updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener('DOMContentLoaded', updateUI);
+

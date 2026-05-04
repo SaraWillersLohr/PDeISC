@@ -1,9 +1,6 @@
-/**
- * Proyecto: 12 - reduce() "Condensación Maestra"
- * Objetivo: Demostrar reduce() mediante 3 casos literales e independientes.
- */
+// proyecto 12_reduce
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_ELEMENTOS = [5, 10, 15, 20];
 const INICIAL_ENTEROS = [1, 2, 3, 4, 5];
 const INICIAL_CARRITO = [
@@ -12,12 +9,12 @@ const INICIAL_CARRITO = [
     { nombre: "Producto C", precio: 500 }
 ];
 
-// --- ESTADO ---
+// las variables
 let elementos = [...INICIAL_ELEMENTOS];
 let enteros = [...INICIAL_ENTEROS];
 let carrito = [...INICIAL_CARRITO];
 
-// --- DOM ---
+// el html
 const dom = {
     // Ejercicio 1
     displayOriginal1: document.getElementById('displayOriginal1'),
@@ -38,7 +35,7 @@ const dom = {
     btnReset: document.getElementById('btnReset')
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const updateUI = () => {
     dom.displayOriginal1.textContent = `Array: [${elementos.join(', ')}]`;
@@ -78,7 +75,7 @@ dom.btnTotalObj.onclick = () => {
     dom.btnTotalObj.disabled = true; // Deshabilitar después de reducir
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
     elementos = [...INICIAL_ELEMENTOS];
@@ -99,5 +96,6 @@ dom.btnReset.onclick = () => {
     updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener('DOMContentLoaded', updateUI);
+

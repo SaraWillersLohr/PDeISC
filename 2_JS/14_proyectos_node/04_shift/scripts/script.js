@@ -1,19 +1,16 @@
-/**
- * Proyecto: 04 - shift() "Extracción del Inicio"
- * Objetivo: Demostrar shift() mediante 3 casos literales e independientes.
- */
+// proyecto 04_shift
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_ENTEROS = [10, 20, 30, 40, 50];
 const INICIAL_MENSAJES = ["Hola", "¿Qué tal?", "Todo bien", "Adiós"];
 const INICIAL_COLA = ["Carlos", "Marta", "Pedro", "Lucía"];
 
-// --- ESTADO ---
+// las variables
 let enteros = [...INICIAL_ENTEROS];
 let mensajes = [...INICIAL_MENSAJES];
 let cola = [...INICIAL_COLA];
 
-// --- DOM ---
+// el html
 const dom = {
   // Ejercicio 1
   listaNum: document.getElementById("listaNum"),
@@ -32,7 +29,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
   const container = dom[elementId];
@@ -91,7 +88,7 @@ dom.btnCola.onclick = () => {
   }
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   enteros = [...INICIAL_ENTEROS];
@@ -104,5 +101,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

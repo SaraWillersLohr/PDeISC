@@ -1,9 +1,6 @@
-/**
- * Proyecto: 09 - forEach() "Iteración Maestra"
- * Objetivo: Demostrar forEach() mediante 3 casos literales e independientes.
- */
+// proyecto 09_foreach
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_NOMBRES = ["Ana", "Beto", "Carla"];
 const INICIAL_NUMEROS = [5, 10, 15, 20];
 const INICIAL_OBJETOS = [
@@ -12,12 +9,12 @@ const INICIAL_OBJETOS = [
   { nombre: "Marcos", edad: 22 },
 ];
 
-// --- ESTADO ---
+// las variables
 let nombres = [...INICIAL_NOMBRES];
 let numeros = [...INICIAL_NUMEROS];
 let objetos = [...INICIAL_OBJETOS];
 
-// --- DOM ---
+// el html
 const dom = {
   // Ejercicio 1
   displayNombres: document.getElementById("displayNombres"),
@@ -38,7 +35,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
   const container = dom[elementId];
@@ -115,7 +112,7 @@ dom.btnListar.onclick = () => {
   dom.btnListar.disabled = true; // Deshabilitar después de ejecutar
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   nombres = [...INICIAL_NOMBRES];
@@ -135,5 +132,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

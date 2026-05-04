@@ -1,19 +1,16 @@
-/**
- * Proyecto: 05 - splice() "Cirugía de Arrays"
- * Objetivo: Demostrar splice() mediante 3 casos literales e independientes.
- */
+// proyecto 05_splice
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_LETRAS = ["A", "B", "C", "D", "E", "F"];
 const INICIAL_NOMBRES = ["Juan", "María", "Pedro"];
 const INICIAL_REEMPLAZO = ["Item 1", "Item 2", "Item 3", "Item 4"];
 
-// --- ESTADO ---
+// las variables
 let letras = [...INICIAL_LETRAS];
 let nombres = [...INICIAL_NOMBRES];
 let reemplazo = [...INICIAL_REEMPLAZO];
 
-// --- DOM ---
+// el html
 const dom = {
   // Ejercicio 1
   listaLet: document.getElementById("listaLet"),
@@ -32,7 +29,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId, isGrid = false) => {
   const container = dom[elementId];
@@ -88,7 +85,7 @@ dom.btnRep.onclick = () => {
   }
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   letras = [...INICIAL_LETRAS];
@@ -102,5 +99,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

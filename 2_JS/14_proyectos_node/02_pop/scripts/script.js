@@ -1,19 +1,16 @@
-/**
- * Proyecto: 02 - pop() "Extracción del Final"
- * Objetivo: Demostrar pop() mediante 3 casos literales e independientes.
- */
+// proyecto 02_pop
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_ANIMALES = ["Perro", "Gato", "Loro", "Pez"];
 const INICIAL_COMPRAS = ["Leche", "Pan", "Frutas", "Café"];
 const INICIAL_VACIADO = ["A", "B", "C", "D", "E"];
 
-// --- ESTADO ---
+// las variables
 let animales = [...INICIAL_ANIMALES];
 let compras = [...INICIAL_COMPRAS];
 let vaciado = [...INICIAL_VACIADO];
 
-// --- DOM ---
+// el html
 const dom = {
     // Ejercicio 1
     listaAni: document.getElementById('listaAni'),
@@ -32,7 +29,7 @@ const dom = {
     btnReset: document.getElementById('btnReset')
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
     const container = dom[elementId];
@@ -93,7 +90,7 @@ dom.btnVac.onclick = () => {
     }, 200);
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
     animales = [...INICIAL_ANIMALES];
@@ -106,5 +103,6 @@ dom.btnReset.onclick = () => {
     updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener('DOMContentLoaded', updateUI);
+

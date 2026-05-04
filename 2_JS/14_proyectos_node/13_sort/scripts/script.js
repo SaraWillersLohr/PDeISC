@@ -10,7 +10,7 @@ const INICIAL_OBJETOS = [
   { nombre: "Beto", edad: 32 },
 ];
 
-// --- ESTADO ---
+// las variables
 let numeros = [...INICIAL_NUMEROS];
 let palabras = [...INICIAL_PALABRAS];
 let objetos = [...INICIAL_OBJETOS];
@@ -74,7 +74,7 @@ dom.btnSortObj.onclick = () => {
   updateUI();
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   numeros = [...INICIAL_NUMEROS];
@@ -91,5 +91,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

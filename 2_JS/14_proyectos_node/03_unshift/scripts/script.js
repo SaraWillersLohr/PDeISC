@@ -1,19 +1,16 @@
-/**
- * Proyecto: 03 - unshift() "Inserción al Inicio"
- * Objetivo: Demostrar unshift() mediante 3 casos literales e independientes.
- */
+// proyecto 03_unshift
 
-// --- DATOS INICIALES ---
+// los datos
 const POOL_COLORES = ["Rojo", "Azul", "Verde"];
 const INICIAL_TAREAS = ["Lavar platos", "Hacer ejercicio"];
 const INICIAL_USUARIOS = ["Maria99", "Juan_Dev"];
 
-// --- ESTADO ---
+// las variables
 let colores = [];
 let tareas = [...INICIAL_TAREAS];
 let usuarios = [...INICIAL_USUARIOS];
 
-// --- DOM ---
+// el html
 const dom = {
     // Ejercicio 1
     listaCol: document.getElementById('listaCol'),
@@ -36,7 +33,7 @@ const dom = {
     btnReset: document.getElementById('btnReset')
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
     const container = dom[elementId];
@@ -106,7 +103,7 @@ dom.btnUser.onclick = () => {
     updateUI();
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
     colores = [];
@@ -127,5 +124,6 @@ dom.btnReset.onclick = () => {
     updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener('DOMContentLoaded', updateUI);
+

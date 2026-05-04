@@ -4,7 +4,7 @@
 const INICIAL_LETRAS = ["A", "B", "C", "D", "E"];
 const INICIAL_NUMEROS = [1, 2, 3, 4, 5, 6];
 
-// --- ESTADO ---
+// las variables
 let letras = [...INICIAL_LETRAS];
 let numeros = [...INICIAL_NUMEROS];
 
@@ -69,7 +69,7 @@ dom.btnRevString.onclick = () => {
   dom.displayResult3.textContent = reversedText;
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   letras = [...INICIAL_LETRAS];
@@ -87,9 +87,10 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", () => {
   updateUI();
   // Revertir el string inicial para mostrar el ejemplo
   dom.btnRevString.click();
 });
+

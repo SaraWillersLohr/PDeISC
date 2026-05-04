@@ -1,9 +1,6 @@
-/**
- * Proyecto: 11 - filter() "Filtrado Maestro"
- * Objetivo: Demostrar filter() mediante 3 casos literales e independientes.
- */
+// proyecto 11_filter
 
-// --- DATOS INICIALES ---
+// los datos
 const INICIAL_NUMEROS = [2, 15, 8, 20, 5, 12, 30];
 const INICIAL_PALABRAS = [
   "sol",
@@ -20,12 +17,12 @@ const INICIAL_USUARIOS = [
   { nombre: "Daniel", activo: false },
 ];
 
-// --- ESTADO ---
+// las variables
 let numeros = [...INICIAL_NUMEROS];
 let palabras = [...INICIAL_PALABRAS];
 let usuarios = [...INICIAL_USUARIOS];
 
-// --- DOM ---
+// el html
 const dom = {
   // Ejercicio 1
   displayOriginal1: document.getElementById("displayOriginal1"),
@@ -46,7 +43,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const updateUI = () => {
   dom.displayOriginal1.textContent = `Original: [${numeros.join(", ")}]`;
@@ -89,7 +86,7 @@ dom.btnFilterActive.onclick = () => {
   dom.btnFilterActive.disabled = true; // Deshabilitar después de filtrar
 };
 
-// --- RESET ---
+// resetear
 
 dom.btnReset.onclick = () => {
   numeros = [...INICIAL_NUMEROS];
@@ -110,5 +107,6 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
-// --- INIT ---
+// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
+

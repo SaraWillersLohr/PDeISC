@@ -1,18 +1,15 @@
-/**
- * Proyecto: 01 - push() "Inserción Maestra"
- * Objetivo: Demostrar push() mediante 3 casos literales e independientes.
- */
+// proyecto 01_push
 
-// --- DATOS INICIALES ---
+// los datos
 const FRUTAS_POOL = ["🍎 Manzana", "🍌 Banana", "🍇 Uva"];
 const AMIGOS_POOL = ["Alex", "Marcos", "Lucía"];
 
-// --- ESTADO ---
+// las variables
 let frutas = [];
 let amigos = ["Juan"];
 let numeros = [10];
 
-// --- DOM ---
+// el html
 const dom = {
     listaFrutas: document.getElementById('listaFrutas'),
     btnFrutas: document.getElementById('btnFrutas'),
@@ -28,7 +25,7 @@ const dom = {
     btnReset: document.getElementById('btnReset')
 };
 
-// --- RENDERERS ---
+// dibujar en pantalla
 
 const renderArray = (arr, elementId) => {
     const container = dom[elementId];
@@ -97,3 +94,4 @@ dom.btnReset.onclick = () => {
 
 // Init
 window.addEventListener('DOMContentLoaded', updateUI);
+

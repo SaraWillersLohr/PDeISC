@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro a Eventos — FormDemo</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">✦ FormDemo</a>
+  <ul>
+    <li><a href="mascotas.html">Mascotas</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="eventos.html">Eventos</a></li>
+  </ul>
+</nav>
+
+<div class="form-page">
+  <div class="page-header">
+    <div class="icon">🎟️</div>
+    <h1>Registro a Eventos</h1>
+    <p>Reservá tu lugar. Solo mayores de 16 años. Te mandamos los detalles por email.</p>
+  </div>
+
+  <div class="form-box">
+    <div class="field">
+      <label for="name">Nombre completo</label>
+      <input type="text" id="name" placeholder="Ej: Valentina Ríos" />
+      <span class="field-msg" data-for="name"></span>
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="tu@email.com" />
+      <span class="field-msg" data-for="email"></span>
+    </div>
+
+    <div class="field">
+      <label for="age">Edad</label>
+      <input type="number" id="age" placeholder="Ej: 22" min="16" max="120" />
+      <span class="field-msg" data-for="age"></span>
+    </div>
+
+    <div class="field">
+      <label for="event">Evento</label>
+      <select id="event">
+        <option value="">Seleccioná un evento</option>
+        <option>Tech Summit 2025 — Buenos Aires</option>
+        <option>Festival de Fotografía — Mar del Plata</option>
+        <option>Hackathon Nacional — Córdoba</option>
+        <option>Charla de IA y Futuro — Online</option>
+      </select>
+      <span class="field-msg" data-for="event"></span>
+    </div>
+
+    <div class="field">
+      <label for="tickets">Cantidad de entradas (máx. 4)</label>
+      <input type="number" id="tickets" placeholder="Ej: 2" min="1" max="4" />
+      <span class="field-msg" data-for="tickets"></span>
+    </div>
+
+    <div class="field">
+      <label for="diet">Preferencia alimentaria</label>
+      <select id="diet">
+        <option value="">Seleccioná una opción</option>
+        <option>Sin restricciones</option>
+        <option>Vegetariano</option>
+        <option>Vegano</option>
+        <option>Sin TACC</option>
+        <option>Otro</option>
+      </select>
+      <span class="field-msg" data-for="diet"></span>
+    </div>
+
+    <button class="btn" id="submitBtn">Reservar lugar</button>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<footer>Hecho con HTML, CSS y JavaScript puro · Emails enviados con Resend</footer>
+
+<script type="module">
+  import { validateName, validateEmail, validateAge, validateRequired, setMsg, setFieldState, submitForm } from './js/validator.js';
+
+  const btn   = document.getElementById('submitBtn');
+  const toast = document.getElementById('toast');
+
+  document.getElementById('name').addEventListener('blur', async e => {
+    const r = await validateName(e.target.value);
+    setMsg('name', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('name', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('email').addEventListener('blur', e => {
+    const r = validateEmail(e.target.value);
+    setMsg('email', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('email', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('age').addEventListener('blur', e => {
+    const r = validateAge(e.target.value, 16, 120);
+    setMsg('age', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('age', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('event').addEventListener('change', e => {
+    const r = validateRequired(e.target.value, 'El evento');
+    setMsg('event', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('event', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('tickets').addEventListener('blur', e => {
+    const n = parseInt(e.target.value);
+    const r = (isNaN(n) || n < 1 || n > 4)
+      ? { ok: false, msg: 'Ingresá entre 1 y 4 entradas.' }
+      : { ok: true, msg: `${n} entrada${n > 1 ? 's' : ''} ✓` };
+    setMsg('tickets', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('tickets', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('diet').addEventListener('change', e => {
+    const r = validateRequired(e.target.value, 'La preferencia alimentaria');
+    setMsg('diet', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('diet', r.ok ? 'valid' : 'error');
+  });
+
+  btn.addEventListener('click', async () => {
+    const name    = document.getElementById('name').value;
+    const email   = document.getElementById('email').value;
+    const age     = document.getElementById('age').value;
+    const event   = document.getElementById('event').value;
+    const tickets = document.getElementById('tickets').value;
+    const diet    = document.getElementById('diet').value;
+
+    const nameR    = await validateName(name);
+    const emailR   = validateEmail(email);
+    const ageR     = validateAge(age, 16, 120);
+    const eventR   = validateRequired(event, 'El evento');
+    const n        = parseInt(tickets);
+    const ticketsR = (!isNaN(n) && n >= 1 && n <= 4)
+      ? { ok: true, msg: '' } : { ok: false, msg: 'Ingresá entre 1 y 4 entradas.' };
+    const dietR    = validateRequired(diet, 'La preferencia alimentaria');
+
+    [['name', nameR], ['email', emailR], ['age', ageR],
+     ['event', eventR], ['tickets', ticketsR], ['diet', dietR]].forEach(([id, r]) => {
+      setMsg(id, r.msg, r.ok ? 'success' : 'error');
+      setFieldState(id, r.ok ? 'valid' : 'error');
+    });
+
+    if (![nameR, emailR, ageR, eventR, ticketsR, dietR].every(r => r.ok)) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const result = await submitForm('/eventos', { name, email, age, event, tickets, diet });
+
+    btn.disabled = false;
+    btn.textContent = 'Reservar lugar';
+
+    toast.className = `toast ${result.ok ? 'success' : 'error'}`;
+    if (result.ok) {
+      toast.textContent = `¡Reserva confirmada, ${name.split(' ')[0]}! Revisá tu email con los detalles.`;
+    } else {
+      toast.textContent = `Error: ${result.error || 'Hubo un problema al enviar. Intentá de nuevo.'}`;
+    }
+  });
+</script>
+
+</body>
+</html>

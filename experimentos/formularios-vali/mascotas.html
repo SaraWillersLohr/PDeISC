@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Mascotas — FormDemo</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">✦ FormDemo</a>
+  <ul>
+    <li><a href="mascotas.html">Mascotas</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="eventos.html">Eventos</a></li>
+  </ul>
+</nav>
+
+<div class="form-page">
+  <div class="page-header">
+    <div class="icon">🐾</div>
+    <h1>Registro de Mascotas</h1>
+    <p>Completá los datos de tu mascota y los tuyos. Te mandamos una confirmación por email.</p>
+  </div>
+
+  <div class="form-box">
+    <div class="field">
+      <label for="owner">Tu nombre</label>
+      <input type="text" id="owner" placeholder="Ej: Laura García" />
+      <span class="field-msg" data-for="owner"></span>
+    </div>
+
+    <div class="field">
+      <label for="email">Tu email</label>
+      <input type="email" id="email" placeholder="tu@email.com" />
+      <span class="field-msg" data-for="email"></span>
+    </div>
+
+    <div class="field">
+      <label for="petname">Nombre de tu mascota</label>
+      <input type="text" id="petname" placeholder="Ej: Milo" />
+      <span class="field-msg" data-for="petname"></span>
+    </div>
+
+    <div class="field">
+      <label for="species">Especie</label>
+      <select id="species">
+        <option value="">Seleccioná una especie</option>
+        <option>Perro</option>
+        <option>Gato</option>
+        <option>Ave</option>
+        <option>Conejo</option>
+        <option>Reptil</option>
+        <option>Otro</option>
+      </select>
+      <span class="field-msg" data-for="species"></span>
+    </div>
+
+    <div class="field">
+      <label for="breed">Raza</label>
+      <input type="text" id="breed" placeholder="Ej: Labrador, Siamés..." />
+      <span class="field-msg" data-for="breed"></span>
+    </div>
+
+    <div class="field">
+      <label for="petage">Edad de la mascota (años)</label>
+      <input type="number" id="petage" placeholder="Ej: 3" min="0" max="50" />
+      <span class="field-msg" data-for="petage"></span>
+    </div>
+
+    <button class="btn" id="submitBtn">Registrar mascota</button>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<footer>Hecho con HTML, CSS y JavaScript puro · Emails enviados con Resend</footer>
+
+<script type="module">
+  import { validateName, validateEmail, validateAge, validateRequired, setMsg, setFieldState, submitForm } from './js/validator.js';
+
+  const btn = document.getElementById('submitBtn');
+  const toast = document.getElementById('toast');
+
+  // Validación en tiempo real
+  document.getElementById('owner').addEventListener('blur', async e => {
+    const r = await validateName(e.target.value);
+    setMsg('owner', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('owner', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('email').addEventListener('blur', e => {
+    const r = validateEmail(e.target.value);
+    setMsg('email', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('email', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('petname').addEventListener('blur', e => {
+    const r = validateRequired(e.target.value, 'El nombre de la mascota');
+    setMsg('petname', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('petname', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('species').addEventListener('change', e => {
+    const r = validateRequired(e.target.value, 'La especie');
+    setMsg('species', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('species', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('breed').addEventListener('blur', e => {
+    const r = validateRequired(e.target.value, 'La raza');
+    setMsg('breed', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('breed', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('petage').addEventListener('blur', e => {
+    const r = validateAge(e.target.value, 0, 50);
+    setMsg('petage', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('petage', r.ok ? 'valid' : 'error');
+  });
+
+  btn.addEventListener('click', async () => {
+    const owner   = document.getElementById('owner').value;
+    const email   = document.getElementById('email').value;
+    const petname = document.getElementById('petname').value;
+    const species = document.getElementById('species').value;
+    const breed   = document.getElementById('breed').value;
+    const petage  = document.getElementById('petage').value;
+
+    // Validar todo antes de enviar
+    const nameR    = await validateName(owner);
+    const emailR   = validateEmail(email);
+    const petnameR = validateRequired(petname, 'El nombre de la mascota');
+    const speciesR = validateRequired(species, 'La especie');
+    const breedR   = validateRequired(breed, 'La raza');
+    const ageR     = validateAge(petage, 0, 50);
+
+    [['owner', nameR], ['email', emailR], ['petname', petnameR],
+     ['species', speciesR], ['breed', breedR], ['petage', ageR]].forEach(([id, r]) => {
+      setMsg(id, r.msg, r.ok ? 'success' : 'error');
+      setFieldState(id, r.ok ? 'valid' : 'error');
+    });
+
+    if (![nameR, emailR, petnameR, speciesR, breedR, ageR].every(r => r.ok)) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const result = await submitForm('/mascotas', { owner, email, petname, species, breed, petage });
+
+    btn.disabled = false;
+    btn.textContent = 'Registrar mascota';
+
+    toast.className = `toast ${result.ok ? 'success' : 'error'}`;
+    if (result.ok) {
+      toast.textContent = `¡Listo! Revisá tu email, ${owner.split(' ')[0]}. Te mandamos la confirmación de ${petname}.`;
+    } else {
+      toast.textContent = `Error: ${result.error || 'Hubo un problema al enviar. Intentá de nuevo.'}`;
+    }
+  });
+</script>
+
+</body>
+</html>

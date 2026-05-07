@@ -1,0 +1,166 @@
+/* 
+   MEGA PROMPT DESIGN: PLATINUM EXCELLENCE (REFINED)
+   Senior UI/UX Design Excellence - High Visibility & Modern Elegance
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+
+:root {
+    --bg-main: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --primary: #0F172A; /* Deep Navy */
+    --accent: #4F46E5; /* Indigo */
+    --accent-light: #EEF2FF;
+    --text-head: #0F172A;
+    --text-body: #334155;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --success: #10B981;
+    --error: #EF4444;
+    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Reset & Visibility */
+body, .bg-dark, .bg-light {
+    background-color: var(--bg-main) !important;
+    color: var(--text-body) !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Excellence */
+h1, h2, h3, h4, h5, h6, .display-4 {
+    font-family: 'Playfair Display', serif !important;
+    font-weight: 900 !important;
+    color: var(--text-head) !important;
+    letter-spacing: -0.02em !important;
+    text-transform: none !important;
+}
+
+header p.lead {
+    font-weight: 600;
+    color: var(--accent) !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+/* Main Card Overrides */
+.card, .bg-card, .border-gold, .border-0 {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 24px !important;
+    box-shadow: var(--shadow) !important;
+    padding: 2.5rem !important;
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 40px -10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Form Controls - Maximum Visibility */
+.form-label {
+    color: var(--text-head) !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem !important;
+}
+
+.form-control, .form-select {
+    background-color: #FFFFFF !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-head) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 4px var(--accent-light) !important;
+    outline: none;
+}
+
+/* Validation Feedback */
+.invalid-feedback {
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--error) !important;
+    margin-top: 0.4rem;
+    display: none; /* Se activa con .is-invalid */
+}
+
+.is-invalid ~ .invalid-feedback {
+    display: block;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.is-invalid { border-color: var(--error) !important; }
+.is-valid { border-color: var(--success) !important; }
+
+/* Buttons */
+.btn-primary, .btn-gold, #submitBtn {
+    background: var(--primary) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 16px 24px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: var(--transition);
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2) !important;
+}
+
+.btn-primary:not(:disabled):hover, #submitBtn:not(:disabled):hover {
+    background: var(--accent) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.3) !important;
+}
+
+.btn-primary:disabled, #submitBtn:disabled {
+    background: #E2E8F0 !important;
+    color: #94A684 !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Responsive Grid & Containers */
+.container {
+    max-width: 1100px !important;
+}
+
+@media (max-width: 768px) {
+    .card { padding: 1.5rem !important; }
+    h1 { font-size: 2.5rem !important; }
+}
+
+/* Utility */
+.hidden { display: none !important; }
+
+/* Cards de resultados */
+#guestList .card, #petList .card, #passengerList .card {
+    padding: 1.5rem !important;
+    border-radius: 16px !important;
+    border-left: 5px solid var(--accent) !important;
+}
+
+/* Navbar SkyCheck-In */
+.navbar {
+    background-color: var(--primary) !important;
+    padding: 1.5rem 0 !important;
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Guest List | Luxury Event</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold">VIP GUEST LIST</h1>
+            <p class="lead">Registro exclusivo con validación profesional</p>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0">
+                    <form id="guestForm" name="invitadosForm" novalidate>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" name="nombre" class="form-control" placeholder="Ej. Juan" required>
+                                <div class="invalid-feedback">Nombre inválido (Mín. 2 letras reales).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Apellido</label>
+                                <input type="text" name="apellido" class="form-control" placeholder="Ej. Pérez" required>
+                                <div class="invalid-feedback">Apellido inválido.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Edad</label>
+                                <input type="number" name="edad" class="form-control" placeholder="18-99" required>
+                                <div class="invalid-feedback">Edad entre 18 y 99 años.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo Entrada</label>
+                                <select name="tipoEntrada" class="form-select">
+                                    <option value="General">General Access</option>
+                                    <option value="VIP">VIP Gold</option>
+                                    <option value="Platinum">Platinum Plus</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Acompañantes</label>
+                                <input type="number" name="acompanantes" class="form-control" value="0" min="0" max="5">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-light rounded-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label small text-muted" for="termsCheck">
+                                    He leído y acepto los <a href="#" class="text-primary fw-bold" data-bs-toggle="modal" data-bs-target="#termsModal">términos y condiciones</a> de privacidad.
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-4" disabled>
+                            CONFIRMAR REGISTRO VIP
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <section class="mt-5">
+            <h2 class="text-center text-gold mb-4">INVITADOS CONFIRMADOS</h2>
+            <div id="guestList" class="row g-4"></div>
+        </section>
+    </div>
+
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-gold text-light">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-gold">Términos y Condiciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body small">
+                    <p>1. Protección de Datos Universitarios.</p>
+                    <p>2. Responsabilidad de la información.</p>
+                    <p>3. Uso de LocalStorage.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/scripts/main.js"></script>
+</body>
+</html>

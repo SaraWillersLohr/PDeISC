@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expo Huellitas | Inscripción de Mascotas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold">🐾 EXPO HUELLITAS</h1>
+            <p class="lead">Inscripción oficial para el gran evento</p>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0">
+                    <form id="petForm" novalidate>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre Mascota</label>
+                                <input type="text" id="nombreMascota" class="form-control" placeholder="Ej. Toby" required>
+                                <div class="invalid-feedback">Nombre inválido o spam detectado.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Especie</label>
+                                <select id="especie" class="form-select">
+                                    <option value="Perro">Perro</option>
+                                    <option value="Gato">Gato</option>
+                                    <option value="Hamster">Hámster</option>
+                                    <option value="Tortuga">Tortuga</option>
+                                    <option value="Ave">Ave</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Raza</label>
+                                <input type="text" id="raza" class="form-control" placeholder="Ej. Labrador" required>
+                                <div class="invalid-feedback">Raza inválida.</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Edad</label>
+                                <input type="number" id="edad" class="form-control" placeholder="Años" required>
+                                <div class="invalid-feedback">Edad no válida.</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Peso (Kg)</label>
+                                <input type="number" id="peso" class="form-control" step="0.1" placeholder="Kg" required>
+                                <div class="invalid-feedback">Peso no válido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Dueño</label>
+                                <input type="text" id="nombreDueno" class="form-control" placeholder="Nombre completo" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="email" class="form-control" placeholder="dueño@correo.com" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">¿Vacunas al día?</label>
+                                <select id="vacunas" class="form-select">
+                                    <option value="no">No posee</option>
+                                    <option value="si">Sí, al día</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Cant. Vacunas</label>
+                                <input type="number" id="cantidadVacunas" class="form-control" placeholder="0" disabled>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-light rounded-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label small text-muted" for="termsCheck">
+                                    Acepto que mi mascota cumpla con los <a href="#" class="text-primary fw-bold" data-bs-toggle="modal" data-bs-target="#termsModal">requisitos de la expo</a>.
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-4" disabled>
+                            REGISTRAR MASCOTA
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div id="petList" class="row mt-5 g-4"></div>
+    </div>
+
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content p-4"><h3>Términos Expo</h3><p class="small">Sus datos serán usados para la organización del evento. Validamos información real.</p></div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/scripts/main.js"></script>
+</body>
+</html>

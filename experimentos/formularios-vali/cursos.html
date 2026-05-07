@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inscripción a Cursos — FormDemo</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">✦ FormDemo</a>
+  <ul>
+    <li><a href="mascotas.html">Mascotas</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="eventos.html">Eventos</a></li>
+  </ul>
+</nav>
+
+<div class="form-page">
+  <div class="page-header">
+    <div class="icon">📚</div>
+    <h1>Inscripción a Cursos</h1>
+    <p>Anotate en uno de nuestros cursos online. Te confirmamos la inscripción por email.</p>
+  </div>
+
+  <div class="form-box">
+    <div class="field">
+      <label for="name">Nombre completo</label>
+      <input type="text" id="name" placeholder="Ej: Martín López" />
+      <span class="field-msg" data-for="name"></span>
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="tu@email.com" />
+      <span class="field-msg" data-for="email"></span>
+    </div>
+
+    <div class="field">
+      <label for="age">Edad</label>
+      <input type="number" id="age" placeholder="Ej: 25" min="14" max="99" />
+      <span class="field-msg" data-for="age"></span>
+    </div>
+
+    <div class="field">
+      <label for="course">Curso</label>
+      <select id="course">
+        <option value="">Seleccioná un curso</option>
+        <option>Desarrollo Web</option>
+        <option>Diseño UX/UI</option>
+        <option>Marketing Digital</option>
+        <option>Python para principiantes</option>
+        <option>Fotografía creativa</option>
+      </select>
+      <span class="field-msg" data-for="course"></span>
+    </div>
+
+    <div class="field">
+      <label for="level">Nivel de experiencia</label>
+      <select id="level">
+        <option value="">Seleccioná tu nivel</option>
+        <option>Sin experiencia</option>
+        <option>Principiante</option>
+        <option>Intermedio</option>
+        <option>Avanzado</option>
+      </select>
+      <span class="field-msg" data-for="level"></span>
+    </div>
+
+    <div class="field">
+      <label for="motivation">¿Por qué querés tomar este curso?</label>
+      <textarea id="motivation" placeholder="Contanos un poco..."></textarea>
+      <span class="field-msg" data-for="motivation"></span>
+    </div>
+
+    <button class="btn" id="submitBtn">Inscribirme</button>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<footer>Hecho con HTML, CSS y JavaScript puro · Emails enviados con Resend</footer>
+
+<script type="module">
+  import { validateName, validateEmail, validateAge, validateRequired, setMsg, setFieldState, submitForm } from './js/validator.js';
+
+  const btn   = document.getElementById('submitBtn');
+  const toast = document.getElementById('toast');
+
+  document.getElementById('name').addEventListener('blur', async e => {
+    const r = await validateName(e.target.value);
+    setMsg('name', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('name', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('email').addEventListener('blur', e => {
+    const r = validateEmail(e.target.value);
+    setMsg('email', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('email', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('age').addEventListener('blur', e => {
+    const r = validateAge(e.target.value, 14, 99);
+    setMsg('age', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('age', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('course').addEventListener('change', e => {
+    const r = validateRequired(e.target.value, 'El curso');
+    setMsg('course', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('course', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('level').addEventListener('change', e => {
+    const r = validateRequired(e.target.value, 'El nivel');
+    setMsg('level', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('level', r.ok ? 'valid' : 'error');
+  });
+
+  document.getElementById('motivation').addEventListener('blur', e => {
+    const r = validateRequired(e.target.value, 'La motivación');
+    setMsg('motivation', r.msg, r.ok ? 'success' : 'error');
+    setFieldState('motivation', r.ok ? 'valid' : 'error');
+  });
+
+  btn.addEventListener('click', async () => {
+    const name       = document.getElementById('name').value;
+    const email      = document.getElementById('email').value;
+    const age        = document.getElementById('age').value;
+    const course     = document.getElementById('course').value;
+    const level      = document.getElementById('level').value;
+    const motivation = document.getElementById('motivation').value;
+
+    const nameR  = await validateName(name);
+    const emailR = validateEmail(email);
+    const ageR   = validateAge(age, 14, 99);
+    const courseR = validateRequired(course, 'El curso');
+    const levelR  = validateRequired(level, 'El nivel');
+    const motivR  = validateRequired(motivation, 'La motivación');
+
+    [['name', nameR], ['email', emailR], ['age', ageR],
+     ['course', courseR], ['level', levelR], ['motivation', motivR]].forEach(([id, r]) => {
+      setMsg(id, r.msg, r.ok ? 'success' : 'error');
+      setFieldState(id, r.ok ? 'valid' : 'error');
+    });
+
+    if (![nameR, emailR, ageR, courseR, levelR, motivR].every(r => r.ok)) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const result = await submitForm('/cursos', { name, email, age, course, level, motivation });
+
+    btn.disabled = false;
+    btn.textContent = 'Inscribirme';
+
+    toast.className = `toast ${result.ok ? 'success' : 'error'}`;
+    if (result.ok) {
+      toast.textContent = `¡Inscripción confirmada, ${name.split(' ')[0]}! Revisá tu email.`;
+    } else {
+      toast.textContent = `Error: ${result.error || 'Hubo un problema al enviar. Intentá de nuevo.'}`;
+    }
+  });
+</script>
+
+</body>
+</html>

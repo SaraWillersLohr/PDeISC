@@ -12,6 +12,19 @@ const termsCheck = document.getElementById("termsCheck");
 // Referencia al elemento del HTML
 const listContainer = document.getElementById("guestList");
 
+// Array para manejar la lista de invitados (Consigna 1)
+let guestsList = [];
+
+/**
+ * Función para eliminar un invitado del array y re-renderizar
+ */
+const deleteGuest = (index) => {
+  // Elimino el elemento del array usando splice (Consigna 1)
+  guestsList.splice(index, 1);
+  // Vuelvo a dibujar la lista actualizada
+  renderGuests(guestsList, listContainer, deleteGuest);
+};
+
 /**
  * Lógica centralizada para mostrar feedback visual instantáneo
  */
@@ -76,7 +89,7 @@ form.addEventListener("submit", (e) => {
   e.preventDefault();
 
   // DEMOSTRACIÓN DE LAS 3 FORMAS DE LEER FORMULARIOS EN JS (Consigna 1)
-// formdata sirve para leer los datos del formulario en forma de objeto
+  // formdata sirve para leer los datos del formulario en forma de objeto
   // Forma 1: Usando FormData (muy moderna y cómoda para muchos campos)
   const formData = new FormData(form);
   const nombre = formData.get("nombre");
@@ -99,8 +112,11 @@ form.addEventListener("submit", (e) => {
     acompanantes: acompanantes,
   };
 
-  // Renderizo nuevamente las cards
-  renderGuests([newGuest], listContainer);
+  // Agrego el nuevo invitado al array (Consigna 1)
+  guestsList.push(newGuest);
+
+  // Renderizo la lista completa desde el array
+  renderGuests(guestsList, listContainer, deleteGuest);
 
   // Reseteo el formulario después de guardar
   form.reset();

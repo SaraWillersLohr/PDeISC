@@ -1,8 +1,4 @@
-/**
- * Lógica de validación robusta para evitar datos basura
- * Pensada para ser profesional pero defendible oralmente
- */
-
+// Lista de nombres y apellidos no permitidos
 const BLACKLIST = [
   "asdf",
   "qwerty",
@@ -29,10 +25,7 @@ const MASH_PATTERNS = [
   "vbnm",
   "1234",
 ];
-
-/**
- * Valida nombres y apellidos de forma estricta
- */
+// Valida nombres y apellidos de forma estricta
 // Exporto esta función para poder usarla en el resto del proyecto
 export const validateRealName = (text) => {
   const val = text.trim();

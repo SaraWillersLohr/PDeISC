@@ -1,139 +1,258 @@
+/* 
+   aca defino todos los estilos globales del sitio
+   uso playfair para titulos y outfit para el resto
+*/
+
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&display=swap");
 
+/* estas son las variables de colores y cosas que mas uso */
 :root {
   --primary: #161437;
   --accent: #5752ac;
+  --accent-hover: #4340a0;
   --bg-main: #f8fafc;
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --card-bg: #ffffff;
+  --border-light: #e2e8f0;
   --header-height: 72px;
+  --radius: 12px;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.12);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --header-offset: 130px;
 }
 
-* {
+/* reset basico para que todo se vea igual */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Outfit", sans-serif;
 }
 
 body {
   background-color: var(--bg-main);
   color: var(--text-dark);
+  font-family: "Outfit", sans-serif;
   line-height: 1.6;
 }
 
+/* uso la serifa para darle un toque mas elegante a los titulos */
 h1,
 h2,
 h3,
 h4,
-.logo,
+.logo-text,
 .footer-logo,
 .title_categoria {
   font-family: "Playfair Display", serif;
 }
 
+/* hago que el scroll se mueva suave */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-offset);
+}
+
+/* aca manejo el header que queda pegado arriba */
 .header {
-  background: rgba(30, 27, 75, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 3px solid var(--accent);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  height: var(--header-height);
-  z-index: 1000;
+  background: #ffffff;
+  z-index: 1030;
+  position: sticky;
+  top: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.logo img {
-  height: 70px;
-  width: auto;
-  transition: var(--transition);
+.header.scrolled {
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
 }
 
-.logo img:hover {
-  transform: scale(1.05);
-}
-
-.navbar-nav .nav-link {
-  height: var(--header-height);
-  padding: 0 1.25rem !important;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #cbd5e1 !important;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: var(--transition);
-  position: relative;
-  display: inline-flex;
+/* esta es la barrita de arriba de todo */
+.header-top {
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.7rem;
+  min-height: 30px;
+  display: flex;
   align-items: center;
 }
 
-.navbar-nav .nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 3px;
-  background: var(--accent);
-  transition: var(--transition);
-  transform: translateX(-50%);
+.top-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.navbar-nav .nav-link:hover {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.navbar-nav .nav-link:hover::after,
-.navbar-nav .nav-link.active::after {
-  width: 80%;
-}
-
-.navbar-nav .nav-link.active {
-  color: #fff !important;
-}
-
-.portada {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-  padding: 1.25rem 0;
-  color: #fff;
-}
-
-.breaking-chip {
-  background: var(--accent);
-  padding: 0.35rem 0.85rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  border-radius: 50px;
+.live-chip-mini {
+  background: #dc2626;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  box-shadow: 0 0 15px rgba(190, 18, 60, 0.4);
+  font-size: 0.6rem;
+  letter-spacing: 0.5px;
 }
 
-.portada h1 {
-  font-size: 1.1rem;
-  font-weight: 400;
-  font-style: italic;
-  opacity: 0.9;
+.top-social a {
+  color: #ffffff;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  transition: var(--transition);
 }
 
-section.categoria {
-  scroll-margin-top: calc(var(--header-height) + 20px);
-  margin-bottom: 3rem !important;
+.top-social a:hover {
+  opacity: 1;
+  color: var(--accent);
 }
 
+/* aca va el logo del diario */
+.header-middle {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.logo-text {
+  color: var(--primary);
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  text-align: center;
+  margin: 0;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+/* aca manejo las categorias del menu */
+.header-bottom {
+  background: #ffffff;
+}
+
+.nav-categories {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-categories .nav-link {
+  padding: 0.6rem 1rem !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-dark) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+  position: relative;
+}
+
+/* le pongo una rayita abajo a la seccion activa en compu */
+@media (min-width: 768px) {
+  .nav-categories .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: var(--transition);
+    transform: translateX(-50%);
+  }
+
+  .nav-categories .nav-link:hover::after,
+  .nav-categories .nav-link.active::after {
+    width: 100%;
+  }
+}
+
+/* aca ajusto todo para que en el celu se vea bien */
+@media (max-width: 767.98px) {
+  body.menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+
+  .logo-text {
+    font-size: 1.6rem;
+    letter-spacing: -0.5px;
+  }
+
+  .header-bottom.collapse.show,
+  .header-bottom.collapsing {
+    background: #ffffff;
+    border-bottom: 2px solid var(--accent);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* pongo los links uno abajo del otro en el celu */
+  .nav-categories {
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .nav-categories li {
+    width: 100%;
+  }
+
+  .nav-categories .nav-link {
+    width: 100%;
+    padding: 1.25rem 1.5rem !important;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border-light);
+    text-transform: none;
+    letter-spacing: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* le agrego una flechita al final para que quede mas prolijo */
+  .nav-categories .nav-link::after {
+    content: "\F285"; /* icono de flecha de bootstrap */
+    font-family: "bootstrap-icons";
+    font-size: 0.9rem;
+    opacity: 0.5;
+  }
+
+  .nav-categories .nav-link:hover,
+  .nav-categories .nav-link.active {
+    background: var(--bg-main);
+    color: var(--accent) !important;
+    padding-left: 2rem !important;
+  }
+
+  .header {
+    z-index: 1050;
+  }
+
+  h1 {
+    font-size: 1.8rem !important;
+  }
+
+  h2.title_categoria {
+    font-size: 1.4rem !important;
+  }
+}
+
+/* aca manejo como se ven los titulos de cada seccion */
 .title_categoria {
+  position: relative;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary);
-  padding: 0 0 0.5rem 0;
+  padding-bottom: 0.6rem;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: transparent !important;
+  padding-top: 1rem;
 }
 
 .title_categoria::before {
@@ -146,39 +265,34 @@ section.categoria {
   background: var(--accent);
 }
 
-.categoria .row {
-  background: transparent;
-}
-
+/* aca estan las tarjetitas de las noticias */
 .noticia1,
 .noticia2 {
   background: var(--card-bg);
-  border-radius: 12px;
+  border-radius: var(--radius);
   overflow: hidden;
   transition: var(--transition);
-  border: 1px solid #e2e8f0;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-card);
+  height: 100%;
 }
 
 .noticia1:hover,
 .noticia2:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  border-color: #cbd5e1;
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
 }
 
-.row.g-0 {
-  gap: 1.5rem;
-  margin: 0;
-}
-
-.col-12 {
-  padding: 0 !important;
+.noticia1 a,
+.noticia2 a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
 }
 
 .img_noticia {
-  height: 280px;
+  height: 260px;
   overflow: hidden;
   position: relative;
 }
@@ -192,71 +306,57 @@ section.categoria {
 
 .noticia1:hover .img_noticia img,
 .noticia2:hover .img_noticia img {
-  transform: scale(1.08);
-}
-
-.img_noticia::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.1));
+  transform: scale(1.06);
 }
 
 .text_noticia {
-  padding: 1.5rem;
+  padding: 1.4rem;
 }
 
-.noticia1 h3,
-.noticia2 h3 {
-  font-size: 1.4rem;
+.noticia1 h3, .noticia2 h3 {
   font-weight: 700;
   color: var(--text-dark);
-  margin-bottom: 1rem;
-  transition: color 0.2s;
   line-height: 1.3;
+  transition: color 0.2s;
 }
 
-.noticia2 h3 {
-  font-size: 1.1rem;
-}
+.noticia1 h3 { font-size: 1.35rem; margin-bottom: 0.85rem; }
+.noticia2 h3 { font-size: 1.05rem; margin-bottom: 0.6rem; }
 
-.noticia1:hover h3,
-.noticia2:hover h3 {
+.noticia1:hover h3, .noticia2:hover h3 {
   color: var(--accent);
 }
 
 .noticia1 p {
-  font-size: 0.95rem;
+  font-size: 0.93rem;
   color: var(--text-muted);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .fecha {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 600;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
+/* aca manejo los estilos del formulario de contacto */
 .contacto-section {
   background: #fff;
-  padding: 6rem 0;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-light);
+  scroll-margin-top: var(--header-offset);
 }
 
 .contacto-label {
   background: var(--accent);
   border-radius: 4px;
-  padding: 0.4rem 1rem;
-  font-size: 0.8rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.78rem;
+  color: #fff;
 }
 
 .contacto-header h2 {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 900;
   color: var(--primary);
 }
@@ -265,49 +365,55 @@ section.categoria {
 .contacto-form .form-select {
   border-radius: 8px;
   padding: 0.8rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid var(--border-light);
   background: #f8fafc;
-  font-size: 0.95rem;
-  transition: var(--transition);
 }
 
-.contacto-form .form-control:focus {
+.contacto-form .form-control:focus,
+.contacto-form .form-select:focus {
   background: #fff;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(190, 18, 60, 0.1);
+  box-shadow: 0 0 0 3px rgba(87, 82, 172, 0.15);
+}
+
+.error-msg {
+  display: none;
+  font-size: 0.82rem;
+  color: #dc2626;
+  margin-top: 0.35rem;
 }
 
 .btn-enviar {
-  background: var(--secondary);
+  background: var(--accent);
+  color: #fff;
+  border: none;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.9rem 1.5rem;
   font-weight: 600;
+  width: 100%;
   transition: var(--transition);
 }
 
 .btn-enviar:hover {
-  background: var(--accent);
-
+  background: var(--accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(30, 19, 83, 0.3);
 }
 
+/* aca va el pie de pagina */
 .footer {
   background: var(--primary);
   color: #94a3b8;
-  padding: 5rem 0 3rem;
 }
 
 .footer-logo {
   color: #fff;
-  font-size: 2rem;
-  margin-bottom: 2rem;
+  font-size: 1.8rem;
 }
 
 .footer-nav a {
   color: #94a3b8;
-  font-size: 0.9rem;
-  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .footer-nav a:hover {
@@ -315,113 +421,151 @@ section.categoria {
 }
 
 .footer-copy {
-  margin-top: 3rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 2rem;
+  font-size: 0.82rem;
 }
 
-.article-header {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
+/* aca estan las cosas de la pagina de la noticia sola */
 .article-header h1 {
-  font-size: 3.5rem;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
+  font-size: 2.8rem;
+  font-weight: 900;
   color: var(--primary);
 }
 
-.article-meta {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
 .article-content {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   line-height: 1.8;
-  color: #334155;
 }
 
-.article-content p {
-  margin-bottom: 1.5rem;
+.volver-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  transition: var(--transition);
 }
 
-.article-content .lead {
-  font-size: 1.4rem;
+.volver-link:hover {
+  color: var(--accent);
+  transform: translateX(-5px);
+}
+
+/* este es el boton para volver arriba rapido */
+.btn-scroll-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 45px;
+  height: 45px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: var(--transition);
+}
+
+.btn-scroll-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.btn-scroll-top:hover {
+  background: var(--accent-hover);
+  transform: translateY(-5px);
+}
+
+/* aca le doy vida a la barrita de noticias que se mueven */
+.ticker-bar {
+  background: #fdfdfd;
+  border-bottom: 1px solid var(--border-light);
+  height: 44px; /* Un poquito mas alto para que respire */
+  display: flex;
+  align-items: center;
+}
+
+.ticker-label {
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 4px;
+  margin-right: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ticker-dot {
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.ticker-window {
+  flex-grow: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-content {
+  font-size: 0.85rem;
   font-weight: 500;
-  color: var(--text-dark);
-  border-left: 4px solid var(--accent);
-  padding-left: 1.5rem;
-  margin: 2rem 0;
 }
 
-@media (max-width: 991px) {
-  .header {
-    height: auto;
-  }
-  .navbar-nav .nav-link {
-    height: auto;
-    padding: 1rem 1.5rem !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  .navbar-nav .nav-link::after {
-    display: none;
-  }
-  .navbar-collapse {
-    background: var(--primary);
-    margin: 0 -1rem;
-    padding: 1rem 0;
-  }
+.fade-in { animation: ticker-in 0.5s forwards; }
+.fade-out { animation: ticker-out 0.5s forwards; }
+
+@keyframes ticker-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  .article-header h1 {
-    font-size: 2.2rem;
-  }
-  .portada h1 {
-    font-size: 0.9rem;
-  }
-  .title_categoria {
-    font-size: 1.2rem;
-  }
-  .img_noticia {
-    height: 220px;
-  }
-  .noticia1 p {
-    font-size: 0.9rem;
-  }
+@keyframes ticker-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
 }
 
-@media (max-width: 576px) {
-  .article-header h1 {
-    font-size: 1.8rem;
-  }
-  .article-content {
-    font-size: 1.05rem;
-  }
-  .article-content .lead {
-    font-size: 1.2rem;
-    padding-left: 1rem;
-  }
-  .text_noticia {
-    padding: 1.25rem;
-  }
-  .noticia1 h3 {
-    font-size: 1.2rem;
-  }
-  .noticia2 h3 {
-    font-size: 1rem;
-  }
-  .footer {
-    padding: 3rem 0 2rem;
-  }
-  .footer-logo {
-    font-size: 1.5rem;
-  }
+/* boton para quitar el archivo adjunto (en rojo) */
+.btn-remove-file {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.btn-remove-file:hover {
+  background: #fecaca;
+  color: #b91c1c;
+  transform: translateY(-1px);
 }

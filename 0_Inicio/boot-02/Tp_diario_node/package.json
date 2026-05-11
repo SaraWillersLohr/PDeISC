@@ -1,0 +1,13 @@
+{
+  "name": "tp-diario-digital",
+  "version": "1.0.0",
+  "description": "Diario digital con arquitectura modular y servidor Express",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

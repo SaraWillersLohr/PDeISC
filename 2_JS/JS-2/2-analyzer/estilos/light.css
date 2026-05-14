@@ -1,0 +1,13 @@
+/* Light Theme - NumberMaster Suite */
+
+:root {
+    --bg-color: #f8fafc;
+    --text-color: #0f172a;
+    --panel-bg: rgba(255, 255, 255, 0.8);
+    --border-color: rgba(0, 0, 0, 0.1);
+    --input-bg: #ffffff;
+    --input-bg-focus: #f1f5f9;
+    --accent-primary: #2563eb;
+    --accent-secondary: #4f46e5;
+    --accent-shadow: rgba(37, 99, 235, 0.2);
+}

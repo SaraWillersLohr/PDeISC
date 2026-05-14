@@ -1,0 +1,13 @@
+/* Dark Theme - NumberMaster Suite */
+
+:root {
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --panel-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --input-bg: #1e293b;
+    --input-bg-focus: #334155;
+    --accent-primary: #38bdf8;
+    --accent-secondary: #818cf8;
+    --accent-shadow: rgba(56, 189, 248, 0.25);
+}

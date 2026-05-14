@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumberMaster Generator | Suite Profesional</title>
+    
+    <!-- fuentes modernas -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- bootstrap y fontawesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- mis estilos -->
+    <link rel="stylesheet" href="/estilos/main.css">
+    <link id="theme-link" rel="stylesheet" href="/estilos/dark.css">
+</head>
+<body>
+
+    <!-- el encabezado principal de la suite -->
+    <header class="header-suite">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="logo-title mb-0">NumberMaster <span class="text-white opacity-50">Generator</span></h1>
+                <p class="subtitle-technical mb-0">Sistema de Generación de Datasets Numéricos</p>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" title="Cambiar Tema">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container py-4">
+        <div class="row g-4">
+            
+            <!-- panel de entrada: acá el usuario escribe los números -->
+            <div class="col-lg-4 col-md-12">
+                <section class="dashboard-panel h-100">
+                    <h2 class="h5 mb-4 d-flex align-items-center">
+                        <i class="fa-solid fa-keyboard me-2 text-primary"></i> Entrada de Datos
+                    </h2>
+                    
+                    <div class="mb-4">
+                        <label for="input-number" class="form-label small opacity-75">Ingresá un número (ej: 25, 0xFF, 5!, 1/2, 3+2i)</label>
+                        <input type="text" id="input-number" class="form-control-custom" placeholder="Esperando número..." autocomplete="off">
+                        <div id="input-feedback" class="small mt-2 min-height-feedback"></div>
+                    </div>
+
+                    <button id="btn-add" class="btn-master w-100 mb-3" disabled>
+                        <i class="fa-solid fa-plus-circle me-2"></i> Agregar al Conjunto
+                    </button>
+
+                    <div class="stat-mini mt-4">
+                        <span class="stat-label">Progreso del Set:</span>
+                        <div class="progress mt-2" style="height: 10px;">
+                            <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1 small opacity-50">
+                            <span id="count-display">0 / 20</span>
+                            <span>Mínimo: 10</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- panel de transformación: acá muestro la previsualización técnica -->
+            <div class="col-lg-4 col-md-6">
+                <section class="dashboard-panel h-100">
+                    <h2 class="h5 mb-4 d-flex align-items-center">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2 text-primary"></i> Transformación
+                    </h2>
+                    <div id="transformation-preview" class="preview-scroll">
+                        <div class="text-center py-5 opacity-25">
+                            <i class="fa-solid fa-microchip fa-3x mb-3"></i>
+                            <p>Esperando entrada...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- panel de conjunto actual: acá se listan los números cargados -->
+            <div class="col-lg-4 col-md-6">
+                <section class="dashboard-panel h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h5 mb-0 d-flex align-items-center">
+                            <i class="fa-solid fa-list-ol me-2 text-primary"></i> Conjunto Actual
+                        </h2>
+                    </div>
+                    <div id="current-set" class="set-list-scroll">
+                        <div class="text-center py-5 opacity-25">
+                            <p>No hay números cargados</p>
+                        </div>
+                    </div>
+
+                    <!-- sección para generar el archivo txt -->
+                    <div id="generate-section" class="mt-4 pt-4 border-top d-none">
+                        <button id="btn-generate" class="btn-master w-100 py-3">
+                            <i class="fa-solid fa-file-export me-2"></i> Generar Archivo TXT
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- el footer con el link cruzado a la otra herramienta -->
+    <footer class="footer-cross mt-5 py-5 border-top">
+        <div class="container text-center">
+            <p class="mb-4 opacity-75">¿Querés analizar tus archivos generados?</p>
+            <a href="http://localhost:3001" class="btn-outline-custom">
+                <i class="fa-solid fa-magnifying-glass-chart me-2"></i> Ir a NumberMaster <strong>Analyzer</strong>
+            </a>
+            <p class="mt-5 small opacity-25">NumberMaster Suite © 2026 | Desarrollo Web Profesional</p>
+        </div>
+    </footer>
+
+    <!-- botón flotante para volver arriba -->
+    <button id="back-to-top" class="back-to-top" title="Volver arriba">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- mis scripts -->
+    <script type="module" src="/scripts/main.js"></script>
+</body>
+</html>

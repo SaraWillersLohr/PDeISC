@@ -1,0 +1,3 @@
+Nombre: sara
+Tiempo: 19 segundos
+Selecciones: 3

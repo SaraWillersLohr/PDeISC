@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumberMaster Analyzer | Suite Profesional</title>
+    
+    <!-- fuentes modernas -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- bootstrap y fontawesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- mis estilos -->
+    <link rel="stylesheet" href="/estilos/main.css">
+    <link id="theme-link" rel="stylesheet" href="/estilos/dark.css">
+</head>
+<body>
+
+    <!-- encabezado principal -->
+    <header class="header-suite">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="logo-title mb-0">NumberMaster <span class="text-white opacity-50">Analyzer</span></h1>
+                <p class="subtitle-technical mb-0">Herramienta de Análisis y Filtrado de Datos</p>
+            </div>
+            <button id="theme-toggle" class="theme-toggle">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container py-4">
+        <div class="row g-4">
+            
+            <!-- panel de subida: acá se carga el txt -->
+            <div class="col-lg-4 col-md-12">
+                <section class="dashboard-panel h-100">
+                    <h2 class="h5 mb-4 d-flex align-items-center">
+                        <i class="fa-solid fa-file-upload me-2 text-primary"></i> Subir Dataset
+                    </h2>
+                    
+                    <div id="drop-area" class="upload-zone mb-4">
+                        <i class="fa-solid fa-cloud-arrow-up fa-3x mb-3 opacity-25"></i>
+                        <p class="mb-3 small">Arrastrá tu archivo .txt acá o hacé click para buscar</p>
+                        <input type="file" id="file-input" class="d-none" accept=".txt">
+                        <button class="btn-master py-2 px-4" onclick="document.getElementById('file-input').click()">
+                            Elegir Archivo
+                        </button>
+                    </div>
+
+                    <div id="info-archivo" class="min-height-feedback mb-4"></div>
+
+                    <!-- tarjetas de estadísticas rápidas -->
+                    <div id="seccion-stats" class="d-none fade-in">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-utiles">0</span>
+                                    <span class="stat-label-mini">Útiles</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-porcentaje">0%</span>
+                                    <span class="stat-label-mini">Efectividad</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-invalidos">0</span>
+                                    <span class="stat-label-mini">Inválidos</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-factoriales">0</span>
+                                    <span class="stat-label-mini">Factoriales</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- panel de resultados: acá se listan todos los números procesados -->
+            <div class="col-lg-4 col-md-6">
+                <section class="dashboard-panel h-100">
+                    <h2 class="h5 mb-4 d-flex align-items-center">
+                        <i class="fa-solid fa-vial-circle-check me-2 text-primary"></i> Análisis de Datos
+                    </h2>
+                    <div id="resultados-analisis" class="set-list-scroll">
+                        <div class="text-center py-5 opacity-25">
+                            <i class="fa-solid fa-file-circle-question fa-3x mb-3"></i>
+                            <p>Esperando archivo...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- panel de útiles: acá mostramos los que pasaron el filtro -->
+            <div class="col-lg-4 col-md-6">
+                <section class="dashboard-panel h-100 d-flex flex-column">
+                    <h2 class="h5 mb-4 d-flex align-items-center">
+                        <i class="fa-solid fa-star me-2 text-primary"></i> Números Útiles (Filtrados)
+                    </h2>
+                    <div id="lista-utiles" class="set-list-scroll flex-grow-1">
+                        <div class="text-center py-5 opacity-25">
+                            <p>Sin datos filtrados</p>
+                        </div>
+                    </div>
+
+                    <!-- botón para exportar el resultado final -->
+                    <div id="seccion-exportar" class="mt-4 pt-4 border-top d-none">
+                        <button id="btn-exportar" class="btn-master w-100 py-3 bg-success">
+                            <i class="fa-solid fa-file-download me-2"></i> Exportar Resultados (.txt)
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- footer con link cruzado -->
+    <footer class="footer-cross mt-5 py-5 border-top">
+        <div class="container text-center">
+            <p class="mb-4 opacity-75">¿Necesitás generar más números?</p>
+            <a href="http://localhost:3000" class="btn-outline-custom">
+                <i class="fa-solid fa-plus-circle me-2"></i> Ir a NumberMaster <strong>Generator</strong>
+            </a>
+            <p class="mt-5 small opacity-25">NumberMaster Suite © 2026 | Desarrollo Web Profesional</p>
+        </div>
+    </footer>
+
+    <!-- botón volver arriba -->
+    <button id="back-to-top" class="back-to-top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- scripts -->
+    <script type="module" src="/scripts/main.js"></script>
+</body>
+</html>

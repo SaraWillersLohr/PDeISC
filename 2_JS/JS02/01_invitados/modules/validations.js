@@ -1,87 +1,35 @@
-// Lista de nombres y apellidos no permitidos
-const BLACKLIST = [
-  "asdf",
-  "qwerty",
-  "jajaja",
-  "xxxx",
-  "test",
-  "fake",
-  "user",
-  "admin",
-  "xddd",
-  "aaaa",
-  "qqqq",
-  "1111",
-  "trash",
-  "spam",
-];
-const MASH_PATTERNS = [
-  "qwer",
-  "asdf",
-  "zxcv",
-  "dfgh",
-  "hjkl",
-  "tyui",
-  "vbnm",
-  "1234",
-];
-// Valida nombres y apellidos de forma estricta
-// Exporto esta función para poder usarla en el resto del proyecto
-export const validateRealName = (text) => {
-  const val = text.trim();
+/**
+ * Validaciones para la lista de invitados VIP
+ */
 
-  // 1. Longitud básica
-  if (val.length < 2) return { valid: false, msg: "Es demasiado corto" };
-  if (val.length > 35) return { valid: false, msg: "Es demasiado largo" };
+const LISTA_NEGRA = ["asdf", "qwerty", "jajaja", "xddd", "aaaa", "trash", "test"];
 
-  // 2. Solo letras y espacios, permitiendo tildes y ñ
-  // Esta función valida que el formato sea real
-  if (!/^[a-zA-ZÁéíóúÁÉÍÓÚñÑ\s]+$/.test(val)) {
-    return { valid: false, msg: "Solo se permiten letras" };
-  }
+/**
+ * Valida nombres y apellidos reales
+ */
+export const validarNombreReal = (texto) => {
+    const valor = texto.trim();
+    if (valor.length < 2) return { valido: false, mensaje: "Muy corto" };
+    if (valor.length > 30) return { valido: false, mensaje: "Muy largo" };
+    
+    // Solo letras y espacios
+    if (!/^[a-zA-ZÁéíóúÁÉÍÓÚñÑ\s]+$/.test(valor)) return { valido: false, mensaje: "Solo letras" };
+    
+    // Evita spam de letras repetidas
+    if (/(.)\1\1/.test(valor)) return { valido: false, mensaje: "Dato inválido" };
+    
+    const valorMinuscula = valor.toLowerCase();
+    if (LISTA_NEGRA.some(palabra => valorMinuscula.includes(palabra))) return { valido: false, mensaje: "Nombre no permitido" };
 
-  // 3. Detectar repeticiones absurdas (aaa, bbb, etc)
-  if (/(.)\1\1/.test(val)) {
-    return { valid: false, msg: "Demasiadas letras repetidas" };
-  }
-
-  // 4. Detectar patrones de teclado (asdf, qwerty)
-  const lowerVal = val.toLowerCase();
-  if (
-    BLACKLIST.some((b) => lowerVal.includes(b)) ||
-    MASH_PATTERNS.some((p) => lowerVal.includes(p))
-  ) {
-    return { valid: false, msg: "Nombre no parece real" };
-  }
-
-  // 5. Verificación de diversidad de caracteres para nombres largos
-  const distinctChars = new Set(lowerVal.replace(/\s/g, "").split("")).size;
-  if (val.length >= 8 && distinctChars < 4) {
-    return { valid: false, msg: "Escriba un nombre válido" };
-  }
-
-  return { valid: true, msg: "¡Se ve bien!" };
+    return { valido: true, mensaje: "¡Válido!" };
 };
 
 /**
- * Valida edad en un rango lógico para eventos
+ * Valida que la edad esté en un rango permitido
  */
-// Exporto esta función para poder usarla en el resto del proyecto
-export const validateAge = (age, min = 18, max = 99) => {
-  const n = Number(age);
-  if (isNaN(n) || age === "") return { valid: false, msg: "Ingrese un número" };
-  if (n < min) return { valid: false, msg: `Mínimo ${min} años` };
-  if (n > max) return { valid: false, msg: `Máximo ${max} años` };
-  return { valid: true, msg: "Edad válida" };
-};
-
-/**
- * Valida emails con regex estándar profesional
- */
-// Exporto esto para que sea reutilizable
-export const validateEmail = (email) => {
-  // Esta función valida que el formato sea real
-  const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  if (!regex.test(email)) return { valid: false, msg: "Email inválido" };
-  return { valid: true, msg: "Email correcto" };
+export const validarEdad = (edad, min, max) => {
+    const numero = Number(edad);
+    if (edad === "" || isNaN(numero)) return { valido: false, mensaje: "Edad requerida" };
+    if (numero < min || numero > max) return { valido: false, mensaje: `Rango: ${min}-${max}` };
+    return { valido: true, mensaje: "Edad correcta" };
 };

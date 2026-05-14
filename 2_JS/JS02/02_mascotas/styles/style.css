@@ -158,3 +158,33 @@ header p.lead {
     border-radius: 16px !important;
     border-left: 5px solid var(--accent) !important;
 }
+/* Notificaciones Toast Premium */
+.toast-custom {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 16px 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    border-left: 6px solid var(--accent);
+    color: var(--text-head);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: var(--transition);
+}
+
+.toast-custom.success { border-left-color: var(--success); }
+.toast-custom.error { border-left-color: var(--error); }
+
+@keyframes toastIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-out {
+    transform: translateX(120%);
+    opacity: 0;
+}

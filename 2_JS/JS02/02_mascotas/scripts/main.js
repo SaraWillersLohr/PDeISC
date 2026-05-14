@@ -1,199 +1,203 @@
-// Traigo las funciones de otros archivos para organizar mejor el código
+// 1. Importaciones
 import {
-  validatePetText,
-  validateAgeWeight,
-  validateEmail,
-} from "../modules/validations.js";
+  validarTextoMascota,
+  validarEdadPeso,
+  validarEmail,
+} from "/modules/validations.js";
 
-// Obtengo los elementos del HTML para poder usarlos en JS
-const form = document.getElementById("petForm");
-const submitBtn = document.getElementById("submitBtn");
-const termsCheck = document.getElementById("termsCheck");
-const vacunasSelect = document.getElementById("vacunas");
-const cantVacunas = document.getElementById("cantidadVacunas");
-const listContainer = document.getElementById("petList");
+const formulario = document.getElementById("petForm");
+const botonEnviar = document.getElementById("submitBtn");
+const checkTerminos = document.getElementById("termsCheck");
+const selectVacunas = document.getElementById("vacunas");
+const inputCantVacunas = document.getElementById("cantidadVacunas");
+const contenedorLista = document.getElementById("petList");
 
-// Array para manejar los registros
-let pets = [];
+// Cargo las mascotas desde localStorage al iniciar (o array vacío si no hay nada)
+let listaMascotas = JSON.parse(localStorage.getItem("mascotas")) || [];
 
-/**
- * Muestra el feedback visual dinámico
- */
-const showFeedback = (input, result) => {
-  input.classList.toggle("is-valid", result.valid);
-  input.classList.toggle("is-invalid", !result.valid);
-
-  let feedback = input.parentElement.querySelector(".invalid-feedback");
-  if (!feedback) {
-    feedback = document.createElement("div");
-    feedback.className = "invalid-feedback";
-    input.parentNode.appendChild(feedback);
-  }
-  feedback.textContent = result.msg || "";
+const razasPorEspecie = {
+  Perro: ["Labrador", "Border Collie", "Pastor Alemán", "Bulldog", "Cane corso"],
+  Gato: ["Siamés", "Persa", "Bengala", "Mestizo", "Ragdoll", "Angora"],
+  Hamster: ["Sirio", "Ruso", "Roborovski", "Anillo"],
+  Tortuga: ["De agua", "Terrestre", "Sulcata"],
+  Ave: ["Canario", "Loro", "Cacatúa", "Periquito"],
 };
 
-// Reacciono al click del usuario
-vacunasSelect.addEventListener("change", () => {
-  cantVacunas.disabled = vacunasSelect.value === "no";
-  if (cantVacunas.disabled) {
-    cantVacunas.value = "";
-    cantVacunas.classList.remove("is-valid", "is-invalid");
+/**
+ * Función central de feedback visual (Sin Alerts)
+ */
+const mostrarFeedback = (input, resultado) => {
+  if (!input) return;
+  
+  const mensajeError = input.parentElement.querySelector(".invalid-feedback");
+  
+  if (resultado.valido) {
+    input.classList.add("is-valid");
+    input.classList.remove("is-invalid");
+    if (mensajeError) {
+      mensajeError.style.display = "none";
+      mensajeError.textContent = "";
+    }
+  } else {
+    input.classList.add("is-invalid");
+    input.classList.remove("is-valid");
+    if (mensajeError) {
+      mensajeError.style.display = "block";
+      mensajeError.textContent = resultado.mensaje;
+    }
   }
-});
+};
 
-// Esta función chequea que todo esté bien antes de habilitar el botón
-const validateForm = () => {
-  const isPetNameValid = validatePetText(form.nombreMascota.value).valid;
-  const isRazaValid = validatePetText(form.raza.value).valid;
-  const isDuenoValid = validatePetText(form.nombreDueno.value).valid;
-  const isEmailValid = validateEmail(form.email.value).valid;
-  const isAgeWeightValid = validateAgeWeight(
-    form.especie.value,
-    form.edad.value,
-    form.peso.value,
-  ).valid;
-  const isTerms = termsCheck.checked;
+/**
+ * Valida el estado general del botón
+ */
+const validarFormularioCompleto = () => {
+  if (!formulario) return;
 
-  submitBtn.disabled = !(
-    isPetNameValid &&
-    isRazaValid &&
-    isDuenoValid &&
-    isEmailValid &&
-    isAgeWeightValid &&
-    isTerms
+  const resNombre = validarTextoMascota(formulario.nombreMascota.value);
+  const resDueno = validarTextoMascota(formulario.nombreDueno.value);
+  const resEmail = validarEmail(formulario.email.value);
+  const resEdadPeso = validarEdadPeso(
+    formulario.especie.value,
+    formulario.raza.value,
+    formulario.edad.value,
+    formulario.peso.value
+  );
+  
+  const terminosAceptados = checkTerminos.checked;
+
+  botonEnviar.disabled = !(
+    resNombre.valido &&
+    resDueno.valido &&
+    resEmail.valido &&
+    resEdadPeso.valido &&
+    terminosAceptados
   );
 };
 
-// Reacciono a lo que el usuario tipea
-form.addEventListener("input", (e) => {
-  const input = e.target;
-  let result = { valid: true, msg: "" };
+const actualizarRazas = () => {
+  const especieElegida = formulario.especie.value;
+  const razas = razasPorEspecie[especieElegida] || [];
 
-  // Valido la entrada del usuario según el ID
-  if (
-    input.id === "nombreMascota" ||
-    input.id === "raza" ||
-    input.id === "nombreDueno"
-  ) {
-    result = validatePetText(input.value);
-  } else if (input.id === "email") {
-    result = validateEmail(input.value);
-  } else if (
-    input.id === "edad" ||
-    input.id === "peso" ||
-    input.id === "especie"
-  ) {
-    // Chequeo que los datos ingresados sean correctos para edad y peso
-    result = validateAgeWeight(
-      form.especie.value,
-      form.edad.value,
-      form.peso.value,
+  formulario.raza.innerHTML = "";
+  razas.forEach((raza) => {
+    const opcion = document.createElement("option");
+    opcion.value = raza;
+    opcion.textContent = raza;
+    formulario.raza.appendChild(opcion);
+  });
+
+  validarFormularioCompleto();
+};
+
+formulario.especie.addEventListener("change", actualizarRazas);
+formulario.raza.addEventListener("change", validarFormularioCompleto);
+
+selectVacunas.addEventListener("change", () => {
+  inputCantVacunas.disabled = selectVacunas.value === "no";
+  if (inputCantVacunas.disabled) {
+    inputCantVacunas.value = "";
+    inputCantVacunas.classList.remove("is-valid", "is-invalid");
+  }
+});
+
+// ESCUCHA DE INPUTS
+formulario.addEventListener("input", (e) => {
+  const input = e.target;
+  let resultado = { valido: true, mensaje: "" };
+
+  if (input.id === "nombreMascota" || input.id === "nombreDueno") {
+    resultado = validarTextoMascota(input.value);
+  } 
+  else if (input.id === "email") {
+    resultado = validarEmail(input.value);
+  } 
+  else if (input.id === "edad" || input.id === "peso" || input.id === "especie" || input.id === "raza") {
+    resultado = validarEdadPeso(
+      formulario.especie.value,
+      formulario.raza.value,
+      formulario.edad.value,
+      formulario.peso.value
     );
 
-    // Si cambiamos especie, actualizamos feedback de edad y peso
-    if (input.id === "especie") {
-      showFeedback(
-        document.getElementById("edad"),
-        result.field === "edad" ? result : { valid: true },
-      );
-      showFeedback(
-        document.getElementById("peso"),
-        result.field === "peso" ? result : { valid: true },
-      );
-      validateForm();
-      return;
-    }
-
-    // Si el error es de un campo específico que no es el actual, no lo mostramos aquí
-    if (!result.valid && result.field && result.field !== input.id) {
-      result = { valid: true };
+    if (!resultado.valido && resultado.campo && resultado.campo !== input.id) {
+       if (input.id === "especie" || input.id === "raza") {
+          mostrarFeedback(document.getElementById("edad"), resultado.campo === "edad" ? resultado : { valido: true });
+          mostrarFeedback(document.getElementById("peso"), resultado.campo === "peso" ? resultado : { valido: true });
+       }
+       resultado = { valido: true }; 
     }
   }
 
   if (input.tagName === "INPUT" && input.type !== "checkbox") {
-    showFeedback(input, result);
+    mostrarFeedback(input, resultado);
   }
 
-  validateForm();
+  validarFormularioCompleto();
 });
 
-// Esta parte se encarga de las validaciones
-termsCheck.addEventListener("change", validateForm);
+checkTerminos.addEventListener("change", validarFormularioCompleto);
 
-// Escucho el submit del formulario
-form.addEventListener("submit", (e) => {
+formulario.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const newPet = {
+  const nuevaMascota = {
     id: Date.now(),
-    nombre: form.nombreMascota.value,
-    especie: form.especie.value,
-    raza: form.raza.value,
-    edad: form.edad.value,
-    peso: form.peso.value,
-    dueno: form.nombreDueno.value,
-    email: form.email.value,
-    vacunas: form.vacunas.value,
+    nombre: formulario.nombreMascota.value,
+    especie: formulario.especie.value,
+    raza: formulario.raza.value,
+    edad: formulario.edad.value,
+    peso: formulario.peso.value,
+    dueno: formulario.nombreDueno.value,
+    email: formulario.email.value,
+    vacunas: formulario.vacunas.value,
   };
 
-  // DEMOSTRACIÓN DE DIFERENTES MÉTODOS DE ALMACENAJE EN ARRAY (Consigna 2)
-  pets.push(newPet);
+  listaMascotas.push(nuevaMascota);
+  
+  // Guardo la lista actualizada en localStorage
+  localStorage.setItem("mascotas", JSON.stringify(listaMascotas));
 
-  renderPets();
-  form.reset();
+  dibujarListaMascotas();
+  formulario.reset();
 
-  Array.from(form.elements).forEach((el) => {
+  Array.from(formulario.elements).forEach((el) => {
     el.classList.remove("is-valid", "is-invalid");
+    const msg = el.parentElement.querySelector(".invalid-feedback");
+    if (msg) msg.style.display = "none";
   });
 
-  alert("¡Mascota registrada correctamente!");
-  validateForm();
+  actualizarRazas();
 });
 
-// Función para dibujar las mascotas en el HTML
-const renderPets = () => {
-  // Limpio y dibujo el contenido nuevo en el HTML
-  listContainer.innerHTML = "";
-
-  if (pets.length === 0) {
-    listContainer.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <p class="text-muted">No hay mascotas registradas aún.</p>
-            </div>
-        `;
-    return;
-  }
-
-  // Recorro la lista de elementos para mostrarlos
-  pets.forEach((pet, index) => {
-    const col = document.createElement("div");
-    col.className = "col-md-4 mb-4";
-    col.innerHTML = `
+const dibujarListaMascotas = () => {
+  contenedorLista.innerHTML = "";
+  
+  listaMascotas.forEach((mascota, indice) => {
+    const columna = document.createElement("div");
+    columna.className = "col-md-4 mb-4";
+    columna.innerHTML = `
             <div class="card h-100 p-3 shadow-sm border-0 rounded-3">
-                <div class="d-flex align-items-center mb-2">
-                    <span class="fs-4 me-2">🐾</span>
-                    <h3 class="h5 mb-0">${pet.nombre}</h3>
-                </div>
-                <div class="mb-3">
-                    <p class="small text-muted mb-1"><strong>Especie:</strong> ${pet.especie} (${pet.raza})</p>
-                    <p class="small text-muted mb-1"><strong>Edad/Peso:</strong> ${pet.edad} años / ${pet.peso}kg</p>
-                    <p class="small text-muted mb-0"><strong>Dueño:</strong> ${pet.dueno}</p>
-                </div>
-                <button class="btn btn-outline-danger btn-sm mt-auto w-100 py-2 fw-bold btn-delete" 
-                        style="border-radius: 12px; border-width: 2px;">
-                    ELIMINAR REGISTRO
-                </button>
+                <h3 class="h5 mb-2">🐾 ${mascota.nombre}</h3>
+                <p class="small text-muted mb-1">${mascota.especie} (${mascota.raza})</p>
+                <p class="small text-muted mb-0">Dueño: ${mascota.dueno}</p>
+                <button class="btn btn-outline-danger btn-sm mt-3 btn-borrar">BORRAR</button>
             </div>
         `;
-
-    // Evento para eliminar mascota
-    col.querySelector(".btn-delete").addEventListener("click", () => {
-      if (confirm(`¿Eliminar a ${pet.nombre}?`)) {
-        pets.splice(index, 1);
-        renderPets();
-      }
+    
+    columna.querySelector(".btn-borrar").addEventListener("click", () => {
+      listaMascotas.splice(indice, 1);
+      
+      // Guardo la lista actualizada después de borrar
+      localStorage.setItem("mascotas", JSON.stringify(listaMascotas));
+      
+      dibujarListaMascotas();
     });
-
-    listContainer.appendChild(col);
+    
+    contenedorLista.appendChild(columna);
   });
 };
+
+// Carga inicial: actualizamos razas y dibujamos lo que haya en localStorage
+actualizarRazas();
+dibujarListaMascotas();

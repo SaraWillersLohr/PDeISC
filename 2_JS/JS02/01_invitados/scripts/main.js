@@ -1,131 +1,102 @@
-// Traigo las funciones de otros archivos para organizar mejor el código
-import { validateRealName, validateAge } from "../modules/validations.js";
-// Traigo lo necesario de otros JS
-import { renderGuests } from "../modules/render.js";
+// Traigo las funciones de validación en español
+import { validarNombreReal, validarEdad } from "../modules/validations.js";
+import { dibujarInvitados } from "../modules/render.js";
 
-// Obtengo los elementos del HTML para poder usarlos en JS
-const form = document.getElementById("guestForm");
-// Referencia al elemento del HTML
-const submitBtn = document.getElementById("submitBtn");
-// Obtengo el elemento principal por su ID
-const termsCheck = document.getElementById("termsCheck");
-// Referencia al elemento del HTML
-const listContainer = document.getElementById("guestList");
+// Obtengo los elementos del HTML
+const formulario = document.getElementById("guestForm");
+const botonEnviar = document.getElementById("submitBtn");
+const checkTerminos = document.getElementById("termsCheck");
+const contenedorLista = document.getElementById("guestList");
 
-// Array para manejar la lista de invitados (Consigna 1)
-let guestsList = [];
+// Array para manejar la lista de invitados
+let listaInvitados = [];
 
 /**
- * Función para eliminar un invitado del array y re-renderizar
+ * Función para eliminar un invitado y actualizar la vista
  */
-const deleteGuest = (index) => {
-  // Elimino el elemento del array usando splice (Consigna 1)
-  guestsList.splice(index, 1);
-  // Vuelvo a dibujar la lista actualizada
-  renderGuests(guestsList, listContainer, deleteGuest);
+const borrarInvitado = (indice) => {
+  listaInvitados.splice(indice, 1);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
 };
 
 /**
- * Lógica centralizada para mostrar feedback visual instantáneo
+ * Muestra el feedback visual (verde/rojo) en los campos
  */
-const showFeedback = (input, result) => {
-  // Cambio las clases de Bootstrap para mostrar si es válido o no
-  input.classList.toggle("is-valid", result.valid);
-  // Alterno la clase de Bootstrap
-  input.classList.toggle("is-invalid", !result.valid);
+const mostrarFeedback = (input, resultado) => {
+  input.classList.toggle("is-valid", resultado.valido);
+  input.classList.toggle("is-invalid", !resultado.valido);
 
-  // Busco el mensaje debajo del input
-  const feedback = input.parentElement.querySelector(".invalid-feedback");
-  if (feedback) {
-    feedback.textContent = result.msg || "";
-    // Transición suave manual (Bootstrap ya tiene algunas por defecto)
-    feedback.style.opacity = result.valid ? "0" : "1";
+  const mensajeError = input.parentElement.querySelector(".invalid-feedback");
+  if (mensajeError) {
+    mensajeError.textContent = resultado.mensaje || "";
   }
 };
 
-// Esta función chequea que todo esté bien antes de habilitar el botón
-const validateForm = () => {
-  // Chequeo que los datos estén bien
-  const isName = validateRealName(form.nombre.value).valid;
-  // Esta función valida que el nombre sea real
-  const isSurname = validateRealName(form.apellido.value).valid;
-  // Chequeo que los datos estén bien
-  const isAge = validateAge(form.edad.value, 18, 99).valid;
-  const isTerms = termsCheck.checked;
+/**
+ * Valida si el formulario completo es correcto
+ */
+const validarFormulario = () => {
+  const nombreValido = validarNombreReal(formulario.nombre.value).valido;
+  const apellidoValido = validarNombreReal(formulario.apellido.value).valido;
+  const edadValida = validarEdad(formulario.edad.value, 18, 99).valido;
+  const terminosAceptados = checkTerminos.checked;
 
-  submitBtn.disabled = !(isName && isSurname && isAge && isTerms);
+  botonEnviar.disabled = !(nombreValido && apellidoValido && edadValida && terminosAceptados);
 };
 
-// Valido mientras el usuario escribe
-form.addEventListener("input", (e) => {
+// Validaciones dinámicas mientras se escribe
+formulario.addEventListener("input", (e) => {
   const input = e.target;
-  let result = { valid: true, msg: "" };
+  let resultado = { valido: true, mensaje: "" };
 
-  // Validaciones dinámicas por campo
   if (input.name === "nombre" || input.name === "apellido") {
-    // Valido la información del usuario
-    result = validateRealName(input.value);
+    resultado = validarNombreReal(input.value);
   } else if (input.name === "edad") {
-    // Chequeo que los datos ingresados sean correctos
-    result = validateAge(input.value, 18, 99);
+    resultado = validarEdad(input.value, 18, 99);
   }
 
   if (input.tagName === "INPUT" && input.type !== "checkbox") {
-    showFeedback(input, result);
+    mostrarFeedback(input, resultado);
   }
 
-  // Chequeo que los datos estén bien
-  validateForm();
+  validarFormulario();
 });
 
-// Detectar el cambio en el checkbox de términos
-// Esta parte se encarga de las validaciones
-termsCheck.addEventListener("change", validateForm);
+checkTerminos.addEventListener("change", validarFormulario);
 
-// Manejo el envío del formulario
-// Escucho el submit del formulario
-form.addEventListener("submit", (e) => {
-  // Evito que se recargue la página sola
+// Manejo del envío del formulario
+formulario.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  // DEMOSTRACIÓN DE LAS 3 FORMAS DE LEER FORMULARIOS EN JS (Consigna 1)
-  // formdata sirve para leer los datos del formulario en forma de objeto
-  // Forma 1: Usando FormData (muy moderna y cómoda para muchos campos)
-  const formData = new FormData(form);
-  const nombre = formData.get("nombre");
+  // DEMOSTRACIÓN DE LAS 3 FORMAS DE LEER FORMULARIOS (Consigna 1)
+  
+  // Forma 1: FormData (Objeto)
+  const datos = new FormData(formulario);
+  const nombre = datos.get("nombre");
 
-  // Forma 2: Acceso directo por name o id desde el formulario
-  const apellido = form.apellido.value;
-  //form directo sirve para leer los datos del formulario en forma de cadena
-  // Forma 3: Usando document.getElementById (la clásica)
+  // Forma 2: Acceso directo por name (Propiedad)
+  const apellido = formulario.apellido.value;
+
+  // Forma 3: Por nombre de elemento (DOM Clásico)
   const edad = document.getElementsByName("edad")[0].value;
 
-  // El resto de los datos los saco normal
-  const tipoEntrada = form.tipoEntrada.value;
-  const acompanantes = form.acompanantes.value;
-
-  const newGuest = {
+  const nuevoInvitado = {
     nombre: nombre,
     apellido: apellido,
     edad: edad,
-    tipoEntrada: tipoEntrada,
-    acompanantes: acompanantes,
+    tipoEntrada: formulario.tipoEntrada.value,
+    acompanantes: formulario.acompanantes.value,
   };
 
-  // Agrego el nuevo invitado al array (Consigna 1)
-  guestsList.push(newGuest);
+  listaInvitados.push(nuevoInvitado);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
+  
+  formulario.reset();
 
-  // Renderizo la lista completa desde el array
-  renderGuests(guestsList, listContainer, deleteGuest);
-
-  // Reseteo el formulario después de guardar
-  form.reset();
-
-  // Limpio las clases de validación
-  Array.from(form.elements).forEach((el) => {
+  // Limpiar estilos visuales
+  Array.from(formulario.elements).forEach((el) => {
     el.classList.remove("is-valid", "is-invalid");
   });
 
-  // Chequeo que los datos estén bien
-  validateForm();
+  validarFormulario();
 });

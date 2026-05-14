@@ -1,128 +1,123 @@
-// Traigo las funciones de otros archivos para organizar mejor el código
-import { checkGender } from "../modules/genderApi.js";
+// Importo las validaciones en español
 import {
-  validateRealName,
-  validateAgeAndBirth,
-  validateDNI,
-  validatePhone,
-  validateEmail,
-  validateNationality,
+  validarNombreReal,
+  validarEdadYFecha,
+  validarDNI,
+  validarTelefono,
+  validarEmail,
+  validarNacionalidad,
 } from "../modules/validations.js";
 
-// Obtengo los elementos del HTML para poder usarlos en JS
-const form = document.getElementById("passengerForm");
-const submitBtn = document.getElementById("submitBtn");
-const termsCheck = document.getElementById("termsCheck");
-const genderWarning = document.getElementById("genderWarning");
-const listContainer = document.getElementById("passengerList");
-const tieneHijosSelect = document.getElementById("tieneHijos");
-const cantHijosInput = document.getElementById("cantidadHijos");
+// Obtengo los elementos del HTML
+const formulario = document.getElementById("passengerForm");
+const botonEnviar = document.getElementById("submitBtn");
+const checkTerminos = document.getElementById("termsCheck");
+const contenedorLista = document.getElementById("passengerList");
+const selectHijos = document.getElementById("tieneHijos");
+const inputCantHijos = document.getElementById("cantidadHijos");
 
-// Intento traer los datos del navegador (Consigna 3)
-let people = JSON.parse(localStorage.getItem("peopleList")) || [];
+// Cargo los datos desde LocalStorage (Consigna 3)
+let listaPersonas = JSON.parse(localStorage.getItem("peopleList")) || [];
 
 /**
- * Muestra el feedback visual dinámico
+ * Muestra el feedback visual (verde/rojo) dinámico
  */
-const showFeedback = (input, result) => {
-  input.classList.toggle("is-valid", result.valid);
-  input.classList.toggle("is-invalid", !result.valid);
+const mostrarFeedback = (input, resultado) => {
+  input.classList.toggle("is-valid", resultado.valido);
+  input.classList.toggle("is-invalid", !resultado.valido);
 
-  let feedback = input.parentElement.querySelector(".invalid-feedback");
-  if (!feedback) {
-    feedback = document.createElement("div");
-    feedback.className = "invalid-feedback";
-    input.parentNode.appendChild(feedback);
+  let mensajeError = input.parentElement.querySelector(".invalid-feedback");
+  if (!mensajeError) {
+    mensajeError = document.createElement("div");
+    mensajeError.className = "invalid-feedback";
+    input.parentNode.appendChild(mensajeError);
   }
-  feedback.textContent = result.msg || "";
+  mensajeError.textContent = resultado.mensaje || "";
 };
 
-// Habilitar/Deshabilitar campo de hijos
-tieneHijosSelect.addEventListener("change", () => {
-  cantHijosInput.disabled = tieneHijosSelect.value === "no";
-  if (cantHijosInput.disabled) {
-    cantHijosInput.value = "0";
-    cantHijosInput.classList.remove("is-valid", "is-invalid");
+// Habilitar/Deshabilitar campo de hijos dinámicamente
+selectHijos.addEventListener("change", () => {
+  inputCantHijos.disabled = selectHijos.value === "no";
+  if (inputCantHijos.disabled) {
+    inputCantHijos.value = "0";
+    inputCantHijos.classList.remove("is-valid", "is-invalid");
   }
 });
 
-// Esta función chequea que todo esté bien antes de habilitar el botón
-const validateForm = () => {
-  const isNameValid = validateRealName(form.nombre.value).valid;
-  const isSurnameValid = validateRealName(form.apellido.value).valid;
-  const isAgeBirthValid = validateAgeAndBirth(
-    form.edad.value,
-    form.fechaNac.value,
-  ).valid;
-  const isDniValid = validateDNI(form.documento.value).valid;
-  const isEmailValid = validateEmail(form.email.value).valid;
-  const isNationalityValid = validateNationality(form.nacionalidad.value).valid;
-  const isTerms = termsCheck.checked;
+/**
+ * Chequea si el formulario es válido para habilitar el botón de envío
+ */
+const validarFormularioCompleto = () => {
+  const nombreValido = validarNombreReal(formulario.nombre.value).valido;
+  const apellidoValido = validarNombreReal(formulario.apellido.value).valido;
+  const edadFechaValida = validarEdadYFecha(
+    formulario.edad.value,
+    formulario.fechaNac.value,
+  ).valido;
+  const dniValido = validarDNI(formulario.documento.value).valido;
+  const emailValido = validarEmail(formulario.email.value).valido;
+  const nacionalidadValida = validarNacionalidad(formulario.nacionalidad.value).valido;
+  const terminosAceptados = checkTerminos.checked;
 
-  submitBtn.disabled = !(
-    isNameValid &&
-    isSurnameValid &&
-    isAgeBirthValid &&
-    isDniValid &&
-    isEmailValid &&
-    isNationalityValid &&
-    isTerms
+  botonEnviar.disabled = !(
+    nombreValido &&
+    apellidoValido &&
+    edadFechaValida &&
+    dniValido &&
+    emailValido &&
+    nacionalidadValida &&
+    terminosAceptados
   );
 };
 
-// Reacciono a lo que el usuario tipea
-form.addEventListener("input", async (e) => {
+// Validaciones en tiempo real mientras el usuario escribe
+formulario.addEventListener("input", (e) => {
   const input = e.target;
-  let result = { valid: true, msg: "" };
+  let resultado = { valido: true, mensaje: "" };
 
   if (input.id === "nombre" || input.id === "apellido") {
-    result = validateRealName(input.value);
+    resultado = validarNombreReal(input.value);
   } else if (input.id === "nacionalidad") {
-    result = validateNationality(input.value);
+    resultado = validarNacionalidad(input.value);
   } else if (input.id === "documento") {
-    result = validateDNI(input.value);
+    resultado = validarDNI(input.value);
   } else if (input.id === "telefono") {
-    result = validatePhone(input.value);
+    resultado = validarTelefono(input.value);
   } else if (input.id === "email") {
-    result = validateEmail(input.value);
+    resultado = validarEmail(input.value);
   } else if (input.id === "edad" || input.id === "fechaNac") {
-    result = validateAgeAndBirth(form.edad.value, form.fechaNac.value);
+    resultado = validarEdadYFecha(formulario.edad.value, formulario.fechaNac.value);
 
-    // Sincronizar feedback entre edad y fecha si corresponde
+    // Sincronizar feedback visual entre ambos campos
     if (input.id === "fechaNac") {
-      showFeedback(
+      mostrarFeedback(
         document.getElementById("edad"),
-        result.field === "edad" ? result : { valid: true },
+        resultado.campo === "edad" ? resultado : { valido: true },
       );
     }
 
-    if (!result.valid && result.field && result.field !== input.id) {
-      result = { valid: true };
+    if (!resultado.valido && resultado.campo && resultado.campo !== input.id) {
+      resultado = { valido: true };
     }
   }
 
   if (input.tagName === "INPUT" && input.type !== "checkbox") {
-    showFeedback(input, result);
+    mostrarFeedback(input, resultado);
   }
 
-  // Gender API para el nombre
-  if (input.id === "nombre" && input.value.length > 3 && result.valid) {
-    const data = await checkGender(input.value);
-    if (data && data.gender) {
-      genderWarning.classList.toggle("hidden", data.gender === form.sexo.value);
-    }
-  }
-
-  validateForm();
+  validarFormularioCompleto();
 });
 
-termsCheck.addEventListener("change", validateForm);
+checkTerminos.addEventListener("change", validarFormularioCompleto);
 
-// Función para mostrar la lista de nombres almacenados
-const renderPeopleList = () => {
-  listContainer.innerHTML = "";
-  if (people.length === 0) {
-    listContainer.innerHTML = `
+/**
+ * Dibuja la lista de personas almacenadas (Consigna 3)
+ */
+const dibujarListaPersonas = () => {
+  contenedorLista.innerHTML = "";
+  
+  if (listaPersonas.length === 0) {
+    contenedorLista.innerHTML = `
             <div class="col-12 text-center py-5">
                 <p class="text-muted">No hay personas registradas en LocalStorage.</p>
             </div>
@@ -130,16 +125,15 @@ const renderPeopleList = () => {
     return;
   }
 
-  const title = document.createElement("h4");
-  title.className = "col-12 mt-4 mb-3 h5 fw-bold text-uppercase";
-  title.style.letterSpacing = "0.05em";
-  title.textContent = "Personas Registradas (LocalStorage):";
-  listContainer.appendChild(title);
+  const titulo = document.createElement("h4");
+  titulo.className = "col-12 mt-4 mb-3 h5 fw-bold text-uppercase";
+  titulo.textContent = "Personas Registradas (LocalStorage):";
+  contenedorLista.appendChild(titulo);
 
-  people.forEach((p, index) => {
-    const item = document.createElement("div");
-    item.className = "col-md-6 mb-3";
-    item.innerHTML = `
+  listaPersonas.forEach((p, indice) => {
+    const tarjeta = document.createElement("div");
+    tarjeta.className = "col-md-6 mb-3";
+    tarjeta.innerHTML = `
             <div class="card h-100 p-3 shadow-sm border-0 border-start border-primary border-4 bg-white">
                 <div class="d-flex justify-content-between align-items-start mb-2">
                     <h5 class="h6 mb-0 fw-bold">${p.nombre} ${p.apellido}</h5>
@@ -150,57 +144,55 @@ const renderPeopleList = () => {
                     <small class="text-muted d-block">${p.email}</small>
                     <small class="text-muted d-block">Hijos: ${p.hijos}</small>
                 </div>
-                <button class="btn btn-outline-danger btn-sm mt-auto w-100 py-2 fw-bold btn-delete" 
+                <button class="btn btn-outline-danger btn-sm mt-auto w-100 py-2 fw-bold btn-borrar" 
                         style="border-radius: 12px; border-width: 2px;">
                     BORRAR REGISTRO
                 </button>
             </div>
         `;
 
-    // Evento para borrar de LocalStorage
-    item.querySelector(".btn-delete").addEventListener("click", () => {
-      if (confirm(`¿Borrar registro de ${p.nombre} de la memoria?`)) {
-        people.splice(index, 1);
-        localStorage.setItem("peopleList", JSON.stringify(people));
-        renderPeopleList();
-      }
+    // Borrar de LocalStorage
+    tarjeta.querySelector(".btn-borrar").addEventListener("click", () => {
+        listaPersonas.splice(indice, 1);
+        localStorage.setItem("peopleList", JSON.stringify(listaPersonas));
+        dibujarListaPersonas();
     });
 
-    listContainer.appendChild(item);
+    contenedorLista.appendChild(tarjeta);
   });
 };
 
 // Manejo el envío del formulario
-form.addEventListener("submit", (e) => {
+formulario.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const newPerson = {
-    nombre: form.nombre.value,
-    apellido: form.apellido.value,
-    edad: form.edad.value,
-    fechaNac: form.fechaNac.value,
-    sexo: form.sexo.value,
-    documento: form.documento.value,
-    estadoCivil: form.estadoCivil.value,
-    nacionalidad: form.nacionalidad.value,
-    telefono: form.telefono.value,
-    email: form.email.value,
-    hijos: form.tieneHijos.value === "si" ? form.cantidadHijos.value : 0,
+  const nuevaPersona = {
+    nombre: formulario.nombre.value,
+    apellido: formulario.apellido.value,
+    edad: formulario.edad.value,
+    fechaNac: formulario.fechaNac.value,
+    sexo: formulario.sexo.value,
+    documento: formulario.documento.value,
+    estadoCivil: formulario.estadoCivil.value,
+    nacionalidad: formulario.nacionalidad.value,
+    telefono: formulario.telefono.value,
+    email: formulario.email.value,
+    hijos: formulario.tieneHijos.value === "si" ? formulario.cantidadHijos.value : 0,
   };
 
-  people.push(newPerson);
-  localStorage.setItem("peopleList", JSON.stringify(people));
+  listaPersonas.push(nuevaPersona);
+  localStorage.setItem("peopleList", JSON.stringify(listaPersonas));
 
-  alert("¡Registro exitoso y guardado en LocalStorage!");
+  dibujarListaPersonas();
+  formulario.reset();
 
-  renderPeopleList();
-  form.reset();
-
-  Array.from(form.elements).forEach((el) => {
+  // Limpiar clases de validación
+  Array.from(formulario.elements).forEach((el) => {
     el.classList.remove("is-valid", "is-invalid");
   });
 
-  validateForm();
+  validarFormularioCompleto();
 });
 
-renderPeopleList();
+// Dibujar lista al cargar la página
+dibujarListaPersonas();

@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Raza</label>
-                                <input type="text" id="raza" class="form-control" placeholder="Ej. Labrador" required>
+                                <select id="raza" class="form-select" required></select>
                                 <div class="invalid-feedback">Raza inválida.</div>
                             </div>
                             <div class="col-md-3">
@@ -95,6 +95,8 @@
     <div class="modal fade" id="termsModal" tabindex="-1">
         <div class="modal-dialog"><div class="modal-content p-4"><h3>Términos Expo</h3><p class="small">Sus datos serán usados para la organización del evento. Validamos información real.</p></div></div>
     </div>
+
+    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/scripts/main.js"></script>

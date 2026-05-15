@@ -146,6 +146,63 @@ servidor.post('/api/exportar-resultados', async (peticion, respuesta) => {
     } catch (e) { respuesta.status(500).json({ error: 'no pude exportar' }); }
 });
 
+// nueva ruta para listar los archivos que ya están en el servidor
+servidor.get('/api/listar-archivos', async (peticion, respuesta) => {
+    try {
+        const rutaSubidos = path.join(directorioActual, 'archivos-subidos');
+        const rutaGenerados = path.join(directorioActual, 'archivos-generados');
+        
+        // aseguro que ambas carpetas existan
+        await fs.mkdir(rutaSubidos, { recursive: true });
+        await fs.mkdir(rutaGenerados, { recursive: true });
+        
+        const subidos = await fs.readdir(rutaSubidos);
+        const generados = await fs.readdir(rutaGenerados);
+        
+        // combino y filtro solo los .txt
+        const todos = [...subidos, ...generados].filter(f => f.endsWith('.txt'));
+        
+        // elimino duplicados por las dudas
+        const unicos = [...new Set(todos)];
+        
+        respuesta.json({ success: true, archivos: unicos });
+    } catch (e) {
+        respuesta.status(500).json({ error: 'no pude listar los archivos' });
+    }
+});
+
+// nueva ruta para leer el contenido de un archivo del servidor (busca en ambas carpetas)
+servidor.get('/api/leer-archivo/:nombre', async (peticion, respuesta) => {
+    try {
+        const nombre = peticion.params.nombre;
+        const rutaSubidos = path.join(directorioActual, 'archivos-subidos', nombre);
+        const rutaGenerados = path.join(directorioActual, 'archivos-generados', nombre);
+        
+        let contenidoTexto = '';
+        try {
+            contenidoTexto = await fs.readFile(rutaSubidos, 'utf-8');
+        } catch (e) {
+            // si no está en subidos, busco en generados
+            contenidoTexto = await fs.readFile(rutaGenerados, 'utf-8');
+        }
+        
+        let lineasExtraidas = [];
+        if (contenidoTexto.includes(',')) {
+            lineasExtraidas = contenidoTexto.split(',').map(item => item.trim());
+        } else {
+            lineasExtraidas = contenidoTexto.split(/\r?\n/).map(item => item.trim());
+        }
+        
+        respuesta.json({ 
+            success: true, 
+            lineas: lineasExtraidas.filter(l => l !== ''),
+            fileName: nombre 
+        });
+    } catch (e) {
+        respuesta.status(500).json({ error: 'no pude leer el archivo del servidor' });
+    }
+});
+
 // ruta para descargar archivos generados
 servidor.get('/api/descargar/:nombreArchivo', (peticion, respuesta) => {
     const rutaAbsoluta = path.join(directorioActual, 'archivos-generados', peticion.params.nombreArchivo);

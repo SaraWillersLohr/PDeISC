@@ -6,7 +6,10 @@ El proyecto sigue una arquitectura modular y profesional, dividiendo responsabil
 - `server.js`: Punto de entrada del backend. Gestiona rutas, persistencia de archivos y descargas reales.
 - `/modulos/numberProcessor.js`: Núcleo lógico que detecta tipos numéricos avanzados (Complejos, Fracciones, Factoriales, etc.).
 - `/paginas/index.html`: Interfaz de dashboard construida con Bootstrap 5.
-- `/scripts/main.js`: Controlador del frontend para validaciones técnicas y visualización de transformaciones.
+- `scripts/main.js`: Lee las líneas del archivo, te pregunta si hay dudas (ambigüedad) y calcula las estadísticas (útiles vs no útiles).
+- **Vista Previa**: Ahora podés inspeccionar el contenido bruto del archivo antes del análisis en una sección dedicada con tipografía profesional.
+- **Selector del Servidor**: Se añadió una opción para elegir archivos que ya están guardados en el servidor, evitando tener que subirlos de nuevo desde tu computadora.
+- `archivos-subidos/`: Una carpeta temporal donde se guardan los archivos que subís para poder leerlos.
 - `/estilos/`: Contiene el sistema de diseño (main, dark, light) con soporte para scroll horizontal en resultados largos.
 
 ## Soporte Numérico Expandido

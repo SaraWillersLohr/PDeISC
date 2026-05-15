@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NumberMaster Analyzer | Suite Profesional</title>
-    
+
     <!-- fuentes modernas -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+
     <!-- bootstrap y fontawesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- mis estilos -->
     <link rel="stylesheet" href="/estilos/main.css">
     <link id="theme-link" rel="stylesheet" href="/estilos/dark.css">
 </head>
+
 <body>
 
     <!-- encabezado principal -->
@@ -32,15 +36,22 @@
     </header>
 
     <main class="container py-4">
+        <!-- botón elegante para alternar la vista previa y mantener el balance visual -->
+        <div class="mb-4 d-flex align-items-center fade-in">
+            <button id="btn-toggle-preview" class="btn-toggle-custom d-none" data-bs-toggle="modal" data-bs-target="#modalPreview">
+                <i class="fa-solid fa-eye me-2"></i> Vista Previa
+            </button>
+        </div>
+
         <div class="row g-4">
-            
+
             <!-- panel de subida: acá se carga el txt -->
             <div class="col-lg-4 col-md-12">
                 <section class="dashboard-panel h-100">
                     <h2 class="h5 mb-4 d-flex align-items-center">
                         <i class="fa-solid fa-file-upload me-2 text-primary"></i> Subir Dataset
                     </h2>
-                    
+
                     <div id="drop-area" class="upload-zone mb-4">
                         <i class="fa-solid fa-cloud-arrow-up fa-3x mb-3 opacity-25"></i>
                         <p class="mb-3 small">Arrastrá tu archivo .txt acá o hacé click para buscar</p>
@@ -50,36 +61,21 @@
                         </button>
                     </div>
 
+                    <!-- nueva sección para elegir archivos que ya están en el servidor -->
+                    <div id="seccion-archivos-servidor" class="mb-4">
+                        <label for="select-archivos" class="small opacity-50 mb-2 d-block">O elegí uno del servidor:</label>
+                        <select id="select-archivos" class="form-select-custom w-100">
+                            <option value="">Cargando archivos...</option>
+                        </select>
+                    </div>
+
                     <div id="info-archivo" class="min-height-feedback mb-4"></div>
 
-                    <!-- tarjetas de estadísticas rápidas -->
-                    <div id="seccion-stats" class="d-none fade-in">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="stat-card-mini">
-                                    <span class="stat-value-mini" id="stat-utiles">0</span>
-                                    <span class="stat-label-mini">Útiles</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-card-mini">
-                                    <span class="stat-value-mini" id="stat-porcentaje">0%</span>
-                                    <span class="stat-label-mini">Efectividad</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-card-mini">
-                                    <span class="stat-value-mini" id="stat-invalidos">0</span>
-                                    <span class="stat-label-mini">Inválidos</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-card-mini">
-                                    <span class="stat-value-mini" id="stat-factoriales">0</span>
-                                    <span class="stat-label-mini">Factoriales</span>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- botón para ver las estadísticas (diagnóstico) -->
+                    <div id="seccion-btn-diagnostico" class="mt-auto pt-3 d-none fade-in">
+                        <button class="btn-master w-100 py-3" data-bs-toggle="modal" data-bs-target="#modalStats">
+                            <i class="fa-solid fa-chart-pie me-2"></i> Ver Diagnóstico
+                        </button>
                     </div>
                 </section>
             </div>
@@ -139,7 +135,83 @@
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
+    <!-- modal para la vista previa del archivo -->
+    <div class="modal fade" id="modalPreview" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content dashboard-panel border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title h5 d-flex align-items-center">
+                        <i class="fa-solid fa-file-code me-2 text-primary"></i> Contenido del Archivo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <label class="small opacity-50 mb-2">Datos detectados en el archivo:</label>
+                    <div id="vista-previa" class="preview-archivo-container" style="max-height: 400px;"></div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-master py-2 px-4 w-100" data-bs-dismiss="modal">Cerrar Vista Previa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal para mostrar las estadísticas (diagnóstico) -->
+    <div class="modal fade" id="modalStats" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content dashboard-panel border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title h5 d-flex align-items-center">
+                        <i class="fa-solid fa-square-poll-vertical me-2 text-primary"></i> Diagnóstico del Dataset
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div id="seccion-stats">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-utiles">0</span>
+                                    <span class="stat-label-mini">Útiles</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-no-utiles">0</span>
+                                    <span class="stat-label-mini">No Útiles</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-porcentaje">0%</span>
+                                    <span class="stat-label-mini">Eficacia</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini" id="stat-factoriales">0</span>
+                                    <span class="stat-label-mini">Factoriales</span>
+                                </div>
+                            </div>
+                            <div class="col-8">
+                                <div class="stat-card-mini">
+                                    <span class="stat-value-mini text-danger" id="stat-invalidos">0</span>
+                                    <span class="stat-label-mini">Inválidos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-master py-2 px-4 w-100" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/scripts/main.js"></script>
 </body>
+
 </html>

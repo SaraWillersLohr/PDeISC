@@ -18,17 +18,23 @@ const zonaDrop = document.getElementById('drop-area');
 const feedbackArchivo = document.getElementById('info-archivo');
 const contenedorResultados = document.getElementById('resultados-analisis');
 const contenedorUtiles = document.getElementById('lista-utiles');
-const seccionEstadisticas = document.getElementById('seccion-stats');
+const seccionBtnDiagnostico = document.getElementById('seccion-btn-diagnostico');
 const botonExportar = document.getElementById('btn-exportar');
 const seccionExportacion = document.getElementById('seccion-exportar');
 const interruptorTema = document.getElementById('theme-toggle');
 const enlaceTema = document.getElementById('theme-link');
 const botonIrArriba = document.getElementById('back-to-top');
 
+// nuevos elementos para la vista previa y archivos del servidor
+const contenedorVistaPrevia = document.getElementById('vista-previa');
+const selectorArchivos = document.getElementById('select-archivos');
+const btnTogglePreview = document.getElementById('btn-toggle-preview');
+
 // indicadores de estadísticas
 const visorUtiles = document.getElementById('stat-utiles');
+const visorNoUtiles = document.getElementById('stat-no-utiles');
 const visorInvalidos = document.getElementById('stat-invalidos');
-const visorFactoriales = document.getElementById('stat-factorials');
+const visorFactoriales = document.getElementById('stat-factoriales');
 const visorPorcentaje = document.getElementById('stat-porcentaje');
 
 // inicio la configuración visual
@@ -38,6 +44,56 @@ async function cargarPreferencias() {
         const datosConfiguracion = await respuesta.json();
         aplicarTema(datosConfiguracion.tema || 'dark');
     } catch (e) { aplicarTema('dark'); }
+    
+    // aprovecho para cargar la lista de archivos del servidor
+    cargarListaDeArchivos();
+}
+
+/**
+ * traigo la lista de archivos que ya están en la carpeta del servidor
+ */
+async function cargarListaDeArchivos() {
+    try {
+        const respuesta = await fetch('/api/listar-archivos');
+        const data = await respuesta.json();
+        
+        if (data.success && data.archivos.length > 0) {
+            selectorArchivos.innerHTML = '<option value="">-- Seleccionar un archivo --</option>' + 
+                data.archivos.map(f => `<option value="${f}">${f}</option>`).join('');
+        } else {
+            selectorArchivos.innerHTML = '<option value="">No hay archivos en el servidor</option>';
+        }
+    } catch (e) {
+        selectorArchivos.innerHTML = '<option value="">Error al cargar archivos</option>';
+    }
+}
+
+/**
+ * esta función carga un archivo específico seleccionado del servidor
+ */
+async function seleccionarArchivoDelServidor(nombre) {
+    if (!nombre) return;
+    
+    try {
+        feedbackArchivo.innerHTML = `<div class="text-primary small fade-in"><i class="fa-solid fa-sync fa-spin me-1"></i> Cargando desde el servidor...</div>`;
+        const respuesta = await fetch(`/api/leer-archivo/${nombre}`);
+        const data = await respuesta.json();
+        
+        if (data.success) {
+            feedbackArchivo.innerHTML = `<div class="text-success small fade-in"><i class="fa-solid fa-check-double me-1"></i> Archivo del servidor cargado</div>`;
+            lineasBrutas = data.lineas;
+            
+            // inhabilito la zona de subida si elegí uno del servidor
+            zonaDrop.style.pointerEvents = "none";
+            zonaDrop.style.opacity = "0.5";
+            entradaArchivo.disabled = true;
+            
+            mostrarVistaPrevia();
+            comenzarAnalisisProfundo();
+        }
+    } catch (e) {
+        mostrarErrorVisual("No pude cargar el archivo del servidor.");
+    }
 }
 
 function aplicarTema(tema) {
@@ -85,7 +141,7 @@ function mostrarErrorVisual(mensaje) {
         </div>
     `;
     contenedorResultados.innerHTML = '<div class="text-center py-5 opacity-25"><p>Esperando análisis...</p></div>';
-    seccionEstadisticas.classList.add('d-none');
+    seccionBtnDiagnostico.classList.add('d-none');
     seccionExportacion.classList.add('d-none');
 }
 
@@ -109,6 +165,12 @@ async function procesarSubidaDeArchivo(archivo) {
         if (data.success) {
             feedbackArchivo.innerHTML = `<div class="text-success small fade-in"><i class="fa-solid fa-check-double me-1"></i> Archivo cargado correctamente</div>`;
             lineasBrutas = data.lineas;
+            
+            // inhabilito el selector del servidor si subí uno local
+            selectorArchivos.disabled = true;
+            selectorArchivos.style.opacity = "0.5";
+            
+            mostrarVistaPrevia();
             comenzarAnalisisProfundo();
         } else {
             mostrarErrorVisual(data.error);
@@ -116,6 +178,19 @@ async function procesarSubidaDeArchivo(archivo) {
     } catch (error) {
         mostrarErrorVisual("No pude conectar con el servidor.");
     }
+}
+
+/**
+ * esta sección renderiza la vista previa del contenido bruto
+ */
+function mostrarVistaPrevia() {
+    if (lineasBrutas.length === 0) return;
+    
+    // limpio y preparo el contenido real del txt dentro del modal
+    contenedorVistaPrevia.textContent = lineasBrutas.join('\n');
+    
+    // muestro el botón de acceso a la vista previa
+    btnTogglePreview.classList.remove('d-none');
 }
 
 /**
@@ -226,16 +301,18 @@ function finalizarYMostrarEstadisticas() {
 
     // actualizo los numeritos de las tarjetas
     const cantidadUtiles = utilesFiltrados.length;
+    const cantidadNoUtiles = listaFinal.filter(d => d.valido && !d.esUtil).length;
     const cantidadInvalidos = listaFinal.filter(d => !d.valido).length;
     const cantidadFactoriales = listaFinal.filter(d => d.esFactorial).length;
     const totalLineas = listaFinal.length;
     
     visorUtiles.textContent = cantidadUtiles;
+    visorNoUtiles.textContent = cantidadNoUtiles;
     visorInvalidos.textContent = cantidadInvalidos;
     visorFactoriales.textContent = cantidadFactoriales;
     visorPorcentaje.textContent = totalLineas > 0 ? `${Math.round((cantidadUtiles / totalLineas) * 100)}%` : '0%';
 
-    seccionEstadisticas.classList.remove('d-none');
+    seccionBtnDiagnostico.classList.remove('d-none');
     seccionExportacion.classList.remove('d-none');
 }
 
@@ -264,6 +341,8 @@ async function exportarResultadosUtiles() {
         const data = await respuesta.json();
         if (data.success) {
             window.location.href = `/api/descargar/${data.fileName}`;
+            // actualizo la lista del servidor para que el nuevo archivo aparezca en el select
+            cargarListaDeArchivos();
         }
     } catch (e) { console.error('error al exportar:', e); } 
     finally { botonExportar.disabled = false; }
@@ -278,7 +357,16 @@ zonaDrop.addEventListener('drop', (e) => {
     procesarSubidaDeArchivo(e.dataTransfer.files[0]);
 });
 
-entradaArchivo.addEventListener('change', (e) => procesarSubidaDeArchivo(e.target.files[0]));
+entradaArchivo.addEventListener('change', (e) => {
+    // si elijo uno nuevo, limpio el selector del servidor
+    selectorArchivos.value = "";
+    procesarSubidaDeArchivo(e.target.files[0]);
+});
+
+selectorArchivos.addEventListener('change', (e) => {
+    seleccionarArchivoDelServidor(e.target.value);
+});
+
 botonExportar.addEventListener('click', exportarResultadosUtiles);
 interruptorTema.addEventListener('click', cambiarModoVisual);
 

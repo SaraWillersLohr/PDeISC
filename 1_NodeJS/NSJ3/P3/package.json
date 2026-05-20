@@ -1,12 +1,8 @@
 {
-  "name": "p3-flujo-estado",
-  "version": "1.0.0",
-  "description": "Proyecto 3: Flujo interactivo con estado",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+  "name": "p3-hijos-dom",
+  "version": "2.0.0",
+  "description": "Proyecto 3: Contar hijos del DOM",
+  "type": "module",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.21.2" }
 }

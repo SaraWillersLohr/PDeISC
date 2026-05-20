@@ -1,16 +1,33 @@
-const express = require('express');
-const path = require('path');
+// Servidor Express — sirve el laboratorio DHTML desde /public
+// Sara Willers Lohr · PDeISC · Node.js
+
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3000;
 
-// Servir archivos estáticos desde la carpeta 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Ruta principal que redirige al index.html en pages
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "pages", "index.html"));
 });
 
-app.listen(PORT, () => {
-    console.log(`P1 corriendo en http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log("==================================================");
+  console.log(`Laboratorio DHTML — http://localhost:${PORT}`);
+  console.log("==================================================");
+});
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`El puerto ${PORT} ya está en uso. Cerrá el otro proceso o cambiá PORT.`);
+  } else {
+    console.error("Error en el servidor:", err);
+  }
+  process.exit(1);
 });

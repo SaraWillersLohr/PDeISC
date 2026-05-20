@@ -1,0 +1,1 @@
+export function initBackToTop(){const b=document.getElementById("back-to-top");if(!b)return;window.addEventListener("scroll",()=>{b.style.display=window.scrollY>300?"flex":"none";});b.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));}

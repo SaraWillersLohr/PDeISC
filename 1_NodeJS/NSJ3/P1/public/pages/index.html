@@ -1,51 +1,83 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P1 - Manipulación DHTML</title>
-    <link rel="stylesheet" href="../styles/main.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P1 — DHTML Básico (H1 e imagen) | Sara Willers Lohr</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link id="theme-link" rel="stylesheet" href="../styles/light.css">
+  <link rel="stylesheet" href="../styles/responsive.css">
+  <script src="../scripts/theme.js"></script>
 </head>
 
 <body>
-    <header>
-        <h1>Consola DHTML Dinámica</h1>
-        <p>Control total sobre los elementos del DOM mediante eventos</p>
-    </header>
-    <main>
-        <section class="card">
-            <h2>Panel de Control</h2>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-                <!-- Controles para H1 -->
-                <button id="btn-add-h1">Agregar H1</button>
-                <button id="btn-change-text" disabled>Cambiar Texto H1</button>
-                <button id="btn-change-color" disabled>Cambiar Color H1</button>
-            </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <!-- Controles para Imagen -->
-                <button id="btn-add-img">Agregar Imagen</button>
-                <button id="btn-change-img" disabled>Cambiar Imagen</button>
-                <button id="btn-resize-img" disabled>Cambiar Tamaño</button>
-            </div>
-        </section>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top custom-navbar py-2">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-type-h1 text-primary me-2 fs-3"></i>
+        <span>
+          <span class="fw-bold text-main d-block lh-1">P1 · DHTML Básico</span>
+          <small class="text-muted">H1 e imagen con eventos</small>
+        </span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navP1"
+        aria-controls="navP1" aria-expanded="false" aria-label="Menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navP1">
+        <span class="navbar-text ms-lg-3 text-muted"><i class="bi bi-mortarboard me-1"></i> Sara Willers Lohr</span>
+        <div class="ms-auto">
+          <button id="btn-theme-toggle" class="btn btn-outline-secondary rounded-circle btn-theme-toggle" type="button" title="Tema">
+            <i id="theme-icon" class="bi bi-sun-fill fs-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-        <section class="card">
-            <h2>Visualización del DOM</h2>
-            <div id="display-container"
-                style="min-height: 200px; border: 2px dashed #dee2e6; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
-                <p id="empty-msg" style="color: #adb5bd;">Los componentes aparecerán aquí...</p>
-            </div>
-        </section>
+  <main class="container py-3 pb-5">
+    <section class="glass-panel p-4 mb-4">
+      <span class="workspace-badge"><i class="bi bi-1-circle-fill me-1"></i> Consigna 1</span>
+      <h1 class="h3 fw-bold text-main mb-2">Manipulación DHTML de H1 e imagen</h1>
+      <p class="text-muted mb-4">Cada botón dispara un evento real sobre el DOM. Los cambios se ven en la zona de trabajo y en la consola.</p>
 
-        <section class="card">
-            <h3>Registro de Eventos</h3>
-            <div id="log-container" class="event-log">
-                <p class="event-item">Esperando interacciones...</p>
-            </div>
-        </section>
-    </main>
-    <script type="module" src="../scripts/main.js"></script>
+      <div class="toolbar-grid mb-4">
+        <button type="button" class="btn btn-custom" data-action="add-h1"><i class="bi bi-plus-lg me-1"></i> Agregar H1</button>
+        <button type="button" class="btn btn-custom" data-action="change-h1-text"><i class="bi bi-pencil me-1"></i> Cambiar texto H1</button>
+        <button type="button" class="btn btn-custom" data-action="change-h1-color"><i class="bi bi-palette me-1"></i> Cambiar color H1</button>
+        <button type="button" class="btn btn-custom" data-action="add-img"><i class="bi bi-image me-1"></i> Agregar imagen</button>
+        <button type="button" class="btn btn-custom" data-action="change-img"><i class="bi bi-arrow-repeat me-1"></i> Cambiar imagen</button>
+        <button type="button" class="btn btn-custom" data-action="resize-img"><i class="bi bi-aspect-ratio me-1"></i> Cambiar tamaño</button>
+      </div>
+
+      <div id="playground-dhtml" class="playground-area" aria-live="polite">
+        <p class="text-muted fs-7 mb-0">Zona de trabajo — los elementos aparecen acá.</p>
+      </div>
+    </section>
+
+    <section class="terminal-console" aria-label="Consola">
+      <div class="terminal-header">
+        <div class="d-flex align-items-center">
+          <span class="terminal-dot dot-red"></span>
+          <span class="terminal-dot dot-yellow"></span>
+          <span class="terminal-dot dot-green"></span>
+          <span class="text-white fs-7 ms-2 fw-semibold"><i class="bi bi-terminal me-1"></i> Consola Visual</span>
+        </div>
+        <button id="btn-clear-console" class="btn btn-sm btn-dark border-0 fs-7" type="button"><i class="bi bi-trash3 me-1"></i> Limpiar</button>
+      </div>
+      <div id="console-body" class="terminal-body">
+        <div class="console-placeholder text-muted fst-italic fs-7">Esperando eventos...</div>
+      </div>
+    </section>
+  </main>
+
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="Volver arriba"><i class="bi bi-arrow-up-short"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../scripts/app.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,103 @@
+/* ==========================================================
+   RESPONSIVE REAL — móvil, tablet y desktop
+   ========================================================== */
+
+@media (max-width: 991.98px) {
+  .terminal-body {
+    height: 170px;
+  }
+
+  .modules-sidebar {
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .custom-navbar .navbar-brand span small {
+    display: none;
+  }
+
+  /* Menú de módulos horizontal deslizable */
+  .modules-nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modules-nav::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .modules-nav::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+  }
+
+  .module-card {
+    flex: 0 0 auto;
+    min-width: 200px;
+    margin-bottom: 0;
+    scroll-snap-align: start;
+  }
+
+  .module-card:hover {
+    transform: none;
+  }
+
+  .toolbar-grid {
+    flex-direction: column;
+  }
+
+  .toolbar-grid .btn {
+    width: 100%;
+  }
+
+  .subnav-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .subnav-pills .nav-item {
+    flex-shrink: 0;
+  }
+
+  .attr-log-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .attr-arrow {
+    display: none;
+  }
+
+  .terminal-body {
+    height: 150px;
+    font-size: 0.78rem;
+  }
+
+  .back-to-top {
+    bottom: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .workspace {
+    padding: 1.25rem !important;
+  }
+}
+
+@media (max-width: 399.98px) {
+  .module-card {
+    min-width: 170px;
+  }
+
+  .dom-h1 {
+    font-size: 1.5rem;
+  }
+}

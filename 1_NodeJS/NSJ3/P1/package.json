@@ -1,12 +1,17 @@
 {
-  "name": "p1-dhtml-basico",
-  "version": "1.0.0",
-  "description": "Proyecto 1: DHTML Básico con eventos",
+  "name": "p1-laboratorio-dhtml",
+  "version": "2.0.0",
+  "description": "Proyecto 1: Laboratorio DHTML profesional con Express — 6 consignas integradas",
   "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
+  "keywords": ["express", "dhtml", "dom", "nodejs"],
+  "author": "Sara Willers Lohr",
+  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.21.2"
   }
 }

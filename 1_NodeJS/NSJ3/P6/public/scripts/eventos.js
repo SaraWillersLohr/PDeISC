@@ -1,0 +1,53 @@
+import { agregarLog } from "./consola.js";
+import { validarFormulario, esNombreValido, esEmailValido, esEdadValida, marcarCampo } from "./validaciones.js";
+
+export function bindEventos() {
+  const form = document.getElementById("registro-form");
+  if (!form) return;
+
+  form.querySelector("#reg-nombre")?.addEventListener("input", (e) => {
+    const v = esNombreValido(e.target.value);
+    marcarCampo(e.target, v.ok, v.msg, "err-nombre");
+  });
+  form.querySelector("#reg-email")?.addEventListener("input", (e) => {
+    const v = esEmailValido(e.target.value);
+    marcarCampo(e.target, v.ok, v.msg, "err-email");
+  });
+  form.querySelector("#reg-edad")?.addEventListener("input", (e) => {
+    const v = esEdadValida(e.target.value);
+    marcarCampo(e.target, v.ok, v.msg, "err-edad");
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const errores = validarFormulario(form);
+    const resultado = document.getElementById("registro-resultado");
+
+    if (Object.keys(errores).length > 0) {
+      agregarLog("Formulario", "Envío con errores");
+      return;
+    }
+
+    const datos = {
+      nombre: form.querySelector("#reg-nombre").value.trim(),
+      genero: form.querySelector('input[name="reg-genero"]:checked').value,
+      pais: form.querySelector("#reg-pais").value,
+      terminos: form.querySelector("#reg-terminos").checked ? "Sí" : "No",
+      edad: form.querySelector("#reg-edad").value,
+      email: form.querySelector("#reg-email").value.trim()
+    };
+
+    resultado.innerHTML = `
+      <h2 class="h6 fw-bold text-main mb-3"><i class="bi bi-check-circle-fill text-success me-1"></i> Registro completado</h2>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item bg-transparent px-0"><strong>Nombre:</strong> ${datos.nombre}</li>
+        <li class="list-group-item bg-transparent px-0"><strong>Género:</strong> ${datos.genero}</li>
+        <li class="list-group-item bg-transparent px-0"><strong>País:</strong> ${datos.pais}</li>
+        <li class="list-group-item bg-transparent px-0"><strong>Términos:</strong> ${datos.terminos}</li>
+        <li class="list-group-item bg-transparent px-0"><strong>Edad:</strong> ${datos.edad}</li>
+        <li class="list-group-item bg-transparent px-0"><strong>Email:</strong> ${datos.email}</li>
+      </ul>
+    `;
+    agregarLog("Formulario", `OK: ${datos.nombre}`);
+  });
+}

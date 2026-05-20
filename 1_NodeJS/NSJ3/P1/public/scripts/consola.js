@@ -1,0 +1,78 @@
+// ==========================================
+// Consola visual de eventos
+// Registro con timestamp, autoscroll e historial de sesión.
+// ==========================================
+
+const STORAGE_KEY = "p1_console_history";
+
+export function initConsole() {
+  const btnLimpiar = document.getElementById("btn-clear-console");
+  if (btnLimpiar) {
+    btnLimpiar.addEventListener("click", limpiarConsola);
+  }
+  cargarHistorialDeSesion();
+}
+
+// Agrego un log nuevo a la consola
+export function agregarLog(modulo, mensaje) {
+  const cuerpo = document.getElementById("console-body");
+  if (!cuerpo) return;
+
+  const placeholder = cuerpo.querySelector(".console-placeholder");
+  if (placeholder) placeholder.remove();
+
+  const ahora = new Date();
+  const h = String(ahora.getHours()).padStart(2, "0");
+  const m = String(ahora.getMinutes()).padStart(2, "0");
+  const s = String(ahora.getSeconds()).padStart(2, "0");
+  const timestamp = `[${h}:${m}:${s}]`;
+
+  const log = { timestamp, modulo, mensaje };
+  guardarEnHistorial(log);
+  pintarLogEnDOM(log, cuerpo);
+}
+
+function pintarLogEnDOM(log, contenedor) {
+  const linea = document.createElement("div");
+  linea.className = "console-line";
+  linea.innerHTML = `
+    <span class="console-time">${log.timestamp}</span>
+    <span class="console-method">${log.modulo}</span>
+    <span class="console-text">${log.mensaje}</span>
+  `;
+  contenedor.appendChild(linea);
+  contenedor.scrollTop = contenedor.scrollHeight;
+}
+
+function guardarEnHistorial(log) {
+  try {
+    const historial = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [];
+    historial.push(log);
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
+  } catch (e) {
+    console.error("No pude guardar el historial:", e);
+  }
+}
+
+export function limpiarConsola() {
+  const cuerpo = document.getElementById("console-body");
+  if (cuerpo) {
+    cuerpo.innerHTML = `<div class="console-placeholder text-muted fst-italic fs-7">Consola vaciada. Esperando nuevas interacciones...</div>`;
+  }
+  sessionStorage.removeItem(STORAGE_KEY);
+}
+
+function cargarHistorialDeSesion() {
+  const cuerpo = document.getElementById("console-body");
+  if (!cuerpo) return;
+
+  try {
+    const historial = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [];
+    if (historial.length > 0) {
+      cuerpo.innerHTML = "";
+      historial.forEach((log) => pintarLogEnDOM(log, cuerpo));
+    }
+  } catch (e) {
+    console.error("No pude cargar el historial:", e);
+  }
+}

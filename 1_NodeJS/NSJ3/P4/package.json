@@ -1,12 +1,8 @@
 {
-  "name": "p4-componentes-reutilizables",
-  "version": "1.0.0",
-  "description": "Proyecto 4: Componentes reutilizables DHTML",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+  "name": "p4-nodos-enlaces",
+  "version": "2.0.0",
+  "description": "Proyecto 4: Nodos a y atributos",
+  "type": "module",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.21.2" }
 }

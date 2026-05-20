@@ -1,14 +1,8 @@
-const express = require('express');
-const path = require('path');
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = 3006;
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
-});
-
-app.listen(PORT, () => {
-    console.log(`P6 corriendo en http://localhost:${PORT}`);
-});
+app.use(express.static(path.join(__dirname, "public")));
+app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public", "pages", "index.html")));
+app.listen(process.env.PORT || 3006, () => console.log("P6 — http://localhost:3006"));

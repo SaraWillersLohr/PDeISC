@@ -111,7 +111,7 @@ dom.btnNum.onclick = () => {
   }
 
   dom.inputNum.value = "";
-  if (dom.contNums) dom.contNums.textContent = `${numeros.length} ITEMS`;
+  updateUI();
 };
 
 dom.btnReset.onclick = () => {

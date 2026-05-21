@@ -1,203 +1,130 @@
-// 1. Importaciones
 import {
-  validarTextoMascota,
-  validarEdadPeso,
+  validarNombre,
   validarEmail,
-} from "/modules/validations.js";
+  validarTelefono,
+  validarEdad,
+  validarMesa,
+  validarAcompanantes,
+  validarNotas,
+} from "../modules/validations.js";
+import { METODOS_ARRAY, renderizarEstadoArray } from "../modules/arrayStorage.js";
+import { dibujarInvitados } from "../modules/render.js";
+import { initTheme } from "../modules/theme.js";
+import { EventConsole } from "../modules/eventConsole.js";
+import { mostrarToast } from "../modules/toast.js";
+import { mostrarFeedback, limpiarFeedbackFormulario } from "../modules/feedback.js";
 
-const formulario = document.getElementById("petForm");
+const formulario = document.getElementById("guestForm");
 const botonEnviar = document.getElementById("submitBtn");
 const checkTerminos = document.getElementById("termsCheck");
-const selectVacunas = document.getElementById("vacunas");
-const inputCantVacunas = document.getElementById("cantidadVacunas");
-const contenedorLista = document.getElementById("petList");
+const contenedorLista = document.getElementById("guestList");
+const visorArray = document.getElementById("arrayViewer");
+const selectMetodo = document.getElementById("metodoArray");
 
-// Cargo las mascotas desde localStorage al iniciar (o array vacío si no hay nada)
-let listaMascotas = JSON.parse(localStorage.getItem("mascotas")) || [];
+const consola = new EventConsole("eventConsole");
+initTheme();
 
-const razasPorEspecie = {
-  Perro: ["Labrador", "Border Collie", "Pastor Alemán", "Bulldog", "Cane corso"],
-  Gato: ["Siamés", "Persa", "Bengala", "Mestizo", "Ragdoll", "Angora"],
-  Hamster: ["Sirio", "Ruso", "Roborovski", "Anillo"],
-  Tortuga: ["De agua", "Terrestre", "Sulcata"],
-  Ave: ["Canario", "Loro", "Cacatúa", "Periquito"],
-};
+let listaInvitados = [];
 
-/**
- * Función central de feedback visual (Sin Alerts)
- */
-const mostrarFeedback = (input, resultado) => {
-  if (!input) return;
-  
-  const mensajeError = input.parentElement.querySelector(".invalid-feedback");
-  
-  if (resultado.valido) {
-    input.classList.add("is-valid");
-    input.classList.remove("is-invalid");
-    if (mensajeError) {
-      mensajeError.style.display = "none";
-      mensajeError.textContent = "";
-    }
-  } else {
-    input.classList.add("is-invalid");
-    input.classList.remove("is-valid");
-    if (mensajeError) {
-      mensajeError.style.display = "block";
-      mensajeError.textContent = resultado.mensaje;
-    }
-  }
-};
-
-/**
- * Valida el estado general del botón
- */
-const validarFormularioCompleto = () => {
-  if (!formulario) return;
-
-  const resNombre = validarTextoMascota(formulario.nombreMascota.value);
-  const resDueno = validarTextoMascota(formulario.nombreDueno.value);
-  const resEmail = validarEmail(formulario.email.value);
-  const resEdadPeso = validarEdadPeso(
-    formulario.especie.value,
-    formulario.raza.value,
-    formulario.edad.value,
-    formulario.peso.value
-  );
-  
-  const terminosAceptados = checkTerminos.checked;
-
-  botonEnviar.disabled = !(
-    resNombre.valido &&
-    resDueno.valido &&
-    resEmail.valido &&
-    resEdadPeso.valido &&
-    terminosAceptados
-  );
-};
-
-const actualizarRazas = () => {
-  const especieElegida = formulario.especie.value;
-  const razas = razasPorEspecie[especieElegida] || [];
-
-  formulario.raza.innerHTML = "";
-  razas.forEach((raza) => {
-    const opcion = document.createElement("option");
-    opcion.value = raza;
-    opcion.textContent = raza;
-    formulario.raza.appendChild(opcion);
+const borrarInvitado = (indice) => {
+  listaInvitados.splice(indice, 1);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+  renderizarEstadoArray(visorArray, listaInvitados, {
+    metodo: "splice()",
+    detalle: `Se eliminó el índice ${indice}`,
   });
-
-  validarFormularioCompleto();
+  mostrarToast("toastZone", "Invitado eliminado del array", "success");
 };
 
-formulario.especie.addEventListener("change", actualizarRazas);
-formulario.raza.addEventListener("change", validarFormularioCompleto);
+const validarTodo = () => {
+  const ok =
+    validarNombre(formulario.nombre.value).valido &&
+    validarNombre(formulario.apellido.value).valido &&
+    validarEmail(formulario.email.value).valido &&
+    validarTelefono(formulario.telefono.value).valido &&
+    validarEdad(formulario.edad.value).valido &&
+    validarMesa(formulario.mesa.value).valido &&
+    validarAcompanantes(formulario.acompanantes.value).valido &&
+    validarNotas(formulario.notas.value).valido &&
+    checkTerminos.checked;
 
-selectVacunas.addEventListener("change", () => {
-  inputCantVacunas.disabled = selectVacunas.value === "no";
-  if (inputCantVacunas.disabled) {
-    inputCantVacunas.value = "";
-    inputCantVacunas.classList.remove("is-valid", "is-invalid");
-  }
-});
+  botonEnviar.disabled = !ok;
+  return ok;
+};
 
-// ESCUCHA DE INPUTS
+const mapaValidadores = {
+  nombre: validarNombre,
+  apellido: validarNombre,
+  email: validarEmail,
+  telefono: validarTelefono,
+  edad: validarEdad,
+  mesa: validarMesa,
+  acompanantes: validarAcompanantes,
+  notas: validarNotas,
+};
+
 formulario.addEventListener("input", (e) => {
   const input = e.target;
-  let resultado = { valido: true, mensaje: "" };
-
-  if (input.id === "nombreMascota" || input.id === "nombreDueno") {
-    resultado = validarTextoMascota(input.value);
-  } 
-  else if (input.id === "email") {
-    resultado = validarEmail(input.value);
-  } 
-  else if (input.id === "edad" || input.id === "peso" || input.id === "especie" || input.id === "raza") {
-    resultado = validarEdadPeso(
-      formulario.especie.value,
-      formulario.raza.value,
-      formulario.edad.value,
-      formulario.peso.value
-    );
-
-    if (!resultado.valido && resultado.campo && resultado.campo !== input.id) {
-       if (input.id === "especie" || input.id === "raza") {
-          mostrarFeedback(document.getElementById("edad"), resultado.campo === "edad" ? resultado : { valido: true });
-          mostrarFeedback(document.getElementById("peso"), resultado.campo === "peso" ? resultado : { valido: true });
-       }
-       resultado = { valido: true }; 
-    }
-  }
-
-  if (input.tagName === "INPUT" && input.type !== "checkbox") {
-    mostrarFeedback(input, resultado);
-  }
-
-  validarFormularioCompleto();
+  const validar = mapaValidadores[input.name];
+  if (validar) mostrarFeedback(input, validar(input.value));
+  validarTodo();
 });
 
-checkTerminos.addEventListener("change", validarFormularioCompleto);
+checkTerminos.addEventListener("change", validarTodo);
+selectMetodo?.addEventListener("change", () => {
+  consola.log(`Método seleccionado: ${selectMetodo.value}`);
+});
+
+document.getElementById("clearConsole")?.addEventListener("click", () => consola.limpiar());
 
 formulario.addEventListener("submit", (e) => {
   e.preventDefault();
+  if (!validarTodo()) {
+    mostrarToast("toastZone", "Hay campos inválidos", "error");
+    consola.log("Validación fallida: no se guardó en el array");
+    return;
+  }
 
-  const nuevaMascota = {
-    id: Date.now(),
-    nombre: formulario.nombreMascota.value,
-    especie: formulario.especie.value,
-    raza: formulario.raza.value,
+  const metodoKey = selectMetodo.value;
+  const estrategia = METODOS_ARRAY[metodoKey];
+  if (!estrategia) return;
+
+  const invitado = {
+    nombre: formulario.nombre.value.trim(),
+    apellido: formulario.apellido.value.trim(),
+    email: formulario.email.value.trim(),
+    telefono: formulario.telefono.value.trim(),
     edad: formulario.edad.value,
-    peso: formulario.peso.value,
-    dueno: formulario.nombreDueno.value,
-    email: formulario.email.value,
-    vacunas: formulario.vacunas.value,
+    mesa: formulario.mesa.value,
+    menu: formulario.menu.value,
+    tipoEntrada: formulario.tipoEntrada.value,
+    acompanantes: formulario.acompanantes.value,
+    notas: formulario.notas.value.trim(),
+    metodoGuardado: estrategia.etiqueta,
   };
 
-  listaMascotas.push(nuevaMascota);
-  
-  // Guardo la lista actualizada en localStorage
-  localStorage.setItem("mascotas", JSON.stringify(listaMascotas));
+  const antes = listaInvitados.length;
+  const resultado = estrategia.aplicar(listaInvitados, invitado);
+  listaInvitados = resultado.lista;
 
-  dibujarListaMascotas();
-  formulario.reset();
-
-  Array.from(formulario.elements).forEach((el) => {
-    el.classList.remove("is-valid", "is-invalid");
-    const msg = el.parentElement.querySelector(".invalid-feedback");
-    if (msg) msg.style.display = "none";
+  renderizarEstadoArray(visorArray, listaInvitados, {
+    metodo: estrategia.etiqueta,
+    detalle: resultado.detalle,
   });
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
 
-  actualizarRazas();
+  consola.log(`Array actualizado con ${estrategia.etiqueta} (${antes} → ${listaInvitados.length})`);
+  consola.log(`Invitado agregado: ${invitado.nombre} ${invitado.apellido}`);
+  mostrarToast("toastZone", `Guardado con ${estrategia.etiqueta}`, "success");
+
+  formulario.reset();
+  limpiarFeedbackFormulario(formulario);
+  validarTodo();
 });
 
-const dibujarListaMascotas = () => {
-  contenedorLista.innerHTML = "";
-  
-  listaMascotas.forEach((mascota, indice) => {
-    const columna = document.createElement("div");
-    columna.className = "col-md-4 mb-4";
-    columna.innerHTML = `
-            <div class="card h-100 p-3 shadow-sm border-0 rounded-3">
-                <h3 class="h5 mb-2">🐾 ${mascota.nombre}</h3>
-                <p class="small text-muted mb-1">${mascota.especie} (${mascota.raza})</p>
-                <p class="small text-muted mb-0">Dueño: ${mascota.dueno}</p>
-                <button class="btn btn-outline-danger btn-sm mt-3 btn-borrar">BORRAR</button>
-            </div>
-        `;
-    
-    columna.querySelector(".btn-borrar").addEventListener("click", () => {
-      listaMascotas.splice(indice, 1);
-      
-      // Guardo la lista actualizada después de borrar
-      localStorage.setItem("mascotas", JSON.stringify(listaMascotas));
-      
-      dibujarListaMascotas();
-    });
-    
-    contenedorLista.appendChild(columna);
-  });
-};
-
-// Carga inicial: actualizamos razas y dibujamos lo que haya en localStorage
-actualizarRazas();
-dibujarListaMascotas();
+renderizarEstadoArray(visorArray, listaInvitados, {
+  metodo: "Estado inicial",
+  detalle: "Array vacío — elegí un método y cargá un invitado",
+});
+consola.log("Proyecto 2 iniciado: arrays en pantalla activos");
+dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);

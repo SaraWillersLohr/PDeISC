@@ -1,75 +1,57 @@
-/**
- * Validaciones Inteligentes y Robustas (Sin Alerts)
- */
+const BASURA = ["asdf", "qwerty", "test", "xxx", "spam", "fake", "lorem"];
 
-export const LIMITES_MASCOTAS = {
-    // Normalizamos nombres para evitar errores de acentos o mayúsculas
-    "perro": { maxEdad: 20, minPeso: 1, maxPeso: 90 },
-    "gato": { maxEdad: 22, minPeso: 0.5, maxPeso: 15 },
-    "hamster": { maxEdad: 4, minPeso: 0.02, maxPeso: 0.8 },
-    "tortuga": { maxEdad: 150, minPeso: 0.1, maxPeso: 250 },
-    "ave": { maxEdad: 60, minPeso: 0.01, maxPeso: 10 },
-    "cane corso": { maxEdad: 12, minPeso: 40, maxPeso: 110 },
-    "border collie": { maxEdad: 17, minPeso: 12, maxPeso: 25 },
-    "default": { maxEdad: 30, minPeso: 0.1, maxPeso: 100 }
-};
+const tieneVocales = (t) => /[aeiouáéíóú]/i.test(t);
 
-export const validarTextoMascota = (texto) => {
-    const valor = texto.trim();
-    if (valor === "") return { valido: false, mensaje: "Este campo es obligatorio" };
-    if (valor.length < 3) return { valido: false, mensaje: "Mínimo 3 letras" };
-    if (!/[aeiouAEIOU]/.test(valor)) return { valido: false, mensaje: "El nombre debe tener vocales" };
-    if (!/^[a-zA-ZÁéíóúÁÉÍÓÚñÑ\s]+$/.test(valor)) return { valido: false, mensaje: "Solo letras permitidas" };
-    if (/(.)\1\1/.test(valor)) return { valido: false, mensaje: "Letras repetidas detectadas" };
-    return { valido: true, mensaje: "¡Correcto!" };
-};
-
-/**
- * Validación de peso y edad ultra-segura
- */
-export const validarEdadPeso = (especie, raza, edad, peso) => {
-    // Normalizamos a minúsculas para que coincida siempre
-    const especieLimpia = especie.toLowerCase();
-    const razaLimpia = raza ? raza.toLowerCase() : "";
-
-    // Buscamos límites: prioridad Raza > Especie > Default
-    const limites = LIMITES_MASCOTAS[razaLimpia] || LIMITES_MASCOTAS[especieLimpia] || LIMITES_MASCOTAS.default;
-    
-    const numEdad = Number(edad);
-    const numPeso = Number(peso);
-    
-    // Validación de Edad
-    if (edad === "" || isNaN(numEdad)) return { valido: false, mensaje: "Edad requerida", campo: "edad" };
-    if (numEdad < 0 || numEdad > limites.maxEdad) {
-        return { valido: false, mensaje: `Un ${especie} vive máximo ${limites.maxEdad} años`, campo: "edad" };
-    }
-    
-    // VALIDACIÓN DE PESO (Aquí estaba el fallo del hámster)
-    if (peso === "" || isNaN(numPeso)) return { valido: false, mensaje: "Peso requerido", campo: "peso" };
-    
-    if (numPeso < limites.minPeso || numPeso > limites.maxPeso) {
-        return { 
-            valido: false, 
-            mensaje: `Peso no válido para ${raza || especie} (${limites.minPeso}-${limites.maxPeso}kg)`, 
-            campo: "peso" 
-        };
-    }
-    
-    return { valido: true, mensaje: "¡Datos correctos!" };
+export const validarNombre = (texto) => {
+  const valor = texto.trim();
+  if (valor.length < 2) return { valido: false, mensaje: "Mínimo 2 letras" };
+  if (/\d/.test(valor)) return { valido: false, mensaje: "Sin números" };
+  if (!/^[a-zA-ZÁéíóúÁÉÍÓÚñÑ\s'-]+$/.test(valor)) return { valido: false, mensaje: "Caracteres inválidos" };
+  if (/(.)\1{2,}/.test(valor)) return { valido: false, mensaje: "Repetición excesiva" };
+  if (!tieneVocales(valor)) return { valido: false, mensaje: "Texto poco real" };
+  if (BASURA.some((b) => valor.toLowerCase().includes(b))) return { valido: false, mensaje: "Dato no permitido" };
+  return { valido: true, mensaje: "OK" };
 };
 
 export const validarEmail = (email) => {
-    const valor = email.trim();
-    if (valor === "") return { valido: false, mensaje: "Email obligatorio" };
-    if (!valor.includes("@")) return { valido: false, mensaje: "Te falta el '@'" };
-    
-    const partes = valor.split("@");
-    if (partes.length < 2 || !partes[1].includes(".")) {
-        return { valido: false, mensaje: "Falta el dominio (.com, .net, etc)" };
-    }
+  const valor = email.trim();
+  if (!valor) return { valido: false, mensaje: "Email obligatorio" };
+  const patron = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!patron.test(valor)) return { valido: false, mensaje: "Formato inválido" };
+  const dominio = valor.split("@")[1] || "";
+  if (dominio.length < 4 || !dominio.includes(".")) return { valido: false, mensaje: "Dominio inválido" };
+  return { valido: true, mensaje: "Email válido" };
+};
 
-    const patron = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!patron.test(valor)) return { valido: false, mensaje: "Formato de email inválido" };
-    
-    return { valido: true, mensaje: "Email válido" };
+export const validarTelefono = (tel) => {
+  const limpio = tel.replace(/[\s\-()]/g, "");
+  if (!/^\d{10,12}$/.test(limpio)) return { valido: false, mensaje: "10 a 12 dígitos" };
+  if (/^(\d)\1{5,}$/.test(limpio)) return { valido: false, mensaje: "Número poco real" };
+  return { valido: true, mensaje: "Teléfono válido" };
+};
+
+export const validarEdad = (edad) => {
+  const n = Number(edad);
+  if (edad === "" || Number.isNaN(n)) return { valido: false, mensaje: "Edad obligatoria" };
+  if (!Number.isInteger(n) || n < 16 || n > 100) return { valido: false, mensaje: "Entre 16 y 100" };
+  return { valido: true, mensaje: "Edad válida" };
+};
+
+export const validarMesa = (mesa) => {
+  const n = Number(mesa);
+  if (Number.isNaN(n) || n < 1 || n > 80) return { valido: false, mensaje: "Mesa entre 1 y 80" };
+  return { valido: true, mensaje: "Mesa válida" };
+};
+
+export const validarAcompanantes = (valor) => {
+  const n = Number(valor);
+  if (Number.isNaN(n) || n < 0 || n > 8) return { valido: false, mensaje: "Entre 0 y 8" };
+  return { valido: true, mensaje: "Cantidad válida" };
+};
+
+export const validarNotas = (texto) => {
+  const valor = texto.trim();
+  if (valor.length > 120) return { valido: false, mensaje: "Máximo 120 caracteres" };
+  if (valor && /(.)\1{4,}/.test(valor)) return { valido: false, mensaje: "Texto spam detectado" };
+  return { valido: true, mensaje: "OK" };
 };

@@ -3,7 +3,7 @@ import { createEventConsole } from "./eventConsole.js";
 
 /** Arranco tema + banner + consola en cada TP */
 export function boot(methodId) {
-  const log = createEventConsole();
+  const { log } = createEventConsole();
   const runSetup = () => setupPage(methodId);
 
   if (document.readyState === "loading") {
@@ -11,6 +11,8 @@ export function boot(methodId) {
   } else {
     runSetup();
   }
+
+  log("Listo. Usá los botones para probar el método.", "system");
 
   return log;
 }

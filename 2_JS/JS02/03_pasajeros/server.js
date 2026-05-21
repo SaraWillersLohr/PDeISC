@@ -6,7 +6,7 @@ import path from "path";
 import url from "url";
 import { fileURLToPath } from "url";
 //configuracion del puerto y el path
-const PORT = 3003;
+const PORT = 3028;
 // __filename es la ruta absoluta del archivo actual __dirname es la ruta absoluta del directorio actual
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
         res.end(data);
     });
 });
-//arranco el servidor en el puerto 3003
+//arranco el servidor en el puerto 3028
 server.listen(PORT, () => {
     console.log(`[PROYECTO 3] Servidor: http://localhost:${PORT}`);
 });

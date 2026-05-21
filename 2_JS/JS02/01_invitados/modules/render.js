@@ -1,44 +1,47 @@
-/**
- * Módulo para dibujar la lista de invitados en el HTML
- */
-export const dibujarInvitados = (invitados, contenedor, callbackBorrar) => {
+// renderizo la lista de invitados sin recargar la página
+export const dibujarInvitados = (invitados, contenedor, callbackBorrar, consola) => {
   contenedor.innerHTML = "";
 
+  const contador = document.getElementById("guestCount");
+  if (contador) contador.textContent = String(invitados.length);
+
   if (invitados.length === 0) {
-    contenedor.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <p class="text-muted">No hay invitados registrados aún.</p>
-            </div>
-        `;
+    const vacio = document.createElement("div");
+    vacio.className = "col-12 empty-state glass-panel";
+    vacio.innerHTML = `<p>Todavía no hay invitados confirmados.</p>`;
+    contenedor.appendChild(vacio);
+    consola?.log("Listado renderizado: sin registros");
     return;
   }
 
-  // Recorremos la lista de invitados para crear las tarjetas
   invitados.forEach((invitado, indice) => {
     const columna = document.createElement("div");
-    columna.className = "col-md-6 mb-4";
+    columna.className = "col-12 col-md-6 col-xl-4";
 
-    columna.innerHTML = `
-            <div class="card h-100 border-0 shadow-sm p-4">
-                <h3 class="h4 mb-3">${invitado.nombre} ${invitado.apellido}</h3>
-                <div class="mb-3">
-                    <p class="mb-1"><strong>Edad:</strong> ${invitado.edad} años</p>
-                    <p class="mb-1"><strong>Entrada:</strong> ${invitado.tipoEntrada}</p>
-                    <p class="mb-0"><strong>Acompañantes:</strong> ${invitado.acompanantes}</p>
-                </div>
-                <button class="btn btn-outline-danger btn-sm mt-auto w-100 py-2 fw-bold btn-borrar" 
-                        style="border-radius: 12px; border-width: 2px; letter-spacing: 0.05em;">
-                    ELIMINAR ACCESO
-                </button>
-            </div>
-        `;
+    const tarjeta = document.createElement("article");
+    tarjeta.className = "result-card glass-panel h-100";
+    tarjeta.innerHTML = `
+      <header class="result-card__head">
+        <h3>${invitado.nombre} ${invitado.apellido}</h3>
+        <span class="badge-pill">${invitado.tipoEntrada}</span>
+      </header>
+      <ul class="result-card__meta">
+        <li><span>Edad</span><strong>${invitado.edad} años</strong></li>
+        <li><span>Email</span><strong>${invitado.email}</strong></li>
+        <li><span>Acompañantes</span><strong>${invitado.acompanantes}</strong></li>
+        <li><span>Lectura</span><strong class="text-wrap">${invitado.metodosUsados}</strong></li>
+      </ul>
+      <button type="button" class="btn btn-outline-danger btn-sm w-100 btn-borrar">Eliminar acceso</button>
+    `;
 
-    // Botón para eliminar (sin usar confirm por la regla de PROHIBIDO ALERTS)
-    const botonBorrar = columna.querySelector(".btn-borrar");
-    botonBorrar.addEventListener("click", () => {
-        callbackBorrar(indice);
+    tarjeta.querySelector(".btn-borrar").addEventListener("click", () => {
+      callbackBorrar(indice);
+      consola?.log(`Invitado eliminado: ${invitado.nombre} ${invitado.apellido}`);
     });
 
+    columna.appendChild(tarjeta);
     contenedor.appendChild(columna);
   });
+
+  consola?.log(`Listado actualizado: ${invitados.length} invitado(s)`);
 };

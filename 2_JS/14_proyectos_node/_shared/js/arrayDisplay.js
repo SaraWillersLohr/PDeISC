@@ -40,7 +40,7 @@ export function renderBadges(container, arr, { emptyText = "vacío", highlightLa
           ? item.nombre ?? JSON.stringify(item)
           : String(item);
       const isLast = highlightLast && idx === arr.length - 1;
-      return `<span class="array-badge ${isLast ? "array-badge--highlight" : ""}" data-idx="${idx}"><small class="array-badge__idx">${idx}</small>${escapeHtml(label)}</span>`;
+      return `<span class="array-badge ${isLast ? "array-badge--highlight" : ""}" data-idx="${idx}"><small class="array-badge__idx">[${idx}]</small><span class="array-badge__label">${escapeHtml(label)}</span></span>`;
     })
     .join("");
 }

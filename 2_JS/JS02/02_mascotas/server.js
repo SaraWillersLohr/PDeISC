@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const PORT = 3002;
+const PORT = 3027;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -32,4 +32,4 @@ const server = http.createServer((req, res) => {
     });
 });
 
-server.listen(PORT, () => console.log(`[HUELLITAS] Servidor: http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`[PROYECTO 2] Servidor: http://localhost:${PORT}`));

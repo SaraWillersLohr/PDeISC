@@ -1,25 +1,64 @@
-# Proyecto 3: Registro de Personas ✈️
+# Proyecto 3 — Registro de Personas (localStorage)
 
-Sistema avanzado de gestión de datos personales con persistencia de datos en el navegador y validaciones de seguridad estrictas.
+Sistema de personas con validaciones **por país**, prefijo telefónico automático y persistencia en `localStorage`.
 
-## Consignas Cumplidas
+## Ejecutar
 
-1.  **Almacén de Datos Completo**: Implementación de todos los campos requeridos: Nombre, Apellido, Edad, Fecha de nacimiento, Sexo, Documento, Estado civil, Nacionalidad, Teléfono, Mail y el campo condicional de Hijos.
-2.  **Persistencia con LocalStorage**: Los datos se guardan de forma permanente en el navegador utilizando `localStorage.setItem` y se recuperan con `localStorage.getItem` al recargar la página.
-3.  **Lógica Dinámica de Hijos**: El campo para ingresar la cantidad de hijos se habilita o deshabilita automáticamente basándose en la selección previa del usuario.
-4.  **Listado de Nombres**: Se muestra una sección dinámica con los nombres completos y datos principales de todas las personas almacenadas en el sistema.
+```bash
+cd 03_pasajeros
+node server.js
+```
 
-## Validaciones Estrictas (Seguridad)
-*   **Geográfica**: Solo se aceptan nacionalidades de países de Sudamérica.
-*   **Identidad**: El DNI debe ser un número real (mínimo 1.000.000).
-*   **Coherencia Temporal**: La fecha de nacimiento no puede ser anterior a 1915 y debe coincidir con la edad ingresada.
-*   **Filtro de Spam**: Los nombres deben ser reales y tener diversidad de caracteres (rechaza textos aleatorios como "dssdsfds").
+Abrí **http://localhost:3028**
 
-## Características Técnicas
-*   **Integración con API**: Uso de Gender API para verificar la coherencia entre el nombre ingresado y el sexo seleccionado.
-*   **UI/UX Premium**: Diseño minimalista, tipografía moderna y feedback visual de alta visibilidad.
+## Nacionalidades permitidas (solo 5)
 
-## Cómo Ejecutar
-1. Navegar a la carpeta `03_pasajeros`.
-2. Ejecutar `node server.js`.
-3. Abrir `http://localhost:3003` en el navegador.
+Argentina · Chile · Uruguay · Brasil · Paraguay
+
+El campo es un `<select>` obligatorio. No se aceptan otros países.
+
+## Documento según país
+
+| País | Formato |
+|------|---------|
+| Argentina | 7 u 8 números |
+| Chile | 7 u 8 números |
+| Uruguay | 7 u 8 números |
+| Brasil | 11 números |
+| Paraguay | 6 a 8 números |
+
+Acá aprendí cómo adaptar validaciones según el país en lugar de usar una regla genérica para todos.
+
+La lógica está en `modules/paisConfig.js` y `validarDocumento()` en `modules/validations.js`.
+
+## Teléfono y prefijo
+
+Cuando cambio la nacionalidad, `modules/uiPais.js` actualiza el prefijo automáticamente:
+
+- Argentina → +54 (10 dígitos)
+- Chile → +56 (9)
+- Uruguay → +598 (8 o 9)
+- Brasil → +55 (10 u 11)
+- Paraguay → +595 (9)
+
+En esta parte conecto el prefijo con el país y bloqueo caracteres que no sean números.
+
+## Edad y fecha
+
+Uso `Date` para calcular la edad real según día, mes y año. Si la edad escrita no coincide **exactamente**, aparece:
+
+> La edad no coincide con la fecha de nacimiento
+
+## Archivos clave
+
+| Archivo | Rol |
+|---------|------|
+| `modules/paisConfig.js` | Reglas por país |
+| `modules/uiPais.js` | Prefijo, hints, contador de teléfono |
+| `modules/validations.js` | Todas las validaciones |
+| `modules/feedback.js` | Bordes + íconos ✓ / ✕ |
+| `modules/render.js` | Cards + lista de nombres |
+
+## Explicación completa del TP
+
+Leé **`../EXPLICACION.md`** en la raíz de `JS02` para la defensa oral y el repaso de los 3 puntos.

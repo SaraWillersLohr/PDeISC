@@ -1,21 +1,52 @@
-# Proyecto 1: VIP Guest List 🥂
+# Proyecto 1 — VIP Guest List
 
-Este proyecto consiste en un sistema de registro para una lista de invitados VIP, enfocado en la carga dinámica de datos y la demostración de técnicas de lectura de formularios en JavaScript.
+Hice este proyecto para practicar **páginas dinámicas** sin recargar el navegador y para dejar bien claras las **3 formas de leer un formulario** con JavaScript.
 
-## Consignas Cumplidas
+## Qué cumple de la consigna
 
-1.  **Página Dinámica**: Se implementó el uso de `e.preventDefault()` en el evento de envío del formulario para evitar que la página se recargue. El renderizado de los nuevos invitados se realiza manipulando el DOM en tiempo real.
-2.  **3 Formas de Lectura de Formularios**: En el archivo `scripts/main.js`, dentro del evento `submit`, se demuestran las tres formas solicitadas:
-    *   **FormData**: Uso del objeto `new FormData(form)` para obtener valores de manera moderna.
-    *   **Acceso directo**: Acceso a través de `form.apellido.value` (propiedad del objeto form).
-    *   **DOM Clásico**: Uso de `document.getElementsByName("edad")[0].value` para acceder a elementos específicos.
+- La página **no se recarga** cuando agrego un invitado (`preventDefault` + render con DOM).
+- Muestro en pantalla las lecturas con:
+  - `getElementById` → nombre
+  - `querySelector` → apellido
+  - `FormData` → edad, email, tipo de entrada y acompañantes
+- Validación en tiempo real (sin `alert` y sin `required` en HTML).
 
-## Características Técnicas
-*   **Validaciones en Tiempo Real**: Los campos se validan mientras el usuario escribe, proporcionando feedback visual instantáneo (bordes verdes/rojos y mensajes de error).
-*   **Filtros Anti-Spam**: Se rechazan nombres irreales, textos aleatorios (como "asdf") y repeticiones excesivas de caracteres.
-*   **Diseño Premium**: Interfaz moderna, limpia y totalmente responsive utilizando una paleta de colores profesional.
+## Cómo está organizado
 
-## Cómo Ejecutar
-1. Navegar a la carpeta `01_invitados`.
-2. Ejecutar `node server.js`.
-3. Abrir `http://localhost:3001` en el navegador.
+| Archivo | Para qué lo uso |
+|---------|-----------------|
+| `scripts/main.js` | Eventos del formulario y flujo general |
+| `modules/formReaders.js` | Las 3 lecturas + panel visual |
+| `modules/render.js` | Creo las cards con `createElement` |
+| `modules/validations.js` | Reglas de nombre, edad, email |
+| `modules/eventConsole.js` | Consola visual con historial en `sessionStorage` |
+| `modules/theme.js` | Dark/light con persistencia en `localStorage` |
+
+## Qué aprendí acá
+
+- **DOM dinámico:** cada invitado se pinta con nodos nuevos y el listado se actualiza al instante.
+- **Eventos:** escucho `input` para validar mientras escribo y `submit` para confirmar sin refresh.
+- **FormData:** me simplifica leer varios campos de una, pero para un solo campo prefiero `getElementById` o `querySelector` cuando quiero ser explícita.
+
+## Errores que me cuidé
+
+- Olvidar `preventDefault()` → la página se recarga y perdés todo el estado.
+- Mezclar validación HTML (`required`) con JS → en este TP valido **solo con JS** (`novalidate`).
+- No limpiar clases `is-valid` / `is-invalid` después del reset.
+
+## Cómo ejecutarlo
+
+```bash
+cd 01_invitados
+node server.js
+```
+
+Abrí `http://localhost:3026`
+
+## Responsive
+
+Usé CSS con variables, `clamp()`, grid de dos columnas en desktop y una en mobile. La consola y el panel de métodos bajan debajo del formulario en pantallas chicas para evitar overflow horizontal.
+
+## Explicación académica completa
+
+En la raíz del TP: **`../EXPLICACION.md`** (Punto 1, 2, 3, validaciones, errores comunes y conclusión).

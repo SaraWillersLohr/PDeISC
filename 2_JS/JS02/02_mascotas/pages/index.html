@@ -1,104 +1,151 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expo Huellitas | Inscripción de Mascotas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Proyecto 2 | Invitados y Arrays</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/styles/style.css">
 </head>
-<body class="bg-light">
-    <div class="container py-5">
-        <header class="text-center mb-5">
-            <h1 class="display-4 fw-bold">🐾 EXPO HUELLITAS</h1>
-            <p class="lead">Inscripción oficial para el gran evento</p>
-        </header>
-
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card border-0">
-                    <form id="petForm" novalidate>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre Mascota</label>
-                                <input type="text" id="nombreMascota" class="form-control" placeholder="Ej. Toby" required>
-                                <div class="invalid-feedback">Nombre inválido o spam detectado.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Especie</label>
-                                <select id="especie" class="form-select">
-                                    <option value="Perro">Perro</option>
-                                    <option value="Gato">Gato</option>
-                                    <option value="Hamster">Hámster</option>
-                                    <option value="Tortuga">Tortuga</option>
-                                    <option value="Ave">Ave</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Raza</label>
-                                <select id="raza" class="form-select" required></select>
-                                <div class="invalid-feedback">Raza inválida.</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Edad</label>
-                                <input type="number" id="edad" class="form-control" placeholder="Años" required>
-                                <div class="invalid-feedback">Edad no válida.</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Peso (Kg)</label>
-                                <input type="number" id="peso" class="form-control" step="0.1" placeholder="Kg" required>
-                                <div class="invalid-feedback">Peso no válido.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Dueño</label>
-                                <input type="text" id="nombreDueno" class="form-control" placeholder="Nombre completo" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" id="email" class="form-control" placeholder="dueño@correo.com" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">¿Vacunas al día?</label>
-                                <select id="vacunas" class="form-select">
-                                    <option value="no">No posee</option>
-                                    <option value="si">Sí, al día</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Cant. Vacunas</label>
-                                <input type="number" id="cantidadVacunas" class="form-control" placeholder="0" disabled>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 p-3 bg-light rounded-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
-                                <label class="form-check-label small text-muted" for="termsCheck">
-                                    Acepto que mi mascota cumpla con los <a href="#" class="text-primary fw-bold" data-bs-toggle="modal" data-bs-target="#termsModal">requisitos de la expo</a>.
-                                </label>
-                            </div>
-                        </div>
-
-                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-4" disabled>
-                            REGISTRAR MASCOTA
-                        </button>
-                    </form>
-                </div>
+<body>
+    <nav class="app-navbar navbar sticky-top">
+        <div class="container-fluid app-container">
+            <a class="navbar-brand" href="#">Evento Invitados</a>
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span class="badge-count">En array: <strong id="guestCount">0</strong></span>
+                <button type="button" id="themeToggle" class="btn-theme" aria-label="Cambiar tema">◐ Tema</button>
             </div>
         </div>
-        
-        <div id="petList" class="row mt-5 g-4"></div>
-    </div>
+    </nav>
 
-    <div class="modal fade" id="termsModal" tabindex="-1">
-        <div class="modal-dialog"><div class="modal-content p-4"><h3>Términos Expo</h3><p class="small">Sus datos serán usados para la organización del evento. Validamos información real.</p></div></div>
-    </div>
+    <main class="app-container py-4 py-lg-5">
+        <header class="page-header text-center mb-4">
+            <p class="kicker">Proyecto 2 · Arrays dinámicos</p>
+            <h1 class="page-title">Registro de invitados al evento</h1>
+            <p class="page-subtitle">Elegí el método de almacenaje y mirá el array actualizarse en pantalla</p>
+        </header>
 
-    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999"></div>
+        <div class="layout-main layout-main--p2">
+            <section class="glass-panel">
+                <h2 class="section-title">Formulario (9 campos)</h2>
+                <form id="guestForm" novalidate>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="nombre">Nombre</label>
+                            <input class="form-control" id="nombre" name="nombre" type="text">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="apellido">Apellido</label>
+                            <input class="form-control" id="apellido" name="apellido" type="text">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="email">Email</label>
+                            <input class="form-control" id="email" name="email" type="email">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="telefono">Teléfono</label>
+                            <input class="form-control" id="telefono" name="telefono" type="tel">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label" for="edad">Edad</label>
+                            <input class="form-control" id="edad" name="edad" type="number" min="16" max="100">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label" for="mesa">Mesa</label>
+                            <input class="form-control" id="mesa" name="mesa" type="number" min="1" max="80">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="menu">Menú</label>
+                            <select class="form-select" id="menu" name="menu">
+                                <option value="Clásico">Clásico</option>
+                                <option value="Vegetariano">Vegetariano</option>
+                                <option value="Vegano">Vegano</option>
+                                <option value="Sin TACC">Sin TACC</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label" for="tipoEntrada">Tipo entrada</label>
+                            <select class="form-select" id="tipoEntrada" name="tipoEntrada">
+                                <option value="General">General</option>
+                                <option value="VIP">VIP</option>
+                                <option value="Prensa">Prensa</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label" for="acompanantes">Acompañantes</label>
+                            <input class="form-control" id="acompanantes" name="acompanantes" type="number" value="0" min="0" max="8">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label" for="notas">Notas</label>
+                            <input class="form-control" id="notas" name="notas" type="text">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="metodoArray">Método de guardado en array</label>
+                            <select class="form-select" id="metodoArray">
+                                <option value="push">push() — al final</option>
+                                <option value="unshift">unshift() — al inicio</option>
+                                <option value="spread">spread [...arr, item]</option>
+                                <option value="concat">concat() — unión</option>
+                            </select>
+                        </div>
+                    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <div class="terms-box mt-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="termsCheck">
+                            <label class="form-check-label" for="termsCheck">Confirmo datos del invitado</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-3" disabled>Agregar al array</button>
+                </form>
+            </section>
+
+            <aside class="side-stack">
+                <section class="glass-panel console-panel" id="eventConsole">
+                    <div class="console-head">
+                        <h2 class="section-title mb-0">Consola visual</h2>
+                        <button type="button" id="clearConsole" class="btn btn-sm btn-outline-secondary">Limpiar</button>
+                    </div>
+                    <div class="console-body"></div>
+                </section>
+
+                <section class="glass-panel array-viewer-panel">
+                    <h2 class="section-title">Estado del array</h2>
+                    <div id="arrayViewer"></div>
+                </section>
+            </aside>
+        </div>
+
+        <section class="mt-5">
+            <h2 class="section-title">Datos renderizados del formulario</h2>
+            <div id="guestList" class="row g-3"></div>
+        </section>
+    </main>
+
+    <div id="toastZone" class="toast-zone"></div>
+
+    <button type="button" id="btnScrollTop" class="btn-scroll-top" aria-label="Subir arriba" hidden>↑</button>
+    <script>
+      (function () {
+        const btn = document.getElementById("btnScrollTop");
+        if (!btn) return;
+        const toggle = () => { btn.hidden = window.scrollY < 320; };
+        window.addEventListener("scroll", toggle, { passive: true });
+        toggle();
+        btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+      })();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/scripts/main.js"></script>
 </body>
 </html>

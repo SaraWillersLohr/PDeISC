@@ -388,10 +388,15 @@ header .lead,
 
 .array-badge__idx,
 .idx {
-  font-size: 0.6rem;
-  opacity: 0.65;
+  font-size: 0.65rem;
+  opacity: 0.85;
   color: var(--text-muted);
   font-weight: 700;
+  margin-right: 0.35rem;
+}
+
+.array-badge__label {
+  word-break: break-word;
 }
 
 .array-empty {
@@ -599,7 +604,8 @@ header .lead,
     left: auto;
     bottom: clamp(0.5rem, 1.5vw, 1rem);
     width: var(--console-w);
-    max-height: none;
+    max-height: calc(100vh - 5.5rem);
+    min-height: 12rem;
     height: auto;
     border-radius: var(--radius);
   }
@@ -648,14 +654,21 @@ header .lead,
   padding: 0.65rem 0.85rem 0.85rem;
   font-family: var(--font-mono);
   font-size: clamp(0.68rem, 1.8vw, 0.78rem);
-  min-height: 4rem;
+  min-height: 6rem;
+  max-height: min(50vh, 420px);
+  color: var(--text-main);
 }
 
 .event-console__line {
+  color: var(--text-main);
   padding: 0.35rem 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12);
   word-break: break-word;
   animation: consoleIn 0.25s ease;
+}
+
+.event-console__msg {
+  color: inherit;
 }
 
 @keyframes consoleIn {

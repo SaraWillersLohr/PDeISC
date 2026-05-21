@@ -35,6 +35,50 @@ export function marcarCampo(input, ok, msg, idErr) {
   if (span) span.textContent = ok ? "" : msg;
 }
 
+// valido si aceptó los términos (checkbox obligatorio)
+export function validarTerminosAceptados() {
+  const checkbox = document.getElementById("reg-terminos");
+  return checkbox?.checked === true;
+}
+
+// Feedback visual del bloque de términos (sin alert)
+export function marcarBloqueTerminos(aceptado, mensaje = "") {
+  const bloque = document.getElementById("terms-block");
+  const feedback = document.getElementById("terms-feedback");
+  const checkbox = document.getElementById("reg-terminos");
+  const errSpan = document.getElementById("err-terminos");
+
+  if (!bloque) return;
+
+  bloque.classList.remove("is-invalid-terms", "is-valid-terms");
+  checkbox?.classList.remove("is-invalid");
+
+  if (aceptado) {
+    bloque.classList.add("is-valid-terms");
+    if (feedback) {
+      feedback.className = "terms-feedback terms-feedback--ok is-visible";
+      feedback.innerHTML = `<i class="bi bi-check-circle-fill flex-shrink-0"></i><span>${mensaje || "Aceptaste los Términos y Condiciones. Ya podés registrarte."}</span>`;
+    }
+    if (errSpan) errSpan.textContent = "";
+  } else {
+    bloque.classList.add("is-invalid-terms");
+    checkbox?.classList.add("is-invalid");
+    if (feedback) {
+      feedback.className = "terms-feedback terms-feedback--error is-visible";
+      feedback.innerHTML = `<i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><span>${mensaje || "Tenés que leer y aceptar los Términos y Condiciones para registrarte."}</span>`;
+    }
+    if (errSpan) errSpan.textContent = mensaje || "Debés aceptar los términos.";
+  }
+}
+
+export function ocultarFeedbackTerminos() {
+  const feedback = document.getElementById("terms-feedback");
+  if (feedback) {
+    feedback.classList.remove("is-visible");
+    feedback.innerHTML = "";
+  }
+}
+
 export function validarFormulario(form) {
   const errores = {};
   const nombre = form.querySelector("#reg-nombre");
@@ -42,7 +86,6 @@ export function validarFormulario(form) {
   const edad = form.querySelector("#reg-edad");
   const genero = form.querySelector('input[name="reg-genero"]:checked');
   const pais = form.querySelector("#reg-pais");
-  const terminos = form.querySelector("#reg-terminos");
 
   const vN = esNombreValido(nombre?.value);
   marcarCampo(nombre, vN.ok, vN.msg, "err-nombre");
@@ -56,14 +99,27 @@ export function validarFormulario(form) {
   marcarCampo(edad, vEd.ok, vEd.msg, "err-edad");
   if (!vEd.ok) errores.edad = vEd.msg;
 
-  if (!genero) { errores.genero = "Elegí un género."; document.getElementById("err-genero").textContent = errores.genero; }
-  else document.getElementById("err-genero").textContent = "";
+  if (!genero) {
+    errores.genero = "Elegí un género.";
+    document.getElementById("err-genero").textContent = errores.genero;
+  } else {
+    document.getElementById("err-genero").textContent = "";
+  }
 
-  if (!pais?.value) { errores.pais = "Elegí un país."; marcarCampo(pais, false, errores.pais, "err-pais"); }
-  else marcarCampo(pais, true, "", "err-pais");
+  if (!pais?.value) {
+    errores.pais = "Elegí un país.";
+    marcarCampo(pais, false, errores.pais, "err-pais");
+  } else {
+    marcarCampo(pais, true, "", "err-pais");
+  }
 
-  if (!terminos?.checked) { errores.terminos = "Aceptá los términos."; document.getElementById("err-terminos").textContent = errores.terminos; }
-  else document.getElementById("err-terminos").textContent = "";
+  // valido si aceptó los términos antes de permitir el submit
+  if (!validarTerminosAceptados()) {
+    errores.terminos = "Aceptá los Términos y Condiciones para continuar.";
+    marcarBloqueTerminos(false, errores.terminos);
+  } else {
+    marcarBloqueTerminos(true);
+  }
 
   return errores;
 }

@@ -1,6 +1,6 @@
-/**
- * Módulo para el ticker de noticias rotativas
- */
+
+//Módulo para el ticker de noticias rotativas
+
 
 const noticiasTicker = [
     "Tensión energética: Irán pone en la mira refinerías clave.",

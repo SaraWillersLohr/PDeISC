@@ -1,6 +1,10 @@
-// proyecto 09_foreach
+// TP 09 — forEach(): recorro sin crear array nuevo
 
-// los datos
+import { boot } from "/_shared/js/boot.js";
+import { paintFlow } from "/_shared/js/arrayDisplay.js";
+
+const log = boot("forEach");
+
 const INICIAL_NOMBRES = ["Ana", "Beto", "Carla"];
 const INICIAL_NUMEROS = [5, 10, 15, 20];
 const INICIAL_OBJETOS = [
@@ -9,129 +13,90 @@ const INICIAL_OBJETOS = [
   { nombre: "Marcos", edad: 22 },
 ];
 
-// las variables
 let nombres = [...INICIAL_NOMBRES];
 let numeros = [...INICIAL_NUMEROS];
 let objetos = [...INICIAL_OBJETOS];
 
-// el html
 const dom = {
-  // Ejercicio 1
   displayNombres: document.getElementById("displayNombres"),
   btnSaludar: document.getElementById("btnSaludar"),
   logSaludos: document.getElementById("logSaludos"),
-
-  // Ejercicio 2
   displayNumeros: document.getElementById("displayNumeros"),
   btnDoblar: document.getElementById("btnDoblar"),
   logDobles: document.getElementById("logDobles"),
-
-  // Ejercicio 3
   displayObjetos: document.getElementById("displayObjetos"),
   btnListar: document.getElementById("btnListar"),
   logObjetos: document.getElementById("logObjetos"),
-
-  // Global
   btnReset: document.getElementById("btnReset"),
 };
 
-// dibujar en pantalla
-
-const renderArray = (arr, elementId) => {
-  const container = dom[elementId];
-  if (typeof arr[0] === "object") {
-    container.innerHTML = arr
-      .map(
-        (item) => `
-            <span class="array-item animate__animated animate__fadeIn">
-                {${item.nombre}, ${item.edad}}
-            </span>
-        `,
-      )
-      .join("");
-  } else {
-    container.innerHTML = arr
-      .map(
-        (item) => `
-            <span class="array-item animate__animated animate__fadeIn">
-                ${item}
-            </span>
-        `,
-      )
-      .join("");
-  }
-};
-
-const updateUI = () => {
-  renderArray(nombres, "displayNombres");
-  renderArray(numeros, "displayNumeros");
-  renderArray(objetos, "displayObjetos");
-};
-
-const addLog = (containerId, text) => {
-  const container = dom[containerId];
+const addLog = (container, text) => {
   const entry = document.createElement("div");
-  entry.className = "log-entry animate__animated animate__fadeInLeft";
+  entry.className = "log-entry";
   entry.textContent = text;
   container.appendChild(entry);
   container.scrollTop = container.scrollHeight;
 };
 
-// --- LÓGICA DE EJERCICIOS ---
+const updateUI = () => {
+  paintFlow(dom.displayNombres, {
+    before: nombres,
+    operation: "nombres.forEach(n => saludo)",
+    after: nombres,
+    note: "forEach no devuelve array nuevo.",
+  });
+  paintFlow(dom.displayNumeros, {
+    before: numeros,
+    operation: "numeros.forEach(n => doble)",
+    after: numeros,
+  });
+  paintFlow(dom.displayObjetos, {
+    before: objetos,
+    operation: "objetos.forEach(p => listar)",
+    after: objetos,
+  });
+};
 
-// 1. Muestra todos los nombres de un array con un saludo
 dom.btnSaludar.onclick = () => {
   dom.logSaludos.innerHTML = "";
-  // MÉTODO ARRAY: forEach() - Ejercicio 1
   nombres.forEach((nombre) => {
-    addLog("logSaludos", `¡Hola, ${nombre}! Bienvenido/a.`);
+    const linea = `¡Hola, ${nombre}!`;
+    addLog(dom.logSaludos, linea);
+    log(`forEach → ${linea}`, "info");
   });
-  dom.btnSaludar.disabled = true; // Deshabilitar después de ejecutar
+  dom.btnSaludar.disabled = true;
 };
 
-// 2. Imprime el doble de cada número de un array con forEach()
 dom.btnDoblar.onclick = () => {
   dom.logDobles.innerHTML = "";
-  // MÉTODO ARRAY: forEach() - Ejercicio 2
   numeros.forEach((num) => {
-    addLog("logDobles", `El doble de ${num} es ${num * 2}`);
+    const linea = `El doble de ${num} es ${num * 2}`;
+    addLog(dom.logDobles, linea);
+    log(`forEach → doble de ${num}`, "info");
   });
-  dom.btnDoblar.disabled = true; // Deshabilitar después de ejecutar
+  dom.btnDoblar.disabled = true;
 };
 
-// 3. Dado un array de objetos {nombre, edad}, muestra cada nombre con su edad
 dom.btnListar.onclick = () => {
   dom.logObjetos.innerHTML = "";
-  // MÉTODO ARRAY: forEach() - Ejercicio 3
   objetos.forEach((persona) => {
-    addLog(
-      "logObjetos",
-      `Usuario: ${persona.nombre} | Edad: ${persona.edad} años`,
-    );
+    const linea = `${persona.nombre}, ${persona.edad} años`;
+    addLog(dom.logObjetos, linea);
+    log(`forEach → ${linea}`, "info");
   });
-  dom.btnListar.disabled = true; // Deshabilitar después de ejecutar
+  dom.btnListar.disabled = true;
 };
-
-// resetear
 
 dom.btnReset.onclick = () => {
   nombres = [...INICIAL_NOMBRES];
   numeros = [...INICIAL_NUMEROS];
   objetos = [...INICIAL_OBJETOS];
-
-  // Habilitar botones
   dom.btnSaludar.disabled = false;
   dom.btnDoblar.disabled = false;
   dom.btnListar.disabled = false;
-
-  // Limpiar logs
-  [dom.logSaludos, dom.logDobles, dom.logObjetos].forEach(
-    (el) => (el.innerHTML = ""),
-  );
-
+  [dom.logSaludos, dom.logDobles, dom.logObjetos].forEach((el) => (el.innerHTML = ""));
+  log("Reinicié forEach()", "system");
   updateUI();
 };
 
-// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
-

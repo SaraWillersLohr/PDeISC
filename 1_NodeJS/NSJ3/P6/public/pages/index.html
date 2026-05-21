@@ -8,6 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link id="theme-link" rel="stylesheet" href="../styles/light.css">
   <link rel="stylesheet" href="../styles/responsive.css">
+  <link rel="stylesheet" href="../styles/terminos.css">
   <script src="../scripts/theme.js"></script>
 </head>
 <body>
@@ -65,10 +66,25 @@
               </select>
               <div id="err-pais" class="invalid-feedback"></div>
             </div>
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="reg-terminos" required>
-              <label class="form-check-label" for="reg-terminos">Acepto términos (checkbox)</label>
-              <div id="err-terminos" class="invalid-feedback d-block"></div>
+            <!-- Términos: checkbox obligatorio + enlaces al modal -->
+            <div class="mb-3" id="terms-block">
+              <div class="terms-block">
+                <div class="terms-check-row">
+                  <input type="checkbox" class="form-check-input" id="reg-terminos" name="terminos" required aria-describedby="err-terminos terms-feedback">
+                  <span class="terms-check-label-text">
+                    <button type="button" class="btn-link-terminos p-0 align-baseline" id="texto-acepto-terminos" data-open-terminos>Acepto los términos</button>
+                    y las
+                    <button type="button" class="btn-link-terminos p-0 align-baseline" data-open-terminos>Términos y Condiciones</button>
+                  </span>
+                  <label class="visually-hidden" for="reg-terminos">Aceptar términos y condiciones</label>
+                </div>
+                <p class="terms-open-hint mb-0">
+                  Podés leer el documento completo haciendo click en
+                  <button type="button" class="btn-link-terminos btn-link-terminos--footer" data-open-terminos>Términos</button>.
+                </p>
+                <div id="err-terminos" class="invalid-feedback d-block"></div>
+                <div id="terms-feedback" class="terms-feedback" role="status" aria-live="polite"></div>
+              </div>
             </div>
             <div class="mb-3">
               <label for="reg-edad" class="form-label fw-semibold">Edad (number)</label>
@@ -102,6 +118,63 @@
       <div id="console-body" class="terminal-body"><div class="console-placeholder text-muted fst-italic fs-7">Esperando eventos...</div></div>
     </section>
   </main>
+
+  <!-- Modal Términos y Condiciones (Bootstrap + glassmorphism) -->
+  <div class="modal fade" id="modal-terminos" tabindex="-1" aria-labelledby="modal-terminos-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content terms-modal-content">
+        <div class="modal-header terms-modal-header">
+          <h2 class="modal-title" id="modal-terminos-titulo">
+            <i class="bi bi-file-earmark-text text-primary me-2"></i>Términos y Condiciones
+          </h2>
+          <button type="button" class="btn-close" id="btn-cerrar-terminos" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body terms-modal-body">
+          <p class="text-muted fs-7">Última actualización: mayo 2026 · Laboratorio de registro PDeISC (proyecto académico).</p>
+
+          <section class="terms-section">
+            <h3>1. Uso responsable de la plataforma</h3>
+            <p>Al registrarte en este formulario de práctica, te comprometés a usar la interfaz solo con fines educativos dentro de la materia. No está permitido intentar sobrecargar el servidor, enviar datos falsos de forma maliciosa ni usar el sitio para actividades ajenas al trabajo práctico.</p>
+          </section>
+
+          <section class="terms-section">
+            <h3>2. Protección de datos básicos</h3>
+            <p>Los datos que cargues (nombre, correo, edad, país y preferencias) se procesan en tu navegador para mostrar el resumen del registro. Este proyecto no envía información a bases de datos externas ni la vende a terceros. Es una demostración local con fines de aprendizaje sobre formularios y validación.</p>
+          </section>
+
+          <section class="terms-section">
+            <h3>3. Aceptación del envío de información</h3>
+            <p>Al marcar la casilla de aceptación y pulsar «Registrar», confirmás que los datos ingresados son tuyos o que tenés autorización para cargarlos en un entorno de prueba. Entendés que el resultado se mostrará en pantalla como parte del ejercicio de DHTML.</p>
+          </section>
+
+          <section class="terms-section">
+            <h3>4. Prohibición de uso malicioso</h3>
+            <ul>
+              <li>No ingresar scripts ni código en los campos de texto.</li>
+              <li>No intentar vulnerar la validación del formulario.</li>
+              <li>No utilizar bots automatizados contra este entorno de estudio.</li>
+            </ul>
+          </section>
+
+          <section class="terms-section">
+            <h3>5. Responsabilidad del usuario</h3>
+            <p>Sos responsable de revisar que tu correo y edad sean correctos antes de enviar. Si compartís la pantalla en clase, evitá mostrar datos personales sensibles de otras personas sin su consentimiento.</p>
+          </section>
+
+          <section class="terms-section">
+            <h3>6. Validación de la información ingresada</h3>
+            <p>El sistema valida en tiempo real nombre (solo letras), correo, edad entre 18 y 100 años, campos obligatorios y la aceptación de estos términos. Un registro incompleto o inválido no se procesará hasta corregir los errores indicados en el formulario.</p>
+          </section>
+        </div>
+        <div class="modal-footer terms-modal-footer">
+          <button type="button" class="btn btn-outline-secondary" id="btn-solo-cerrar-terminos" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-custom" id="btn-aceptar-terminos-modal">
+            <i class="bi bi-check2-circle me-1"></i> Entendido, acepto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <button id="back-to-top" class="back-to-top" type="button"><i class="bi bi-arrow-up-short"></i></button>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

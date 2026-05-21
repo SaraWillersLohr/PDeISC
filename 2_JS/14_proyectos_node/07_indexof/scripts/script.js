@@ -1,152 +1,106 @@
-// proyecto 07_indexof
+// TP 07 — indexOf(): busco la posición (o -1)
 
-// los datos
+import { boot } from "/_shared/js/boot.js";
+import { paintFlow, renderBadges } from "/_shared/js/arrayDisplay.js";
+
+const log = boot("indexOf");
+
 const INICIAL_ANIMALES = ["gato", "perro", "pájaro", "conejo"];
 const INICIAL_NUMEROS = [10, 25, 50, 75, 100];
 const INICIAL_CIUDADES = ["Londres", "París", "Roma", "Madrid", "Berlín"];
 
-// las variables
 let animales = [...INICIAL_ANIMALES];
 let numeros = [...INICIAL_NUMEROS];
 let ciudades = [...INICIAL_CIUDADES];
 
-// el html
 const dom = {
-  // Ejercicio 1
   displayOriginal1: document.getElementById("displayOriginal1"),
   btnSearchPerro: document.getElementById("btnSearchPerro"),
   resPerro: document.getElementById("resPerro"),
-
-  // Ejercicio 2
   displayOriginal2: document.getElementById("displayOriginal2"),
   btnSearch50: document.getElementById("btnSearch50"),
   res50: document.getElementById("res50"),
-
-  // Ejercicio 3
   displayOriginal3: document.getElementById("displayOriginal3"),
   btnSearchMadrid: document.getElementById("btnSearchMadrid"),
   resMadrid: document.getElementById("resMadrid"),
-
-  // Global
   btnReset: document.getElementById("btnReset"),
 };
 
-// dibujar en pantalla
+const pintarBusqueda = (container, arr, busqueda, indice, resEl) => {
+  paintFlow(container, {
+    before: arr,
+    operation: `indexOf("${busqueda}") → ${indice}`,
+    after: arr,
+    note: indice === -1 ? "No está en el array." : `Encontrado en índice ${indice}. El array NO cambia.`,
+  });
 
-const renderArray = (arr, elementId) => {
-  const container = dom[elementId];
-  container.innerHTML = arr
-    .map(
-      (item, idx) => `
-        <span class="array-item animate__animated animate__fadeIn" id="${elementId}-item-${idx}">
-            ${item}
-        </span>
-    `,
-    )
-    .join("");
+  const badges = container.querySelector('[data-role="after-badges"]');
+  if (badges && indice >= 0) {
+    renderBadges(badges, arr, { highlightLast: false });
+    const badge = badges.querySelector(`[data-idx="${indice}"]`);
+    if (badge) badge.classList.add("array-badge--highlight");
+  }
+
+  if (resEl) {
+    resEl.className = `feedback-box ${indice >= 0 ? "feedback-success" : "feedback-danger"}`;
+    resEl.innerHTML =
+      indice >= 0
+        ? `<i class="fas fa-search me-2"></i>Índice: <strong>${indice}</strong>`
+        : `<i class="fas fa-times me-2"></i>No encontrado (devuelve -1)`;
+  }
 };
 
 const updateUI = () => {
-  renderArray(animales, "displayOriginal1");
-  renderArray(numeros, "displayOriginal2");
-  renderArray(ciudades, "displayOriginal3");
-};
-
-const highlightItem = (elementId, index, type) => {
-  // Limpiar otros highlights del mismo contenedor
-  const container = dom[elementId];
-  container.querySelectorAll(".array-item").forEach((el) => {
-    el.style.border = "1px solid rgba(0,0,0,0.05)";
-    el.style.backgroundColor = "white";
+  paintFlow(dom.displayOriginal1, {
+    before: animales,
+    operation: 'animales.indexOf("perro")',
+    after: animales,
+    note: "Array sin modificar.",
   });
-
-  if (index !== -1) {
-    const item = document.getElementById(`${elementId}-item-${index}`);
-    if (item) {
-      item.style.borderColor = `var(--${type})`;
-      item.style.backgroundColor = `var(--${type}-soft)`;
-      item.classList.add("animate__animated", "animate__pulse");
-    }
-  }
+  paintFlow(dom.displayOriginal2, {
+    before: numeros,
+    operation: "numeros.indexOf(50)",
+    after: numeros,
+  });
+  paintFlow(dom.displayOriginal3, {
+    before: ciudades,
+    operation: 'ciudades.indexOf("Madrid")',
+    after: ciudades,
+  });
 };
 
-// --- LÓGICA DE EJERCICIOS ---
-
-// 1. Encuentra la posición de la palabra "perro" en un array
 dom.btnSearchPerro.onclick = () => {
-  // MÉTODO ARRAY: indexOf() - Ejercicio 1
   const idx = animales.indexOf("perro");
-
-  highlightItem("displayOriginal1", idx, "primary");
-
-  dom.resPerro.className =
-    "feedback-box mt-3 feedback-success animate__animated animate__fadeIn";
-  dom.resPerro.innerHTML = `<i class="fas fa-search me-2"></i>"perro" encontrado en el índice: <strong>${idx}</strong>`;
-
+  log(`indexOf("perro") → ${idx}`, idx >= 0 ? "success" : "warn");
+  pintarBusqueda(dom.displayOriginal1, animales, "perro", idx, dom.resPerro);
   dom.btnSearchPerro.disabled = true;
 };
 
-// 2. Verifica si el número 50 está en un array y en qué posición
 dom.btnSearch50.onclick = () => {
-  // MÉTODO ARRAY: indexOf() - Ejercicio 2
   const idx = numeros.indexOf(50);
-
-  highlightItem("displayOriginal2", idx, "success");
-
-  if (idx !== -1) {
-    dom.res50.className =
-      "feedback-box mt-3 feedback-success animate__animated animate__fadeIn";
-    dom.res50.innerHTML = `<i class="fas fa-check-circle me-2"></i>El 50 existe en la posición: <strong>${idx}</strong>`;
-  } else {
-    dom.res50.className =
-      "feedback-box mt-3 feedback-danger animate__animated animate__fadeIn";
-    dom.res50.textContent = "El número 50 no está en el array.";
-  }
-
+  log(`indexOf(50) → ${idx}`, idx >= 0 ? "success" : "warn");
+  pintarBusqueda(dom.displayOriginal2, numeros, "50", idx, dom.res50);
   dom.btnSearch50.disabled = true;
 };
 
-// 3. Dado un array de ciudades, muestra el índice de "Madrid" o un mensaje si no está
 dom.btnSearchMadrid.onclick = () => {
-  // MÉTODO ARRAY: indexOf() - Ejercicio 3
   const idx = ciudades.indexOf("Madrid");
-
-  highlightItem("displayOriginal3", idx, "warning");
-
-  if (idx !== -1) {
-    dom.resMadrid.className =
-      "feedback-box mt-3 feedback-success animate__animated animate__fadeIn";
-    dom.resMadrid.innerHTML = `<i class="fas fa-map-pin me-2"></i>Madrid se encuentra en el índice: <strong>${idx}</strong>`;
-  } else {
-    dom.resMadrid.className =
-      "feedback-box mt-3 feedback-danger animate__animated animate__fadeIn";
-    dom.resMadrid.textContent = "Madrid no se encuentra en la lista.";
-  }
-
+  log(`indexOf("Madrid") → ${idx}`, idx >= 0 ? "success" : "warn");
+  pintarBusqueda(dom.displayOriginal3, ciudades, "Madrid", idx, dom.resMadrid);
   dom.btnSearchMadrid.disabled = true;
 };
-
-// resetear
 
 dom.btnReset.onclick = () => {
   animales = [...INICIAL_ANIMALES];
   numeros = [...INICIAL_NUMEROS];
   ciudades = [...INICIAL_CIUDADES];
-
-  // Limpiar feedbacks
   [dom.resPerro, dom.res50, dom.resMadrid].forEach((el) => {
-    el.className = "feedback-box mt-3 feedback-waiting";
-    el.textContent = "Esperando...";
+    el.className = "feedback-box feedback-waiting";
+    el.textContent = "Esperando…";
   });
-
-  // Habilitar botones
-  [dom.btnSearchPerro, dom.btnSearch50, dom.btnSearchMadrid].forEach(
-    (btn) => (btn.disabled = false),
-  );
-
+  [dom.btnSearchPerro, dom.btnSearch50, dom.btnSearchMadrid].forEach((b) => (b.disabled = false));
+  log("Reinicié indexOf()", "system");
   updateUI();
 };
 
-// inicio
 window.addEventListener("DOMContentLoaded", updateUI);
-

@@ -1,96 +1,82 @@
-// proyecto 14_reverse
+// TP 14 — reverse(): invierto el orden in-place
 
-// constantes
+import { boot } from "/_shared/js/boot.js";
+import { paintFlow } from "/_shared/js/arrayDisplay.js";
+
+const log = boot("reverse");
+
 const INICIAL_LETRAS = ["A", "B", "C", "D", "E"];
 const INICIAL_NUMEROS = [1, 2, 3, 4, 5, 6];
 
-// las variables
 let letras = [...INICIAL_LETRAS];
 let numeros = [...INICIAL_NUMEROS];
 
-// elementos del html
 const dom = {
-  // Ejercicio 1
   displayOriginal1: document.getElementById("displayOriginal1"),
   btnRevLetters: document.getElementById("btnRevLetters"),
-
-  // Ejercicio 2
   displayOriginal2: document.getElementById("displayOriginal2"),
   btnRevNums: document.getElementById("btnRevNums"),
-
-  // Ejercicio 3
   inputString: document.getElementById("inputString"),
   displayResult3: document.getElementById("displayResult3"),
   btnRevString: document.getElementById("btnRevString"),
-
-  // Global
   btnReset: document.getElementById("btnReset"),
 };
 
-// funciones para dibujar en pantalla
+const flowRev = (el, antes, despues, op, nota) => {
+  paintFlow(el, {
+    before: antes,
+    operation: op,
+    after: despues,
+    note: nota ?? "reverse() modifica el array original.",
+  });
+};
 
 const updateUI = () => {
-  dom.displayOriginal1.textContent = `[${letras.map((l) => '"' + l + '"').join(", ")}]`;
-  dom.displayOriginal2.textContent = `[${numeros.join(", ")}]`;
+  flowRev(dom.displayOriginal1, [...INICIAL_LETRAS], letras, "letras.reverse()");
+  flowRev(dom.displayOriginal2, [...INICIAL_NUMEROS], numeros, "numeros.reverse()");
 };
 
-// --- LÓGICA DE EJERCICIOS ---
-
-// 1. Invierte un array de letras
 dom.btnRevLetters.onclick = () => {
-  // usamos el metodo  reverse() - Ejercicio 1
+  const antes = [...letras];
   letras.reverse();
-
-  dom.displayOriginal1.className =
-    "array-display mb-4 animate__animated animate__flipInX";
-  updateUI();
+  log(`reverse() en letras → [${letras.join(", ")}]`, "success");
+  flowRev(dom.displayOriginal1, antes, letras, "letras.reverse()");
 };
 
-// 2. Invierte el orden de un array de números
 dom.btnRevNums.onclick = () => {
-  // usamos el metodo  reverse() - Ejercicio 2
+  const antes = [...numeros];
   numeros.reverse();
-
-  dom.displayOriginal2.className =
-    "array-display mb-4 animate__animated animate__flipInY";
-  updateUI();
+  log(`reverse() en números → [${numeros.join(", ")}]`, "success");
+  flowRev(dom.displayOriginal2, antes, numeros, "numeros.reverse()");
 };
 
-// 3. Dado un string, conviertelo en array y revierte el texto
 dom.btnRevString.onclick = () => {
-  const originalText = dom.inputString.value;
+  const texto = dom.inputString.value;
+  const chars = texto.split("");
+  const antes = [...chars];
+  const revertido = [...chars].reverse().join("");
 
-  // usamos el metodo  reverse() - Ejercicio 3
-  // Lógica: String -> Array -> Reverse -> String
-  const reversedText = originalText.split("").reverse().join("");
-
-  dom.displayResult3.className =
-    "array-display mb-4 animate__animated animate__bounceIn";
-  dom.displayResult3.textContent = reversedText;
+  paintFlow(dom.displayResult3, {
+    before: antes,
+    operation: 'split("").reverse().join("")',
+    after: revertido.split(""),
+    note: `Texto invertido: "${revertido}"`,
+  });
+  log(`reverse() en caracteres → "${revertido}"`, "success");
 };
-
-// resetear
 
 dom.btnReset.onclick = () => {
   letras = [...INICIAL_LETRAS];
   numeros = [...INICIAL_NUMEROS];
   dom.inputString.value = "Hola Mundo";
-  dom.displayResult3.textContent = "odnuM aloH";
-
-  // Limpiar animaciones
-  [dom.displayOriginal1, dom.displayOriginal2, dom.displayResult3].forEach(
-    (el) => {
-      el.className = "array-display mb-4";
-    },
-  );
-
+  log("Reinicié reverse()", "system");
   updateUI();
+  paintFlow(dom.displayResult3, {
+    before: "Hola Mundo".split(""),
+    operation: "ejemplo inicial",
+    after: [],
+    note: "Probá revertir de nuevo.",
+  });
 };
 
-// inicio
-window.addEventListener("DOMContentLoaded", () => {
-  updateUI();
-  // Revertir el string inicial para mostrar el ejemplo
-  dom.btnRevString.click();
-});
-
+window.addEventListener("DOMContentLoaded", updateUI);

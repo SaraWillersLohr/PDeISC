@@ -1,11 +1,13 @@
 import { initConsole, agregarLog } from "./consola.js";
 import { bindEventos } from "./eventos.js";
 import { initBackToTop } from "./ui.js";
+import { initModalTerminos } from "./terminos.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   window.initTheme?.();
   initConsole();
+  initModalTerminos();
   bindEventos();
   initBackToTop();
-  setTimeout(() => agregarLog("P6", "Completá el formulario y registrá"), 300);
+  setTimeout(() => agregarLog("P6", "Formulario listo — probá el enlace de Términos"), 300);
 });

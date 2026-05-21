@@ -5,6 +5,9 @@ const PORT = process.env.PORT || 3001;
 
 // archivos estaticos
 app.use(express.static(path.join(__dirname)));
+// módulos compartidos del TP (../../_shared)
+app.use("/_shared", express.static(path.join(__dirname, "..", "_shared")));
+
 
 // ruta principal
 app.get('/', (req, res) => {

@@ -1,7 +1,7 @@
 // TP 12 — reduce(): todo el array en un solo valor
 
-import { boot } from "/_shared/js/boot.js";
-import { paintFlow, formatArrayLiteral } from "/_shared/js/arrayDisplay.js";
+import { boot } from "../../_shared/js/boot.js";
+import { paintFlow, formatArrayLiteral } from "../../_shared/js/arrayDisplay.js";
 
 const log = boot("reduce");
 

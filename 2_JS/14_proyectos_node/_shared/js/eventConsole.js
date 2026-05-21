@@ -58,5 +58,7 @@ export function createEventConsole(rootSelector = "#eventConsole") {
     scrollToBottom(body);
   };
 
+  ensureRoot();
+
   return { log, history, root: () => ensureRoot() };
 }

@@ -1,7 +1,7 @@
 // TP 06 — slice(): copio un pedazo sin tocar el original
 
-import { boot } from "/_shared/js/boot.js";
-import { paintFlow, formatArrayLiteral } from "/_shared/js/arrayDisplay.js";
+import { boot } from "../../_shared/js/boot.js";
+import { paintFlow, formatArrayLiteral } from "../../_shared/js/arrayDisplay.js";
 
 const log = boot("slice");
 

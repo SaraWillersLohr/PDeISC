@@ -1,9 +1,8 @@
-/**
- * Módulo de validaciones para el formulario
- * Contiene la lógica "atómica" de validación de campos
- */
+// Módulo de validaciones para el formulario
+// Contiene la lógica "atómica" de validación de campos
 
-// Valida si un nombre tiene un formato humano razonable
+// Valido el nombre para el formulario de contacto
+// Si el nombre es demasiado corto, solo permito letras y espacios, no permito repeticiones de letras, no permito secuencias de teclado y no permito muchas consonantes
 export function validarNombre(nombre) {
     const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
     const secuenciasTeclado = /asdf|sdfg|jkl|qwerty|zxcv|abcabc|123/i.test(nombre);
@@ -18,7 +17,7 @@ export function validarNombre(nombre) {
     return null; // Sin errores
 }
 
-// Valida formato de email
+// Valido el email para el formulario de contacto
 export function validarEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) return "El email es obligatorio.";
@@ -26,7 +25,7 @@ export function validarEmail(email) {
     return null;
 }
 
-// Calcula la edad basándose en una fecha de nacimiento
+// Calculo la edad basándose en una fecha de nacimiento
 export function calcularEdad(fechaNacimiento) {
     if (!fechaNacimiento) return 0;
     const hoy = new Date();
@@ -40,7 +39,7 @@ export function calcularEdad(fechaNacimiento) {
     return edad;
 }
 
-// Valida la edad según reglas de negocio (máximo 120 años)
+// Valido la edad según reglas de negocio (máximo 120 años)
 export function validarEdad(edad) {
     if (edad < 0) return "La fecha no puede ser futura.";
     if (edad > 120) return "La edad no puede ser mayor a 120 años.";

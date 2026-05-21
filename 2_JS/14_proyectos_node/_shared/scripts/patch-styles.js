@@ -6,9 +6,7 @@ const folders = fs
   .readdirSync(root)
   .filter((f) => /^\d{2}_/.test(f) && fs.statSync(path.join(root, f)).isDirectory());
 
-const styleContent = `@import url("/_shared/css/base.css");
-
-/* Overrides locales del ejercicio (si hace falta) */
+const styleContent = `/* Overrides locales del ejercicio (si hace falta) */
 `;
 
 folders.forEach((folder) => {

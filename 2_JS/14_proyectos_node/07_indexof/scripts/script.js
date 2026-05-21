@@ -1,7 +1,7 @@
 // TP 07 — indexOf(): busco la posición (o -1)
 
-import { boot } from "/_shared/js/boot.js";
-import { paintFlow, renderBadges } from "/_shared/js/arrayDisplay.js";
+import { boot } from "../../_shared/js/boot.js";
+import { paintFlow, renderBadges } from "../../_shared/js/arrayDisplay.js";
 
 const log = boot("indexOf");
 

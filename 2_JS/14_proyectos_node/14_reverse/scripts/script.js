@@ -1,7 +1,7 @@
 // TP 14 — reverse(): invierto el orden in-place
 
-import { boot } from "/_shared/js/boot.js";
-import { paintFlow } from "/_shared/js/arrayDisplay.js";
+import { boot } from "../../_shared/js/boot.js";
+import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
 const log = boot("reverse");
 

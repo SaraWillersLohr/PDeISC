@@ -105,9 +105,9 @@ node server.js
 
 Abrís la URL que muestra la terminal (suele ser `http://localhost:3000` o similar según `server.js`).
 
-O con **Live Server** en VS Code/Cursor: clic derecho en `pages/index.html`.
+O con **Live Server** en VS Code/Cursor: abrí la carpeta **`14_proyectos_node`** como workspace (no solo `01_push`), clic derecho en `01_push/pages/index.html` → *Open with Live Server*.
 
-> Los módulos ES (`import`) necesitan servidor; no abras el HTML como `file://` si usás `_shared`.
+> Los módulos ES (`import`) necesitan servidor; no abras el HTML como `file://`. Las rutas son relativas (`../../_shared`, `../scripts`) para que funcionen con Live Server y con `node server.js`.
 
 ## Archivos compartidos (`_shared/`)
 

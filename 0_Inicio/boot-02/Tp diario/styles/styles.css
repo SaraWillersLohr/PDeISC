@@ -20,7 +20,7 @@
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
   --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.12);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --header-offset: 130px;
+  --header-offset: clamp(100px, 14vw, 130px);
 }
 
 /* reset basico para que todo se vea igual */
@@ -37,6 +37,8 @@ body {
   color: var(--text-dark);
   font-family: "Outfit", sans-serif;
   line-height: 1.6;
+  overflow-x: clip; /* evito scroll horizontal raro */
+  min-width: 0;
 }
 
 /* uso la serifa para darle un toque mas elegante a los titulos */
@@ -54,6 +56,7 @@ h4,
 html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--header-offset);
+  overflow-x: clip;
 }
 
 /* aca manejo el header que queda pegado arriba */
@@ -84,8 +87,27 @@ html {
 
 .top-info {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: inherit;
+  row-gap: 0.35rem;
+}
+
+/* arreglo el header viejo de fmi que usa col sin row */
+.header-top .top-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.header-top .top-wrapper > [class*="col-"] {
+  flex: 1 1 auto;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .live-chip-mini {
@@ -119,13 +141,14 @@ html {
 
 .logo-text {
   color: var(--primary);
-  font-size: 2.2rem;
+  font-size: clamp(1.35rem, 4.5vw, 2.2rem);
   font-weight: 900;
   letter-spacing: -1px;
   text-align: center;
   margin: 0;
-  line-height: 1;
+  line-height: 1.1;
   transition: transform 0.3s ease;
+  word-break: break-word;
 }
 
 /* aca manejo las categorias del menu */
@@ -179,12 +202,24 @@ html {
   }
 
   .logo-text {
-    font-size: 1.6rem;
     letter-spacing: -0.5px;
   }
 
+  .header-top {
+    font-size: clamp(0.62rem, 2.8vw, 0.7rem);
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .header-middle {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
   .header-bottom.collapse.show,
-  .header-bottom.collapsing {
+  .header-bottom.collapsing,
+  .header-bottom.navbar-collapse.show,
+  .header-bottom.navbar-collapse.collapsing {
     background: #ffffff;
     border-bottom: 2px solid var(--accent);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -194,6 +229,7 @@ html {
   .nav-categories {
     flex-direction: column;
     padding: 0;
+    width: 100%;
   }
 
   .nav-categories li {
@@ -202,8 +238,8 @@ html {
 
   .nav-categories .nav-link {
     width: 100%;
-    padding: 1.25rem 1.5rem !important;
-    font-size: 1.1rem;
+    padding: 1rem 1.25rem !important;
+    font-size: clamp(0.95rem, 3.5vw, 1.05rem);
     border-bottom: 1px solid var(--border-light);
     text-transform: none;
     letter-spacing: 0;
@@ -218,13 +254,14 @@ html {
     font-family: "bootstrap-icons";
     font-size: 0.9rem;
     opacity: 0.5;
+    flex-shrink: 0;
   }
 
   .nav-categories .nav-link:hover,
   .nav-categories .nav-link.active {
     background: var(--bg-main);
     color: var(--accent) !important;
-    padding-left: 2rem !important;
+    padding-left: 1.75rem !important;
   }
 
   .header {
@@ -232,18 +269,49 @@ html {
   }
 
   h1 {
-    font-size: 1.8rem !important;
+    font-size: clamp(1.45rem, 6vw, 1.8rem) !important;
   }
 
   h2.title_categoria {
-    font-size: 1.4rem !important;
+    font-size: clamp(1.2rem, 4.5vw, 1.4rem) !important;
+    margin-bottom: 1rem;
+    padding-top: 0.5rem;
+  }
+
+  main.container {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.25rem !important;
+  }
+
+  .categoria.mb-5 {
+    margin-bottom: 2.5rem !important;
+  }
+
+  .text_noticia {
+    padding: 1rem;
+  }
+
+  .contacto-section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  .contacto-header {
+    margin-bottom: 2rem !important;
+  }
+
+  .btn-scroll-top {
+    bottom: 1rem;
+    right: 1rem;
+    width: 42px;
+    height: 42px;
   }
 }
 
 /* aca manejo como se ven los titulos de cada seccion */
 .title_categoria {
   position: relative;
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
   font-weight: 700;
   color: var(--primary);
   padding-bottom: 0.6rem;
@@ -252,6 +320,8 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   padding-top: 1rem;
 }
 
@@ -277,24 +347,69 @@ html {
   height: 100%;
 }
 
-.noticia1:hover,
-.noticia2:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
+/* hover solo en mouse, en touch no salta raro */
+@media (hover: hover) and (pointer: fine) {
+  .noticia1:hover,
+  .noticia2:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .noticia1:hover .img_noticia img,
+  .noticia2:hover .img_noticia img {
+    transform: scale(1.06);
+  }
+
+  .noticia1:hover h3,
+  .noticia2:hover h3 {
+    color: var(--accent);
+  }
+
+  .btn-enviar:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+  }
+
+  .volver-link:hover {
+    color: var(--accent);
+    transform: translateX(-5px);
+  }
+
+  .btn-scroll-top:hover {
+    background: var(--accent-hover);
+    transform: translateY(-5px);
+  }
+
+  .btn-remove-file:hover {
+    background: #fecaca;
+    color: #b91c1c;
+    transform: translateY(-1px);
+  }
 }
 
 .noticia1 a,
 .noticia2 a {
   text-decoration: none;
   color: inherit;
-  display: block;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  min-width: 0;
 }
 
 .img_noticia {
-  height: 260px;
+  height: clamp(180px, 32vw, 260px);
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   position: relative;
+  flex-shrink: 0;
+}
+
+/* la secundaria un poco mas chica en mobile */
+@media (max-width: 991.98px) {
+  .noticia2 .img_noticia {
+    height: clamp(160px, 28vw, 220px);
+  }
 }
 
 .img_noticia img {
@@ -304,13 +419,13 @@ html {
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.noticia1:hover .img_noticia img,
-.noticia2:hover .img_noticia img {
-  transform: scale(1.06);
-}
 
 .text_noticia {
   padding: 1.4rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .noticia1 h3,
@@ -319,26 +434,25 @@ html {
   color: var(--text-dark);
   line-height: 1.3;
   transition: color 0.2s;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .noticia1 h3 {
-  font-size: 1.35rem;
+  font-size: clamp(1.05rem, 2.5vw, 1.35rem);
   margin-bottom: 0.85rem;
 }
 .noticia2 h3 {
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
   margin-bottom: 0.6rem;
 }
 
-.noticia1:hover h3,
-.noticia2:hover h3 {
-  color: var(--accent);
-}
 
 .noticia1 p {
-  font-size: 0.93rem;
+  font-size: clamp(0.88rem, 1.8vw, 0.93rem);
   color: var(--text-muted);
   margin-bottom: 1.2rem;
+  flex-grow: 1;
 }
 
 .fecha {
@@ -364,9 +478,11 @@ html {
 }
 
 .contacto-header h2 {
-  font-size: 2.2rem;
+  font-size: clamp(1.5rem, 4.5vw, 2.2rem);
   font-weight: 900;
   color: var(--primary);
+  line-height: 1.15;
+  overflow-wrap: break-word;
 }
 
 .contacto-form .form-control,
@@ -402,10 +518,6 @@ html {
   transition: var(--transition);
 }
 
-.btn-enviar:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-}
 
 /* aca va el pie de pagina */
 .footer {
@@ -439,9 +551,10 @@ html {
 .article-meta {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   margin-bottom: 1rem;
-  font-size: 0.9rem;
+  font-size: clamp(0.82rem, 2vw, 0.9rem);
   color: var(--text-muted);
 }
 
@@ -456,14 +569,42 @@ html {
 }
 
 .article-header h1 {
-  font-size: 2.8rem;
+  font-size: clamp(1.65rem, 5vw + 0.25rem, 2.8rem);
   font-weight: 900;
   color: var(--primary);
+  line-height: 1.15;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .article-content {
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
   line-height: 1.8;
+}
+
+.article-content .lead {
+  font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+}
+
+/* articulo: ancho y imagen sin desbordar */
+main article.mx-auto {
+  max-width: min(900px, 100%);
+  width: 100%;
+  padding-inline: clamp(0rem, 2vw, 0.5rem);
+}
+
+.img-container {
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: clamp(1rem, 3vw, 1.75rem) 0;
+}
+
+.img-container img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
 }
 
 .volver-link {
@@ -473,10 +614,6 @@ html {
   transition: var(--transition);
 }
 
-.volver-link:hover {
-  color: var(--accent);
-  transform: translateX(-5px);
-}
 
 /* este es el boton para volver arriba rapido */
 .btn-scroll-top {
@@ -506,32 +643,44 @@ html {
   transform: translateY(0);
 }
 
-.btn-scroll-top:hover {
-  background: var(--accent-hover);
-  transform: translateY(-5px);
-}
 
 /* aca le doy vida a la barrita de noticias que se mueven */
 .ticker-bar {
   background: #fdfdfd;
   border-bottom: 1px solid var(--border-light);
-  height: 44px; /* Un poquito mas alto para que respire */
+  min-height: 44px;
+  height: auto;
   display: flex;
   align-items: center;
+  overflow: hidden;
+  width: 100%;
+}
+
+.ticker-bar .container {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.ticker-bar .container > .d-flex {
+  min-width: 0;
+  width: 100%;
+  gap: 0.5rem;
 }
 
 .ticker-label {
   background: var(--primary);
   color: #fff;
-  padding: 2px 12px;
-  font-size: 0.7rem;
+  padding: 2px 10px;
+  font-size: clamp(0.62rem, 1.8vw, 0.7rem);
   font-weight: 700;
   text-transform: uppercase;
   border-radius: 4px;
-  margin-right: 15px;
+  margin-right: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .ticker-dot {
@@ -566,8 +715,14 @@ html {
 }
 
 .ticker-content {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   font-weight: 500;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
 }
 
 .fade-in {
@@ -616,8 +771,219 @@ html {
   margin-top: 0.5rem;
 }
 
-.btn-remove-file:hover {
-  background: #fecaca;
-  color: #b91c1c;
-  transform: translateY(-1px);
+/* ─── responsive general: grids, cols y medios ─── */
+
+/* las columnas de bootstrap no empujan el ancho */
+.row > [class*="col-"] {
+  min-width: 0;
+}
+
+.container,
+.container-fluid {
+  max-width: 100%;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+.navbar-brand,
+.logo {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* header de articulos con navbar simple */
+.header > .navbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.header > .navbar .container {
+  gap: 0.5rem;
+}
+
+.header > .navbar .logo-text {
+  font-size: clamp(1.15rem, 4vw, 1.6rem);
+  text-align: left;
+}
+
+@media (max-width: 991.98px) {
+  .header > .navbar .navbar-collapse {
+    background: #ffffff;
+    border-top: 1px solid var(--border-light);
+    margin-top: 0.5rem;
+    padding: 0.5rem 0 0.75rem;
+  }
+
+  .header > .navbar .navbar-nav {
+    width: 100%;
+    gap: 0;
+  }
+
+  .header > .navbar .nav-link {
+    padding: 0.85rem 0.25rem;
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    border-bottom: 1px solid var(--border-light);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .header > .navbar .nav-item:last-child .nav-link {
+    border-bottom: none;
+  }
+}
+
+/* tablet: menu un poco mas compacto */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .nav-categories .nav-link {
+    padding: 0.55rem 0.65rem !important;
+    font-size: 0.78rem;
+    letter-spacing: 0.35px;
+  }
+
+  .ticker-bar {
+    padding-block: 0.25rem;
+  }
+}
+
+/* notebook: ajustes suaves sin cambiar el look */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .nav-categories .nav-link {
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.8rem;
+  }
+}
+
+/* footer mas prolijo en pantallas chicas */
+@media (max-width: 575.98px) {
+  .footer {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  .footer-logo {
+    font-size: clamp(1.35rem, 6vw, 1.8rem);
+  }
+
+  .footer-nav {
+    gap: 0.65rem 1rem !important;
+    padding-inline: 0.5rem;
+  }
+
+  .footer-nav a {
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+
+  .footer-copy {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    padding-inline: 0.75rem;
+    line-height: 1.5;
+  }
+}
+
+/* formulario: inputs y botones comodos en mobile */
+@media (max-width: 575.98px) {
+  .contacto-form .form-control,
+  .contacto-form .form-select {
+    padding: 0.75rem 0.9rem;
+    font-size: 1rem;
+  }
+
+  .contacto-form .form-label {
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-enviar {
+    padding: 0.85rem 1.25rem;
+  }
+}
+
+/* articulo: menos padding en main chico */
+@media (max-width: 767.98px) {
+  main.container.py-5 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .article-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .img-container.shadow-lg {
+    box-shadow: var(--shadow-card) !important;
+  }
+
+  .img-container.p-4 {
+    padding: 1rem !important;
+  }
+
+  .img-container.p-4 img[style*="max-height"] {
+    max-height: min(280px, 55vw) !important;
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+/* seccion tecnologia: menos padding en celular */
+@media (max-width: 767.98px) {
+  #tecnologia .rounded-4.p-5,
+  .categoria .bg-light.p-5 {
+    padding: 1.5rem !important;
+  }
+
+  #tecnologia .fs-1 {
+    font-size: clamp(2rem, 10vw, 2.5rem) !important;
+  }
+}
+
+/* ticker en tablet angosta */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .ticker-bar {
+    min-height: 40px;
+  }
+
+  .ticker-label {
+    padding: 2px 8px;
+  }
+}
+
+/* grids de noticias con gap mas chico en mobile */
+@media (max-width: 575.98px) {
+  main .row.g-4 {
+    --bs-gutter-y: 1rem;
+    --bs-gutter-x: 1rem;
+  }
+}
+
+/* mensaje de exito del form */
+.contacto-success {
+  font-size: clamp(0.88rem, 2vw, 0.95rem);
+  line-height: 1.5;
+  text-align: center;
+  color: var(--primary);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+/* evita que el toggler se achique raro */
+.navbar-toggler {
+  flex-shrink: 0;
+}
+
+#btnMenuMobile {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

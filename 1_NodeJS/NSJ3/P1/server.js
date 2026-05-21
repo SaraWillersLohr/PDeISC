@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3006;
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -25,7 +25,9 @@ const server = app.listen(PORT, () => {
 
 server.on("error", (err) => {
   if (err.code === "EADDRINUSE") {
-    console.error(`El puerto ${PORT} ya está en uso. Cerrá el otro proceso o cambiá PORT.`);
+    console.error(
+      `El puerto ${PORT} ya está en uso. Cerrá el otro proceso o cambiá PORT.`,
+    );
   } else {
     console.error("Error en el servidor:", err);
   }

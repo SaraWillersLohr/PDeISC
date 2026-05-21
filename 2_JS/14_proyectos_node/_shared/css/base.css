@@ -72,15 +72,33 @@ body {
   padding-bottom: clamp(6rem, 18vh, 10rem);
 }
 
+body.tp-ready {
+  padding-top: clamp(3.25rem, 9vw, 4.25rem);
+}
+
 body.tp-ready .container,
 body.tp-ready .container-fluid {
   padding-right: var(--page-pad);
   padding-left: var(--page-pad);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  body.tp-ready {
+    padding-bottom: clamp(9rem, 24vh, 13rem);
+  }
 }
 
 @media (min-width: 1200px) {
-  body.tp-ready {
+  body.tp-ready:has(#eventConsole) {
     padding-right: calc(var(--console-w) + 1.5rem);
+    padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  body.tp-ready:has(#eventConsole) .container-fluid {
+    max-width: min(1100px, calc(100vw - var(--console-w) - 4rem));
+    margin-inline: auto;
   }
 }
 
@@ -210,6 +228,11 @@ header .lead,
 .tp-header .lead {
   font-size: clamp(0.95rem, 2vw, 1.1rem);
   max-width: 42rem;
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--text-muted) !important;
 }
 
 /* ─── Cards ─── */
@@ -708,6 +731,40 @@ header .lead,
 @media (max-width: 767.98px) {
   .card-premium:hover {
     transform: none;
+  }
+
+  .tp-header,
+  header.text-center {
+    padding-inline: 0.25rem;
+  }
+
+  .method-banner__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-premium .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .badge-premium {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .theme-toggle {
+    padding: 0.5rem 0.65rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .display-4 {
+    font-size: clamp(1.45rem, 7vw, 2rem) !important;
+  }
+
+  .event-console__head {
+    padding: 0.6rem 0.75rem;
   }
 }
 

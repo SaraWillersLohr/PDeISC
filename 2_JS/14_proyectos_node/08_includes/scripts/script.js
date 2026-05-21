@@ -1,7 +1,7 @@
 // TP 08 — includes(): pregunto si está (true/false)
 
-import { boot } from "/_shared/js/boot.js";
-import { paintFlow } from "/_shared/js/arrayDisplay.js";
+import { boot } from "../../_shared/js/boot.js";
+import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
 const log = boot("includes");
 

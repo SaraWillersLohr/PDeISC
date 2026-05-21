@@ -1,7 +1,5 @@
-/**
- * Scripts principales del sitio
- * Organiza la inicialización de módulos y eventos globales
- */
+// Scripts principales del sitio
+// Organizo la inicialización de módulos y eventos globales
 
 import {
   validarNombre,
@@ -13,23 +11,23 @@ import { cargarIndicadores } from "./indicadores.js";
 import { iniciarTicker } from "./ticker.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ─── INICIALIZACIÓN DE MÓDULOS ───
+  // Inicializo los módulos
   cargarIndicadores("economicos-data");
   iniciarTicker("ticker-text");
 
-  // ─── NAVEGACIÓN Y MENÚ ───
+  // Navegación y menú
   const header = document.querySelector(".header");
   const iconMenu = document.getElementById("iconMenu");
   const btnMenuMobile = document.getElementById("btnMenuMobile");
   const navLinks = document.querySelectorAll(".nav-link");
   const body = document.body;
 
-  // Sticky Header Effect
+  // Efecto sticky header
   window.addEventListener("scroll", () => {
     header.classList.toggle("scrolled", window.scrollY > 50);
   });
 
-  // Menú Mobile Toggle
+  // Menú móvil toggle
   if (btnMenuMobile) {
     btnMenuMobile.addEventListener("click", () => {
       setTimeout(() => {
@@ -44,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Cierre automático de menú al clickear link
+  // Cierre automático de menú al hacer click en un link
   navLinks.forEach((link) => {
     link.addEventListener("click", () => {
       const navbarCollapse = document.getElementById("navbarNav");
@@ -57,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ─── FORMULARIO DE CONTACTO (DINÁMICO Y REAL-TIME) ───
+  // Formulario de contacto dinámico y en tiempo real
   const contactoForm = document.getElementById("contactoForm");
   if (contactoForm) {
     const inputs = {
@@ -78,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
       dynamic: document.getElementById("errorDynamic"),
     };
 
-    // Helper para mostrar/limpiar errores visuales
+    // Función para mostrar/limpiar errores visuales
     const updateError = (field, message) => {
       const errorEl = errors[field];
       const inputEl = inputs[field];
@@ -96,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Validaciones en tiempo real (on input)
+    // Validaciones en tiempo real (al escribir en el input)
     inputs.nombre.addEventListener("input", () =>
       updateError("nombre", validarNombre(inputs.nombre.value)),
     );
@@ -110,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateError("fechaNac", validarEdad(edadCalculada));
     });
 
-    // Lógica de Asunto Dinámico
+    // Lógica de asunto dinámico
     const opcionesDinamicas = {
       publicidad: {
         label: "Seleccioná el tipo de propuesta",
@@ -180,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Botón Quitar Archivo
+    // Botón quitar archivo
     const btnRemoveFile = document.getElementById("btnRemoveFile");
     inputs.archivo.addEventListener("change", function () {
       btnRemoveFile.classList.toggle("d-none", !this.files.length);
@@ -190,11 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
       btnRemoveFile.classList.add("d-none");
     });
 
-    // Envío final
+    // Envío final del formulario
     contactoForm.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      // Re-validar todo antes de enviar
+      // Re-validar todo antes de enviar el formulario
       const errNombre = validarNombre(inputs.nombre.value);
       const errEmail = validarEmail(inputs.email.value);
       const errEdad = validarEdad(calcularEdad(inputs.fechaNac.value));
@@ -216,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Éxito
+      // Éxito al enviar el formulario
       const successMsg = document.getElementById("successMsg");
       successMsg.classList.remove("d-none");
       this.reset();
@@ -226,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ─── BOTÓN IR ARRIBA ───
+  // Botón ir arriba
   const btnScrollTop = document.getElementById("btnScrollTop");
   if (btnScrollTop) {
     window.addEventListener("scroll", () => {

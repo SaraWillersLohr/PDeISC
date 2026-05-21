@@ -1,7 +1,7 @@
 // TP 05 — splice(): corto, inserto o reemplazo en cualquier índice
 
-import { boot } from "/_shared/js/boot.js";
-import { paintFlow } from "/_shared/js/arrayDisplay.js";
+import { boot } from "../../_shared/js/boot.js";
+import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
 const log = boot("splice");
 

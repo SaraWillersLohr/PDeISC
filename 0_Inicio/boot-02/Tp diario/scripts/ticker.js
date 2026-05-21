@@ -19,7 +19,7 @@ export function iniciarTicker(elementId) {
     tickerText.textContent = noticiasTicker[0];
 
     setInterval(() => {
-        // Efecto fade out
+        // Efecto desvanecimiento
         tickerText.classList.remove('fade-in');
         tickerText.classList.add('fade-out');
 

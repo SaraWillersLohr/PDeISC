@@ -4,5 +4,9 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
-app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public", "pages", "index.html")));
-app.listen(process.env.PORT || 3005, () => console.log("P5 — http://localhost:3005"));
+app.get("/", (_req, res) =>
+  res.sendFile(path.join(__dirname, "public", "pages", "index.html")),
+);
+app.listen(process.env.PORT || 3010, () =>
+  console.log("P5 — http://localhost:3010"),
+);

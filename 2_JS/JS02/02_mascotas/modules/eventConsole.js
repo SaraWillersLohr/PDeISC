@@ -1,5 +1,5 @@
 const CLAVE_LOG = "js02-consola-p2";
-
+// clase para la consola visual de eventos
 export class EventConsole {
   constructor(contenedorId) {
     this.cuerpo = document.getElementById(contenedorId)?.querySelector(".console-body");
@@ -7,6 +7,7 @@ export class EventConsole {
     this.render();
   }
 
+  // método para agregar un mensaje a la consola
   log(mensaje) {
     const hora = new Date().toLocaleTimeString("es-AR", { hour12: false });
     this.logs.push(`[${hora}] ${mensaje}`);
@@ -15,6 +16,7 @@ export class EventConsole {
     this.render();
   }
 
+  // método para renderizar la consola
   render() {
     if (!this.cuerpo) return;
     this.cuerpo.innerHTML = "";
@@ -27,6 +29,7 @@ export class EventConsole {
     this.cuerpo.scrollTop = this.cuerpo.scrollHeight;
   }
 
+  // método para limpiar la consola
   limpiar() {
     this.logs = [];
     sessionStorage.removeItem(CLAVE_LOG);

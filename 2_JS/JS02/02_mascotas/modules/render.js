@@ -1,8 +1,10 @@
+// función para dibujar los invitados en la pantalla
 export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
   contenedor.innerHTML = "";
   const contador = document.getElementById("guestCount");
   if (contador) contador.textContent = String(lista.length);
 
+  // si no hay invitados, mostrar un mensaje de que no hay invitados en el array
   if (!lista.length) {
     const vacio = document.createElement("div");
     vacio.className = "col-12 empty-state glass-panel";
@@ -11,6 +13,7 @@ export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
     return;
   }
 
+  // si hay invitados, dibujarlos en la pantalla
   lista.forEach((inv, i) => {
     const col = document.createElement("div");
     col.className = "col-12 col-lg-6";
@@ -41,5 +44,6 @@ export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
     contenedor.appendChild(col);
   });
 
+  // loguear la cantidad de invitados renderizados
   consola?.log(`Cards renderizadas: ${lista.length} invitado(s)`);
 };

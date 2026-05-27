@@ -176,14 +176,28 @@ svg {
 
 .is-invalid {
   border-color: var(--error) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--error) 15%, transparent) !important;
+  background-image: none !important;
 }
 
-.is-invalid ~ .invalid-feedback {
+.is-invalid:focus {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--error) 25%, transparent) !important;
+}
+
+.is-invalid ~ .invalid-feedback,
+.input-with-icon:has(.is-invalid) ~ .invalid-feedback {
   display: block;
 }
 
 .is-valid {
   border-color: var(--success) !important;
+  background-image: none !important;
+}
+
+.is-valid:focus {
+  border-color: var(--success) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 20%, transparent) !important;
 }
 
 .btn-primary {
@@ -553,12 +567,20 @@ svg {
 
 .field-icon {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 800;
   pointer-events: none;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  transition: opacity 0.2s ease, color 0.2s ease;
 }
 
 .field-icon.icon-ok {
@@ -595,7 +617,7 @@ svg {
 }
 
 .phone-row .field-icon {
-  right: 10px;
+  right: 14px;
 }
 
 .prefijo-select {

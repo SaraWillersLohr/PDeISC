@@ -9,6 +9,7 @@ import {
   validarSexo,
   validarEstadoCivil,
   validarFormularioCompleto,
+  calcularEdadDesdeFecha,
 } from "../modules/validations.js";
 import { dibujarListaPersonas } from "../modules/render.js";
 import { initTheme } from "../modules/theme.js";
@@ -109,6 +110,12 @@ formulario.addEventListener("input", (e) => {
   if (input.id === "nombre" || input.id === "apellido") resultado = validarNombreReal(input.value);
   else if (input.id === "email") resultado = validarEmail(input.value);
   else if (input.id === "edad" || input.id === "fechaNac") {
+    if (input.id === "fechaNac" && input.value) {
+      const edadCalculada = calcularEdadDesdeFecha(input.value);
+      if (!isNaN(edadCalculada) && edadCalculada >= 0) {
+        formulario.edad.value = edadCalculada;
+      }
+    }
     revalidarEdadFecha();
     actualizarBoton();
     return;

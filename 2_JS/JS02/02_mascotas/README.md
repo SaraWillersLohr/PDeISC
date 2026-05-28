@@ -18,12 +18,12 @@ Con este proyecto practico **arrays en pantalla** y distintos métodos para guar
 
 ## Módulos
 
-| Módulo | Rol |
-|--------|-----|
-| `arrayStorage.js` | Lógica de cada método + render del array |
-| `render.js` | Cards con todos los campos del invitado |
-| `validations.js` | Nombres reales, mail, teléfono, edad, mesa, etc. |
-| `eventConsole.js` | Historial de eventos de la sesión |
+| Módulo            | Rol                                              |
+| ----------------- | ------------------------------------------------ |
+| `arrayStorage.js` | Lógica de cada método + render del array         |
+| `render.js`       | Cards con todos los campos del invitado          |
+| `validations.js`  | Nombres reales, mail, teléfono, edad, mesa, etc. |
+| `eventConsole.js` | Historial de eventos de la sesión                |
 
 ## Diferencia entre métodos (resumen)
 

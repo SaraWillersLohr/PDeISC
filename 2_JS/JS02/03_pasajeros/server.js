@@ -1,50 +1,61 @@
-// server.js
-//importo lo que necesito: puerto, filesystem, patron para path y url
+// Yo creo un servidor HTTP simple para servir los archivos estáticos del proyecto
+// Esto me permite ejecutar la aplicación sin necesidad de un servidor complejo
+
+// Yo importo los módulos que necesito: http, filesystem, path y url
 import http from "http";
 import fs from "fs";
 import path from "path";
 import url from "url";
 import { fileURLToPath } from "url";
-//configuracion del puerto y el path
+
+// Yo configuro el puerto donde va a correr el servidor
 const PORT = 3028;
-// __filename es la ruta absoluta del archivo actual __dirname es la ruta absoluta del directorio actual
+
+// Yo obtengo la ruta absoluta del archivo actual y del directorio
+// Esto es necesario porque en ES modules no existen __filename y __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Yo defino los tipos MIME para los diferentes archivos que voy a servir
+// Esto le dice al navegador qué tipo de archivo es cada uno
 const MIME_TYPES = {
-    ".html": "text/html",
-    ".css": "text/css",
-    ".js": "text/javascript",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".svg": "image/svg+xml",
-    ".ico": "image/x-icon"
+  ".html": "text/html",
+  ".css": "text/css",
+  ".js": "text/javascript",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
 };
-//creacion del servidor
-const server = http.createServer((req, res) => {
-    //parseo la url para obtener el pathname 
-    const parsedUrl = url.parse(req.url);
-    // Establezco la ruta por defecto index.html y la guardo en pathname
-    let pathname = parsedUrl.pathname === "/" ? "/pages/index.html" : parsedUrl.pathname;
-    // genero la ruta absoluta del archivo
-    let filePath = path.join(__dirname, pathname);
-    // obtengo la extension del archivo y la guardo en ext
-    const ext = path.extname(filePath);
-    const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            //si hay un error, escribo 404
-            res.writeHead(404, { "Content-Type": "text/plain" });
-            res.end("404 Error: Archivo no encontrado");
-            return;
-        }
-        // Si no hay error, escribo 200 y envio el archivo
-        res.writeHead(200, { "Content-Type": contentType });
-        res.end(data);
-    });
+// Yo creo el servidor HTTP con un callback que maneja cada petición
+const server = http.createServer((req, res) => {
+  // Yo parseo la URL para obtener el pathname (la ruta del archivo solicitado)
+  const parsedUrl = url.parse(req.url);
+  // Yo establezco la ruta por defecto a index.html si el usuario pide la raíz
+  let pathname =
+    parsedUrl.pathname === "/" ? "/pages/index.html" : parsedUrl.pathname;
+  // Yo genero la ruta absoluta del archivo combinando el directorio actual con el pathname
+  let filePath = path.join(__dirname, pathname);
+  // Yo obtengo la extensión del archivo para determinar su tipo MIME
+  const ext = path.extname(filePath);
+  const contentType = MIME_TYPES[ext] || "application/octet-stream";
+
+  // Yo leo el archivo del sistema de archivos de forma asíncrona
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      // Si hay un error (archivo no encontrado), devuelvo un 404
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("404 Error: Archivo no encontrado");
+      return;
+    }
+    // Si no hay error, devuelvo el archivo con el tipo MIME correcto
+    res.writeHead(200, { "Content-Type": contentType });
+    res.end(data);
+  });
 });
-//arranco el servidor en el puerto 3028
+
+// Yo inicio el servidor y lo pongo a escuchar en el puerto configurado
 server.listen(PORT, () => {
-    console.log(`[PROYECTO 3] Servidor: http://localhost:${PORT}`);
+  console.log(`[PROYECTO 3] Servidor: http://localhost:${PORT}`);
 });

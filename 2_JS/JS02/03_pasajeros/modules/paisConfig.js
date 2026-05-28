@@ -1,4 +1,5 @@
-// reglas por país: documento, teléfono y prefijo
+// Yo defino las reglas de validación por país: documento, teléfono y prefijo
+// Esto me permite adaptar las validaciones según la nacionalidad del usuario
 export const PAISES_PERMITIDOS = {
   argentina: {
     nombre: "Argentina",
@@ -15,6 +16,7 @@ export const PAISES_PERMITIDOS = {
       mensaje: "El teléfono argentino debe tener 10 números",
     },
   },
+  // Agrego otros países de la región con sus reglas específicas
   chile: {
     nombre: "Chile",
     prefijo: "+56",
@@ -77,4 +79,5 @@ export const PAISES_PERMITIDOS = {
   },
 };
 
+// Yo obtengo la configuración de un país según su código
 export const obtenerConfigPais = (codigo) => PAISES_PERMITIDOS[codigo] || null;

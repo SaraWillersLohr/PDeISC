@@ -1,10 +1,13 @@
-// función para dibujar los invitados en la pantalla
+// Yo renderizo la lista de invitados sin recargar la página
+// Esto hace que la aplicación sea más rápida y fluida para el usuario
 export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
+  // Yo limpio el contenedor antes de volver a dibujar
   contenedor.innerHTML = "";
+  // Yo actualizo el contador de invitados en la interfaz
   const contador = document.getElementById("guestCount");
   if (contador) contador.textContent = String(lista.length);
 
-  // si no hay invitados, mostrar un mensaje de que no hay invitados en el array
+  // Si no hay invitados, muestro un mensaje de estado vacío
   if (!lista.length) {
     const vacio = document.createElement("div");
     vacio.className = "col-12 empty-state glass-panel";
@@ -13,7 +16,7 @@ export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
     return;
   }
 
-  // si hay invitados, dibujarlos en la pantalla
+  // Yo recorro cada invitado y creo una tarjeta visual para cada uno
   lista.forEach((inv, i) => {
     const col = document.createElement("div");
     col.className = "col-12 col-lg-6";
@@ -36,6 +39,7 @@ export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
       </ul>
       <button type="button" class="btn btn-outline-danger btn-sm w-100 btn-borrar">Eliminar del array</button>
     `;
+    // Yo agrego el evento click al botón de eliminar para poder borrar el invitado
     card.querySelector(".btn-borrar").addEventListener("click", () => {
       onBorrar(i);
       consola?.log(`Registro eliminado del array (índice ${i})`);
@@ -44,6 +48,6 @@ export const dibujarInvitados = (lista, contenedor, onBorrar, consola) => {
     contenedor.appendChild(col);
   });
 
-  // loguear la cantidad de invitados renderizados
+  // Yo registro en la consola cuántos invitados hay actualmente
   consola?.log(`Cards renderizadas: ${lista.length} invitado(s)`);
 };

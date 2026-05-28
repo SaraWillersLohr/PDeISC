@@ -1,9 +1,11 @@
-// distintas formas de guardar en el array (se ve en pantalla)
+// Yo defino distintas formas de guardar datos en el array que se ven en pantalla
+// Esto me permite demostrar diferentes métodos de manipulación de arrays
 export const METODOS_ARRAY = {
   push: {
     etiqueta: "push()",
     descripcion: "Agrega al final del array",
     aplicar: (lista, dato) => {
+      // Yo creo una copia del array y uso push para agregar al final
       const copia = [...lista];
       copia.push(dato);
       return { lista: copia, detalle: "push(dato) → nuevo elemento al final" };
@@ -13,31 +15,42 @@ export const METODOS_ARRAY = {
     etiqueta: "unshift()",
     descripcion: "Agrega al inicio del array",
     aplicar: (lista, dato) => {
+      // Yo creo una copia y uso unshift para agregar al inicio
       const copia = [...lista];
       copia.unshift(dato);
-      return { lista: copia, detalle: "unshift(dato) → nuevo elemento al inicio" };
+      return {
+        lista: copia,
+        detalle: "unshift(dato) → nuevo elemento al inicio",
+      };
     },
   },
   spread: {
     etiqueta: "spread [...arr, dato]",
     descripcion: "Crea un array nuevo con spread",
     aplicar: (lista, dato) => {
+      // Yo uso el operador spread para crear una copia inmutable
       const copia = [...lista, dato];
-      return { lista: copia, detalle: "[...lista, dato] → copia inmutable al final" };
+      return {
+        lista: copia,
+        detalle: "[...lista, dato] → copia inmutable al final",
+      };
     },
   },
   concat: {
     etiqueta: "concat()",
     descripcion: "Concatena sin mutar el original",
     aplicar: (lista, dato) => {
+      // Yo uso concat para unir arrays sin mutar el original
       const copia = lista.concat(dato);
       return { lista: copia, detalle: "lista.concat(dato) → unión al final" };
     },
   },
 };
 
+// Yo renderizo el estado actual del array en pantalla para que se vea visualmente
 export const renderizarEstadoArray = (contenedor, lista, info) => {
   if (!contenedor) return;
+  // Yo muestro el método usado, la cantidad de registros y el contenido del array
   contenedor.innerHTML = `
     <div class="array-block">
       <p class="array-label">Método usado</p>

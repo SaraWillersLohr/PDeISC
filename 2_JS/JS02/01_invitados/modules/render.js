@@ -1,10 +1,19 @@
-// renderizo la lista de invitados sin recargar la página
-export const dibujarInvitados = (invitados, contenedor, callbackBorrar, consola) => {
+// Yo renderizo la lista de invitados sin recargar la página
+// Esto hace que la aplicación sea más rápida y fluida para el usuario
+export const dibujarInvitados = (
+  invitados,
+  contenedor,
+  callbackBorrar,
+  consola,
+) => {
+  // Yo limpio el contenedor antes de volver a dibujar
   contenedor.innerHTML = "";
 
+  // Yo actualizo el contador de invitados en la interfaz
   const contador = document.getElementById("guestCount");
   if (contador) contador.textContent = String(invitados.length);
 
+  // Si no hay invitados, muestro un mensaje de estado vacío
   if (invitados.length === 0) {
     const vacio = document.createElement("div");
     vacio.className = "col-12 empty-state glass-panel";
@@ -14,6 +23,7 @@ export const dibujarInvitados = (invitados, contenedor, callbackBorrar, consola)
     return;
   }
 
+  // Yo recorro cada invitado y creo una tarjeta visual para cada uno
   invitados.forEach((invitado, indice) => {
     const columna = document.createElement("div");
     columna.className = "col-12 col-md-6 col-xl-4";
@@ -34,14 +44,18 @@ export const dibujarInvitados = (invitados, contenedor, callbackBorrar, consola)
       <button type="button" class="btn btn-outline-danger btn-sm w-100 btn-borrar">Eliminar acceso</button>
     `;
 
+    // Yo agrego el evento click al botón de eliminar para poder borrar el invitado
     tarjeta.querySelector(".btn-borrar").addEventListener("click", () => {
       callbackBorrar(indice);
-      consola?.log(`Invitado eliminado: ${invitado.nombre} ${invitado.apellido}`);
+      consola?.log(
+        `Invitado eliminado: ${invitado.nombre} ${invitado.apellido}`,
+      );
     });
 
     columna.appendChild(tarjeta);
     contenedor.appendChild(columna);
   });
 
+  // Yo registro en la consola cuántos invitados hay actualmente
   consola?.log(`Listado actualizado: ${invitados.length} invitado(s)`);
 };

@@ -1,15 +1,21 @@
-// acá centralizo las 3 formas de leer el formulario (consigna 1)
+// Yo centralizo las 3 formas de leer el formulario que pide la consigna 1
+// Esto me permite demostrar diferentes métodos de acceso al DOM
 export const leerConGetElementById = (formulario) => {
+  // Yo uso getElementById para obtener el valor del campo nombre directamente del documento
   const nombre = document.getElementById("nombre")?.value.trim() || "";
   return { campo: "nombre", metodo: "getElementById", valor: nombre };
 };
 
 export const leerConQuerySelector = (formulario) => {
-  const apellido = formulario.querySelector('[name="apellido"]')?.value.trim() || "";
+  // Yo uso querySelector sobre el formulario para buscar por atributo name
+  const apellido =
+    formulario.querySelector('[name="apellido"]')?.value.trim() || "";
   return { campo: "apellido", metodo: "querySelector", valor: apellido };
 };
 
 export const leerConFormData = (formulario) => {
+  // Yo uso FormData para leer todos los campos del formulario de una sola vez
+  // Es muy útil cuando hay muchos campos o cuando necesito enviar datos a un servidor
   const datos = new FormData(formulario);
   return {
     metodo: "FormData",
@@ -22,6 +28,8 @@ export const leerConFormData = (formulario) => {
   };
 };
 
+// Yo renderizo visualmente los resultados de los diferentes métodos de lectura
+// Esto ayuda a entender cómo cada método obtiene los datos
 export const renderizarLecturaMetodos = (contenedor, lecturas) => {
   if (!contenedor) return;
   contenedor.innerHTML = "";

@@ -1,7 +1,12 @@
+/** 
+ * ¡Hola! Este archivo es el decorador de mis páginas.
+ * Se encarga de inyectar el banner del método, el botón de tema y preparar la consola.
+ */
+
 import { getMethodMeta } from "./methodMeta.js";
 import { initTheme } from "./theme.js";
 
-/** Armo el layout común: banner del método, toggle de tema, consola */
+// Esta es la función principal que arma todo el "look and feel" común de los TPs.
 export function setupPage(methodId) {
   const meta = getMethodMeta(methodId);
   injectThemeToggle();
@@ -11,6 +16,7 @@ export function setupPage(methodId) {
   document.body.classList.add("tp-ready");
 }
 
+// Inyecto el botoncito para cambiar entre modo claro y oscuro.
 function injectThemeToggle() {
   if (document.getElementById("themeToggle")) return;
 
@@ -22,6 +28,7 @@ function injectThemeToggle() {
   document.body.appendChild(btn);
 }
 
+// Aquí armo el banner superior que te dice si el método muta el array o no.
 function injectMethodBanner(meta) {
   const header = document.querySelector(".tp-header, header.text-center, header");
   if (!header || document.getElementById("methodBanner")) return;
@@ -46,6 +53,7 @@ function injectMethodBanner(meta) {
   header.insertAdjacentElement("afterend", banner);
 }
 
+// Me aseguro de que haya un lugar donde enganchar la consola de eventos.
 function ensureConsolePlaceholder() {
   if (document.getElementById("eventConsole")) return;
   const placeholder = document.createElement("div");

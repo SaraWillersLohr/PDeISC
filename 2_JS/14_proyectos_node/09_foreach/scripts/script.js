@@ -1,10 +1,13 @@
-// TP 09 — forEach(): recorro sin crear array nuevo
+// ¡Hola! Hoy vamos a recorrer arrays con forEach().
+// Este método es ideal cuando queremos hacer algo con cada elemento, como mostrarlos en pantalla, pero sin crear un array nuevo.
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver el recorrido de mis elementos.
 const log = boot("forEach");
 
+// Datos de ejemplo para iterar.
 const INICIAL_NOMBRES = ["Ana", "Beto", "Carla"];
 const INICIAL_NUMEROS = [5, 10, 15, 20];
 const INICIAL_OBJETOS = [
@@ -17,6 +20,7 @@ let nombres = [...INICIAL_NOMBRES];
 let numeros = [...INICIAL_NUMEROS];
 let objetos = [...INICIAL_OBJETOS];
 
+// Referencias a los elementos del DOM.
 const dom = {
   displayNombres: document.getElementById("displayNombres"),
   btnSaludar: document.getElementById("btnSaludar"),
@@ -30,6 +34,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para ir agregando líneas a mis logs en pantalla.
 const addLog = (container, text) => {
   const entry = document.createElement("div");
   entry.className = "log-entry";
@@ -38,6 +43,7 @@ const addLog = (container, text) => {
   container.scrollTop = container.scrollHeight;
 };
 
+// Actualizo la UI con el estado inicial.
 const updateUI = () => {
   paintFlow(dom.displayNombres, {
     before: nombres,
@@ -57,6 +63,7 @@ const updateUI = () => {
   });
 };
 
+// Caso 1: Saludo a cada persona de mi lista.
 dom.btnSaludar.onclick = () => {
   dom.logSaludos.innerHTML = "";
   nombres.forEach((nombre) => {
@@ -67,6 +74,7 @@ dom.btnSaludar.onclick = () => {
   dom.btnSaludar.disabled = true;
 };
 
+// Caso 2: Calculo el doble de cada número y lo muestro.
 dom.btnDoblar.onclick = () => {
   dom.logDobles.innerHTML = "";
   numeros.forEach((num) => {
@@ -77,6 +85,7 @@ dom.btnDoblar.onclick = () => {
   dom.btnDoblar.disabled = true;
 };
 
+// Caso 3: Recorro una lista de objetos para listar nombres y edades.
 dom.btnListar.onclick = () => {
   dom.logObjetos.innerHTML = "";
   objetos.forEach((persona) => {
@@ -87,6 +96,7 @@ dom.btnListar.onclick = () => {
   dom.btnListar.disabled = true;
 };
 
+// Reseteo todo para volver a iterar.
 dom.btnReset.onclick = () => {
   nombres = [...INICIAL_NOMBRES];
   numeros = [...INICIAL_NUMEROS];
@@ -99,4 +109,5 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

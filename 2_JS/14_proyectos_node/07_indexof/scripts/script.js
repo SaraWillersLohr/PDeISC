@@ -1,10 +1,13 @@
-// TP 07 — indexOf(): busco la posición (o -1)
+// ¡Hola! Hoy vamos a usar indexOf() para encontrar la posición de un elemento.
+// Si lo encuentra, nos da su índice; si no, nos devuelve un -1. ¡Así de fácil!
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow, renderBadges } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver los resultados de mis búsquedas.
 const log = boot("indexOf");
 
+// Algunos arrays para buscar cosas.
 const INICIAL_ANIMALES = ["gato", "perro", "pájaro", "conejo"];
 const INICIAL_NUMEROS = [10, 25, 50, 75, 100];
 const INICIAL_CIUDADES = ["Londres", "París", "Roma", "Madrid", "Berlín"];
@@ -13,6 +16,7 @@ let animales = [...INICIAL_ANIMALES];
 let numeros = [...INICIAL_NUMEROS];
 let ciudades = [...INICIAL_CIUDADES];
 
+// Referencias a los elementos del DOM.
 const dom = {
   displayOriginal1: document.getElementById("displayOriginal1"),
   btnSearchPerro: document.getElementById("btnSearchPerro"),
@@ -26,6 +30,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para pintar el resultado de la búsqueda y resaltar el índice si se encuentra.
 const pintarBusqueda = (container, arr, busqueda, indice, resEl) => {
   paintFlow(container, {
     before: arr,
@@ -50,6 +55,7 @@ const pintarBusqueda = (container, arr, busqueda, indice, resEl) => {
   }
 };
 
+// Actualizo la UI mostrando el estado inicial.
 const updateUI = () => {
   paintFlow(dom.displayOriginal1, {
     before: animales,
@@ -69,6 +75,7 @@ const updateUI = () => {
   });
 };
 
+// Caso 1: Busco "perro" en mi lista de animales.
 dom.btnSearchPerro.onclick = () => {
   const idx = animales.indexOf("perro");
   log(`indexOf("perro") → ${idx}`, idx >= 0 ? "success" : "warn");
@@ -76,6 +83,7 @@ dom.btnSearchPerro.onclick = () => {
   dom.btnSearchPerro.disabled = true;
 };
 
+// Caso 2: Busco el número 50.
 dom.btnSearch50.onclick = () => {
   const idx = numeros.indexOf(50);
   log(`indexOf(50) → ${idx}`, idx >= 0 ? "success" : "warn");
@@ -83,6 +91,7 @@ dom.btnSearch50.onclick = () => {
   dom.btnSearch50.disabled = true;
 };
 
+// Caso 3: Busco la ciudad "Madrid".
 dom.btnSearchMadrid.onclick = () => {
   const idx = ciudades.indexOf("Madrid");
   log(`indexOf("Madrid") → ${idx}`, idx >= 0 ? "success" : "warn");
@@ -90,6 +99,7 @@ dom.btnSearchMadrid.onclick = () => {
   dom.btnSearchMadrid.disabled = true;
 };
 
+// Reseteo todo para buscar de nuevo.
 dom.btnReset.onclick = () => {
   animales = [...INICIAL_ANIMALES];
   numeros = [...INICIAL_NUMEROS];
@@ -98,9 +108,10 @@ dom.btnReset.onclick = () => {
     el.className = "feedback-box feedback-waiting";
     el.textContent = "Esperando…";
   });
-  [dom.btnSearchPerro, dom.btnSearch50, dom.btnSearchMadrid].forEach((b) => (b.disabled = false));
+  [dom.btnSearchPerro, dom.btnSearch50, dom.btnSearchMadrid].forEach((btn) => (btn.disabled = false));
   log("Reinicié indexOf()", "system");
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

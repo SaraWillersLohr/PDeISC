@@ -1,17 +1,22 @@
-// TP 01 — push(): agrego al final y el array original cambia
+// ¡Hola! Bienvenidos a mi primer TP sobre el método push().
+// Aquí voy a mostrar cómo este método nos permite agregar elementos al final de un array, modificándolo directamente.
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Inicializo mi consola personalizada para ir viendo qué pasa.
 const log = boot("push");
 
+// Preparo unos "pools" de datos para usar más adelante.
 const FRUTAS_POOL = ["🍎 Manzana", "🍌 Banana", "🍇 Uva"];
 const AMIGOS_POOL = ["Alex", "Marcos", "Lucía"];
 
+// Estos son mis arrays iniciales con los que voy a jugar.
 let frutas = [];
 let amigos = ["Juan"];
 let numeros = [10];
 
+// Agrupo mis referencias al DOM para tener todo ordenado y a mano.
 const dom = {
   listaFrutas: document.getElementById("listaFrutas"),
   btnFrutas: document.getElementById("btnFrutas"),
@@ -30,6 +35,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Esta función me ayuda a mostrar visualmente qué pasa con las frutas cuando uso push().
 const pintarFrutas = (antes, operacion) => {
   paintFlow(dom.listaFrutas, {
     before: antes,
@@ -40,6 +46,7 @@ const pintarFrutas = (antes, operacion) => {
   if (dom.contFrutas) dom.contFrutas.textContent = `${frutas.length} ITEMS`;
 };
 
+// Lo mismo para mis amigos, para ver cómo crece la lista.
 const pintarAmigos = (antes, operacion) => {
   paintFlow(dom.listaAmigos, {
     before: antes,
@@ -50,6 +57,7 @@ const pintarAmigos = (antes, operacion) => {
   if (dom.contAmigos) dom.contAmigos.textContent = `${amigos.length} ITEMS`;
 };
 
+// Y aquí manejo la visualización de mis números.
 const pintarNums = (antes, operacion) => {
   paintFlow(dom.listaNums, {
     before: antes,
@@ -57,11 +65,18 @@ const pintarNums = (antes, operacion) => {
     after: [...numeros],
     note: "Solo hago push si el número es mayor al último.",
   });
-  if (dom.contNums) dom.contNums.textContent = `${numeros.length} ITEM${numeros.length === 1 ? "" : "S"}`;
+  if (dom.contNums)
+    dom.contNums.textContent = `${numeros.length} ITEM${numeros.length === 1 ? "" : "S"}`;
 };
 
+// Con esta función mantengo mi interfaz actualizada y controlo los botones.
 const updateUI = () => {
-  pintarFrutas([...frutas], frutas.length ? "estado actual" : 'push("🍎 Manzana", "🍌 Banana", "🍇 Uva")');
+  pintarFrutas(
+    [...frutas],
+    frutas.length
+      ? "estado actual"
+      : 'push("🍎 Manzana", "🍌 Banana", "🍇 Uva")',
+  );
   pintarAmigos([...amigos], "estado actual");
   pintarNums([...numeros], "estado actual");
 
@@ -69,7 +84,7 @@ const updateUI = () => {
   dom.btnAmigos.disabled = amigos.length >= 4;
 };
 
-// 1. Array vacío → tres frutas con push
+// Caso 1: Mi array de frutas empieza vacío y le agrego tres de un tirón.
 dom.btnFrutas.onclick = () => {
   if (frutas.length > 0) return;
   const antes = [];
@@ -79,7 +94,7 @@ dom.btnFrutas.onclick = () => {
   updateUI();
 };
 
-// 2. Array existente → tres amigos más
+// Caso 2: Aquí ya tengo un amigo y le sumo otros tres amigos nuevos.
 dom.btnAmigos.onclick = () => {
   if (amigos.length !== 1) return;
   const antes = [...amigos];
@@ -89,7 +104,7 @@ dom.btnAmigos.onclick = () => {
   updateUI();
 };
 
-// 3. Push condicional si es mayor al último
+// Caso 3: Solo voy a permitir agregar un número si es más grande que el último que puse.
 dom.btnNum.onclick = () => {
   const val = parseInt(dom.inputNum.value, 10);
   if (Number.isNaN(val)) return;
@@ -99,29 +114,25 @@ dom.btnNum.onclick = () => {
 
   if (val > ultimo) {
     numeros.push(val);
-    dom.resNum.className = "feedback-box feedback-success";
-    dom.resNum.innerHTML = `<i class="fas fa-check me-2"></i>${val} &gt; ${ultimo} → agregado con push().`;
-    log(`push(${val}) agregó el número (era mayor que ${ultimo})`, "success");
+    log(`push(${val}) exitoso`, "success");
     pintarNums(antes, `push(${val})`);
+    dom.inputNum.value = "";
+    dom.resNum.textContent = "";
   } else {
-    dom.resNum.className = "feedback-box feedback-danger";
-    dom.resNum.innerHTML = `<i class="fas fa-times me-2"></i>${val} no supera a ${ultimo}. No hice push.`;
-    log(`push() no se ejecutó: ${val} no es mayor que ${ultimo}`, "warn");
-    pintarNums(antes, `// sin push — ${val} ≤ ${ultimo}`);
+    log(`No puedo hacer push(${val}) porque no es mayor a ${ultimo}`, "error");
+    dom.resNum.textContent = `❌ ${val} no es > ${ultimo}`;
   }
-
-  dom.inputNum.value = "";
   updateUI();
 };
 
+// Por último, mi botón de reset para volver a empezar desde cero.
 dom.btnReset.onclick = () => {
   frutas = [];
   amigos = ["Juan"];
   numeros = [10];
-  dom.resNum.className = "feedback-box feedback-waiting";
-  dom.resNum.textContent = "Esperando número…";
-  log("Reinicié los tres ejercicios", "system");
+  log("Todo reseteado. ¡A probar de nuevo!", "warning");
   updateUI();
 };
 
-window.addEventListener("DOMContentLoaded", updateUI);
+// Inicio la interfaz para que se vea bien desde el primer momento.
+updateUI();

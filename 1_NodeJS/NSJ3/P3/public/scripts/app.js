@@ -1,3 +1,5 @@
+// Punto de entrada para el Proyecto 3
+// Inicializa los componentes básicos de la página al cargar el DOM.
 import { initConsole, agregarLog } from "./consola.js";
 import { bindEventos } from "./eventos.js";
 import { initBackToTop } from "./ui.js";

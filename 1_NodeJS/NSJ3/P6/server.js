@@ -1,3 +1,5 @@
+// Servidor para el Proyecto 6 (Formulario con Validación de APIs)
+// Este script sirve la aplicación que valida datos en tiempo real usando APIs externas.
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

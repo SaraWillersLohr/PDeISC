@@ -1,3 +1,5 @@
+// Servidor para el Proyecto 4 (Manipulación Avanzada de Atributos)
+// Este script sirve la aplicación donde exploramos cómo cambiar propiedades de los elementos HTML dinámicamente.
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

@@ -1,10 +1,13 @@
-// TP 02 — pop(): saco del final y el array se achica
+// ¡Hola! En este TP vamos a ver el método pop().
+// Básicamente, sirve para quitar el último elemento de un array. ¡Es como el opuesto a push!
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver qué vamos eliminando.
 const log = boot("pop");
 
+// Mis listas iniciales para tener algo que borrar.
 const INICIAL_ANIMALES = ["Perro", "Gato", "Loro", "Pez"];
 const INICIAL_COMPRAS = ["Leche", "Pan", "Frutas", "Café"];
 const INICIAL_VACIADO = ["A", "B", "C", "D", "E"];
@@ -13,6 +16,7 @@ let animales = [...INICIAL_ANIMALES];
 let compras = [...INICIAL_COMPRAS];
 let vaciado = [...INICIAL_VACIADO];
 
+// Aquí guardo las referencias a los elementos de mi página.
 const dom = {
   listaAni: document.getElementById("listaAni"),
   btnAni: document.getElementById("btnAni"),
@@ -24,10 +28,12 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Una función cortita para pintar los cambios en la pantalla.
 const flow = (el, antes, op, despues, nota) => {
   paintFlow(el, { before: antes, operation: op, after: despues, note: nota });
 };
 
+// Actualizo mi interfaz y deshabilito botones si no hay nada más que borrar.
 const updateUI = () => {
   flow(dom.listaAni, [...animales], "listo para pop()", [...animales], "Un clic = un pop() al final.");
   flow(dom.listaCom, [...compras], "listo para pop()", [...compras], "Guardo lo eliminado en una variable.");
@@ -38,6 +44,7 @@ const updateUI = () => {
   dom.btnVac.disabled = vaciado.length === 0;
 };
 
+// Caso 1: Borro un animal del final. ¡Chau pez!
 dom.btnAni.onclick = () => {
   if (!animales.length) return;
   const antes = [...animales];
@@ -47,6 +54,7 @@ dom.btnAni.onclick = () => {
   updateUI();
 };
 
+// Caso 2: Borro algo de las compras pero guardo qué fue lo que borré.
 dom.btnCom.onclick = () => {
   if (!compras.length) return;
   const antes = [...compras];
@@ -58,6 +66,7 @@ dom.btnCom.onclick = () => {
   updateUI();
 };
 
+// Caso 3: Vaciado automático usando un intervalo (como si fuera un loop).
 dom.btnVac.onclick = () => {
   dom.btnVac.disabled = true;
   const interval = setInterval(() => {
@@ -74,6 +83,7 @@ dom.btnVac.onclick = () => {
   }, 220);
 };
 
+// Reseteo todo a sus valores originales.
 dom.btnReset.onclick = () => {
   animales = [...INICIAL_ANIMALES];
   compras = [...INICIAL_COMPRAS];
@@ -84,4 +94,5 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
+// Inicio la UI apenas carga la página.
 window.addEventListener("DOMContentLoaded", updateUI);

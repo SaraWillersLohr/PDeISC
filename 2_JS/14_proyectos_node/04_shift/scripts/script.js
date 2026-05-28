@@ -1,10 +1,13 @@
-// TP 04 — shift(): saco del inicio (cola FIFO)
+// ¡Hola! En este TP vamos a ver el método shift().
+// Es el opuesto a unshift(): sirve para sacar el primer elemento del array. ¡Ideal para filas!
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver quién sale primero.
 const log = boot("shift");
 
+// Listas iniciales para probar el método.
 const INICIAL_ENTEROS = [10, 20, 30, 40, 50];
 const INICIAL_MENSAJES = ["Hola", "¿Qué tal?", "Todo bien", "Adiós"];
 const INICIAL_COLA = ["Carlos", "Marta", "Pedro", "Lucía"];
@@ -13,6 +16,7 @@ let enteros = [...INICIAL_ENTEROS];
 let mensajes = [...INICIAL_MENSAJES];
 let cola = [...INICIAL_COLA];
 
+// Mis referencias a los elementos de la página.
 const dom = {
   listaNum: document.getElementById("listaNum"),
   btnNum: document.getElementById("btnNum"),
@@ -24,9 +28,11 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para pintar los cambios visuales.
 const flow = (el, antes, op, despues, nota) =>
   paintFlow(el, { before: antes, operation: op, after: despues, note: nota });
 
+// Actualizo la UI y bloqueo botones si ya no queda nada que sacar.
 const updateUI = () => {
   flow(dom.listaNum, [...enteros], "shift()", [...enteros]);
   flow(dom.listaMsg, [...mensajes], "shift()", [...mensajes]);
@@ -37,6 +43,7 @@ const updateUI = () => {
   dom.btnCola.disabled = !cola.length;
 };
 
+// Caso 1: Saco el primer número de la lista.
 dom.btnNum.onclick = () => {
   if (!enteros.length) return;
   const antes = [...enteros];
@@ -46,6 +53,7 @@ dom.btnNum.onclick = () => {
   updateUI();
 };
 
+// Caso 2: Saco el primer mensaje.
 dom.btnMsg.onclick = () => {
   if (!mensajes.length) return;
   const antes = [...mensajes];
@@ -55,6 +63,7 @@ dom.btnMsg.onclick = () => {
   updateUI();
 };
 
+// Caso 3: Atiendo al primer cliente de la fila y lo saco de la cola.
 dom.btnCola.onclick = () => {
   if (!cola.length) return;
   const antes = [...cola];
@@ -66,6 +75,7 @@ dom.btnCola.onclick = () => {
   updateUI();
 };
 
+// Reseteo todo a los valores iniciales.
 dom.btnReset.onclick = () => {
   enteros = [...INICIAL_ENTEROS];
   mensajes = [...INICIAL_MENSAJES];
@@ -76,4 +86,5 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

@@ -1,3 +1,5 @@
+// Servidor para el Proyecto 5 (Carrito de Compras)
+// Este script sirve la tienda virtual y maneja la lectura del catálogo de productos desde un JSON.
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

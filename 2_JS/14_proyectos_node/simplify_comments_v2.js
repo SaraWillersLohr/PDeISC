@@ -1,13 +1,18 @@
+/**
+ * ¡Hola! Este script lo usé en algún momento para simplificar los comentarios de mis scripts.
+ * Básicamente, busca patrones y los reemplaza por otros más cortitos y fáciles de leer.
+ */
 const fs = require('fs');
 const path = require('path');
 
 const rootDir = __dirname;
 
+// Esta función recibe el contenido de un archivo y el nombre del proyecto, y devuelve el contenido con comentarios simplificados.
 const simplifyScriptComments = (content, projectName) => {
-    // Remove block comments at the top
+    // Primero, reemplazo los comentarios de bloque del principio por uno más simple con el nombre del proyecto.
     content = content.replace(/\/\*\*[\s\S]*?\*\//, `// proyecto ${projectName}`);
     
-    // Replace section headers
+    // Luego, voy simplificando los encabezados de cada sección.
     content = content.replace(/\/\/ --- DATOS INICIALES ---/g, '// constantes');
     content = content.replace(/\/\/ --- ESTADO ---/g, '// variables');
     content = content.replace(/\/\/ --- DOM ---/g, '// elementos html');
@@ -18,7 +23,7 @@ const simplifyScriptComments = (content, projectName) => {
     content = content.replace(/\/\/ --- INIT ---/g, '// inicio');
     content = content.replace(/\/\/ Init/g, '// inicio');
     
-    // Simplifications inside logic
+    // También simplifico algunos comentarios específicos dentro de la lógica.
     content = content.replace(/\/\/ MÉTODO ARRAY:(.*?)( - Ejercicio \d+)?/g, (match, p1) => {
         return `// usando el metodo ${p1.trim().toLowerCase()}`;
     });
@@ -32,8 +37,10 @@ const simplifyScriptComments = (content, projectName) => {
     return content;
 };
 
+// Busco todas las carpetas en el directorio raíz.
 const folders = fs.readdirSync(rootDir).filter(f => fs.statSync(path.join(rootDir, f)).isDirectory());
 
+// Recorro cada carpeta y, si tiene un script.js, le aplico la simplificación.
 folders.forEach(folder => {
     const scriptPath = path.join(rootDir, folder, 'scripts', 'script.js');
     if (fs.existsSync(scriptPath)) {
@@ -43,4 +50,5 @@ folders.forEach(folder => {
         console.log(`Updated JS comments in ${folder}`);
     }
 });
-console.log("Done!");
+
+console.log("¡Listo! Comentarios simplificados en todos los proyectos.");

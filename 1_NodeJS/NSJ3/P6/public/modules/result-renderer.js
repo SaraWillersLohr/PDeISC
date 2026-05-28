@@ -1,3 +1,8 @@
+/**
+ * Renderizador de Resultados
+ * Toma los datos validados del formulario y los muestra de forma prolija 
+ * en una ventana modal de éxito.
+ */
 export const resultRenderer = {
     render(data, containerId) {
         const container = document.getElementById(containerId);

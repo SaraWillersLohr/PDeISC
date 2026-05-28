@@ -1,3 +1,7 @@
+/**
+ * Módulo de Logger para la interfaz
+ * Muestra mensajes de eventos en un contenedor de la página para que el usuario vea qué sucede.
+ */
 export const uiLogger = {
     log(message, containerId) {
         const container = document.getElementById(containerId);

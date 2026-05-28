@@ -1,10 +1,13 @@
-// TP 10 — map(): transformo y obtengo un array NUEVO
+// ¡Hola! Hoy vamos a ver map().
+// A diferencia de forEach(), map() crea un array nuevo con los resultados de la transformación. ¡Es súper potente!
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver cómo se transforman mis datos.
 const log = boot("map");
 
+// Datos iniciales que se van a transformar.
 const INICIAL_NUMEROS = [5, 10, 15, 20, 25];
 const INICIAL_NOMBRES = ["ana", "beto", "carla", "daniel"];
 const INICIAL_PRECIOS = [100, 250, 500, 1000];
@@ -13,6 +16,7 @@ const numeros = [...INICIAL_NUMEROS];
 const nombres = [...INICIAL_NOMBRES];
 const precios = [...INICIAL_PRECIOS];
 
+// Referencias a los elementos del DOM.
 const dom = {
   displayOriginal1: document.getElementById("displayOriginal1"),
   displayResult1: document.getElementById("displayResult1"),
@@ -26,6 +30,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para mostrar el proceso de mapeo visualmente.
 const flowMap = (origEl, resEl, original, resultado, operacion) => {
   paintFlow(origEl, {
     before: original,
@@ -41,6 +46,7 @@ const flowMap = (origEl, resEl, original, resultado, operacion) => {
   });
 };
 
+// Actualizo la UI con el estado inicial.
 const updateUI = () => {
   flowMap(dom.displayOriginal1, dom.displayResult1, numeros, [], "numeros.map(n => n * 3)");
   flowMap(dom.displayOriginal2, dom.displayResult2, nombres, [], 'nombres.map(n => n.toUpperCase())');
@@ -53,6 +59,7 @@ const updateUI = () => {
   );
 };
 
+// Caso 1: Triplico cada número.
 dom.btnMapX3.onclick = () => {
   const triplicados = numeros.map((n) => n * 3);
   log(`map() creó un nuevo array con ${triplicados.length} números (×3)`, "success");
@@ -60,6 +67,7 @@ dom.btnMapX3.onclick = () => {
   dom.btnMapX3.disabled = true;
 };
 
+// Caso 2: Convierto todos los nombres a MAYÚSCULAS.
 dom.btnMapUpper.onclick = () => {
   const mayusculas = nombres.map((nombre) => nombre.toUpperCase());
   log(`map() convirtió ${mayusculas.length} nombres a mayúsculas`, "success");
@@ -67,6 +75,7 @@ dom.btnMapUpper.onclick = () => {
   dom.btnMapUpper.disabled = true;
 };
 
+// Caso 3: Calculo el IVA (21%) para cada precio de mi lista.
 dom.btnMapIVA.onclick = () => {
   const preciosConIVA = precios.map((precio) => Number((precio * 1.21).toFixed(2)));
   log(`map() calculó IVA en ${preciosConIVA.length} precios`, "success");
@@ -80,6 +89,7 @@ dom.btnMapIVA.onclick = () => {
   dom.btnMapIVA.disabled = true;
 };
 
+// Reseteo todo para volver a transformar.
 dom.btnReset.onclick = () => {
   dom.btnMapX3.disabled = false;
   dom.btnMapUpper.disabled = false;
@@ -88,4 +98,5 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

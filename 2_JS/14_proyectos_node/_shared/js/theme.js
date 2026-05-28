@@ -1,12 +1,19 @@
+/** 
+ * ¡Hola! Este es mi gestor de temas (claro/oscuro).
+ * Uso localStorage para que, si elegís el modo oscuro, se mantenga así aunque recargues la página.
+ */
 const STORAGE_KEY = "array-tp-theme";
 
-/** Tema claro/oscuro con localStorage */
+// Esta función inicializa el tema cuando carga la página.
 export function initTheme() {
   const saved = localStorage.getItem(STORAGE_KEY);
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  
+  // Si no hay nada guardado, me fijo en la preferencia del sistema operativo.
   const theme = saved || (prefersDark ? "dark" : "light");
   applyTheme(theme, false);
 
+  // Configuro el botón para que al hacer click cambie el tema.
   const btn = document.getElementById("themeToggle");
   if (btn && !btn.dataset.bound) {
     btn.dataset.bound = "1";
@@ -17,6 +24,7 @@ export function initTheme() {
   }
 }
 
+// Esta función aplica el tema al documento y actualiza el icono del botón.
 function applyTheme(theme, persist) {
   document.documentElement.setAttribute("data-theme", theme);
   if (persist) localStorage.setItem(STORAGE_KEY, theme);

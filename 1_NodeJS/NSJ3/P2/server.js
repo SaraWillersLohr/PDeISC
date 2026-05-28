@@ -1,3 +1,5 @@
+// Servidor para el Proyecto 2 (Single Page Application básica)
+// Este script sirve la SPA y permite navegar entre secciones sin recargar.
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

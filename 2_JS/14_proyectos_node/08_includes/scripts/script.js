@@ -1,10 +1,13 @@
-// TP 08 — includes(): pregunto si está (true/false)
+// ¡Hola! Hoy vamos a ver includes().
+// Este método es genial porque solo nos dice true o false si un elemento existe en el array. ¡Muy práctico!
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver las respuestas de mis preguntas al array.
 const log = boot("includes");
 
+// Datos iniciales para preguntar.
 const INICIAL_USUARIOS = ["pepe", "admin", "maria", "lucas"];
 const INICIAL_COLORES = ["rojo", "azul", "amarillo", "blanco"];
 const INICIAL_NUMEROS = [10, 20, 30, 40];
@@ -13,6 +16,7 @@ let usuarios = [...INICIAL_USUARIOS];
 let colores = [...INICIAL_COLORES];
 let numeros = [...INICIAL_NUMEROS];
 
+// Referencias a los elementos del DOM.
 const dom = {
   displayUsers: document.getElementById("displayUsers"),
   btnCheckAdmin: document.getElementById("btnCheckAdmin"),
@@ -27,6 +31,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para mostrar el chequeo visualmente.
 const flowCheck = (el, arr, valor, resultado, resEl) => {
   paintFlow(el, {
     before: arr,
@@ -42,6 +47,7 @@ const flowCheck = (el, arr, valor, resultado, resEl) => {
   }
 };
 
+// Actualizo la UI con el estado inicial.
 const updateUI = () => {
   paintFlow(dom.displayUsers, {
     before: usuarios,
@@ -60,6 +66,7 @@ const updateUI = () => {
   });
 };
 
+// Caso 1: Pregunto si "admin" está en la lista de usuarios.
 dom.btnCheckAdmin.onclick = () => {
   const ok = usuarios.includes("admin");
   log(`includes("admin") → ${ok}`, ok ? "success" : "warn");
@@ -67,6 +74,7 @@ dom.btnCheckAdmin.onclick = () => {
   dom.btnCheckAdmin.disabled = true;
 };
 
+// Caso 2: Pregunto si "verde" está en mi lista de colores.
 dom.btnCheckVerde.onclick = () => {
   const ok = colores.includes("verde");
   log(`includes("verde") → ${ok}`, ok ? "success" : "warn");
@@ -74,6 +82,7 @@ dom.btnCheckVerde.onclick = () => {
   dom.btnCheckVerde.disabled = true;
 };
 
+// Caso 3: Uso includes() para evitar agregar números duplicados. ¡Súper útil!
 dom.btnAddNumero.onclick = () => {
   const val = parseInt(dom.inputNumero.value, 10);
   if (Number.isNaN(val)) {
@@ -98,29 +107,30 @@ dom.btnAddNumero.onclick = () => {
   numeros.push(val);
   dom.inputNumero.value = "";
   dom.resNumero.className = "feedback-box feedback-success";
-  dom.resNumero.innerHTML = `<i class="fas fa-plus me-2"></i>${val} agregado (no estaba).`;
-  log(`includes(${val}) → false, luego push(${val})`, "success");
+  dom.resNumero.innerHTML = `<i class="fas fa-plus me-2"></i>Agregué ${val} porque no estaba.`;
+  log(`includes(${val}) → false, agregando con push()`, "success");
   paintFlow(dom.displayNumeros, {
     before: antes,
-    operation: `!includes(${val}) → push(${val})`,
-    after: numeros,
-    note: "Primero verifico con includes, después muto con push.",
+    operation: `push(${val}) porque no estaba`,
+    after: [...numeros],
   });
 };
 
+// Reseteo todo para probar de nuevo.
 dom.btnReset.onclick = () => {
   usuarios = [...INICIAL_USUARIOS];
   colores = [...INICIAL_COLORES];
   numeros = [...INICIAL_NUMEROS];
-  dom.btnCheckAdmin.disabled = false;
-  dom.btnCheckVerde.disabled = false;
   [dom.resAdmin, dom.resVerde, dom.resNumero].forEach((el) => {
     el.className = "feedback-box feedback-waiting";
     el.textContent = "Esperando…";
   });
+  dom.btnCheckAdmin.disabled = false;
+  dom.btnCheckVerde.disabled = false;
   dom.inputNumero.value = "";
   log("Reinicié includes()", "system");
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

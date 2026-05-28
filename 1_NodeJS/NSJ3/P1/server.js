@@ -1,6 +1,5 @@
-// Servidor Express — sirve el laboratorio DHTML desde /public
-// Sara Willers Lohr · PDeISC · Node.js
-
+// Servidor Express para el Proyecto 1 (Laboratorio DHTML)
+// Este script levanta un servidor local para mostrar los ejercicios de manipulación del DOM.
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

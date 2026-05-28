@@ -1,5 +1,9 @@
-/** Helpers para mostrar arrays en pantalla con estilo académico */
+/** 
+ * ¡Hola! Este archivo es mi caja de herramientas para mostrar los arrays en la pantalla.
+ * Aquí definí varias funciones que me ayudan a que todo se vea lindo y ordenado.
+ */
 
+// Esta función me sirve para convertir un array en una cadena de texto que parezca código real.
 export function formatArrayLiteral(arr) {
   if (!Array.isArray(arr)) return String(arr);
   if (arr.length === 0) return "[]";
@@ -7,12 +11,15 @@ export function formatArrayLiteral(arr) {
   const items = arr.map((item) => {
     if (item === null) return "null";
     if (typeof item === "object") {
+      // Si el objeto tiene nombre y edad, lo formateo de una forma especial.
       if (item.nombre !== undefined && item.edad !== undefined) {
         return `{ nombre: "${item.nombre}", edad: ${item.edad} }`;
       }
+      // Lo mismo si tiene nombre y activo (para los usuarios).
       if (item.nombre !== undefined && item.activo !== undefined) {
         return `{ nombre: "${item.nombre}", activo: ${item.activo} }`;
       }
+      // O si tiene nombre y precio (para el carrito).
       if (item.nombre !== undefined && item.precio !== undefined) {
         return `{ nombre: "${item.nombre}", precio: ${item.precio} }`;
       }
@@ -25,6 +32,7 @@ export function formatArrayLiteral(arr) {
   return `[${items.join(", ")}]`;
 }
 
+// Con esta función dibujo esas "etiquetas" (badges) que ves en la página para cada elemento del array.
 export function renderBadges(container, arr, { emptyText = "vacío", highlightLast = false } = {}) {
   if (!container) return;
 
@@ -46,7 +54,8 @@ export function renderBadges(container, arr, { emptyText = "vacío", highlightLa
 }
 
 /**
- * Pinta bloque ANTES → OPERACIÓN → RESULTADO en un contenedor
+ * ¡Esta es la función estrella! Pinta todo el flujo: cómo estaba el array ANTES, 
+ * qué OPERACIÓN le hicimos y cómo quedó como RESULTADO.
  */
 export function paintFlow(container, { before, operation, after, note = "" }) {
   if (!container) return;
@@ -75,19 +84,21 @@ export function paintFlow(container, { before, operation, after, note = "" }) {
     </div>
   `;
 
+  // Después de armar el HTML, mando a renderizar los badges en cada paso.
   const beforeBadges = container.querySelector('[data-role="before-badges"]');
   const afterBadges = container.querySelector('[data-role="after-badges"]');
   renderBadges(beforeBadges, beforeArr);
   renderBadges(afterBadges, afterArr);
 }
 
-/** Contenedor legacy: solo badges (lista simple) */
+/** Una forma más simple de mostrar una lista, por si la necesito. */
 export function renderArrayIn(container, arr) {
   if (!container) return;
   container.className = (container.className || "") + " items-container";
   renderBadges(container, arr);
 }
 
+// Una función interna para evitar que me rompan el HTML con caracteres raros.
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")

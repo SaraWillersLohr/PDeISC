@@ -1,3 +1,5 @@
+// Punto de entrada para el Proyecto 4
+// Configura la interfaz y prepara los logs de la consola.
 import { initConsole, agregarLog } from "./consola.js";
 import { bindEventos } from "./eventos.js";
 import { initBackToTop } from "./ui.js";

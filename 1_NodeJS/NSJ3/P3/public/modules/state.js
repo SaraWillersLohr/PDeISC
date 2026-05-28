@@ -1,3 +1,8 @@
+/**
+ * Gestor de Estado (State Manager)
+ * Centraliza los datos de la aplicación (como el nombre del usuario o el tema) 
+ * para que sea fácil consultarlos y actualizarlos desde cualquier parte.
+ */
 export const stateManager = {
     state: {
         name: '',

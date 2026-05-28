@@ -1,10 +1,13 @@
-// TP 12 — reduce(): todo el array en un solo valor
+// ¡Hola! Hoy vamos a ver reduce(), uno de los métodos más potentes (y a veces confusos) de los arrays.
+// Sirve para "reducir" todo un array a un único valor (una suma, un producto, un objeto, etc.).
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow, formatArrayLiteral } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver cómo se va acumulando el resultado.
 const log = boot("reduce");
 
+// Datos para reducir.
 const INICIAL_ELEMENTOS = [5, 10, 15, 20];
 const INICIAL_ENTEROS = [1, 2, 3, 4, 5];
 const INICIAL_CARRITO = [
@@ -17,6 +20,7 @@ const elementos = [...INICIAL_ELEMENTOS];
 const enteros = [...INICIAL_ENTEROS];
 const carrito = [...INICIAL_CARRITO];
 
+// Referencias a los elementos del DOM.
 const dom = {
   displayOriginal1: document.getElementById("displayOriginal1"),
   resSum: document.getElementById("resSum"),
@@ -30,6 +34,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para mostrar visualmente el resultado de la reducción.
 const flowReduce = (origEl, resEl, arr, valor, operacion) => {
   paintFlow(origEl, {
     before: arr,
@@ -43,6 +48,7 @@ const flowReduce = (origEl, resEl, arr, valor, operacion) => {
   }
 };
 
+// Actualizo la UI con el estado inicial y las operaciones que vamos a hacer.
 const updateUI = () => {
   paintFlow(dom.displayOriginal1, {
     before: elementos,
@@ -65,6 +71,7 @@ const updateUI = () => {
   });
 };
 
+// Caso 1: Sumo todos los números del array.
 dom.btnSum.onclick = () => {
   const suma = elementos.reduce((acc, curr) => acc + curr, 0);
   log(`reduce() sumó → ${suma}`, "success");
@@ -72,6 +79,7 @@ dom.btnSum.onclick = () => {
   dom.btnSum.disabled = true;
 };
 
+// Caso 2: Multiplico todos los números (producto).
 dom.btnMult.onclick = () => {
   const producto = enteros.reduce((acc, curr) => acc * curr, 1);
   log(`reduce() multiplicó → ${producto}`, "success");
@@ -79,6 +87,7 @@ dom.btnMult.onclick = () => {
   dom.btnMult.disabled = true;
 };
 
+// Caso 3: Sumo los precios de una lista de objetos (como un carrito de compras).
 dom.btnTotalObj.onclick = () => {
   const total = carrito.reduce((acc, curr) => acc + curr.precio, 0);
   log(`reduce() total carrito → $${total}`, "success");
@@ -86,6 +95,7 @@ dom.btnTotalObj.onclick = () => {
   dom.btnTotalObj.disabled = true;
 };
 
+// Reseteo todo para volver a reducir.
 dom.btnReset.onclick = () => {
   dom.btnSum.disabled = false;
   dom.btnMult.disabled = false;
@@ -94,4 +104,5 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

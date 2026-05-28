@@ -1,4 +1,7 @@
-/** Metadatos de cada método — lo uso en el banner y en la consola */
+/** 
+ * ¡Hola! Aquí guardo toda la información (metadatos) de cada método que estamos estudiando.
+ * Uso estos datos para armar el banner de cada página y darte pistas en la consola.
+ */
 export const METHOD_META = {
   push: {
     id: "push",
@@ -100,6 +103,8 @@ export const METHOD_META = {
   },
 };
 
+// Esta función me devuelve la info de un método específico. 
+// Si no lo encuentro, por defecto devuelvo la de push().
 export function getMethodMeta(methodId) {
   return METHOD_META[methodId] ?? METHOD_META.push;
 }

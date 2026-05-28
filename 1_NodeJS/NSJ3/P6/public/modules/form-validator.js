@@ -1,3 +1,8 @@
+/**
+ * Validador de Formulario
+ * Realiza comprobaciones locales y consultas a APIs externas (Abstract API) 
+ * para asegurar que los datos del formulario sean válidos.
+ */
 const API_KEY = 'ea4ce909ad82d0126f571fa852ae1a41a2c1eff83fd7d98d45799187ffe0ce8c';
 
 export const formValidator = {

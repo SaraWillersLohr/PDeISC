@@ -1,11 +1,16 @@
-/** Consola visual de eventos — registro real en el DOM */
+/** 
+ * ¡Hola! Este es el código de mi consola de eventos visual.
+ * Me permite mostrar mensajitos en la página para que sepas qué está pasando con el código.
+ */
 export function createEventConsole(rootSelector = "#eventConsole") {
   let root = document.querySelector(rootSelector);
   const history = [];
 
+  // Esta función se asegura de que el elemento de la consola exista en la página.
   const ensureRoot = () => {
     if (root) return root;
 
+    // Si no existe, lo creo desde cero con JavaScript.
     root = document.createElement("aside");
     root.id = "eventConsole";
     root.className = "event-console glass-panel";
@@ -23,6 +28,7 @@ export function createEventConsole(rootSelector = "#eventConsole") {
     `;
     document.body.appendChild(root);
 
+    // Agrego la funcionalidad para limpiar la consola cuando hacés click en la goma de borrar.
     root.querySelector("#btnClearConsole")?.addEventListener("click", () => {
       history.length = 0;
       const body = root.querySelector("#eventConsoleBody");
@@ -33,17 +39,20 @@ export function createEventConsole(rootSelector = "#eventConsole") {
     return root;
   };
 
+  // Una función interna para saber qué hora es en cada mensaje.
   const formatTime = () => {
     const now = new Date();
     return now.toLocaleTimeString("es-AR", { hour12: false });
   };
 
+  // Hago que la consola siempre baje automáticamente cuando hay mensajes nuevos.
   const scrollToBottom = (body) => {
     requestAnimationFrame(() => {
       body.scrollTop = body.scrollHeight;
     });
   };
 
+  // ¡Esta es la función que uso para escribir en la consola!
   const log = (message, type = "info") => {
     ensureRoot();
     const body = root.querySelector("#eventConsoleBody");
@@ -58,6 +67,7 @@ export function createEventConsole(rootSelector = "#eventConsole") {
     scrollToBottom(body);
   };
 
+  // Inicializo la consola apenas se llama a esta función.
   ensureRoot();
 
   return { log, history, root: () => ensureRoot() };

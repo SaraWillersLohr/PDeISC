@@ -1,3 +1,8 @@
+/**
+ * Módulo de enrutamiento (Router)
+ * Se encarga de cargar archivos HTML externos en el contenedor principal 
+ * para simular una aplicación de una sola página (SPA).
+ */
 export const router = {
     async loadPage(pageName, containerId) {
         const container = document.getElementById(containerId);

@@ -1,3 +1,5 @@
+// Servidor para el Proyecto 3 (Manejo de Estados y Formularios)
+// Este script sirve la aplicación donde practicamos cómo guardar y validar datos del usuario.
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

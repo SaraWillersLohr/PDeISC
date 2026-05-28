@@ -1,10 +1,13 @@
-// TP 11 — filter(): me quedo solo con los que cumplen la condición
+// ¡Hola! Hoy vamos a filtrar datos con filter().
+// Este método nos devuelve un array nuevo que solo contiene los elementos que cumplen con la condición que le pasemos. ¡Como un colador!
 
 import { boot } from "../../_shared/js/boot.js";
 import { paintFlow } from "../../_shared/js/arrayDisplay.js";
 
+// Arranco mi consola para ver quiénes pasan el filtro y quiénes no.
 const log = boot("filter");
 
+// Datos de prueba para filtrar.
 const INICIAL_NUMEROS = [2, 15, 8, 20, 5, 12, 30];
 const INICIAL_PALABRAS = ["sol", "planeta", "luz", "estrellas", "galaxia", "mar"];
 const INICIAL_USUARIOS = [
@@ -18,6 +21,7 @@ const numeros = [...INICIAL_NUMEROS];
 const palabras = [...INICIAL_PALABRAS];
 const usuarios = [...INICIAL_USUARIOS];
 
+// Referencias a los elementos del DOM.
 const dom = {
   displayOriginal1: document.getElementById("displayOriginal1"),
   displayResult1: document.getElementById("displayResult1"),
@@ -31,6 +35,7 @@ const dom = {
   btnReset: document.getElementById("btnReset"),
 };
 
+// Función para mostrar visualmente cómo funciona el filtro.
 const flowFilter = (origEl, resEl, original, filtrados, operacion) => {
   paintFlow(origEl, {
     before: original,
@@ -46,12 +51,14 @@ const flowFilter = (origEl, resEl, original, filtrados, operacion) => {
   });
 };
 
+// Actualizo la UI con el estado inicial.
 const updateUI = () => {
   flowFilter(dom.displayOriginal1, dom.displayResult1, numeros, [], "numeros.filter(n => n > 10)");
   flowFilter(dom.displayOriginal2, dom.displayResult2, palabras, [], "palabras.filter(p => p.length > 5)");
   flowFilter(dom.displayOriginal3, dom.displayResult3, usuarios, [], "usuarios.filter(u => u.activo)");
 };
 
+// Caso 1: Me quedo solo con los números mayores a 10.
 dom.btnFilterNums.onclick = () => {
   const mayores = numeros.filter((n) => n > 10);
   log(`filter() dejó ${mayores.length} números (> 10)`, "success");
@@ -59,6 +66,7 @@ dom.btnFilterNums.onclick = () => {
   dom.btnFilterNums.disabled = true;
 };
 
+// Caso 2: Filtro palabras largas (más de 5 letras).
 dom.btnFilterWords.onclick = () => {
   const largas = palabras.filter((p) => p.length > 5);
   log(`filter() dejó ${largas.length} palabras largas`, "success");
@@ -66,6 +74,7 @@ dom.btnFilterWords.onclick = () => {
   dom.btnFilterWords.disabled = true;
 };
 
+// Caso 3: Solo muestro los usuarios que están activos.
 dom.btnFilterActive.onclick = () => {
   const activos = usuarios.filter((u) => u.activo);
   log(`filter() dejó ${activos.length} usuarios activos`, "success");
@@ -79,6 +88,7 @@ dom.btnFilterActive.onclick = () => {
   dom.btnFilterActive.disabled = true;
 };
 
+// Reseteo todo para volver a filtrar.
 dom.btnReset.onclick = () => {
   dom.btnFilterNums.disabled = false;
   dom.btnFilterWords.disabled = false;
@@ -87,4 +97,5 @@ dom.btnReset.onclick = () => {
   updateUI();
 };
 
+// Inicio la interfaz.
 window.addEventListener("DOMContentLoaded", updateUI);

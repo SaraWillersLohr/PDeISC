@@ -1,3 +1,8 @@
+/**
+ * Gestor del Carrito de Compras
+ * Mantiene la lista de productos seleccionados, permite agregar/quitar 
+ * y calcula el total de la compra.
+ */
 export const cartManager = {
     items: [],
     

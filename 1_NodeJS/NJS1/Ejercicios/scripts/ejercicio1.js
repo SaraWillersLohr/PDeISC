@@ -19,17 +19,17 @@ const server = createServer((req, res) => {
   // Como Node.js básico no sirve archivos estáticos solos, yo tengo que leerlos con "readFileSync" y enviárselos al navegador con el tipo de contenido correcto.
   if (req.url.startsWith("/styles.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "styles.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "styles.css")));
     return;
   }
   if (req.url.startsWith("/lightmode.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "lightmode.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "lightmode.css")));
     return;
   }
   if (req.url.startsWith("/darkmode.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "darkmode.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "darkmode.css")));
     return;
   }
 

@@ -4,7 +4,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 // Acá importo mis propias funciones matemáticas personalizadas desde el módulo externo "calculos.js" que creé para cumplir la consigna 4.
 // Uso la sintaxis de ES Modules ("import" y llaves) trayendo la suma, resta, multiplicación y división.
-import { suma, resta, multiplicacion, division } from "./calculos.js";
+import { suma, resta, multiplicacion, division } from "../modules/calculos.js";
 
 // Acá obtengo la ruta exacta de la carpeta donde se encuentra este archivo.
 // Al usar ES Modules, emulo el comportamiento tradicional de "__dirname" obteniéndola desde "import.meta.url".
@@ -26,17 +26,17 @@ const server = createServer((req, res) => {
   // Intercepto las solicitudes de mis estilos CSS locales para cargárselos dinámicamente al navegador cuando los pida.
   if (req.url.startsWith("/styles.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "styles.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "styles.css")));
     return;
   }
   if (req.url.startsWith("/lightmode.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "lightmode.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "lightmode.css")));
     return;
   }
   if (req.url.startsWith("/darkmode.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "darkmode.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "darkmode.css")));
     return;
   }
 

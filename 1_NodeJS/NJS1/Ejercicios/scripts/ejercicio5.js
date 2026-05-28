@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { suma, resta, multiplicacion, division } from "./calculos.js";
+import { suma, resta, multiplicacion, division } from "../modules/calculos.js";
 
 // Acá obtengo la ruta de la carpeta de este archivo.
 // Al usar ES Modules, emulo el comportamiento tradicional de "__dirname" obteniéndola desde "import.meta.url" para que no haya fallas al localizar los estilos CSS.
@@ -40,17 +40,17 @@ const server = createServer((req, res) => {
   // Intercepto las solicitudes de mis stylesheets para cargárselos dinámicamente al navegador cuando los pida.
   if (req.url.startsWith("/styles.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "styles.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "styles.css")));
     return;
   }
   if (req.url.startsWith("/lightmode.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "lightmode.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "lightmode.css")));
     return;
   }
   if (req.url.startsWith("/darkmode.css")) {
     res.writeHead(200, { "Content-Type": "text/css" });
-    res.end(readFileSync(join(__dirname, "darkmode.css")));
+    res.end(readFileSync(join(__dirname, "..", "styles", "darkmode.css")));
     return;
   }
 

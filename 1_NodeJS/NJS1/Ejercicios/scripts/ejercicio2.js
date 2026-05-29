@@ -82,9 +82,9 @@ const server = createServer((req, res) => {
         </nav>
 
         <!-- Mi sección de contenido principal -->
-        <main class="container my-5 flex-grow-1">
+        <main class="container-fluid my-5 flex-grow-1">
           <div class="row justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-12">
               <!-- Encabezado del Ejercicio 2 -->
               <div class="text-center mb-5">
                 <span class="badge bg-primary-subtle text-primary badge-custom mb-3">Ejercicio 2</span>

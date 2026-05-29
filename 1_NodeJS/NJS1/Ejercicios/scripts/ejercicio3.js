@@ -10,10 +10,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Acá declaro mis propias funciones locales dentro del archivo para realizar las cuatro operaciones básicas, tal como indica la consigna 3.
 // Cada función toma dos parámetros ("a" y "b") y retorna el resultado aritmético correspondiente.
-function Sumar(a, b) { return a + b; }
-function Restar(a, b) { return a - b; }
-function Multiplicar(a, b) { return a * b; }
-function Dividir(a, b) { return a / b; }
+function Sumar(a, b) {
+  return a + b;
+}
+function Restar(a, b) {
+  return a - b;
+}
+function Multiplicar(a, b) {
+  return a * b;
+}
+function Dividir(a, b) {
+  return a / b;
+}
 
 // Acá ejecuto mis funciones locales recién creadas pasándole los valores fijos requeridos por la consigna.
 // Los guardo en constantes para poder inyectarlos luego en la tabla HTML de manera dinámica.
@@ -87,9 +95,9 @@ const server = createServer((req, res) => {
         </nav>
 
         <!-- Mi sección principal de contenido -->
-        <main class="container my-5 flex-grow-1">
+        <main class="container-fluid my-5 flex-grow-1">
           <div class="row justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-12">
               <!-- Encabezado del Ejercicio 3 -->
               <div class="text-center mb-5">
                 <span class="badge bg-primary-subtle text-primary badge-custom mb-3">Ejercicio 3</span>

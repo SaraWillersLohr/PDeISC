@@ -75,9 +75,9 @@ const server = createServer((req, res) => {
         </nav>
 
         <!-- Acá adentro coloco todo el contenido principal de mi página -->
-        <main class="container my-5 flex-grow-1">
+        <main class="container-fluid my-5 flex-grow-1">
           <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-12">
               <!-- Encabezado del Ejercicio 1 -->
               <div class="text-center mb-5">
                 <span class="badge bg-primary-subtle text-primary badge-custom mb-3">Ejercicio 1</span>

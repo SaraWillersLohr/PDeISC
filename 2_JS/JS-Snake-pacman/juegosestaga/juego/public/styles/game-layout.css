@@ -1,0 +1,910 @@
+/* ================================================================
+   game-layout.css — Layout de juego Escape Escolar / Cable Rush
+   HUD 3 columnas · Panel lateral de controles · Mapa escalado
+   ================================================================ */
+
+body.game-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Shell principal ─────────────────────────────────────────────── */
+.game-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-sm);
+  gap: var(--space-xs);
+}
+
+.game-shell--snake {
+  padding-bottom: 8px;
+}
+
+/* ── HUD BAR — 3 columnas ────────────────────────────────────────── */
+.hud-bar {
+  font-family: var(--font-cyber);
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* HUD compacto — snake */
+.hud-bar--compact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  min-height: 44px;
+  gap: 8px;
+}
+
+.hud-bar--compact .hud-stats--compact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.hud-bar--compact .hud-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.hud-bar--compact .hud-stat .label {
+  font-size: 0.5rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+  font-family: var(--font-cyber);
+}
+
+.hud-bar--compact .hud-stat .val {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.6rem, 1.3vw, 0.8rem);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.hud-controls--compact {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Layout tricolumna */
+.hud-bar--tricolumn {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0;
+  min-height: 64px;
+  padding: 0;
+}
+
+/* Columna izquierda */
+.hud-col--left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  justify-content: flex-start;
+}
+
+/* Columna central */
+.hud-col--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-left: 1px solid rgba(255,255,255,0.07);
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Columna derecha */
+.hud-col--right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  justify-content: flex-end;
+}
+
+/* Divisor vertical entre stats */
+.hud-divider-v {
+  width: 1px;
+  height: 24px;
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  margin: 0 6px;
+}
+
+/* Stat individual */
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+}
+
+.hud-stat__label {
+  font-size: 0.48rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  font-family: var(--font-cyber);
+}
+
+.hud-stat__val {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.6rem, 1.4vw, 0.75rem);
+  white-space: nowrap;
+}
+
+/* Botones de acción en HUD */
+.hud-action-btns {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* ── Tarjeta de misión (centro del HUD) ──────────────────────────── */
+.hud-mission-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 8px;
+  padding: 6px 16px;
+  border: 1px solid rgba(0,240,255,0.15);
+  min-width: 160px;
+  max-width: 580px;
+}
+
+.hud-mission-label {
+  font-family: var(--font-cyber);
+  font-size: 0.5rem;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.hud-mission-text {
+  font-family: var(--font-cyber);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  text-align: center;
+  word-wrap: break-word;
+  white-space: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  max-width: 560px;
+}
+
+/* ── Botones HUD ─────────────────────────────────────────────────── */
+.btn-hud {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--font-cyber);
+  font-size: clamp(0.55rem, 1vw, 0.65rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 6px 10px;
+  min-height: 36px;
+  min-width: 36px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-hud-pause {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+.btn-hud-pause:hover {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 12px rgba(0,240,255,0.4);
+}
+
+.btn-hud-restart {
+  color: var(--accent-yellow, #fff01f);
+  border-color: var(--accent-yellow, #fff01f);
+}
+.btn-hud-restart:hover {
+  background: var(--accent-yellow, #fff01f);
+  color: #000;
+  box-shadow: 0 0 12px rgba(255,240,31,0.4);
+}
+
+.btn-hud-home {
+  color: var(--accent-pink);
+  border-color: var(--accent-pink);
+}
+.btn-hud-home:hover {
+  background: var(--accent-pink);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255,0,127,0.4);
+}
+
+/* ── Área de juego (canvas + panel lateral) ──────────────────────── */
+.game-area {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  gap: var(--space-sm);
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* ── Canvas ──────────────────────────────────────────────────────── */
+.canvas-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Snake: el canvas-wrap se adapta al canvas calculado */
+.canvas-wrap--snake {
+  align-items: center;
+  justify-content: center;
+}
+
+#gameCanvas {
+  background: #0e1320;
+  border: 3px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow:
+    0 0 28px rgba(255,0,127,0.2),
+    0 0 55px rgba(255,0,127,0.06),
+    inset 0 0 20px rgba(0,0,0,0.5);
+  /* canvas-resize.js maneja width/height vía applyCanvasPixelSize */
+  max-width: 100%;
+  max-height: none;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+}
+
+body.game-page[data-game="snake"] #gameCanvas {
+  background-color: #030305;
+  box-shadow: 0 0 25px rgba(0,240,255,0.25);
+}
+
+/* Badge de pausa */
+.pause-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-arcade);
+  font-size: clamp(1rem, 4vw, 1.8rem);
+  color: var(--accent-cyan);
+  text-shadow: 0 0 20px var(--accent-cyan), 0 0 40px var(--accent-cyan);
+  background: rgba(10,11,13,0.75);
+  padding: clamp(8px,2vw,12px) clamp(16px,4vw,28px);
+  border-radius: 12px;
+  border: 2px solid var(--accent-cyan);
+  pointer-events: none;
+  display: none;
+  animation: pulseBadge 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Panel lateral de controles ──────────────────────────────────── */
+.controls-panel {
+  display: none; /* oculto por defecto, visible en desktop 992px+ */
+  flex-direction: column;
+  gap: 10px;
+  width: 165px;
+  min-width: 165px;
+  flex-shrink: 0;
+  background: rgba(12,16,28,0.88);
+  border: 1px solid rgba(255,0,127,0.2);
+  border-radius: 12px;
+  padding: 14px 12px;
+  backdrop-filter: blur(10px);
+  align-self: flex-start;
+  max-height: calc(100% - 8px);
+  overflow-y: auto;
+}
+
+.controls-panel__title {
+  font-family: var(--font-cyber);
+  font-size: 0.6rem;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-align: center;
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0,240,255,0.15);
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.controls-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.controls-section--misc,
+.controls-section--bonus {
+  gap: 6px;
+}
+
+.controls-player-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.controls-badge {
+  font-family: var(--font-arcade);
+  font-size: 0.38rem;
+  padding: 3px 6px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+.controls-badge--p1 {
+  background: rgba(0,240,255,0.2);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0,240,255,0.4);
+}
+
+.controls-badge--p2 {
+  background: rgba(255,0,127,0.2);
+  color: var(--accent-pink);
+  border: 1px solid rgba(255,0,127,0.4);
+}
+
+.controls-player-name {
+  font-family: var(--font-cyber);
+  font-size: 0.58rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Grid de teclas (3x3) */
+.controls-key-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.key-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 5px;
+  color: var(--text-primary);
+  font-family: var(--font-cyber);
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 5px 2px;
+  min-height: 26px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.key-badge:hover {
+  border-color: rgba(0,240,255,0.35);
+  background: rgba(0,240,255,0.06);
+}
+
+.key-badge--center {
+  opacity: 0.2;
+}
+
+.key-badge--wide {
+  grid-column: span 1;
+  padding: 5px 8px;
+}
+
+.controls-misc-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls-misc-label {
+  font-family: var(--font-cyber);
+  font-size: 0.55rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.controls-bonus-val {
+  font-family: var(--font-arcade);
+  font-size: 0.5rem;
+  color: var(--accent-yellow);
+  text-shadow: 0 0 8px rgba(255,240,31,0.5);
+  text-align: center;
+}
+
+/* ── Level status ────────────────────────────────────────────────── */
+.level-status {
+  font-family: var(--font-arcade);
+  font-size: var(--text-xs);
+  color: var(--accent-yellow);
+  text-shadow: 0 0 10px var(--accent-yellow);
+  display: none;
+  flex-shrink: 0;
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Controls hint (legacy, oculto) ─────────────────────────────── */
+.controls-hint {
+  display: none;
+}
+
+/* ── Powerups (Snake) ────────────────────────────────────────────── */
+.powerup-indicators {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 22px;
+  width: 100%;
+  margin-top: var(--space-xs);
+}
+
+.powerup-badge {
+  font-size: var(--text-xs);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-arcade);
+}
+
+.badge-overclock { background-color: #ffaa00; color: #000; }
+.badge-firewall  { background-color: #db2777; color: #fff; }
+.badge-emp       { background-color: #0ea5e9; color: #000; }
+.badge-ghost     { background-color: #a855f7; color: #fff; }
+
+/* ── Header de juego ─────────────────────────────────────────────── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-cyber);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  padding: clamp(6px,1.2vw,8px) clamp(10px,2vw,14px);
+  min-height: var(--touch-min);
+  border: 2px solid;
+  border-radius: 6px;
+  background: transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-back-pink {
+  color: var(--accent-pink);
+  border-color: var(--accent-pink);
+  text-shadow: 0 0 8px var(--accent-pink);
+}
+.btn-back-pink:hover {
+  background: var(--accent-pink);
+  color: #fff;
+  text-shadow: none;
+  box-shadow: 0 0 16px rgba(255,0,127,0.5);
+}
+
+.btn-back-cyan {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  text-shadow: 0 0 8px var(--accent-cyan);
+}
+.btn-back-cyan:hover {
+  background: var(--accent-cyan);
+  color: #000;
+  text-shadow: none;
+  box-shadow: 0 0 16px rgba(0,240,255,0.5);
+}
+
+.header-game-label {
+  font-family: var(--font-arcade);
+  font-size: var(--text-xs);
+}
+
+.header-nav--game {
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.header-nav--game .header-title {
+  font-size: clamp(0.9rem,2.5vw,1.2rem);
+}
+
+.header-nav--game .header-game-label {
+  order: 3;
+  width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 576px) {
+  .header-nav--game .header-game-label {
+    order: unset;
+    width: auto;
+    text-align: right;
+    margin-left: auto;
+    margin-right: var(--space-sm);
+  }
+}
+
+/* ── D-Pad táctil ────────────────────────────────────────────────── */
+.game-shell .d-pad-container {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: clamp(4px,1vw,8px);
+  width: clamp(120px,28vw,180px);
+  height: clamp(120px,28vw,180px);
+  padding: clamp(6px,1.5vw,10px);
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+
+.game-shell .d-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: clamp(1rem,3vw,1.5rem);
+  color: var(--accent-cyan);
+  transition: all 0.15s ease;
+  user-select: none;
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.game-shell .d-btn:active {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 15px rgba(0,240,255,0.5);
+  transform: scale(0.92);
+}
+
+/* ── Overlay de juego ────────────────────────────────────────────── */
+.overlay .arcade-card {
+  max-width: min(460px, 92vw);
+  margin: var(--space-sm);
+}
+.overlay .arcade-card h2 {
+  font-size: clamp(1.25rem,5vw,2rem);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BREAKPOINTS
+══════════════════════════════════════════════════════════════════ */
+
+/* Desktop grande (992px+) — mostrar panel lateral */
+@media (min-width: 992px) {
+  .controls-panel {
+    display: flex;
+  }
+
+  .game-shell {
+    max-width: 1200px;
+  }
+}
+
+/* Desktop muy grande (1400px+) */
+@media (min-width: 1400px) {
+  .controls-panel {
+    width: 180px;
+  }
+
+  .hud-stat__val {
+    font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  }
+
+  .hud-mission-text {
+    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  }
+}
+
+/* Ultrawide (1920px+) */
+@media (min-width: 1920px) {
+  .game-shell {
+    max-width: 1500px;
+  }
+
+  .controls-panel {
+    width: 200px;
+  }
+}
+
+/* Tablet (768px–991px) — sin panel lateral, con d-pad */
+@media (min-width: 768px) and (max-width: 991px) {
+  .game-shell {
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .game-shell .d-pad-container {
+    display: grid;
+  }
+}
+
+/* Móvil (<768px) — HUD compacto, d-pad visible */
+@media (max-width: 767px) {
+  .hud-bar--tricolumn {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    min-height: auto;
+  }
+
+  .hud-col--left,
+  .hud-col--right {
+    justify-content: center;
+    padding: 8px 12px;
+  }
+
+  .hud-col--center {
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 6px 12px;
+  }
+
+  .hud-mission-card {
+    min-width: unset;
+    width: 100%;
+    max-width: none;
+  }
+
+  .hud-mission-text {
+    font-size: 0.75rem;
+  }
+
+  .game-shell .d-pad-container {
+    display: grid;
+  }
+
+  .game-area {
+    flex-direction: column;
+  }
+}
+
+/* Landscape bajo (móvil horizontal) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hud-bar--tricolumn {
+    min-height: 48px;
+  }
+
+  .hud-col--center {
+    display: none; /* Ocultar misión en landscape muy bajo */
+  }
+
+  .hud-bar--tricolumn {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .game-area {
+    flex-direction: row;
+  }
+
+  .level-status,
+  .controls-hint {
+    display: none;
+  }
+}
+
+/* Panel de Controles Cyberpunk Desktop */
+.controls-panel-cyber {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(4, 8, 16, 0.9) 0%, rgba(2, 4, 8, 0.95) 100%);
+  border: 1.5px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), inset 0 1px 0 rgba(0, 240, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 18px;
+  width: 100%;
+}
+
+.controls-panel-title {
+  font-family: var(--font-arcade);
+  font-size: 0.75rem;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+  margin: 0 0 4px 0;
+  letter-spacing: 2px;
+}
+
+.controls-keys-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.controls-key-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.control-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #0b0f19;
+  border: 1.5px solid rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
+  border-radius: 4px;
+  font-family: var(--font-cyber);
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+}
+
+.control-key--wide {
+  width: auto;
+  padding: 0 6px;
+}
+
+.control-label {
+  font-family: var(--font-cyber);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-left: 4px;
+  letter-spacing: 0.5px;
+}
+
+.controls-key-separator {
+  display: none;
+}
+
+/* Layout de dos columnas responsive */
+.game-layout-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.game-main-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.game-sidebar-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.level-status--snake-custom {
+  font-family: var(--font-arcade);
+  font-size: 0.65rem;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  text-align: center;
+  margin: 4px 0 0 0;
+  width: 100%;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+
+@media (min-width: 992px) {
+  .game-layout-container {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .game-main-area {
+    flex: 1;
+    align-items: stretch;
+    min-width: 0;
+  }
+  
+  .game-sidebar-area {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    flex-shrink: 0;
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+  
+  .controls-panel-cyber {
+    display: flex;
+  }
+}
+
+@media (max-width: 991px) {
+  .controls-panel-cyber {
+    display: none;
+  }
+}

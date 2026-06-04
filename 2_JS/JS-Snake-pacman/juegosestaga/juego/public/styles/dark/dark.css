@@ -1,0 +1,19 @@
+/* Estilo Cyberpunk Neon - Dark Mode */
+:root {
+  --bg-primary: #0a0b0d;
+  --bg-secondary: #12141a;
+  
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  
+  --accent-cyan: #00f0ff;
+  --accent-pink: #ff007f;
+  --accent-green: #39ff14;
+  --accent-yellow: #fff01f;
+  
+  --neon-glow-cyan: 0 0 5px #00f0ff, 0 0 15px #00f0ff;
+  --neon-glow-pink: 0 0 5px #ff007f, 0 0 15px #ff007f;
+  
+  --card-bg: rgba(18, 20, 26, 0.7);
+  --border-color: #ff007f; /* Borde rosa por defecto */
+}

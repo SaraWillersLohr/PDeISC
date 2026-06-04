@@ -1,0 +1,368 @@
+/* Escape Escolar — HUD profesional + layout 3 columnas */
+
+body.game-page[data-game="pacman"] {
+  --pacman-hud-h: clamp(72px, 9vh, 96px);
+  --pacman-panel-w: clamp(180px, 16vw, 240px);
+  --pacman-canvas-max: min(80vh, 1000px);
+}
+
+body.game-page[data-game="pacman"] .game-shell--pacman {
+  max-width: min(1600px, 98vw);
+  padding: var(--space-xs) var(--space-sm);
+  gap: var(--space-sm);
+}
+
+.pacman-hud {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--pacman-hud-h);
+  display: grid;
+  grid-template-columns: 1fr minmax(200px, 1.4fr) 1fr;
+  align-items: center;
+  gap: var(--space-md);
+  padding: clamp(10px, 1.5vh, 16px) clamp(12px, 2vw, 24px);
+  background: linear-gradient(180deg, rgba(14, 19, 32, 0.95) 0%, rgba(10, 15, 26, 0.88) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  animation: pacmanHudIn 0.45s ease-out;
+}
+
+@keyframes pacmanHudIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pacman-hud__left,
+.pacman-hud__right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(8px, 1.2vw, 18px);
+}
+
+.pacman-hud__right {
+  justify-content: flex-end;
+}
+
+.pacman-hud__center {
+  text-align: center;
+  min-width: 0;
+}
+
+.pacman-hud__objective-label {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.45rem, 1vw, 0.55rem);
+  color: var(--text-secondary);
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+
+.pacman-hud__objective {
+  font-family: var(--font-cyber);
+  font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+  font-weight: 700;
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pacman-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 56px;
+}
+
+.pacman-stat__label {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.42rem, 0.9vw, 0.5rem);
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+}
+
+.pacman-stat__val {
+  font-family: var(--font-cyber);
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.pacman-hud__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pacman-hud__character {
+  font-family: var(--font-cyber);
+  font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 0, 127, 0.4);
+  background: rgba(255, 0, 127, 0.08);
+}
+
+.pacman-hud__state {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.42rem, 0.85vw, 0.5rem);
+  color: #39ff14;
+}
+
+.pacman-hud__state--danger {
+  color: #ff007f;
+}
+
+/* ── Stage 3 columnas ─────────────────────────────────── */
+.pacman-stage {
+  display: grid;
+  grid-template-columns: var(--pacman-panel-w) 1fr var(--pacman-panel-w);
+  gap: clamp(10px, 1.5vw, 20px);
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  align-items: stretch;
+  animation: pacmanStageIn 0.5s ease-out 0.1s both;
+}
+
+@keyframes pacmanStageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pacman-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.pacman-panel__card {
+  background: rgba(10, 15, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: clamp(12px, 1.5vw, 18px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pacman-panel__card:hover {
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.pacman-panel__title {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.48rem, 1vw, 0.58rem);
+  color: var(--accent-cyan);
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.pacman-mission__target {
+  font-family: var(--font-cyber);
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  font-weight: 700;
+  color: #fbbf24;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.pacman-mission__hint {
+  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pacman-controls-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pacman-controls-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+}
+
+.pacman-controls-list .keys {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.45rem, 0.9vw, 0.52rem);
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+.pacman-ghost-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pacman-ghost-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  color: var(--text-secondary);
+}
+
+.pacman-ghost-list .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* ── Canvas protagonista ──────────────────────────────── */
+body.game-page[data-game="pacman"] .canvas-wrap--pacman {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  height: 100%;
+}
+
+body.game-page[data-game="pacman"] #gameCanvas {
+  width: auto !important;
+  height: auto !important;
+  max-width: none;
+  max-height: none;
+  min-height: 0;
+  border-width: 2px;
+  box-shadow:
+    0 0 20px rgba(255, 0, 127, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 0 16px rgba(0, 0, 0, 0.4);
+}
+
+body.game-page[data-game="pacman"] .controls-hint--desktop {
+  display: none !important;
+}
+
+body.game-page[data-game="pacman"] .hud-bar--legacy {
+  display: none !important;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .pacman-stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .pacman-panel--left {
+    order: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .pacman-panel--left .pacman-panel__card {
+    flex: 1 1 240px;
+  }
+
+  .canvas-wrap--pacman {
+    order: 2;
+  }
+
+  .pacman-panel--right {
+    order: 3;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .pacman-panel--right .pacman-panel__card {
+    flex: 1 1 200px;
+  }
+}
+
+@media (max-width: 767px) {
+  .pacman-hud {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    min-height: auto;
+    padding: 10px 12px;
+  }
+
+  .pacman-hud__center {
+    grid-column: 1 / -1;
+    order: -1;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .pacman-hud__left { grid-column: 1; }
+  .pacman-hud__right { grid-column: 2; justify-content: flex-end; }
+
+  .pacman-panel--side-desktop {
+    display: none;
+  }
+
+  body.game-page[data-game="pacman"] #gameCanvas {
+    max-height: min(72vh, 680px);
+    min-height: 280px;
+  }
+}
+
+@media (min-width: 1920px) {
+  body.game-page[data-game="pacman"] {
+    --pacman-canvas-max: min(82vh, 1100px);
+    --pacman-panel-w: 260px;
+  }
+}
+
+@media (min-width: 2560px) {
+  body.game-page[data-game="pacman"] {
+    --pacman-canvas-max: min(80vh, 1200px);
+  }
+}
+
+/* ── Modo Claro (Light Theme) ────────────────────────────────── */
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-hud {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-panel__card {
+  background: var(--card-bg, rgba(255, 255, 255, 0.85));
+  border-color: var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-hud__objective-label,
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-stat__label,
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-ghost-list li,
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-mission__hint,
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-panel__title {
+  color: var(--text-secondary);
+}
+
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-hud__objective,
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-mission__target {
+  color: var(--accent-cyan);
+  text-shadow: none;
+}
+
+body.game-page[data-theme="light"][data-game="pacman"] .pacman-hud__character {
+  color: var(--text-primary);
+  background: rgba(219, 39, 119, 0.1);
+  border-color: rgba(219, 39, 119, 0.4);
+}

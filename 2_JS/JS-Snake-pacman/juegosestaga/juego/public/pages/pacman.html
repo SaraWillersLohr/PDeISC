@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MSGames - Escape Escolar</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles/shared.css">
+  <link rel="stylesheet" href="/styles/game-layout.css">
+  <link rel="stylesheet" href="/styles/game-mobile-fullscreen.css">
+  <link rel="stylesheet" href="/styles/pacman-hud.css">
+  <link rel="stylesheet" href="/styles/pacman-mobile.css">
+  <script src="/scripts/shared/theme.js"></script>
+</head>
+<body class="game-page" data-game="pacman">
+
+  <header class="header-nav header-nav--game header-nav--compact">
+    <div class="d-flex align-items-center gap-2">
+      <a href="/" class="btn-back btn-back-pink" title="Volver al menú principal">
+        <span>&#8592;</span> Menú
+      </a>
+      <a href="/" class="header-title neon-text-pink">MSGames</a>
+    </div>
+    <span class="header-game-label text-warning">Escape Escolar</span>
+    <label class="theme-switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider"></span>
+    </label>
+  </header>
+
+  <main class="game-shell game-shell--pacman">
+
+    <!-- HUD profesional -->
+    <div class="pacman-hud" role="banner" aria-label="Estado de partida">
+      <div class="pacman-hud__left">
+        <div class="pacman-stat">
+          <span class="pacman-stat__label">NIVEL</span>
+          <span id="hudLevel" class="pacman-stat__val text-info">1</span>
+        </div>
+        <div class="pacman-stat">
+          <span class="pacman-stat__label">PUNTOS</span>
+          <span id="hudScore" class="pacman-stat__val text-success">0</span>
+        </div>
+        <div class="pacman-stat">
+          <span class="pacman-stat__label">RÉCORD</span>
+          <span id="hudHighScore" class="pacman-stat__val text-warning">0</span>
+        </div>
+      </div>
+
+      <div class="pacman-hud__center">
+        <div class="pacman-hud__objective-label">OBJETIVO</div>
+        <div id="hudObjective" class="pacman-hud__objective">Recuperar el Guardapolvo</div>
+      </div>
+
+      <div class="pacman-hud__right">
+        <div class="pacman-stat">
+          <span class="pacman-stat__label">VIDAS</span>
+          <span id="hudLives" class="pacman-stat__val text-danger">❤️❤️❤️</span>
+        </div>
+        <span id="hudCharacter" class="pacman-hud__character">Sara</span>
+        <span id="hudGameState" class="pacman-hud__state">EN JUEGO</span>
+        <div class="pacman-hud__actions">
+          <button id="btnPause" class="btn-hud btn-hud-pause" onclick="togglePause()">⏸</button>
+          <button id="btnRestart" class="btn-hud btn-hud-restart" onclick="restartGame()">↺</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage: paneles + mapa -->
+    <div class="pacman-stage">
+      <aside class="pacman-panel pacman-panel--left pacman-panel--side-desktop" aria-label="Misión y controles">
+        <div class="pacman-panel__card pacman-mission">
+          <h3 class="pacman-panel__title">MISIÓN ACTUAL</h3>
+          <p id="missionTarget" class="pacman-mission__target">🎯 Recuperar el Guardapolvo</p>
+          <p id="missionHint" class="pacman-mission__hint">
+            Evitá a los directivos, reuní puntos y completá el bonus del nivel para avanzar.
+          </p>
+        </div>
+        <div class="pacman-panel__card">
+          <h3 class="pacman-panel__title">CONTROLES</h3>
+          <ul class="pacman-controls-list">
+            <li><span>Jugador 1</span><span class="keys">W A S D / Flechas</span></li>
+            <li id="p2ControlRow" style="display:none;"><span>Jugador 2</span><span class="keys">FLECHAS</span></li>
+            <li><span>Pausa</span><span class="keys">ESC / P</span></li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="canvas-wrap canvas-wrap--pacman">
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        <div id="pauseBadge" class="pause-badge">⏸ PAUSA</div>
+      </div>
+
+      <aside class="pacman-panel pacman-panel--right pacman-panel--side-desktop" aria-label="Info de partida">
+        <div class="pacman-panel__card">
+          <h3 class="pacman-panel__title">BONUS</h3>
+          <p id="hudBonus" class="pacman-mission__target" style="font-size:0.9rem;">—</p>
+        </div>
+        <div class="pacman-panel__card">
+          <h3 class="pacman-panel__title">DIRECTIVOS</h3>
+          <ul class="pacman-ghost-list">
+            <li><span class="dot" style="color:#f97316"></span><strong>Esteban</strong> — Cazador</li>
+            <li><span class="dot" style="color:#ff007f"></span><strong>Lorena</strong> — Emboscador</li>
+            <li><span class="dot" style="color:#a855f7"></span><strong>Scaglione</strong> — Patrulla</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Móvil: D-Pad -->
+  <aside class="mobile-controls-stack" id="mobileControlsStack" aria-label="Controles táctiles">
+    <div class="d-pad-container d-pad-container--pacman">
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir" id="tBtnUp" aria-label="Arriba">▲</button>
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir" id="tBtnLeft" aria-label="Izquierda">◀</button>
+      <div class="d-pad-center" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir" id="tBtnRight" aria-label="Derecha">▶</button>
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir" id="tBtnDown" aria-label="Abajo">▼</button>
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+    </div>
+  </aside>
+
+  <div id="gameOverlay" class="overlay">
+    <div class="arcade-card text-center p-4 p-md-5">
+      <h2 id="overlayTitle" class="neon-text-pink mb-3">-</h2>
+      <p id="overlayMessage" class="text-secondary mb-3">-</p>
+      <div id="overlayScoreSection" class="mb-4 text-arcade" style="display:none;">
+        <span class="text-warning">PUNTUACIÓN FINAL:</span>
+        <span id="overlayFinalScore" class="text-success ms-2">0</span>
+      </div>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <button id="btnOverlayAction" class="btn-neon btn-neon-pink py-2" style="flex:1;min-width:140px;max-width:200px;">Reintentar</button>
+        <a href="/" class="btn-neon py-2 text-decoration-none text-center" style="flex:1;min-width:140px;max-width:200px;">Salir</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/scripts/pacman/pacman-config.js"></script>
+  <script src="/scripts/pacman/pacman-assets.js"></script>
+  <script src="/scripts/pacman/ghost-ai.js"></script>
+  <script src="/scripts/shared/canvas-resize.js"></script>
+  <script src="/scripts/shared/level-toast.js"></script>
+  <script src="/scripts/shared/audio.js"></script>
+  <script src="/scripts/pacman/renderer.js"></script>
+  <script src="/scripts/pacman/client-pacman.js"></script>
+</body>
+</html>

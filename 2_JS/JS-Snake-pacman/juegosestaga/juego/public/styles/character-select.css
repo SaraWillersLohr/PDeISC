@@ -1,0 +1,303 @@
+/* Selector de Personajes + Lobby — tarjetas protagonistas */
+
+.app-container--lobby {
+  max-width: min(920px, 96vw);
+  padding-bottom: var(--space-xl);
+}
+
+.lobby-panel {
+  padding: clamp(20px, 3vw, 36px) !important;
+  animation: lobbyFadeIn 0.5s ease-out;
+}
+
+@keyframes lobbyFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lobby-panel__title {
+  font-size: clamp(0.85rem, 2vw, 1.1rem) !important;
+  margin-bottom: clamp(16px, 3vw, 28px) !important;
+}
+
+.lobby-section {
+  margin-bottom: clamp(20px, 3vh, 32px);
+}
+
+.lobby-section--characters {
+  margin-bottom: clamp(28px, 4vh, 40px);
+}
+
+.lobby-section__label {
+  display: block;
+  text-align: center;
+  font-size: clamp(0.55rem, 1.2vw, 0.65rem) !important;
+  margin-bottom: clamp(14px, 2vh, 20px) !important;
+  letter-spacing: 0.08em;
+}
+
+/* ── Tarjetas de personaje (60–80% más grandes) ───────── */
+#characterSelectContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(16px, 3vw, 28px);
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+#characterSelectContainer .char-grid-item {
+  flex: 1 1 min(100%, 320px);
+  max-width: 380px;
+}
+
+.select-char-card {
+  width: 100%;
+  min-height: clamp(340px, 42vh, 420px);
+  background: linear-gradient(165deg, rgba(14, 19, 32, 0.95) 0%, rgba(8, 12, 22, 0.98) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(20px, 3vw, 28px) clamp(16px, 2.5vw, 24px);
+  position: relative;
+  overflow: hidden;
+}
+
+.select-char-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.06) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.select-char-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 24px rgba(0, 240, 255, 0.12);
+}
+
+.select-char-card:hover::before {
+  opacity: 1;
+}
+
+.select-char-card.selected {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.25), inset 0 0 20px rgba(0, 240, 255, 0.06);
+  background: linear-gradient(165deg, rgba(0, 240, 255, 0.08) 0%, rgba(8, 12, 22, 0.98) 100%);
+  transform: translateY(-4px);
+}
+
+.select-char-card.selected .char-name {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.char-portrait {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(180px, 28vh, 240px);
+  margin-bottom: clamp(12px, 2vh, 18px);
+}
+
+.select-char-card .char-img {
+  width: clamp(160px, 22vw, 220px);
+  height: clamp(200px, 28vh, 280px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.select-char-card:hover .char-img {
+  transform: scale(1.06);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+}
+
+.select-char-card .char-name {
+  font-family: var(--font-cyber);
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: clamp(10px, 1.5vh, 14px);
+  letter-spacing: 0.04em;
+}
+
+.char-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.char-stats li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: clamp(0.72rem, 1.3vw, 0.82rem);
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.char-stats .stat-label {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.42rem, 0.9vw, 0.5rem);
+  color: var(--text-secondary);
+}
+
+.char-stat-bar {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.45rem, 0.95vw, 0.52rem);
+  letter-spacing: 0.05em;
+  color: var(--accent-cyan);
+}
+
+.char-selected-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: var(--font-arcade);
+  font-size: clamp(0.42rem, 0.9vw, 0.5rem);
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--accent-cyan);
+  color: #000;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.select-char-card.selected .char-selected-badge,
+.btn-neon.is-active .char-selected-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Ajustes específicos para insignias en botones de modo */
+.btn-neon .char-selected-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: clamp(0.35rem, 0.75vw, 0.45rem);
+  padding: 3px 6px;
+  background: var(--accent-cyan);
+  color: #000;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  font-weight: bold;
+}
+
+.btn-neon.btn-neon-pink .char-selected-badge {
+  background: var(--accent-pink);
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+}
+
+/* ── Modo de juego vs Iniciar ─────────────────────────── */
+.lobby-section--mode {
+  padding-top: clamp(8px, 1.5vh, 16px);
+  margin-bottom: 0;
+}
+
+.lobby-mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(12px, 2vw, 20px);
+}
+
+.lobby-mode-buttons .btn-neon {
+  flex: 1 1 160px;
+  max-width: 280px;
+  min-height: 52px;
+  font-size: clamp(0.65rem, 1.3vw, 0.75rem);
+}
+
+.lobby-divider--major {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.35), transparent);
+  margin: clamp(16px, 2vh, 24px) 0 clamp(16px, 2vh, 24px);
+  border: none;
+}
+
+.lobby-section--start {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.lobby-section--start .btn-neon {
+  min-height: 56px;
+  font-size: clamp(0.7rem, 1.4vw, 0.85rem);
+  padding: 16px 24px;
+  box-shadow: 0 8px 32px rgba(255, 0, 127, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lobby-section--start .btn-neon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 0, 127, 0.25);
+}
+
+/* Cable Rush — borde por color */
+.select-char-card.selected[data-cable="USB"] {
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.22);
+}
+
+.select-char-card.selected[data-cable="HDMI"] {
+  border-color: #bf00ff !important;
+  box-shadow: 0 0 28px rgba(191, 0, 255, 0.22);
+}
+
+.select-char-card.selected[data-cable="Ethernet"] {
+  border-color: #39ff14 !important;
+  box-shadow: 0 0 28px rgba(57, 255, 20, 0.22);
+}
+
+@media (max-width: 768px) {
+  #characterSelectContainer .char-grid-item {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .select-char-card {
+    min-height: 300px;
+  }
+
+  .select-char-card .char-img {
+    width: 140px;
+    height: 180px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+  #characterSelectContainer .char-grid-item {
+    flex: 1 1 calc(50% - 14px);
+    max-width: none;
+  }
+}
+
+@media (min-width: 992px) {
+  #characterSelectContainer .char-grid-item {
+    flex: 1 1 340px;
+  }
+}

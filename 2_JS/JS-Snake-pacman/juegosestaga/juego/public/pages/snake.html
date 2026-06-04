@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MSGames - Cable Rush</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles/shared.css">
+  <link rel="stylesheet" href="/styles/game-layout.css">
+  <link rel="stylesheet" href="/styles/game-mobile-fullscreen.css">
+  <link rel="stylesheet" href="/styles/snake-theme.css">
+  <link rel="stylesheet" href="/styles/snake-mobile.css">
+  <script src="/scripts/shared/theme.js"></script>
+</head>
+<body class="game-page" data-game="snake">
+
+  <header class="header-nav header-nav--game header-nav--compact">
+    <div class="d-flex align-items-center gap-2">
+      <a href="/" class="btn-back btn-back-cyan" title="Volver al menú principal">
+        <span>&#8592;</span> Menú
+      </a>
+      <a href="/" class="header-title neon-text-cyan">MSGames</a>
+    </div>
+    <span class="header-game-label text-warning">Cable Rush</span>
+    <label class="theme-switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider"></span>
+    </label>
+  </header>
+
+  <main class="game-shell game-shell--snake">
+
+    <!-- Banner conexión -->
+    <div id="connectionBanner" class="snake-connection-banner" style="display:none;" role="status" aria-live="polite"></div>
+
+    <div class="game-layout-container">
+      <div class="game-main-area">
+        <!-- HUD -->
+        <div class="hud-bar hud-bar--compact hud-bar--snake">
+          <div class="hud-stats hud-stats--compact">
+            <div class="hud-stat">
+              <span class="label">Tiempo</span>
+              <span id="hudDuration" class="val text-info">0s</span>
+            </div>
+            <div class="hud-stat">
+              <span class="label">Nvl</span>
+              <span id="hudLevel" class="val text-warning">1</span>
+            </div>
+            <div class="hud-stat hud-stat--player">
+              <span id="hudP1Name" class="label text-info">J1</span>
+              <span id="hudP1Score" class="val text-success">0</span>
+            </div>
+            <div class="hud-stat hud-stat--player" id="hudP2Container" style="display:none;">
+              <span id="hudP2Name" class="label text-danger">J2</span>
+              <span id="hudP2Score" class="val text-success">0</span>
+            </div>
+            <div class="hud-stat" id="hudRoomInfo" style="display:none;">
+              <span class="label">Sala</span>
+              <span id="hudRoomCode" class="val text-warning">-</span>
+            </div>
+          </div>
+
+          <div class="hud-controls hud-controls--compact">
+            <button id="btnPause" class="btn-hud btn-hud-pause" type="button" onclick="togglePause()">⏸ Pausa</button>
+            <button id="btnRestart" class="btn-hud btn-hud-restart" type="button" onclick="restartGame()">↺ Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- Powerups activos -->
+        <div id="powerupIndicators" class="powerup-indicators powerup-indicators--snake" aria-live="polite"></div>
+
+        <!-- Canvas -->
+        <div class="canvas-wrap canvas-wrap--snake">
+          <canvas id="gameCanvas" width="600" height="400" aria-label="Tablero Cable Rush"></canvas>
+          <div id="pauseBadge" class="pause-badge pause-badge--snake">⏸ PAUSA</div>
+          <div id="countdownBadge" class="countdown-badge" style="display:none;" aria-live="assertive"></div>
+        </div>
+      </div>
+
+      <div class="game-sidebar-area">
+        <!-- Instrucciones desktop -->
+        <div class="controls-panel-cyber">
+          <h3 class="controls-panel-title">CONTROLES</h3>
+          <div class="controls-keys-container">
+            <div class="controls-key-group">
+              <span class="control-key">W</span>
+              <span class="control-key">A</span>
+              <span class="control-key">S</span>
+              <span class="control-key">D</span>
+              <span class="control-label">Movimiento J1</span>
+            </div>
+            <div class="controls-key-separator">o</div>
+            <div class="controls-key-group">
+              <span class="control-key">↑</span>
+              <span class="control-key">↓</span>
+              <span class="control-key">←</span>
+              <span class="control-key">→</span>
+              <span class="control-label">Movimiento J2</span>
+            </div>
+            <div class="controls-key-separator">|</div>
+            <div class="controls-key-group">
+              <span class="control-key control-key--wide">ESC</span>
+              <span class="control-label">Pausa</span>
+            </div>
+          </div>
+        </div>
+        <p id="levelStatus" class="level-status level-status--snake-custom"></p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Dock móvil: status + D-Pad -->
+  <aside class="mobile-controls-stack mobile-controls-stack--snake" id="mobileControlsStack" aria-label="Controles táctiles">
+    <p id="levelStatus" class="level-status level-status--dock level-status--snake"></p>
+    <div class="d-pad-container d-pad-container--snake">
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir d-btn--snake" id="tBtnUp" aria-label="Arriba">▲</button>
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir d-btn--snake" id="tBtnLeft" aria-label="Izquierda">◀</button>
+      <button type="button" class="d-btn d-btn--center d-btn--snake" id="tBtnSwitch" aria-label="Cambiar jugador" title="Cambiar jugador">J1</button>
+      <button type="button" class="d-btn d-btn--dir d-btn--snake" id="tBtnRight" aria-label="Derecha">▶</button>
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+      <button type="button" class="d-btn d-btn--dir d-btn--snake" id="tBtnDown" aria-label="Abajo">▼</button>
+      <div class="d-pad-spacer" aria-hidden="true"></div>
+    </div>
+  </aside>
+
+  <!-- Overlay game over -->
+  <div id="gameOverlay" class="overlay overlay--snake" role="dialog" aria-modal="true" aria-labelledby="overlayTitle">
+    <div class="arcade-card arcade-card--snake text-center p-4 p-md-5">
+      <div class="overlay-icon" aria-hidden="true">⚡</div>
+      <h2 id="overlayTitle" class="neon-text-cyan mb-3">-</h2>
+      <p id="overlayMessage" class="text-secondary mb-3">-</p>
+      <div class="mb-4 text-arcade overlay-scores" id="overlayScoreSection"></div>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <button id="btnOverlayAction" class="btn-neon btn-neon-pink py-2" style="flex:1;min-width:140px;max-width:200px;">Reintentar</button>
+        <a href="/" class="btn-neon py-2 text-decoration-none text-center" style="flex:1;min-width:140px;max-width:200px;">Salir</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/scripts/shared/canvas-resize.js"></script>
+  <script src="/scripts/shared/level-toast.js"></script>
+  <script src="/scripts/shared/audio.js"></script>
+  <script src="/scripts/snake/cable-assets.js"></script>
+  <script src="/scripts/snake/renderer.js"></script>
+  <script src="/scripts/snake/client-snake.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSGames - Tablas de Clasificación</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles/shared.css">
+  <script src="/scripts/shared/theme.js"></script>
+</head>
+<body>
+
+  <header class="header-nav">
+    <a href="/" class="header-title neon-text-pink">MSGames</a>
+    <label class="theme-switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider"></span>
+    </label>
+  </header>
+
+  <main class="app-container">
+    <div class="text-center mb-5">
+      <h1 class="display-4 neon-text-cyan animate-pulse">Salón de la Fama</h1>
+      <p class="text-arcade text-secondary">Los 10 mejores puntajes arcade</p>
+    </div>
+
+    <!-- Pestañas de Selección de Juego -->
+    <div class="d-flex justify-content-center gap-3 mb-5">
+      <button id="tabPacman" class="btn-neon btn-neon-pink px-4" onclick="switchTab('pacman')">Escape Escolar</button>
+      <button id="tabSnake" class="btn-neon px-4" onclick="switchTab('snake')">Cable Rush</button>
+    </div>
+
+    <!-- Contenedor de la Tabla -->
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="arcade-card">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0 text-center">
+              <thead>
+                <tr class="text-arcade text-warning">
+                  <th scope="col">#</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Personaje</th>
+                  <th scope="col">Puntaje</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Detalles</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody">
+                <!-- Se rellena dinámicamente con JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          <div id="noScoresMsg" style="display: none;" class="text-center py-4 text-secondary">
+            No hay puntuaciones registradas aún para este juego. ¡Sé el primero en jugar!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="/" class="btn-neon px-5">Volver al Launcher</a>
+    </div>
+  </main>
+
+  <script>
+    let activeGame = 'pacman';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadLeaderboard(activeGame);
+    });
+
+    function switchTab(game) {
+      activeGame = game;
+      
+      const tabPac = document.getElementById('tabPacman');
+      const tabSnk = document.getElementById('tabSnake');
+
+      if (game === 'pacman') {
+        tabPac.classList.add('btn-neon-pink');
+        tabSnk.classList.remove('btn-neon-pink');
+      } else {
+        tabSnk.classList.add('btn-neon-pink');
+        tabPac.classList.remove('btn-neon-pink');
+      }
+
+      loadLeaderboard(game);
+    }
+
+    async function loadLeaderboard(game) {
+      const tbody = document.getElementById('leaderboardBody');
+      const noScoresMsg = document.getElementById('noScoresMsg');
+      tbody.innerHTML = '';
+      noScoresMsg.style.display = 'none';
+
+      try {
+        const response = await fetch(`/api/leaderboard/${game}`);
+        if (!response.ok) throw new Error('Error al cargar clasificaciones');
+        
+        const scores = await response.json();
+        
+        if (scores.length === 0) {
+          noScoresMsg.style.display = 'block';
+          return;
+        }
+
+        scores.forEach((entry, index) => {
+          const row = document.createElement('tr');
+          row.className = 'text-arcade fs-7';
+          
+          // Resaltar el TOP 3
+          let positionBadge = index + 1;
+          if (index === 0) positionBadge = '🥇';
+          else if (index === 1) positionBadge = '🥈';
+          else if (index === 2) positionBadge = '🥉';
+
+          let detailsText = '';
+          if (game === 'pacman') {
+            detailsText = entry.victories > 0 ? '🏆 Nivel 5 Completado' : 'Directivos ganaron';
+          } else {
+            detailsText = `⏱️ ${entry.duration}s | ${entry.victories > 0 ? '🏆 Victoria' : 'Derrota'}`;
+          }
+
+          row.innerHTML = `
+            <th scope="row" class="text-warning font-bold" style="width: 8%;">${positionBadge}</th>
+            <td class="text-white font-bold" style="width: 25%;">${escapeHTML(entry.name)}</td>
+            <td class="text-info" style="width: 20%;">${entry.character}</td>
+            <td class="text-success font-bold" style="width: 22%;">${entry.score} pts</td>
+            <td class="text-secondary" style="width: 15%;">${entry.date}</td>
+            <td class="text-secondary small" style="width: 25%; font-size: 0.6rem;">${detailsText}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error(err);
+        noScoresMsg.style.display = 'block';
+        noScoresMsg.textContent = 'Hubo un error al recuperar los marcadores.';
+      }
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MSGames - Launcher Arcade</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles/shared.css">
+  <script src="/scripts/shared/theme.js"></script>
+  <script src="/scripts/shared/audio.js"></script>
+</head>
+<body>
+
+  <header class="header-nav">
+    <a href="/" class="header-title neon-text-pink">MSGames</a>
+    <div class="d-flex align-items-center gap-2 gap-sm-3">
+      <label class="theme-switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <main class="app-container">
+    <div class="launcher-header">
+      <h1 class="neon-text-cyan animate-pulse">MSGames</h1>
+      <p class="text-arcade text-secondary">Selecciona tu juego y domina el arcade</p>
+    </div>
+
+    <div class="launcher-grid">
+      <!-- Juego 1: Escape Escolar -->
+      <article class="arcade-card game-card">
+        <div class="game-card__body">
+          <h2 class="neon-text-pink mb-2">Escape Escolar</h2>
+          <p class="text-secondary">Ayuda a Sara o Male a recorrer la escuela esquivando a los directivos. ¡Un clásico adaptado al aula!</p>
+          <div class="game-card__features">
+            <img src="/assets/characters/festejo-sara.png" alt="Sara" class="game-card__char-img">
+            <img src="/assets/characters/festejo-male.png" alt="Male" class="game-card__char-img">
+          </div>
+        </div>
+        <div class="game-card__actions">
+          <button onclick="selectGame('pacman')" class="btn-neon btn-neon-pink">Jugar</button>
+        </div>
+      </article>
+
+      <!-- Juego 2: Cable Rush -->
+      <article class="arcade-card game-card">
+        <div class="game-card__body">
+          <h2 class="neon-text-cyan mb-2">Cable Rush</h2>
+          <p class="text-secondary">Controlá cables USB, HDMI y Ethernet. Crecé devorando datos, energía y nodos en un tablero cyberpunk.</p>
+          <div class="game-card__features">
+            <img src="/assets/characters/azul-completo.png"    alt="Cable USB"      class="game-card__char-img">
+            <img src="/assets/characters/violeta-completo.png" alt="Cable HDMI"     class="game-card__char-img">
+            <img src="/assets/characters/verde-completo.png"   alt="Cable Ethernet" class="game-card__char-img">
+          </div>
+        </div>
+        <div class="game-card__actions">
+          <button onclick="selectGame('snake')" class="btn-neon">Jugar</button>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="text-arcade text-secondary">© 2026 MSGames Arcade Inc. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- Modal de confirmación para salir -->
+  <div id="exitModal" class="overlay" style="display:none; opacity:0; pointer-events:none;">
+    <div class="arcade-card text-center p-4 p-md-5">
+      <h3 class="neon-text-pink mb-2">&#9888; ¿Salir?</h3>
+      <p class="text-secondary mb-4">
+        ¿Estás seguro que querés cerrar MSGames?
+      </p>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <button onclick="doExit()" class="btn-neon btn-neon-pink" style="flex:1; min-width:120px; max-width:180px;">Sí, salir</button>
+        <button onclick="cancelExit()" class="btn-neon" style="flex:1; min-width:120px; max-width:180px;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectGame(game) {
+      localStorage.setItem('selectedGame', game);
+      window.location.href = '/lobby';
+    }
+
+    function confirmExit() {
+      const modal = document.getElementById('exitModal');
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'all';
+      });
+      if (window.audioSynth) window.audioSynth.playSelect();
+    }
+
+    function cancelExit() {
+      const modal = document.getElementById('exitModal');
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+      setTimeout(() => modal.style.display = 'none', 350);
+    }
+
+    function doExit() {
+      window.close();
+      setTimeout(() => {
+        document.body.innerHTML = `
+          <div style="display:flex;height:100vh;align-items:center;justify-content:center;
+                      background:#0a0b0d;font-family:'Orbitron',sans-serif;color:#00f0ff;
+                      flex-direction:column;gap:20px;padding:20px;text-align:center;">
+            <h1 style="font-size:clamp(1.25rem,5vw,2rem);text-shadow:0 0 20px #00f0ff;">Hasta la próxima &#128075;</h1>
+            <p style="color:#94a3b8;font-size:clamp(0.85rem,2vw,0.9rem);">Podés cerrar esta pestaña.</p>
+          </div>`;
+      }, 200);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') cancelExit();
+    });
+  </script>
+</body>
+</html>

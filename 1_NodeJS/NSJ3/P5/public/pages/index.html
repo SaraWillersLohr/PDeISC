@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="light" data-project="p5">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P5 — innerHTML | Sara Willers Lohr</title>
+  <title>P5 — Inserción dinámica con innerHTML | NSJ3 · Sara Willers Lohr</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link id="theme-link" rel="stylesheet" href="../styles/light.css">
@@ -12,37 +12,47 @@
 </head>
 <body>
   <nav class="navbar navbar-expand-lg sticky-top custom-navbar py-2">
-    <div class="container">
+    <div class="container-fluid px-0">
       <a class="navbar-brand d-flex align-items-center" href="#">
+        <span class="nsj3-badge">NSJ3</span>
         <i class="bi bi-file-earmark-code-fill text-primary me-2 fs-3"></i>
-        <span><span class="fw-bold text-main d-block lh-1">P5 · innerHTML</span><small class="text-muted">Objetos HTML dinámicos</small></span>
+        <span>
+          <span class="fw-bold text-main d-block lh-1">P5 · innerHTML</span>
+          <small class="navbar-project-label d-block">Inserción dinámica de objetos HTML</small>
+        </span>
       </a>
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navP5"><span class="navbar-toggler-icon"></span></button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navP5" aria-label="Menú"><span class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navP5">
         <span class="navbar-text ms-lg-3 text-muted"><i class="bi bi-mortarboard me-1"></i> Sara Willers Lohr</span>
-        <div class="ms-auto"><button id="btn-theme-toggle" class="btn btn-outline-secondary rounded-circle btn-theme-toggle" type="button"><i id="theme-icon" class="bi bi-sun-fill fs-5"></i></button></div>
+        <div class="ms-auto"><button id="btn-theme-toggle" class="btn btn-outline-secondary rounded-circle btn-theme-toggle" type="button" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro"><i id="theme-icon" class="bi bi-sun-fill fs-5"></i></button></div>
       </div>
     </div>
   </nav>
 
-  <main class="container py-3 pb-5">
+  <main class="page-main">
+    <header class="project-hero">
+      <p class="project-kicker"><i class="bi bi-code-slash"></i> Proyecto NSJ3</p>
+      <h1 class="project-heading">Punto 5 — Inserción dinámica mediante innerHTML</h1>
+      <p class="project-intro">Cada botón inserta un bloque HTML distinto (card, alerta, tabla, lista o badges) en la zona de trabajo usando <code>innerHTML</code>. Podés acumular bloques o limpiar la zona cuando quieras.</p>
+    </header>
+
     <section class="glass-panel p-4 mb-4">
-      <span class="workspace-badge"><i class="bi bi-5-circle-fill me-1"></i> Consigna 5</span>
-      <h1 class="h3 fw-bold text-main mb-2">Agregar HTML con innerHTML</h1>
-      <p class="text-muted mb-4">Cada botón inserta un objeto HTML distinto en la zona de trabajo.</p>
+      <span class="workspace-badge"><i class="bi bi-5-circle-fill me-1"></i> Punto 5</span>
+      <h2 class="section-title h4 fw-bold text-main mb-2">Zona innerHTML</h2>
+      <p class="text-muted mb-4">Elegí un tipo de objeto HTML para insertarlo dinámicamente.</p>
 
       <div class="toolbar-grid mb-3">
-        <button type="button" class="btn btn-custom btn-sm" data-inner="card">+ Card</button>
-        <button type="button" class="btn btn-custom btn-sm" data-inner="alert">+ Alerta</button>
-        <button type="button" class="btn btn-custom btn-sm" data-inner="table">+ Tabla</button>
-        <button type="button" class="btn btn-custom btn-sm" data-inner="list">+ Lista</button>
-        <button type="button" class="btn btn-custom btn-sm" data-inner="badge">+ Badges</button>
-        <button type="button" class="btn btn-outline-danger btn-sm" id="btn-clear-inner">Limpiar</button>
+        <button type="button" class="btn btn-custom btn-sm" data-inner="card"><i class="bi bi-card-heading me-1"></i> + Card</button>
+        <button type="button" class="btn btn-custom btn-sm" data-inner="alert"><i class="bi bi-exclamation-triangle me-1"></i> + Alerta</button>
+        <button type="button" class="btn btn-custom btn-sm" data-inner="table"><i class="bi bi-table me-1"></i> + Tabla</button>
+        <button type="button" class="btn btn-custom btn-sm" data-inner="list"><i class="bi bi-list-ul me-1"></i> + Lista</button>
+        <button type="button" class="btn btn-custom btn-sm" data-inner="badge"><i class="bi bi-tags me-1"></i> + Badges</button>
+        <button type="button" class="btn btn-outline-danger btn-sm" id="btn-clear-inner"><i class="bi bi-trash3 me-1"></i> Limpiar</button>
       </div>
       <div id="inner-zone" class="playground-area inner-zone"></div>
     </section>
 
-    <section class="terminal-console">
+    <section class="terminal-console" aria-label="Consola">
       <div class="terminal-header">
         <div class="d-flex align-items-center">
           <span class="terminal-dot dot-red"></span><span class="terminal-dot dot-yellow"></span><span class="terminal-dot dot-green"></span>
@@ -52,9 +62,13 @@
       </div>
       <div id="console-body" class="terminal-body"><div class="console-placeholder text-muted fst-italic fs-7">Esperando eventos...</div></div>
     </section>
+
+    <footer class="site-footer-mini">
+      <p class="mb-0">NSJ3 · Punto 5 · Laboratorio independiente · Puerto 3010</p>
+    </footer>
   </main>
 
-  <button id="back-to-top" class="back-to-top" type="button"><i class="bi bi-arrow-up-short"></i></button>
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="Volver arriba"><i class="bi bi-arrow-up-short"></i></button>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module" src="../scripts/app.js"></script>
 </body>

@@ -1,0 +1,239 @@
+/* estilos base del modo oscuro */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #e2e8f0;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0b1120 100%);
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  padding: 2rem 0 3rem;
+}
+
+/* armo el encabezado del dashboard a ancho completo */
+.dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(1400px, calc(100% - 2rem));
+  margin: 0 auto 2.5rem;
+  padding: 1.5rem 2rem;
+  border-radius: 1.25rem;
+  background: rgba(30, 41, 59, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.6s ease;
+}
+
+.page-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.page-subtitle {
+  margin: 0.5rem 0 0;
+  max-width: 42rem;
+  color: #94a3b8;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* boton para cambiar de tema */
+.btn-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.08);
+  color: #f8fafc;
+  font-weight: 500;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.btn-theme:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+  background: rgba(248, 250, 252, 0.14);
+}
+
+/* uso todo el ancho en desktop */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem;
+  width: min(1400px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+/* tarjetas con efecto glass */
+.glass-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(30, 41, 59, 0.62);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  animation: slideUp 0.55s ease;
+}
+
+.glass-card-body {
+  padding: 2.5rem;
+}
+
+.icon-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 1.25rem;
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  font-size: 2.25rem;
+}
+
+.card-heading {
+  margin-bottom: 1rem;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.card-text {
+  margin-bottom: 1.75rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #cbd5e1;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.badge-http {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.badge-fs {
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+}
+
+/* panel lateral con info del ejercicio */
+.side-title {
+  margin-bottom: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.step-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.step-item {
+  display: flex;
+  gap: 0.85rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.step-item:last-child {
+  border-bottom: none;
+}
+
+.step-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  flex-shrink: 0;
+}
+
+.step-text {
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 992px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-wrapper {
+    padding: 1.25rem 0 2rem;
+  }
+
+  .dashboard-header,
+  .content-grid {
+    width: calc(100% - 1.25rem);
+  }
+
+  .dashboard-header {
+    padding: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .glass-card-body {
+    padding: 1.5rem;
+  }
+}

@@ -1,0 +1,119 @@
+/* estilos base del modo claro */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #1e293b;
+  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 40%, #dbeafe 100%);
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  position: relative;
+}
+
+/* centro la tarjeta principal */
+.main-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+}
+
+/* boton para cambiar de tema */
+.btn-theme {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: #0f172a;
+  font-weight: 500;
+  box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-theme:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.12);
+}
+
+/* tarjeta con efecto glass */
+.glass-card {
+  width: min(560px, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1.25rem 2.5rem rgba(15, 23, 42, 0.1);
+  animation: slideUp 0.55s ease;
+}
+
+.glass-card-body {
+  padding: 2.75rem 2rem;
+}
+
+.icon-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 1.25rem;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  font-size: 2.25rem;
+}
+
+.card-heading {
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.card-text {
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #475569;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .page-wrapper {
+    padding: 1.25rem 0.85rem;
+  }
+
+  .btn-theme {
+    top: 0.85rem;
+    right: 0.85rem;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .glass-card-body {
+    padding: 2rem 1.35rem;
+  }
+}

@@ -9,12 +9,57 @@
   --glass-bg: rgba(15, 23, 42, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
   --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
+  --text-muted: #b8c5d6;
   --accent-color: #38bdf8;
   --accent-hover: #0ea5e9;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --accent-glow: rgba(56, 189, 248, 0.22);
   --shadow-color: rgba(0, 0, 0, 0.45);
   --playground-bg: rgba(0, 0, 0, 0.25);
   --inner-card-bg: rgba(30, 41, 59, 0.5);
+}
+
+/* acentos oscuros por proyecto */
+html[data-project="p1"] {
+  --accent-color: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-soft: rgba(129, 140, 248, 0.14);
+  --accent-glow: rgba(129, 140, 248, 0.24);
+}
+
+html[data-project="p2"] {
+  --accent-color: #a78bfa;
+  --accent-hover: #8b5cf6;
+  --accent-soft: rgba(167, 139, 250, 0.14);
+  --accent-glow: rgba(167, 139, 250, 0.24);
+}
+
+html[data-project="p3"] {
+  --accent-color: #34d399;
+  --accent-hover: #10b981;
+  --accent-soft: rgba(52, 211, 153, 0.14);
+  --accent-glow: rgba(52, 211, 153, 0.24);
+}
+
+html[data-project="p4"] {
+  --accent-color: #fbbf24;
+  --accent-hover: #f59e0b;
+  --accent-soft: rgba(251, 191, 36, 0.14);
+  --accent-glow: rgba(251, 191, 36, 0.24);
+}
+
+html[data-project="p5"] {
+  --accent-color: #fb7185;
+  --accent-hover: #f43f5e;
+  --accent-soft: rgba(251, 113, 133, 0.14);
+  --accent-glow: rgba(251, 113, 133, 0.24);
+}
+
+html[data-project="p6"] {
+  --accent-color: #22d3ee;
+  --accent-hover: #06b6d4;
+  --accent-soft: rgba(34, 211, 238, 0.14);
+  --accent-glow: rgba(34, 211, 238, 0.24);
 }
 
 .custom-navbar {
@@ -59,4 +104,134 @@
 
 .attr-log-row {
   border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.registro-form .form-control,
+.registro-form .form-select {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.2);
+  color: var(--text-main);
+}
+
+.project-hero {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+/* ==========================================================
+   Legibilidad en modo oscuro
+   Bootstrap trae grises oscuros (#6c757d, #212529) que no se ven
+   sobre fondos navy — forzamos colores del tema acá.
+   ========================================================== */
+
+.text-muted,
+p.text-muted,
+small.text-muted,
+.navbar-text.text-muted,
+.console-placeholder.text-muted,
+.attr-log-empty.text-muted,
+.terms-modal-body .text-muted {
+  color: var(--text-muted) !important;
+}
+
+.navbar-project-label,
+.site-footer-mini,
+.site-footer-mini p {
+  color: var(--text-muted) !important;
+}
+
+.project-intro,
+.terms-section p,
+.terms-section li,
+.terms-open-hint {
+  color: var(--text-muted) !important;
+}
+
+.form-label,
+.form-check-label,
+.terms-check-label-text {
+  color: var(--text-main) !important;
+}
+
+.list-group-item,
+.registro-resultado .list-group-item,
+.registro-resultado .list-group-item strong,
+.inner-block .list-group-item,
+.playground-area .list-group-item {
+  color: var(--text-main) !important;
+  background-color: transparent !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+.inner-block .card,
+.inner-block .card-body,
+.inner-block .card-title,
+.inner-block .card-text,
+.inner-block p,
+.inner-block td,
+.inner-block th,
+.inner-block li {
+  color: var(--text-main);
+}
+
+.inner-block .text-muted {
+  color: var(--text-muted) !important;
+}
+
+.inner-block .alert {
+  color: inherit;
+}
+
+.attr-log,
+.attr-log-row {
+  color: var(--text-main);
+}
+
+.attr-link.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.subnav-pills .nav-link:not(.active) {
+  color: var(--text-muted) !important;
+}
+
+.subnav-pills .nav-link:not(.active):hover {
+  color: var(--text-main) !important;
+}
+
+.playground-area,
+.nav-content-area,
+.children-demo,
+.inner-zone {
+  color: var(--text-main);
+}
+
+.playground-area .text-muted,
+.nav-content-area .text-muted,
+.children-demo .text-muted,
+.inner-zone .text-muted,
+.result-panel .text-muted {
+  color: var(--text-muted) !important;
+}
+
+.registro-resultado h2,
+.registro-resultado h6 {
+  color: var(--text-main) !important;
+}
+
+code {
+  color: var(--accent-color);
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.invalid-feedback {
+  color: #fca5a5 !important;
+}
+
+.form-control::placeholder,
+.form-select option[value=""] {
+  color: #94a3b8;
+}
+
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
 }

@@ -12,9 +12,39 @@ import { analizarYMostrarURL } from "../ej3/modules/analizador.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// sirvo css y js estaticos para la estetica visual
+const archivosEstaticos = {
+  "/styles/light.css": {
+    ruta: path.join(__dirname, "styles", "light.css"),
+    tipo: "text/css; charset=utf-8",
+  },
+  "/styles/dark.css": {
+    ruta: path.join(__dirname, "styles", "dark.css"),
+    tipo: "text/css; charset=utf-8",
+  },
+  "/scripts/theme.js": {
+    ruta: path.join(__dirname, "scripts", "theme.js"),
+    tipo: "application/javascript; charset=utf-8",
+  },
+};
+
 const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   let pathname = parsedUrl.pathname;
+
+  const archivo = archivosEstaticos[pathname];
+  if (archivo) {
+    fs.readFile(archivo.ruta, (err, data) => {
+      if (err) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end("Error leyendo archivo estatico");
+        return;
+      }
+      res.writeHead(200, { "Content-Type": archivo.tipo });
+      res.end(data);
+    });
+    return;
+  }
 
   let fileName = "index.html";
   let contentToInject = "";

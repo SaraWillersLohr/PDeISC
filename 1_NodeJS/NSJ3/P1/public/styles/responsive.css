@@ -1,6 +1,65 @@
 /* ==========================================================
-   RESPONSIVE REAL — móvil, tablet y desktop
+   RESPONSIVE — móvil, tablet, notebook, monitor y ultrawide
    ========================================================== */
+
+@media (min-width: 1200px) {
+  .terminal-body {
+    height: 240px;
+  }
+
+  .playground-area {
+    min-height: 200px;
+  }
+}
+
+@media (min-width: 1400px) {
+  :root {
+    --page-max: 1520px;
+  }
+
+  .toolbar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .inner-zone {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --page-max: 1600px;
+  }
+
+  .page-main,
+  .custom-navbar .container-fluid {
+    width: min(var(--page-max), calc(100% - 3rem));
+  }
+
+  .project-hero {
+    padding: 2.25rem 2.75rem;
+  }
+
+  .terminal-body {
+    height: 260px;
+  }
+}
+
+@media (min-width: 2000px) {
+  :root {
+    --page-max: 1800px;
+  }
+
+  .page-main,
+  .custom-navbar .container-fluid {
+    width: min(var(--page-max), calc(100% - 4rem));
+  }
+
+  .toolbar-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
 
 @media (max-width: 991.98px) {
   .terminal-body {
@@ -10,14 +69,36 @@
   .modules-sidebar {
     margin-bottom: 0.5rem;
   }
+
+  .project-hero {
+    padding: 1.5rem 1.35rem 1.5rem 1.5rem;
+  }
+
+  .project-intro {
+    max-width: none;
+  }
 }
 
 @media (max-width: 767.98px) {
-  .custom-navbar .navbar-brand span small {
+  .page-main {
+    width: calc(100% - 1.25rem);
+    padding-top: 0.75rem;
+  }
+
+  .custom-navbar .container-fluid {
+    width: calc(100% - 1.25rem);
+  }
+
+  .custom-navbar .navbar-brand span small,
+  .navbar-project-label {
     display: none;
   }
 
-  /* Menú de módulos horizontal deslizable */
+  .nsj3-badge {
+    min-width: 2.6rem;
+    margin-right: 0.45rem;
+  }
+
   .modules-nav {
     display: flex;
     flex-direction: row;
@@ -60,10 +141,12 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
   }
 
   .subnav-pills .nav-item {
     flex-shrink: 0;
+    scroll-snap-align: start;
   }
 
   .attr-log-row {
@@ -89,6 +172,24 @@
 
   .workspace {
     padding: 1.25rem !important;
+  }
+
+  .inner-zone {
+    grid-template-columns: 1fr;
+  }
+
+  .registro-form {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .project-heading {
+    font-size: 1.35rem;
+  }
+
+  .glass-panel {
+    padding: 1.15rem !important;
   }
 }
 

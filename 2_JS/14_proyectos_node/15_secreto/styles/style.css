@@ -1,0 +1,175 @@
+/* Overrides locales — Proyecto 15: El Mensaje Secreto */
+
+.secreto-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pipeline-step {
+  background: var(--code-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: clamp(0.85rem, 2vw, 1.1rem);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.pipeline-step--active {
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.pipeline-step__label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.pipeline-step__content {
+  font-family: var(--font-mono);
+  font-size: clamp(0.78rem, 2vw, 0.9rem);
+  word-break: break-word;
+  white-space: pre-wrap;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.pipeline-arrow {
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.1rem;
+  line-height: 1;
+  animation: bounceDown 1.6s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+
+.bloques-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.bloque-card {
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  animation: consoleIn 0.35s ease;
+}
+
+.bloque-card__titulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.bloque-card__fila {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 7rem) 1fr;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.25rem;
+}
+
+.bloque-card__fila:last-child {
+  margin-bottom: 0;
+}
+
+.bloque-card__clave {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.bloque-card__valor {
+  font-family: var(--font-mono);
+  word-break: break-word;
+  color: var(--text-main);
+}
+
+.bloque-card__valor--ok {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.resultado-final {
+  background: var(--success-soft);
+  border-color: rgba(22, 163, 74, 0.35);
+  font-weight: 600;
+}
+
+.textarea-codificado {
+  min-height: 5.5rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.btn-back-top {
+  position: fixed;
+  bottom: clamp(5.5rem, 16vh, 7rem);
+  right: clamp(0.65rem, 2vw, 1rem);
+  z-index: 1035;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--card);
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+}
+
+.btn-back-top--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.btn-back-top:hover {
+  background: var(--primary-soft);
+  transform: translateY(-2px);
+}
+
+@media (min-width: 1200px) {
+  .btn-back-top {
+    bottom: clamp(1rem, 2vw, 1.5rem);
+    right: calc(var(--console-w) + 1.25rem);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .bloque-card__fila {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-arrow {
+    animation: none;
+  }
+}

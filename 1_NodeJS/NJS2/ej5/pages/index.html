@@ -1,68 +1,117 @@
 <!DOCTYPE html>
-<html lang='es'>
+<html lang="es">
+
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Portfolio - NJS2</title>
-    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
-    <style>
-        .hero { background: linear-gradient(135deg, #2c3e50 0%, #000000 100%); color: white; padding: 100px 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio - NJS2</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link id="theme-css" href="/styles/light.css" rel="stylesheet">
 </head>
-<body class='bg-light'>
-    {{MENU}}
-    <header class='hero text-center mb-5'>
-        <div class='container'>
-            <h1 class='display-2 fw-bold mb-3'>Trabajos Practicos</h1>
-            <p class='lead fs-4 opacity-75'>Explora la resolucion de los ejercicios de Node.js (NJS2)</p>
-        </div>
-    </header>
-    <div class='container'>
-        <div class='row g-4'>
-            <div class='col-md-6 col-lg-3'>
-                <div class='card h-100 shadow-sm border-0'>
-                    <div class='card-body text-center p-4'>
-                        <div class='h1 text-primary mb-3'>01</div>
-                        <h5 class='card-title fw-bold'>Clima API</h5>
-                        <p class='card-text text-secondary small'>Consumo de API Open-Meteo para Mar del Plata.</p>
-                        <a href='/ej1' class='btn btn-outline-primary w-100 mt-3'>Ver Ejercicio</a>
-                    </div>
-                </div>
-            </div>
-            <div class='col-md-6 col-lg-3'>
-                <div class='card h-100 shadow-sm border-0'>
-                    <div class='card-body text-center p-4'>
-                        <div class='h1 text-primary mb-3'>02</div>
-                        <h5 class='card-title fw-bold'>HTTP & FS</h5>
-                        <p class='card-text text-secondary small'>Lectura y servicio de archivos HTML locales.</p>
-                        <a href='/ej2' class='btn btn-outline-primary w-100 mt-3'>Ver Ejercicio</a>
-                    </div>
-                </div>
-            </div>
-            <div class='col-md-6 col-lg-3'>
-                <div class='card h-100 shadow-sm border-0'>
-                    <div class='card-body text-center p-4'>
-                        <div class='h1 text-primary mb-3'>03</div>
-                        <h5 class='card-title fw-bold'>URL Module</h5>
-                        <p class='card-text text-secondary small'>Analisis de URLs y salida por consola.</p>
-                        <a href='/ej3' class='btn btn-outline-primary w-100 mt-3'>Ver Ejercicio</a>
-                    </div>
-                </div>
-            </div>
-            <div class='col-md-6 col-lg-3'>
-                <div class='card h-100 shadow-sm border-0'>
-                    <div class='card-body text-center p-4'>
-                        <div class='h1 text-primary mb-3'>04</div>
-                        <h5 class='card-title fw-bold'>NPM Package</h5>
-                        <p class='card-text text-secondary small'>Uso del paquete upper-case para transformacion.</p>
-                        <a href='/ej4' class='btn btn-outline-primary w-100 mt-3'>Ver Ejercicio</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'></script>
+
+<body>
+  {{MENU}}
+
+  <button id="theme-toggle" class="btn-theme" type="button">
+    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+    <span id="theme-label">Modo oscuro</span>
+  </button>
+
+  <div class="page-wrapper">
+    <main class="page-main">
+      <header class="landing-hero">
+        <h1 class="landing-title">Trabajos Practicos NJS2</h1>
+        <p class="landing-subtitle">
+          Portfolio integrador que reune los ejercicios de Node.js con modulos propios,
+          HTTP, FS, URL y paquetes NPM en una sola experiencia visual.
+        </p>
+      </header>
+
+      <section class="cards-grid">
+        <article class="project-card">
+          <div class="project-card-body">
+            <span class="project-number">01</span>
+            <i class="bi bi-cloud-sun-fill project-icon"></i>
+            <h2 class="project-title">Ejercicio 1</h2>
+            <p class="project-text">
+              Modulos propios de clima y calculo con datos dinamicos desde una API externa.
+            </p>
+            <a href="/ej1" class="btn-glass">
+              Ver ejercicio <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-card-body">
+            <span class="project-number">02</span>
+            <i class="bi bi-folder2-open project-icon"></i>
+            <h2 class="project-title">Ejercicio 2</h2>
+            <p class="project-text">
+              Lectura de archivos HTML con File System y servicio mediante HTTP.
+            </p>
+            <a href="/ej2" class="btn-glass">
+              Ver ejercicio <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-card-body">
+            <span class="project-number">03</span>
+            <i class="bi bi-link-45deg project-icon"></i>
+            <h2 class="project-title">Ejercicio 3</h2>
+            <p class="project-text">
+              Analisis de URLs con el modulo URL y salida de resultados por consola.
+            </p>
+            <a href="/ej3" class="btn-glass">
+              Ver ejercicio <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-card-body">
+            <span class="project-number">04</span>
+            <i class="bi bi-box-seam project-icon"></i>
+            <h2 class="project-title">Ejercicio 4</h2>
+            <p class="project-text">
+              Transformacion de texto usando el paquete upper-case instalado con NPM.
+            </p>
+            <a href="/ej4" class="btn-glass">
+              Ver ejercicio <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-card-body">
+            <span class="project-number">05</span>
+            <i class="bi bi-info-circle-fill project-icon"></i>
+            <h2 class="project-title">Acerca de</h2>
+            <p class="project-text">
+              Informacion del proyecto final y las tecnologias utilizadas en NJS2.
+            </p>
+            <a href="/acerca" class="btn-glass">
+              Ver seccion <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p class="footer-brand"><i class="bi bi-code-slash"></i> Portfolio NJS2</p>
+        <p class="footer-text">Trabajo practico integrador con Node.js, modulos ES6 y Bootstrap 5</p>
+        <p class="footer-copy">Ejercicio 5 — Proyecto Final</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/scripts/theme.js"></script>
 </body>
+
 </html>
-
-

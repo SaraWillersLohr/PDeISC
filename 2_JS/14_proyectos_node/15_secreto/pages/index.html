@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Maestro: Proyecto 15 — El Mensaje Secreto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../_shared/css/base.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body data-method="secreto">
+    <div class="container-fluid py-4 py-md-5">
+        <header class="tp-header text-center mb-4 animate__animated animate__fadeIn">
+            <h1 class="display-4 fw-800 mb-2">Proyecto 15: <code>El Mensaje Secreto</code></h1>
+            <p class="text-muted lead mx-auto" style="max-width: 680px;">
+                Decodificá un mensaje donde los fragmentos entre paréntesis están escritos al revés.
+                Usamos arrays, strings y métodos como <code>split()</code>, <code>reverse()</code> y
+                <code>join()</code>.
+            </p>
+        </header>
+
+        <div id="methodBanner" class="method-banner glass-panel mb-4 animate__animated animate__fadeIn">
+            <div class="method-banner__top">
+                <span class="method-badge">Ejercicio extra</span>
+                <span class="method-mutates mutates-no">
+                    <i class="fas fa-shield"></i> No modifica el mensaje original
+                </span>
+            </div>
+            <p class="method-banner__summary">
+                Los bloques entre paréntesis contienen texto invertido. Hay que detectarlos, revertir cada
+                fragmento y armar el mensaje legible.
+            </p>
+            <p class="method-banner__hint">
+                <i class="fas fa-lightbulb"></i> Ejemplo: <code>(.sh 22 sal a)</code> se convierte en
+                <code>a las 22 hs.</code>
+            </p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-xl-10 animate__animated animate__fadeInUp">
+                <section class="card-premium">
+                    <div class="card-icon bg-primary-soft text-primary mb-3">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <h2 class="section-title">Decodificador de mensajes</h2>
+                    <p class="text-muted small mb-4">
+                        Ingresá un mensaje con bloques codificados entre paréntesis y presioná
+                        <strong>Decodificar</strong> para ver el algoritmo paso a paso.
+                    </p>
+
+                    <label for="inputMensaje" class="form-label small fw-bold text-muted mb-2">
+                        Mensaje codificado
+                    </label>
+                    <textarea id="inputMensaje" class="form-control-modern textarea-codificado mb-4"
+                        rows="3">Hoy (.sh 22 sal a) (ed asac ne sominuer son) Marcelo.</textarea>
+
+                    <div class="d-grid d-sm-flex gap-2 mb-4">
+                        <button id="btnDecodificar" class="btn-modern btn-primary-modern flex-sm-grow-1">
+                            <i class="fas fa-unlock me-2"></i>Decodificar
+                        </button>
+                        <button id="btnReset" class="btn-modern btn-outline-modern">
+                            <i class="fas fa-sync-alt me-2"></i>Reiniciar
+                        </button>
+                    </div>
+
+                    <div class="secreto-pipeline" id="pipeline">
+                        <div class="pipeline-step" id="stepOriginal">
+                            <span class="pipeline-step__label">Mensaje original</span>
+                            <p class="pipeline-step__content" id="displayOriginal">—</p>
+                        </div>
+
+                        <div class="pipeline-arrow" aria-hidden="true">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <div class="pipeline-step" id="stepBloques">
+                            <span class="pipeline-step__label">Bloques detectados</span>
+                            <div id="displayBloques" class="bloques-lista">
+                                <p class="pipeline-step__content text-muted mb-0">Esperando decodificación…</p>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-arrow" aria-hidden="true">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <div class="pipeline-step" id="stepTransformacion">
+                            <span class="pipeline-step__label">Transformación</span>
+                            <div id="displayTransformacion" class="bloques-lista">
+                                <p class="pipeline-step__content text-muted mb-0">Acá verás cada bloque invertido.</p>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-arrow" aria-hidden="true">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <div class="pipeline-step pipeline-step--active" id="stepResultado">
+                            <span class="pipeline-step__label">Resultado final</span>
+                            <p class="pipeline-step__content resultado-final" id="displayResultado">—</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" id="btnBackTop" class="btn-back-top glass-panel" title="Volver arriba"
+        aria-label="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="../scripts/script.js" type="module"></script>
+</body>
+
+</html>

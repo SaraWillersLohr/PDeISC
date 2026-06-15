@@ -1,0 +1,276 @@
+/* estilos base del modo claro */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #1e293b;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 45%, #dbeafe 100%);
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  padding: 2rem 0 3rem;
+}
+
+/* armo el encabezado tipo dashboard */
+.dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1140px;
+  margin: 0 auto 2.5rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1rem 2.5rem rgba(15, 23, 42, 0.08);
+  animation: fadeIn 0.6s ease;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.85rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.page-subtitle {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* boton para cambiar de tema */
+.btn-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+  font-weight: 500;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.btn-theme:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.12);
+  background: rgba(15, 23, 42, 0.12);
+}
+
+/* tarjetas con efecto glass */
+.glass-card {
+  max-width: 480px;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1.25rem 2.5rem rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+  animation: slideUp 0.55s ease;
+}
+
+.glass-card-header {
+  padding: 1.1rem 1.25rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.glass-card-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-warm {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.35), rgba(253, 224, 71, 0.25));
+  color: #92400e;
+}
+
+.header-cool {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(96, 165, 250, 0.25));
+  color: #1e3a8a;
+}
+
+.header-calc {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.75));
+  color: #f8fafc;
+}
+
+.glass-card-body {
+  padding: 1.75rem 1.5rem;
+}
+
+.clima-lugar {
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.clima-temp {
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+
+.clima-resumen {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 1.25rem;
+}
+
+.clima-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.metric-box {
+  padding: 0.85rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}
+
+.metric-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.metric-value {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* lista de calculos */
+.calc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.calc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  transition: background 0.25s ease;
+}
+
+.calc-item:last-child {
+  border-bottom: none;
+}
+
+.calc-item:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.calc-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #334155;
+}
+
+.calc-badge {
+  min-width: 3rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.badge-suma {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
+.badge-resta {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+}
+
+.badge-mult {
+  background: rgba(14, 165, 233, 0.15);
+  color: #0369a1;
+}
+
+.badge-div {
+  background: rgba(59, 130, 246, 0.15);
+  color: #1d4ed8;
+}
+
+.alert-glass {
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(254, 226, 226, 0.75);
+  backdrop-filter: blur(12px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .page-wrapper {
+    padding: 1.25rem 0 2rem;
+  }
+
+  .dashboard-header {
+    margin-bottom: 1.75rem;
+    padding: 1.25rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .clima-temp {
+    font-size: 3rem;
+  }
+}

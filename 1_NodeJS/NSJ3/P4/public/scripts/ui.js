@@ -1,4 +1,15 @@
-export function initBackToTop(){const b=document.getElementById("back-to-top");if(!b)return;window.addEventListener("scroll",()=>{b.style.display=window.scrollY>300?"flex":"none";});b.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));}
+// Este archivo contiene funciones de utilidad para la interfaz de usuario, como el botón "Volver arriba" y el registro de cambios de atributos.
+// Función para inicializar el botón "Volver arriba"
+export function initBackToTop() {
+  const b = document.getElementById("back-to-top");
+  if (!b) return;
+  window.addEventListener("scroll", () => {
+    b.style.display = window.scrollY > 300 ? "flex" : "none";
+  });
+  b.addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" }),
+  );
+}
 
 export function logAtributo(textoEnlace, atributo, anterior, nuevo) {
   const log = document.getElementById("attr-log");

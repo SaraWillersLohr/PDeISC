@@ -1,7 +1,5 @@
-// ==========================================
 // Tema claro / oscuro — comportamiento unificado NSJ3
 // Se carga en el <head> para evitar parpadeo al recargar.
-// ==========================================
 
 (function aplicarTemaGuardado() {
   const link = document.getElementById("theme-link");
@@ -14,7 +12,7 @@
     aplicarTema("dark", link, icon);
   }
 })();
-
+// Función para inicializar el tema y el botón de cambio
 window.initTheme = function initTheme() {
   const btn = document.getElementById("btn-theme-toggle");
   const link = document.getElementById("theme-link");

@@ -31,7 +31,7 @@ export function agregarLog(modulo, mensaje) {
   guardarEnHistorial(log);
   pintarLogEnDOM(log, cuerpo);
 }
-
+// Agrego un log nuevo a la consola
 function pintarLogEnDOM(log, contenedor) {
   const linea = document.createElement("div");
   linea.className = "console-line";
@@ -43,7 +43,7 @@ function pintarLogEnDOM(log, contenedor) {
   contenedor.appendChild(linea);
   contenedor.scrollTop = contenedor.scrollHeight;
 }
-
+// Guarda el log en sessionStorage para mantenerlo entre recargas
 function guardarEnHistorial(log) {
   try {
     const historial = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [];
@@ -53,7 +53,7 @@ function guardarEnHistorial(log) {
     console.error("No pude guardar el historial:", e);
   }
 }
-
+// Limpia la consola y el historial de sesión
 export function limpiarConsola() {
   const cuerpo = document.getElementById("console-body");
   if (cuerpo) {
@@ -61,7 +61,7 @@ export function limpiarConsola() {
   }
   sessionStorage.removeItem(STORAGE_KEY);
 }
-
+// Carga el historial de sesión y lo muestra en la consola
 function cargarHistorialDeSesion() {
   const cuerpo = document.getElementById("console-body");
   if (!cuerpo) return;

@@ -5,9 +5,11 @@ export function initBackToTop() {
   window.addEventListener("scroll", () => {
     btn.style.display = window.scrollY > 300 ? "flex" : "none";
   });
-  btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  btn.addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" }),
+  );
 }
-
+// Función para registrar cambios de atributos en la interfaz
 export function mostrarAviso(mensaje, tipo = "warning") {
   const zona = document.querySelector(".glass-panel");
   if (!zona) return;

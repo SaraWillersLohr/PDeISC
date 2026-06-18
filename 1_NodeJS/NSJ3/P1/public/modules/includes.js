@@ -59,6 +59,7 @@ export const includesMethod = {
         const arr = [...array];
         
         let numero = 15; // default académico
+        // Si if (inputVal !== undefined && inputVal !== null && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal !== undefined && inputVal !== null && inputVal.trim() !== "") {
           numero = Number(inputVal);
         }
@@ -67,6 +68,7 @@ export const includesMethod = {
         const existe = arr.includes(numero);
         let mensaje = "";
         
+        // Si if (existe), entonces se ejecuta este bloque.
         if (existe) {
           mensaje = `includes(${numero}) devolvió true. ⚠️ El número ya existe en el array. ¡No lo agregamos!`;
         } else {

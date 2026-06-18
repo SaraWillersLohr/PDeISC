@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * ¡Hola! Este script lo uso para asegurarme de que todos mis servidores de Express 
  * tengan acceso a la carpeta compartida "_shared".
@@ -18,7 +20,8 @@ app.use("/_shared", express.static(path.join(__dirname, "..", "_shared")));
 // Recorro cada carpeta y parcheo el archivo server.js si es necesario.
 folders.forEach((folder) => {
   const serverPath = path.join(root, folder, "server.js");
-  if (!fs.existsSync(serverPath)) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!fs.existsSync(serverPath)) return;
 
   let content = fs.readFileSync(serverPath, "utf8");
   // Si no tiene la ruta compartida, se la agrego después de la configuración de archivos estáticos básicos.

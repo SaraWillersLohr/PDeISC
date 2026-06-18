@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 import { agregarLog } from "./consola.js";
 import { logAtributo } from "./ui.js";
 
@@ -19,6 +21,7 @@ export function bindEventos() {
 function crearEnlace(key) {
   const sitio = SITIOS[key];
   const cont = document.getElementById("link-container");
+  // Si if (!sitio || !cont), entonces se ejecuta este bloque.
   if (!sitio || !cont) return;
 
   const a = document.createElement("a");

@@ -30,6 +30,7 @@ const LEVELS = [
   /* 8 */ { tickInterval:  52, duration: 160, obstacles: 28, bonusChance: 0.40 },
 ];
 
+// Función getLevelConfig(level) que ayuda a entender la lógica.
 function getLevelConfig(level) {
   const idx = Math.min(level - 1, LEVELS.length - 1);
   return LEVELS[idx];
@@ -38,8 +39,10 @@ function getLevelConfig(level) {
 // Calcula el nivel actual según duración
 function calcLevel(duration) {
   let lv = 1;
+  // Repite este bloque con un bucle for.
   for (let i = LEVELS.length - 1; i >= 0; i--) {
-    if (duration >= LEVELS[i].duration) { lv = i + 1; break; }
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (duration >= LEVELS[i].duration) { lv = i + 1; break; }
   }
   return lv;
 }
@@ -78,6 +81,7 @@ class SnakeGame {
       const initialDir = isFirst ? 'RIGHT' : 'LEFT';
 
       const segments = [];
+      // Repite este bloque con un bucle for.
       for (let i = 0; i < 3; i++) {
         segments.push({ x: startX - (isFirst ? i : -i), y: startY });
       }
@@ -118,7 +122,8 @@ class SnakeGame {
     // Agregar obstáculos si faltan
     while (this.obstacles.length < target) {
       const tile = this._getRandomFreeTileForObstacle();
-      if (tile) this.obstacles.push(tile);
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (tile) this.obstacles.push(tile);
       else break; // tablero lleno
     }
     // No se quitan obstáculos (solo se agregan al subir de nivel)
@@ -127,11 +132,13 @@ class SnakeGame {
   _getRandomFreeTileForObstacle() {
     const safeZone = 5; // no spawnear cerca del centro ni de los extremos iniciales
     let x, y, attempts = 0;
+    // Ejecuta este bloque al menos una vez y luego repite mientras la condición sea verdadera.
     do {
       x = Math.floor(Math.random() * (this.width  - 4)) + 2;
       y = Math.floor(Math.random() * (this.height - 4)) + 2;
       attempts++;
-      if (attempts > 200) return null;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (attempts > 200) return null;
     } while (
       this.isTileOccupied(x, y) ||
       this.isObstacle(x, y)     ||
@@ -158,11 +165,13 @@ class SnakeGame {
 
   getRandomFreeTile() {
     let x, y, attempts = 0;
+    // Ejecuta este bloque al menos una vez y luego repite mientras la condición sea verdadera.
     do {
       x = Math.floor(Math.random() * (this.width  - 2)) + 1;
       y = Math.floor(Math.random() * (this.height - 2)) + 1;
       attempts++;
-      if (attempts > 200) break;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (attempts > 200) break;
     } while (
       this.isTileOccupied(x, y)  ||
       this.isObstacle(x, y)      ||
@@ -188,8 +197,10 @@ class SnakeGame {
 
     const r2 = Math.random();
     let type = 'datos';
-    if (r2 > 0.6 && r2 <= 0.9) type = 'energia';
-    else if (r2 > 0.9)          type = 'nodo';
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (r2 > 0.6 && r2 <= 0.9) type = 'energia';
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (r2 > 0.9)          type = 'nodo';
     this.items.push({ x: tile.x, y: tile.y, type });
   }
 
@@ -206,9 +217,11 @@ class SnakeGame {
   }
 
   schedulePowerupRespawn() {
-    if (this.powerupSpawnTimer) clearTimeout(this.powerupSpawnTimer);
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.powerupSpawnTimer) clearTimeout(this.powerupSpawnTimer);
     this.powerupSpawnTimer = setTimeout(() => {
-      if (this.state === 'playing') this.spawnPowerup();
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state === 'playing') this.spawnPowerup();
     }, 8000);
   }
 
@@ -216,25 +229,35 @@ class SnakeGame {
 
   applyMagnetAttraction() {
     this.players.forEach(player => {
-      if (player.isDead || !(player.magnetTicks > 0)) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead || !(player.magnetTicks > 0)) return;
       const head   = player.segments[0];
       const radius = 5.5;
       this.items.forEach(item => {
         let dx = head.x - item.x;
         let dy = head.y - item.y;
-        if (dx >  this.width  / 2) dx -= this.width;
-        if (dx < -this.width  / 2) dx += this.width;
-        if (dy >  this.height / 2) dy -= this.height;
-        if (dy < -this.height / 2) dy += this.height;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx >  this.width  / 2) dx -= this.width;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx < -this.width  / 2) dx += this.width;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy >  this.height / 2) dy -= this.height;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy < -this.height / 2) dy += this.height;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > 0 && dist <= radius) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dist > 0 && dist <= radius) {
           const force = 0.15 + (1 - dist / radius) * 0.35;
           item.x += (dx / dist) * force;
           item.y += (dy / dist) * force;
-          if (item.x < 0)             item.x += this.width;
-          if (item.x >= this.width)   item.x -= this.width;
-          if (item.y < 0)             item.y += this.height;
-          if (item.y >= this.height)  item.y -= this.height;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.x < 0)             item.x += this.width;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.x >= this.width)   item.x -= this.width;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.y < 0)             item.y += this.height;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.y >= this.height)  item.y -= this.height;
         }
       });
     });
@@ -243,7 +266,8 @@ class SnakeGame {
   // ─── Tick ──────────────────────────────────────────────────────────────────
 
   tick() {
-    if (this.state !== 'playing') return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state !== 'playing') return;
 
     this.tickCount++;
 
@@ -252,7 +276,8 @@ class SnakeGame {
     if (this.tickCount % 10 === 0) {
       this.duration++;
       const newLevel = calcLevel(this.duration);
-      if (newLevel !== this.level) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (newLevel !== this.level) {
         this.level = newLevel;
         this._syncObstacles();
       }
@@ -264,20 +289,27 @@ class SnakeGame {
     this.applyMagnetAttraction();
 
     this.players.forEach(player => {
-      if (player.isDead) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead) return;
 
-      if (player.overclockTicks > 0) player.overclockTicks--;
-      if (player.firewallTicks  > 0) player.firewallTicks--;
-      if (player.empTicks > 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.overclockTicks > 0) player.overclockTicks--;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks  > 0) player.firewallTicks--;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.empTicks > 0) {
         player.empTicks--;
         return; // congelado
       }
-      if (player.magnetTicks > 0) player.magnetTicks--;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.magnetTicks > 0) player.magnetTicks--;
 
       // Overclock = doble movimiento por tick (2 celdas)
       const steps = player.overclockTicks > 0 ? 2 : 1;
+      // Repite este bloque con un bucle for.
       for (let step = 0; step < steps; step++) {
-        if (player.isDead) break;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead) break;
         this._stepPlayer(player);
       }
     });
@@ -290,20 +322,30 @@ class SnakeGame {
     player.dir = player.nextDir;
 
     const head = { ...player.segments[0] };
-    if (player.dir === 'UP')    head.y--;
-    if (player.dir === 'DOWN')  head.y++;
-    if (player.dir === 'LEFT')  head.x--;
-    if (player.dir === 'RIGHT') head.x++;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'UP')    head.y--;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'DOWN')  head.y++;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'LEFT')  head.x--;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'RIGHT') head.x++;
 
     // Colisión con bordes
     const outOfBounds = head.x < 0 || head.x >= this.width || head.y < 0 || head.y >= this.height;
-    if (outOfBounds) {
-      if (player.firewallTicks > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (outOfBounds) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks > 0) {
         player.firewallTicks = 0;
-        if      (head.x < 0)             head.x = this.width  - 1;
-        else if (head.x >= this.width)   head.x = 0;
-        else if (head.y < 0)             head.y = this.height - 1;
-        else if (head.y >= this.height)  head.y = 0;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (head.x < 0)             head.x = this.width  - 1;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (head.x >= this.width)   head.x = 0;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (head.y < 0)             head.y = this.height - 1;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (head.y >= this.height)  head.y = 0;
       } else {
         player.isDead = true;
         return;
@@ -312,7 +354,8 @@ class SnakeGame {
 
     // Colisión con obstáculos fijos
     if (this.isObstacle(head.x, head.y)) {
-      if (player.firewallTicks > 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks > 0) {
         player.firewallTicks = 0;
       } else {
         player.isDead = true;
@@ -324,15 +367,19 @@ class SnakeGame {
     let hitCable = false;
     this.players.forEach(other => {
       other.segments.forEach((seg, sIdx) => {
-        if (seg.x === head.x && seg.y === head.y) {
-          if (other.socketId === player.socketId && sIdx === 0) return;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (seg.x === head.x && seg.y === head.y) {
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (other.socketId === player.socketId && sIdx === 0) return;
           hitCable = true;
         }
       });
     });
 
-    if (hitCable) {
-      if (player.firewallTicks > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hitCable) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks > 0) {
         player.firewallTicks = 0;
       } else {
         player.isDead = true;
@@ -344,25 +391,35 @@ class SnakeGame {
 
     // Consumo de items
     let ate = false;
+    // Función itemIdx que organiza esta parte del código.
     const itemIdx = this.items.findIndex(item => {
       let dx = head.x - item.x;
       let dy = head.y - item.y;
-      if (dx >  this.width  / 2) dx -= this.width;
-      if (dx < -this.width  / 2) dx += this.width;
-      if (dy >  this.height / 2) dy -= this.height;
-      if (dy < -this.height / 2) dy += this.height;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx >  this.width  / 2) dx -= this.width;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx < -this.width  / 2) dx += this.width;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy >  this.height / 2) dy -= this.height;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy < -this.height / 2) dy += this.height;
       return Math.abs(dx) < 0.55 && Math.abs(dy) < 0.55;
     });
 
-    if (itemIdx !== -1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (itemIdx !== -1) {
       const item = this.items.splice(itemIdx, 1)[0];
       ate = true;
       let scoreAdd     = 10;
       let growSegments = 1;
-      if      (item.type === 'energia') { scoreAdd = 25;  growSegments = 2; }
-      else if (item.type === 'nodo')    { scoreAdd = 50;  growSegments = 3; }
-      else if (item.type === 'bonus')   { scoreAdd = 100; growSegments = 1; }
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (item.type === 'energia') { scoreAdd = 25;  growSegments = 2; }
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (item.type === 'nodo')    { scoreAdd = 50;  growSegments = 3; }
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (item.type === 'bonus')   { scoreAdd = 100; growSegments = 1; }
       player.score += scoreAdd;
+      // Repite este bloque con un bucle for.
       for (let i = 1; i < growSegments; i++) {
         player.segments.push({ ...player.segments[player.segments.length - 1] });
       }
@@ -371,35 +428,44 @@ class SnakeGame {
 
     // Consumo de powerups
     const puIdx = this.powerups.findIndex(pu => pu.x === head.x && pu.y === head.y);
-    if (puIdx !== -1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (puIdx !== -1) {
       const pu = this.powerups.splice(puIdx, 1)[0];
       ate = true;
-      if (pu.type === 'overclock') {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (pu.type === 'overclock') {
         player.overclockTicks = 50;
       } else if (pu.type === 'firewall') {
         player.firewallTicks = 80;
       } else if (pu.type === 'emp') {
         player.magnetTicks = 80;
         this.players.forEach(other => {
-          if (other.socketId !== player.socketId) other.empTicks = 20;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (other.socketId !== player.socketId) other.empTicks = 20;
         });
       }
       this.schedulePowerupRespawn();
     }
 
-    if (!ate) player.segments.pop();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!ate) player.segments.pop();
   }
 
   checkGameOver() {
+    // Función alive que organiza esta parte del código.
     const alive = this.players.filter(p => !p.isDead);
 
-    if (alive.length === 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (alive.length === 0) {
       this.state  = 'game_over';
       const p1 = this.players[0];
       const p2 = this.players[1];
-      if (p1 && p2) {
-        if      (p1.score > p2.score) this.winner = p1.socketId;
-        else if (p2.score > p1.score) this.winner = p2.socketId;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p1 && p2) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (p1.score > p2.score) this.winner = p1.socketId;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (p2.score > p1.score) this.winner = p2.socketId;
         else                          this.winner = 'draw';
       }
     } else if (alive.length === 1 && this.players.length > 1) {

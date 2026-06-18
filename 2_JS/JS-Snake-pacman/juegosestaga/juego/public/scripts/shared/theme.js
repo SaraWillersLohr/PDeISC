@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setTheme(currentTheme);
 
   const themeToggle = document.getElementById('themeToggle');
-  if (themeToggle) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (themeToggle) {
     themeToggle.checked = (currentTheme === 'light');
     themeToggle.addEventListener('change', () => {
       const targetTheme = themeToggle.checked ? 'light' : 'dark';
@@ -13,10 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Función setTheme(theme) que ayuda a entender la lógica.
 function setTheme(theme) {
   // Buscar o crear la etiqueta link para el stylesheet específico de tema
   let themeLink = document.getElementById('theme-style');
-  if (!themeLink) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!themeLink) {
     themeLink = document.createElement('link');
     themeLink.id = 'theme-style';
     themeLink.rel = 'stylesheet';

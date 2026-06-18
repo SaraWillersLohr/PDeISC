@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** 
  * ¡Hola! Este archivo es mi caja de herramientas para mostrar los arrays en la pantalla.
  * Aquí definí varias funciones que me ayudan a que todo se vea lindo y ordenado.
@@ -5,12 +7,17 @@
 
 // Esta función me sirve para convertir un array en una cadena de texto que parezca código real.
 export function formatArrayLiteral(arr) {
-  if (!Array.isArray(arr)) return String(arr);
-  if (arr.length === 0) return "[]";
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!Array.isArray(arr)) return String(arr);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (arr.length === 0) return "[]";
 
+  // Función items que organiza esta parte del código.
   const items = arr.map((item) => {
-    if (item === null) return "null";
-    if (typeof item === "object") {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item === null) return "null";
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (typeof item === "object") {
       // Si el objeto tiene nombre y edad, lo formateo de una forma especial.
       if (item.nombre !== undefined && item.edad !== undefined) {
         return `{ nombre: "${item.nombre}", edad: ${item.edad} }`;
@@ -25,7 +32,8 @@ export function formatArrayLiteral(arr) {
       }
       return JSON.stringify(item);
     }
-    if (typeof item === "string") return `"${item}"`;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (typeof item === "string") return `"${item}"`;
     return String(item);
   });
 
@@ -34,9 +42,11 @@ export function formatArrayLiteral(arr) {
 
 // Con esta función dibujo esas "etiquetas" (badges) que ves en la página para cada elemento del array.
 export function renderBadges(container, arr, { emptyText = "vacío", highlightLast = false } = {}) {
-  if (!container) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!container) return;
 
-  if (!arr || arr.length === 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!arr || arr.length === 0) {
     container.innerHTML = `<span class="array-empty">${emptyText}</span>`;
     return;
   }
@@ -57,8 +67,10 @@ export function renderBadges(container, arr, { emptyText = "vacío", highlightLa
  * ¡Esta es la función estrella! Pinta todo el flujo: cómo estaba el array ANTES, 
  * qué OPERACIÓN le hicimos y cómo quedó como RESULTADO.
  */
+// Función function que ayuda a entender la lógica.
 export function paintFlow(container, { before, operation, after, note = "" }) {
-  if (!container) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!container) return;
 
   const beforeArr = Array.isArray(before) ? before : [];
   const afterArr = Array.isArray(after) ? after : [];
@@ -92,8 +104,10 @@ export function paintFlow(container, { before, operation, after, note = "" }) {
 }
 
 /** Una forma más simple de mostrar una lista, por si la necesito. */
+// Función function que ayuda a entender la lógica.
 export function renderArrayIn(container, arr) {
-  if (!container) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!container) return;
   container.className = (container.className || "") + " items-container";
   renderBadges(container, arr);
 }

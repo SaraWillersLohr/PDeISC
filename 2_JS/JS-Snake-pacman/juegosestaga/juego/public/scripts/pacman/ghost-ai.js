@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** IA fantasmas — cliente (espejo del servidor) */
 const AI_STATE = {
   CHASE: 'CHASE',
@@ -6,6 +8,7 @@ const AI_STATE = {
   PATROL: 'PATROL'
 };
 
+// Función buildPatrolWaypoints(cols, que ayuda a entender la lógica.
 function buildPatrolWaypoints(cols, rows, spawnX, spawnY) {
   const margin = 2;
   return [
@@ -17,33 +20,43 @@ function buildPatrolWaypoints(cols, rows, spawnX, spawnY) {
   ];
 }
 
+// Función getScatterTarget(ghost, que ayuda a entender la lógica.
 function getScatterTarget(ghost, cols, rows) {
-  if (ghost.name === 'Esteban') return { x: cols - 2, y: 1 };
-  if (ghost.name === 'Lorena') return { x: 1, y: 1 };
-  if (ghost.name === 'Scaglione') return { x: cols - 2, y: rows - 2 };
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.name === 'Esteban') return { x: cols - 2, y: 1 };
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.name === 'Lorena') return { x: 1, y: 1 };
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.name === 'Scaglione') return { x: cols - 2, y: rows - 2 };
   return { x: ghost.spawnX, y: ghost.spawnY };
 }
 
+// Función getPlayerAhead(player, que ayuda a entender la lógica.
 function getPlayerAhead(player, steps, getNeighborCoords, isWall) {
   let x = player.x;
   let y = player.y;
   let dir = player.dir;
-  if (dir === 'NONE') dir = player.lastHorizontalDir || 'RIGHT';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dir === 'NONE') dir = player.lastHorizontalDir || 'RIGHT';
+  // Repite este bloque con un bucle for.
   for (let i = 0; i < steps; i++) {
     const next = getNeighborCoords(x, y, dir);
-    if (isWall(next.x, next.y)) break;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isWall(next.x, next.y)) break;
     x = next.x;
     y = next.y;
   }
   return { x, y };
 }
 
+// Función pickBestMove(validMoves, que ayuda a entender la lógica.
 function pickBestMove(validMoves, targetX, targetY) {
   let best = null;
   let minDist = Infinity;
   validMoves.forEach((move) => {
     const dist = Math.pow(move.x - targetX, 2) + Math.pow(move.y - targetY, 2);
-    if (dist < minDist) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dist < minDist) {
       minDist = dist;
       best = move;
     }
@@ -51,6 +64,7 @@ function pickBestMove(validMoves, targetX, targetY) {
   return best;
 }
 
+// Función updateGhostBehavior(ghost, que ayuda a entender la lógica.
 function updateGhostBehavior(ghost, ctx) {
   const {
     validMoves,
@@ -63,9 +77,11 @@ function updateGhostBehavior(ghost, ctx) {
     isWall
   } = ctx;
 
-  if (ghost.mode === 'returning' || ghost.mode === 'eaten') return null;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.mode === 'returning' || ghost.mode === 'eaten') return null;
 
-  if (ghost.mode === 'frightened') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.mode === 'frightened') {
     return validMoves[Math.floor(Math.random() * validMoves.length)];
   }
 
@@ -74,7 +90,8 @@ function updateGhostBehavior(ghost, ctx) {
   const profile = typeof GHOST_PROFILES !== 'undefined' ? GHOST_PROFILES[ghost.name] : null;
   const behavior = profile?.behavior || 'HUNTER';
 
-  if (scatterPhase) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (scatterPhase) {
     const scatter = getScatterTarget(ghost, cols, rows);
     targetX = scatter.x;
     targetY = scatter.y;
@@ -89,7 +106,8 @@ function updateGhostBehavior(ghost, ctx) {
     targetY = ahead.y;
     ghost.aiState = AI_STATE.INTERCEPT;
   } else if (behavior === 'PATROL') {
-    if (!ghost.patrolWaypoints?.length) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!ghost.patrolWaypoints?.length) {
       ghost.patrolWaypoints = buildPatrolWaypoints(cols, rows, ghost.spawnX, ghost.spawnY);
       ghost.patrolIndex = 0;
     }
@@ -98,7 +116,8 @@ function updateGhostBehavior(ghost, ctx) {
     targetY = wp.y;
     ghost.aiState = AI_STATE.PATROL;
     const distToWp = Math.pow(ghost.x - wp.x, 2) + Math.pow(ghost.y - wp.y, 2);
-    if (distToWp < 0.4 && tickCount % 30 === 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (distToWp < 0.4 && tickCount % 30 === 0) {
       ghost.patrolIndex = (ghost.patrolIndex + 1) % ghost.patrolWaypoints.length;
     }
   }
@@ -106,6 +125,7 @@ function updateGhostBehavior(ghost, ctx) {
   return pickBestMove(validMoves, targetX, targetY);
 }
 
+// Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (typeof window !== 'undefined') {
   window.GhostAI = { AI_STATE, updateGhostBehavior, pickBestMove, buildPatrolWaypoints };
 }

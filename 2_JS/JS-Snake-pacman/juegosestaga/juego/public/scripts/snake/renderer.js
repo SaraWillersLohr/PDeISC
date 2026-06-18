@@ -7,8 +7,10 @@ let _frameTick = 0;
 let _lastRenderState = null;
 let _lastStateTime = 0;
 
+// Función _loadImg(src) que ayuda a entender la lógica.
 function _loadImg(src) {
-  if (!_snakeImgCache[src]) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!_snakeImgCache[src]) {
     const img = new Image();
     img.onload = () => { _snakeImgCache[src]._ready = true; };
     img.src = src;
@@ -17,6 +19,7 @@ function _loadImg(src) {
   return _snakeImgCache[src];
 }
 
+// Función _preloadCableAssets() que ayuda a entender la lógica.
 function _preloadCableAssets() {
   CABLE_LIST.forEach((c) => {
     _loadImg(c.cabeza);
@@ -25,17 +28,21 @@ function _preloadCableAssets() {
 }
 
 (function preload() {
-  if (typeof CABLE_LIST !== 'undefined') _preloadCableAssets();
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (typeof CABLE_LIST !== 'undefined') _preloadCableAssets();
   else document.addEventListener('DOMContentLoaded', _preloadCableAssets);
 })();
 
+// Función _isImgReady(img) que ayuda a entender la lógica.
 function _isImgReady(img) {
   return img && (img._ready || (img.complete && img.naturalWidth > 0));
 }
 
+// Función _drawRotatedSprite(ctx, que ayuda a entender la lógica.
 function _drawRotatedSprite(ctx, img, cx, cy, size, angle, glowColor, glowIntensity) {
   ctx.save();
-  if (glowColor && glowIntensity > 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (glowColor && glowIntensity > 0) {
     ctx.shadowBlur = 8 + glowIntensity * 10;
     ctx.shadowColor = glowColor;
   }
@@ -44,9 +51,11 @@ function _drawRotatedSprite(ctx, img, cx, cy, size, angle, glowColor, glowIntens
 
   let dw = size;
   let dh = size;
-  if (img.naturalWidth && img.naturalHeight) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (img.naturalWidth && img.naturalHeight) {
     const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (aspect > 1) {
       dh = size / aspect;
     } else {
       dw = size * aspect;
@@ -57,32 +66,44 @@ function _drawRotatedSprite(ctx, img, cx, cy, size, angle, glowColor, glowIntens
   ctx.restore();
 }
 
+// Función _segmentCenter(seg, que ayuda a entender la lógica.
 function _segmentCenter(seg, tileW, tileH) {
   return { x: seg.x * tileW + tileW / 2, y: seg.y * tileH + tileH / 2 };
 }
 
+// Función getCableColorName(characterId) que ayuda a entender la lógica.
 function getCableColorName(characterId) {
-  if (characterId === 'USB') return 'azul';
-  if (characterId === 'HDMI') return 'violeta';
-  if (characterId === 'Ethernet') return 'verde';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (characterId === 'USB') return 'azul';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (characterId === 'HDMI') return 'violeta';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (characterId === 'Ethernet') return 'verde';
   return 'azul';
 }
 
+// Función getRelativeDir(p1, que ayuda a entender la lógica.
 function getRelativeDir(p1, p2, width, height) {
   let dx = p2.x - p1.x;
   let dy = p2.y - p1.y;
-  if (dx > width / 2) dx -= width;
-  else if (dx < -width / 2) dx += width;
-  if (dy > height / 2) dy -= height;
-  else if (dy < -height / 2) dy += height;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx > width / 2) dx -= width;
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dx < -width / 2) dx += width;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy > height / 2) dy -= height;
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dy < -height / 2) dy += height;
   
-  if (Math.abs(dx) > Math.abs(dy)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Math.abs(dx) > Math.abs(dy)) {
     return dx > 0 ? 'RIGHT' : 'LEFT';
   } else {
     return dy > 0 ? 'DOWN' : 'UP';
   }
 }
 
+// Función _drawCableSegment(ctx, que ayuda a entender la lógica.
 function _drawCableSegment(ctx, prev, curr, next, cable, tileW, tileH, alpha, isTail, glowBoost, width, height) {
   const center = _segmentCenter(curr, tileW, tileH);
   const size = Math.max(tileW, tileH) * 1.70;
@@ -104,13 +125,15 @@ function _drawCableSegment(ctx, prev, curr, next, cable, tileW, tileH, alpha, is
   ctx.save();
   ctx.globalAlpha = alpha;
 
-  if (isTail) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isTail) {
     const segImg = colaImg;
     // La cola apunta hacia el cuerpo (hacia prev = hacia la cabeza).
     // Rotamos 180° para que la parte oscura quede en el extremo final.
     const dir = getRelativeDir(curr, prev, width, height);
     const angle = dirToAngle(dir) + Math.PI;
-    if (_isImgReady(segImg)) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_isImgReady(segImg)) {
       _drawRotatedSprite(ctx, segImg, center.x, center.y, size, angle, cable.glow || cable.color, glow);
     }
   } else {
@@ -122,13 +145,15 @@ function _drawCableSegment(ctx, prev, curr, next, cable, tileW, tileH, alpha, is
                        (dirToHead === 'LEFT' && dirToTail === 'RIGHT') ||
                        (dirToHead === 'RIGHT' && dirToTail === 'LEFT');
 
-    if (isStraight) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isStraight) {
       const segImg = colaImg;
       // dirToHead apunta hacia la cabeza. El sprite tiene la parte brillante
       // hacia "adelante" (hacia la cabeza), así que rotamos 180° para que
       // la parte oscura quede atrás (hacia la cola).
       const angle = dirToAngle(dirToHead) + Math.PI;
-      if (_isImgReady(segImg)) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_isImgReady(segImg)) {
         _drawRotatedSprite(ctx, segImg, center.x, center.y, size, angle, cable.glow || cable.color, glow);
       }
     } else {
@@ -145,12 +170,14 @@ function _drawCableSegment(ctx, prev, curr, next, cable, tileW, tileH, alpha, is
       const spriteUrl = `/assets/characters/doblar-${vMap[vDir]}-${hMap[hDir]}-${colorName}.png?v=4`;
       const turnImg = _loadImg(spriteUrl);
 
-      if (_isImgReady(turnImg)) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_isImgReady(turnImg)) {
         // Usar sizeTurn para que el grosor de la curva coincida con el del cuerpo
         _drawRotatedSprite(ctx, turnImg, center.x, center.y, sizeTurn, 0, cable.glow || cable.color, glow);
       } else {
         const angle = dirToAngle(dirToHead);
-        if (_isImgReady(colaImg)) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_isImgReady(colaImg)) {
           _drawRotatedSprite(ctx, colaImg, center.x, center.y, size, angle, cable.glow || cable.color, glow);
         }
       }
@@ -159,6 +186,7 @@ function _drawCableSegment(ctx, prev, curr, next, cable, tileW, tileH, alpha, is
   ctx.restore();
 }
 
+// Función _drawCableHead(ctx, que ayuda a entender la lógica.
 function _drawCableHead(ctx, seg, dir, cable, tileW, tileH, alpha, glowBoost) {
   const center = _segmentCenter(seg, tileW, tileH);
   const size = Math.max(tileW, tileH) * 1.85;
@@ -168,7 +196,8 @@ function _drawCableHead(ctx, seg, dir, cable, tileW, tileH, alpha, glowBoost) {
   ctx.save();
   ctx.globalAlpha = alpha;
 
-  if (_isImgReady(headImg)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_isImgReady(headImg)) {
     _drawRotatedSprite(ctx, headImg, center.x, center.y, size, angle, cable.glow || cable.color, 1.2 + (glowBoost || 0));
     ctx.globalAlpha = alpha * 0.4;
     ctx.globalCompositeOperation = 'lighter';
@@ -186,6 +215,7 @@ function _drawCableHead(ctx, seg, dir, cable, tileW, tileH, alpha, glowBoost) {
   ctx.restore();
 }
 
+// Función _drawPlayerLabel(ctx, que ayuda a entender la lógica.
 function _drawPlayerLabel(ctx, seg, name, cable, tileW, tileH) {
   const cx = seg.x * tileW + tileW / 2;
   const cy = seg.y * tileH - 4;
@@ -202,10 +232,12 @@ function _drawPlayerLabel(ctx, seg, name, cable, tileW, tileH) {
   ctx.restore();
 }
 
+// Función _drawPlayerCable(ctx, que ayuda a entender la lógica.
 function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) {
   const cable = getCable(player.character);
   const segments = player.segments;
-  if (!segments || !segments.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!segments || !segments.length) return;
 
   const baseAlpha = player.ghost ? 0.5 : 1;
   const glowBoost = player.overclock ? 0.5 : 0;
@@ -218,7 +250,8 @@ function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) 
     const prev = segments[index - 1]; // más cerca de la cabeza
     const next = segments[index + 1]; // más cerca de la cola (puede ser undefined)
     const isTail = index === segments.length - 1;
-    if (prev) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (prev) {
       _drawCableSegment(ctx, prev, seg, next, cable, tileW, tileH, baseAlpha, isTail, glowBoost, width, height);
     }
   }
@@ -228,7 +261,8 @@ function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) 
   const nextSeg = segments[1];
   const headDir = player.dir || (nextSeg ? vecToDir(nextSeg.x - headSeg.x, nextSeg.y - headSeg.y) : 'RIGHT');
   _drawCableHead(ctx, headSeg, headDir, cable, tileW, tileH, baseAlpha, glowBoost);
-  if (showLabels && player.name) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (showLabels && player.name) {
     _drawPlayerLabel(ctx, headSeg, player.name.split(' ')[0], cable, tileW, tileH);
   }
 
@@ -236,7 +270,8 @@ function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) 
   const hx = head.x * tileW + tileW / 2;
   const hy = head.y * tileH + tileH / 2;
 
-  if (player.firewall) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewall) {
     ctx.save();
     ctx.strokeStyle = '#db2777';
     ctx.shadowBlur = 16;
@@ -248,7 +283,8 @@ function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) 
     ctx.restore();
   }
 
-  if (player.emp) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.emp) {
     ctx.save();
     ctx.fillStyle = 'rgba(14,165,233,0.35)';
     ctx.strokeStyle = '#0ea5e9';
@@ -258,10 +294,12 @@ function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) 
     ctx.restore();
   }
 
-  if (player.overclock) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.overclock) {
     const sparkCount = 3;
     const sparkRadius = Math.max(1.5, tileW * 0.08);
     const orbitRadius = Math.max(10, tileW * 0.5);
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < sparkCount; i++) {
       const t = (_frameTick + i * 7) % 20;
       const angle = (t / 20) * Math.PI * 2;
@@ -277,8 +315,10 @@ function _drawPlayerCable(ctx, player, tileW, tileH, showLabels, width, height) 
   }
 }
 
+// Función _spawnAmbientParticle(w, que ayuda a entender la lógica.
 function _spawnAmbientParticle(w, h, level) {
-  if (_particles.length > 40) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_particles.length > 40) return;
   _particles.push({
     x: Math.random() * w,
     y: Math.random() * h,
@@ -293,17 +333,22 @@ function _spawnAmbientParticle(w, h, level) {
   });
 }
 
+// Función _updateParticles(w, que ayuda a entender la lógica.
 function _updateParticles(w, h, level) {
-  if (_frameTick % 8 === 0) _spawnAmbientParticle(w, h, level);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (_frameTick % 8 === 0) _spawnAmbientParticle(w, h, level);
+  // Repite este bloque con un bucle for.
   for (let i = _particles.length - 1; i >= 0; i--) {
     const p = _particles[i];
     p.x += p.vx;
     p.y += p.vy;
     p.life--;
-    if (p.life <= 0 || p.y < 0) _particles.splice(i, 1);
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.life <= 0 || p.y < 0) _particles.splice(i, 1);
   }
 }
 
+// Función _drawParticles(ctx, que ayuda a entender la lógica.
 function _drawParticles(ctx, w, h) {
   _particles.forEach((p) => {
     ctx.save();
@@ -314,12 +359,14 @@ function _drawParticles(ctx, w, h) {
   });
 }
 
+// Función _drawBackground(ctx, que ayuda a entender la lógica.
 function _drawBackground(ctx, level) {
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
 
   const g = ctx.createLinearGradient(0, 0, w, h);
-  if (level >= 3) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (level >= 3) {
     g.addColorStop(0, '#0a0510');
     g.addColorStop(0.5, '#120818');
     g.addColorStop(1, '#080410');
@@ -335,20 +382,24 @@ function _drawBackground(ctx, level) {
   ctx.strokeStyle = level >= 3 ? 'rgba(255,0,127,0.04)' : 'rgba(0,240,255,0.04)';
   ctx.lineWidth = 1;
   const step = 28;
+  // Repite este bloque con un bucle for.
   for (let x = 0; x < w; x += step) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
   }
+  // Repite este bloque con un bucle for.
   for (let y = 0; y < h; y += step) {
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
   }
   ctx.restore();
 }
 
+// Función _drawGrid(ctx, que ayuda a entender la lógica.
 function _drawGrid(ctx, width, height, tileW, tileH, level) {
   // Grid estático — sin desplazamiento para que el tablero no se mueva
   ctx.save();
   ctx.strokeStyle = level >= 3 ? 'rgba(255,0,127,0.06)' : 'rgba(0,240,255,0.06)';
   ctx.lineWidth = 1;
+  // Repite este bloque con un bucle for.
   for (let c = 0; c <= width; c++) {
     ctx.beginPath();
     const x = c * tileW;
@@ -356,6 +407,7 @@ function _drawGrid(ctx, width, height, tileW, tileH, level) {
     ctx.lineTo(x, ctx.canvas.height);
     ctx.stroke();
   }
+  // Repite este bloque con un bucle for.
   for (let r = 0; r <= height; r++) {
     ctx.beginPath();
     const y = r * tileH;
@@ -366,10 +418,12 @@ function _drawGrid(ctx, width, height, tileW, tileH, level) {
   ctx.restore();
 }
 
+// Función _drawScanlines(ctx) que ayuda a entender la lógica.
 function _drawScanlines(ctx) {
   ctx.save();
   ctx.globalAlpha = 0.04;
   ctx.fillStyle = '#000';
+  // Repite este bloque con un bucle for.
   for (let y = 0; y < ctx.canvas.height; y += 3) {
     ctx.fillRect(0, y, ctx.canvas.width, 1);
   }
@@ -383,8 +437,10 @@ const POWERUP_SPRITES = {
   emp: '/assets/items/iman.png'
 };
 
+// Función _loadPowerupImg(src) que ayuda a entender la lógica.
 function _loadPowerupImg(src) {
-  if (!_powerupImgCache[src]) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!_powerupImgCache[src]) {
     const img = new Image();
     img.onload = () => { _powerupImgCache[src]._ready = true; };
     img.src = src;
@@ -397,6 +453,7 @@ function _loadPowerupImg(src) {
   Object.values(POWERUP_SPRITES).forEach((src) => _loadPowerupImg(src));
 })();
 
+// Función _drawItem(ctx, que ayuda a entender la lógica.
 function _drawItem(ctx, item, tileW, tileH, frame) {
   const ix = item.x * tileW;
   const iy = item.y * tileH;
@@ -404,7 +461,8 @@ function _drawItem(ctx, item, tileW, tileH, frame) {
   const cy = iy + tileH / 2;
   ctx.save();
 
-  if (item.type === 'datos') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.type === 'datos') {
     const pulse = 0.85 + Math.sin(frame / 6) * 0.15;
     ctx.fillStyle = '#00f0ff';
     ctx.shadowBlur = 12 * pulse;
@@ -459,6 +517,7 @@ function _drawItem(ctx, item, tileW, tileH, frame) {
 
     // Dibujar estrella
     ctx.beginPath();
+    // Repite este bloque con un bucle for.
     for (let s = 0; s < spikes * 2; s++) {
       const angle  = spin + (s * Math.PI) / spikes;
       const radius = s % 2 === 0 ? r : r * 0.45;
@@ -492,6 +551,7 @@ function _drawItem(ctx, item, tileW, tileH, frame) {
   ctx.restore();
 }
 
+// Función _drawObstacle(ctx, que ayuda a entender la lógica.
 function _drawObstacle(ctx, obs, tileW, tileH, level) {
   const ox = obs.x * tileW;
   const oy = obs.y * tileH;
@@ -537,6 +597,7 @@ function _drawObstacle(ctx, obs, tileW, tileH, level) {
   ctx.restore();
 }
 
+// Función _drawPowerup(ctx, que ayuda a entender la lógica.
 function _drawPowerup(ctx, pu, tileW, tileH, frame) {
   const px = pu.x * tileW + tileW / 2;
   const py = pu.y * tileH + tileH / 2;
@@ -556,7 +617,8 @@ function _drawPowerup(ctx, pu, tileW, tileH, frame) {
   ctx.shadowBlur = 18;
   ctx.shadowColor = s.color;
 
-  if (img && _isImgReady(img)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (img && _isImgReady(img)) {
     ctx.drawImage(img, px - size / 2, py + bob - size / 2, size, size);
   } else {
     const r = Math.max(12, tileW * 0.45);
@@ -577,6 +639,7 @@ function _drawPowerup(ctx, pu, tileW, tileH, frame) {
   ctx.restore();
 }
 
+// Función drawSnakeGame(canvas, que ayuda a entender la lógica.
 function drawSnakeGame(canvas, ctx, state) {
   _frameTick++;
   const width = state.width || 30;
@@ -584,9 +647,11 @@ function drawSnakeGame(canvas, ctx, state) {
   const level = state.level || 1;
   const tileW = canvas.width / width;
   const tileH = canvas.height / height;
+  // Función is2P que organiza esta parte del código.
   const is2P = state.players && state.players.filter((p) => !p.isDead).length > 1;
 
-  if (!_lastRenderState || _lastRenderState.tickId !== state.tickId || _lastRenderState.players.length !== state.players.length) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!_lastRenderState || _lastRenderState.tickId !== state.tickId || _lastRenderState.players.length !== state.players.length) {
     _lastRenderState = JSON.parse(JSON.stringify(state));
     _lastStateTime = Date.now();
   }
@@ -598,7 +663,8 @@ function drawSnakeGame(canvas, ctx, state) {
   _drawParticles(ctx, canvas.width, canvas.height);
   _drawGrid(ctx, width, height, tileW, tileH, level);
 
-  if (state.eatFlash && Date.now() - state.eatFlash < 200) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.eatFlash && Date.now() - state.eatFlash < 200) {
     ctx.save();
     const alpha = 1 - (Date.now() - state.eatFlash) / 200;
     ctx.fillStyle = `rgba(0, 240, 255, ${0.18 * alpha})`;
@@ -614,10 +680,14 @@ function drawSnakeGame(canvas, ctx, state) {
     state.obstacles.forEach((obs) => _drawObstacle(ctx, obs, tileW, tileH, level));
   }
 
+  // Función interpolatedPlayers que organiza esta parte del código.
   const interpolatedPlayers = state.players.map((player) => {
-    if (player.isDead) return player;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead) return player;
+    // Función lastPlayer que organiza esta parte del código.
     const lastPlayer = _lastRenderState.players.find((lp) => lp.playerIndex === player.playerIndex);
-    if (!lastPlayer || lastPlayer.isDead) return player;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!lastPlayer || lastPlayer.isDead) return player;
 
     // Intervalo de movimiento real según nivel y overclock
     // SNAKE_LEVELS está disponible en client-snake.js (mismo scope de página)
@@ -629,25 +699,33 @@ function drawSnakeGame(canvas, ctx, state) {
     const playerInterval = player.overclock ? baseTick / 2 : baseTick;
 
     let t = timeElapsed / playerInterval;
-    if (isNaN(t) || !isFinite(t)) t = 1;
-    if (t > 1) t = 1;
-    if (t < 0) t = 0;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isNaN(t) || !isFinite(t)) t = 1;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (t > 1) t = 1;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (t < 0) t = 0;
 
     const currSegs = player.segments;
     const prevSegs = lastPlayer.segments;
     const interpolatedSegments = [];
 
     const len = currSegs.length;
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < len; i++) {
       const currSeg = currSegs[i];
       const prevSeg = (prevSegs && prevSegs[i]) ? prevSegs[i] : (prevSegs ? prevSegs[prevSegs.length - 1] : currSeg);
 
       let dx = currSeg.x - prevSeg.x;
       let dy = currSeg.y - prevSeg.y;
-      if (dx > width / 2) dx -= width;
-      else if (dx < -width / 2) dx += width;
-      if (dy > height / 2) dy -= height;
-      else if (dy < -height / 2) dy += height;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx > width / 2) dx -= width;
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dx < -width / 2) dx += width;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy > height / 2) dy -= height;
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dy < -height / 2) dy += height;
 
       const interpX = prevSeg.x + dx * t;
       const interpY = prevSeg.y + dy * t;
@@ -661,12 +739,14 @@ function drawSnakeGame(canvas, ctx, state) {
   });
 
   interpolatedPlayers.forEach((p) => {
-    if (p.isDead) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.isDead) return;
     ctx.save();
     _drawPlayerCable(ctx, p, tileW, tileH, is2P, width, height);
     ctx.restore();
 
-    if (p.magnet) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.magnet) {
       const head = p.segments[0];
       const hx = head.x * tileW + tileW / 2;
       const hy = head.y * tileH + tileH / 2;
@@ -676,13 +756,18 @@ function drawSnakeGame(canvas, ctx, state) {
       state.items.forEach((item) => {
         let dx = head.x - item.x;
         let dy = head.y - item.y;
-        if (dx > width / 2) dx -= width;
-        else if (dx < -width / 2) dx += width;
-        if (dy > height / 2) dy -= height;
-        else if (dy < -height / 2) dy += height;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx > width / 2) dx -= width;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dx < -width / 2) dx += width;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy > height / 2) dy -= height;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dy < -height / 2) dy += height;
 
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > 0 && dist <= radius) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dist > 0 && dist <= radius) {
           const ix = item.x * tileW + tileW / 2;
           const iy = item.y * tileH + tileH / 2;
           ctx.strokeStyle = 'rgba(14, 165, 233, 0.45)';
@@ -692,6 +777,7 @@ function drawSnakeGame(canvas, ctx, state) {
           ctx.beginPath();
           ctx.moveTo(hx, hy);
           const segments = 4;
+          // Repite este bloque con un bucle for.
           for (let i = 1; i < segments; i++) {
             const ratio = i / segments;
             const px = hx + (ix - hx) * ratio + (Math.random() - 0.5) * 6;
@@ -718,6 +804,7 @@ function drawSnakeGame(canvas, ctx, state) {
   _drawScanlines(ctx);
 }
 
+// Función resetSnakeRenderer() que ayuda a entender la lógica.
 function resetSnakeRenderer() {
   _particles.length = 0;
   _frameTick = 0;

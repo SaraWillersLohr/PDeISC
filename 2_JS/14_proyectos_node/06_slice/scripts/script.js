@@ -50,9 +50,12 @@ const updateUI = () => {
   flowCopia(dom.listaNum, numOriginal, numCopia, "numOriginal.slice(0, 3)");
   flowCopia(dom.listaPel, pelOriginal, pelCopia, "pelOriginal.slice(2, 5)");
   flowCopia(dom.listaUlt, letOriginal, letCopia, "letOriginal.slice(-3)");
-  if (dom.contNum) dom.contNum.textContent = `${numCopia.length} ITEMS`;
-  if (dom.contPel) dom.contPel.textContent = `${pelCopia.length} ITEMS`;
-  if (dom.contUlt) dom.contUlt.textContent = `${letCopia.length} ITEMS`;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dom.contNum) dom.contNum.textContent = `${numCopia.length} ITEMS`;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dom.contPel) dom.contPel.textContent = `${pelCopia.length} ITEMS`;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dom.contUlt) dom.contUlt.textContent = `${letCopia.length} ITEMS`;
 };
 
 // Caso 1: Copio los primeros 3 números.

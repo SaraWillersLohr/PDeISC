@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * este es el servidor del analizador de números.
  * acá recibo los archivos, los valido de forma estricta y genero las exportaciones.
@@ -56,14 +58,16 @@ servidor.get('/', (peticion, respuesta) => {
 
 // manejo de configuración de tema
 servidor.post('/api/configuracion', async (peticion, respuesta) => {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         await fs.writeFile(path.join(directorioActual, 'configuracion.json'), JSON.stringify(peticion.body, null, 2));
         respuesta.json({ success: true });
     } catch (e) { respuesta.status(500).json({ error: 'error' }); }
 });
 
 servidor.get('/api/configuracion', async (peticion, respuesta) => {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const datosConfiguracion = await fs.readFile(path.join(directorioActual, 'configuracion.json'), 'utf-8');
         respuesta.json(JSON.parse(datosConfiguracion));
     } catch (e) { respuesta.json({ tema: 'dark' }); }
@@ -74,18 +78,22 @@ servidor.get('/api/configuracion', async (peticion, respuesta) => {
  */
 servidor.post('/api/subir-archivo', (peticion, respuesta) => {
     subida(peticion, respuesta, async (errorMulter) => {
-        if (errorMulter) {
-            if (errorMulter.message === 'FORMATO_PROHIBIDO') {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (errorMulter) {
+            // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (errorMulter.message === 'FORMATO_PROHIBIDO') {
                 return respuesta.status(400).json({ error: 'Solo aceptamos archivos .txt reales.' });
             }
             return respuesta.status(400).json({ error: 'Error al subir el archivo.' });
         }
 
-        if (!peticion.file) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!peticion.file) {
             return respuesta.status(400).json({ error: 'No mandaste ningún archivo.' });
         }
 
-        try {
+        // try: prueba este bloque y permite capturar errores con catch.
+try {
             const contenidoTexto = await fs.readFile(peticion.file.path, 'utf-8');
             
             // si tiene caracteres nulos, es un binario disfrazado
@@ -96,7 +104,8 @@ servidor.post('/api/subir-archivo', (peticion, respuesta) => {
 
             // separo por líneas o por comas
             let lineasExtraidas = [];
-            if (contenidoTexto.includes(',')) {
+            // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (contenidoTexto.includes(',')) {
                 lineasExtraidas = contenidoTexto.split(',').map(item => item.trim());
             } else {
                 lineasExtraidas = contenidoTexto.split(/\r?\n/).map(item => item.trim());
@@ -106,9 +115,11 @@ servidor.post('/api/subir-archivo', (peticion, respuesta) => {
             // el txt solo debe tener números válidos, nada de texto raro como "hola"
             const lineasLimpias = lineasExtraidas.filter(l => l !== '');
             
+            // Repite este bloque con un bucle for.
             for (let linea of lineasLimpias) {
                 const testDato = procesarDato(linea);
-                if (!testDato.valido) {
+                // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!testDato.valido) {
                     await fs.unlink(peticion.file.path);
                     return respuesta.status(400).json({ 
                         error: `Contenido inválido detectado: "${linea}". El archivo solo debe tener números.` 
@@ -133,13 +144,15 @@ servidor.post('/api/subir-archivo', (peticion, respuesta) => {
  */
 servidor.post('/api/exportar-resultados', async (peticion, respuesta) => {
     const { datos } = peticion.body;
-    if (!datos || !Array.isArray(datos)) return respuesta.status(400).json({ error: 'faltan los datos' });
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!datos || !Array.isArray(datos)) return respuesta.status(400).json({ error: 'faltan los datos' });
     
     const nombreResultado = `resultado_filtrado_${Date.now()}.txt`;
     const rutaCarpetaExport = path.join(directorioActual, 'archivos-generados');
     const rutaFinal = path.join(rutaCarpetaExport, nombreResultado);
     
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         await fs.mkdir(rutaCarpetaExport, { recursive: true });
         await fs.writeFile(rutaFinal, datos.join('\r\n'), 'utf-8');
         respuesta.json({ success: true, fileName: nombreResultado });
@@ -148,7 +161,8 @@ servidor.post('/api/exportar-resultados', async (peticion, respuesta) => {
 
 // nueva ruta para listar los archivos que ya están en el servidor
 servidor.get('/api/listar-archivos', async (peticion, respuesta) => {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const rutaSubidos = path.join(directorioActual, 'archivos-subidos');
         const rutaGenerados = path.join(directorioActual, 'archivos-generados');
         
@@ -173,13 +187,15 @@ servidor.get('/api/listar-archivos', async (peticion, respuesta) => {
 
 // nueva ruta para leer el contenido de un archivo del servidor (busca en ambas carpetas)
 servidor.get('/api/leer-archivo/:nombre', async (peticion, respuesta) => {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const nombre = peticion.params.nombre;
         const rutaSubidos = path.join(directorioActual, 'archivos-subidos', nombre);
         const rutaGenerados = path.join(directorioActual, 'archivos-generados', nombre);
         
         let contenidoTexto = '';
-        try {
+        // try: prueba este bloque y permite capturar errores con catch.
+try {
             contenidoTexto = await fs.readFile(rutaSubidos, 'utf-8');
         } catch (e) {
             // si no está en subidos, busco en generados
@@ -187,7 +203,8 @@ servidor.get('/api/leer-archivo/:nombre', async (peticion, respuesta) => {
         }
         
         let lineasExtraidas = [];
-        if (contenidoTexto.includes(',')) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (contenidoTexto.includes(',')) {
             lineasExtraidas = contenidoTexto.split(',').map(item => item.trim());
         } else {
             lineasExtraidas = contenidoTexto.split(/\r?\n/).map(item => item.trim());

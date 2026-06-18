@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** Constantes Escape Escolar — servidor Node */
 const LEVEL_ITEM_QUEUE = {
   1: ['Guardapolvo'],

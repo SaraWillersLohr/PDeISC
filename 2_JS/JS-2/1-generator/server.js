@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * este es el servidor del generador de números.
  * acá manejo las rutas para guardar el tema y generar el archivo txt físico.
@@ -28,7 +30,8 @@ servidor.get('/', (peticion, respuesta) => {
 
 // acá guardo la preferencia del tema (oscuro/claro) en un archivito json
 servidor.post('/api/configuracion', async (peticion, respuesta) => {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const rutaConfig = path.join(directorioActual, 'configuracion.json');
         await fs.writeFile(rutaConfig, JSON.stringify(peticion.body, null, 2));
         respuesta.json({ success: true });
@@ -39,7 +42,8 @@ servidor.post('/api/configuracion', async (peticion, respuesta) => {
 
 // devuelvo la configuración guardada
 servidor.get('/api/configuracion', async (peticion, respuesta) => {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const rutaConfig = path.join(directorioActual, 'configuracion.json');
         const contenidoConfig = await fs.readFile(rutaConfig, 'utf-8');
         respuesta.json(JSON.parse(contenidoConfig));
@@ -52,7 +56,8 @@ servidor.get('/api/configuracion', async (peticion, respuesta) => {
 servidor.post('/api/generar-txt', async (peticion, respuesta) => {
     const { numeros, nombre } = peticion.body;
     
-    if (!numeros || !Array.isArray(numeros)) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!numeros || !Array.isArray(numeros)) {
         return respuesta.status(400).json({ error: 'faltan los números' });
     }
 
@@ -60,7 +65,8 @@ servidor.post('/api/generar-txt', async (peticion, respuesta) => {
     const rutaCarpetaDestino = path.join(directorioActual, 'archivos-generados');
     const rutaCompletaArchivo = path.join(rutaCarpetaDestino, nombreArchivoFinal);
 
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         // me aseguro de que la carpeta exista
         await fs.mkdir(rutaCarpetaDestino, { recursive: true });
         

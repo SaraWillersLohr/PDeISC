@@ -45,7 +45,8 @@ let listaPersonas = JSON.parse(localStorage.getItem("peopleList")) || [];
 
 // Yo muestro el estado del guardado en el banner
 const mostrarEstadoGuardado = (ok, mensaje) => {
-  if (!bannerEstado) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!bannerEstado) return;
   bannerEstado.className = `save-status glass-panel ${ok ? "is-ok" : "is-error"}`;
   bannerEstado.textContent = mensaje;
   bannerEstado.hidden = false;
@@ -62,18 +63,22 @@ const revalidarEdadFecha = () => {
     formulario.edad.value,
     formulario.fechaNac.value,
   );
-  if (res.valido) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (res.valido) {
     mostrarFeedback(formulario.edad, res);
     mostrarFeedback(formulario.fechaNac, res);
     return;
   }
-  if (res.campo === "edad") {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (res.campo === "edad") {
     mostrarFeedback(formulario.edad, res);
-    if (formulario.fechaNac.value)
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (formulario.fechaNac.value)
       mostrarFeedback(formulario.fechaNac, { valido: true, mensaje: "" });
   } else {
     mostrarFeedback(formulario.fechaNac, res);
-    if (formulario.edad.value !== "")
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (formulario.edad.value !== "")
       mostrarFeedback(formulario.edad, { valido: true, mensaje: "" });
   }
 };
@@ -91,7 +96,8 @@ const borrarPersona = (indice) => {
 // Yo manejo el cambio en el select de hijos
 selectHijos.addEventListener("change", () => {
   inputCantHijos.disabled = selectHijos.value === "no";
-  if (inputCantHijos.disabled) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (inputCantHijos.disabled) {
     inputCantHijos.value = "0";
     inputCantHijos.classList.remove("is-valid", "is-invalid");
   }
@@ -139,19 +145,24 @@ formulario.telefono.addEventListener("input", () => {
 // Yo manejo el input general del formulario para validar campos
 formulario.addEventListener("input", (e) => {
   const input = e.target;
-  if (["documento", "telefono", "nacionalidad"].includes(input.id)) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (["documento", "telefono", "nacionalidad"].includes(input.id)) return;
 
   let resultado = { valido: true, mensaje: "" };
   const pais = formulario.nacionalidad.value;
 
-  if (input.id === "nombre" || input.id === "apellido")
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (input.id === "nombre" || input.id === "apellido")
     resultado = validarNombreReal(input.value);
-  else if (input.id === "email") resultado = validarEmail(input.value);
-  else if (input.id === "edad" || input.id === "fechaNac") {
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (input.id === "email") resultado = validarEmail(input.value);
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (input.id === "edad" || input.id === "fechaNac") {
     // Si el usuario ingresa la fecha, yo calculo automáticamente la edad
     if (input.id === "fechaNac" && input.value) {
       const edadCalculada = calcularEdadDesdeFecha(input.value);
-      if (!isNaN(edadCalculada) && edadCalculada >= 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!isNaN(edadCalculada) && edadCalculada >= 0) {
         formulario.edad.value = edadCalculada;
       }
     }
@@ -162,7 +173,8 @@ formulario.addEventListener("input", (e) => {
     resultado = validarHijos(selectHijos.value, input.value);
   }
 
-  if (input.tagName === "INPUT" && input.type !== "checkbox") {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (input.tagName === "INPUT" && input.type !== "checkbox") {
     mostrarFeedback(input, resultado);
   }
   actualizarBoton();
@@ -193,7 +205,8 @@ document
 formulario.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  if (!validarFormularioCompleto(formulario, checkTerminos)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!validarFormularioCompleto(formulario, checkTerminos)) {
     mostrarEstadoGuardado(
       false,
       "Guardado incorrecto: revisá los campos marcados en rojo",

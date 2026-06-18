@@ -1,9 +1,13 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** Toast de nivel — overlay no bloqueante, fade in/out */
 
+// Función showLevelToast(message, que ayuda a entender la lógica.
 function showLevelToast(message, durationMs) {
   const duration = durationMs || 2000;
   let el = document.getElementById('levelToast');
-  if (!el) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!el) {
     el = document.createElement('div');
     el.id = 'levelToast';
     el.className = 'level-toast';
@@ -16,8 +20,10 @@ function showLevelToast(message, durationMs) {
   el.classList.remove('level-toast--hide', 'level-toast--out');
   el.classList.add('level-toast--show');
 
-  if (el._toastTimer) clearTimeout(el._toastTimer);
-  if (el._fadeTimer) clearTimeout(el._fadeTimer);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (el._toastTimer) clearTimeout(el._toastTimer);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (el._fadeTimer) clearTimeout(el._fadeTimer);
 
   el._fadeTimer = setTimeout(() => {
     el.classList.add('level-toast--out');
@@ -29,8 +35,10 @@ function showLevelToast(message, durationMs) {
   }, duration);
 }
 
+// Función showLevelUpToast(level, que ayuda a entender la lógica.
 function showLevelUpToast(level, completed) {
-  if (completed) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (completed) {
     showLevelToast(`¡Nivel ${level} completado!`, 2200);
   } else {
     showLevelToast(`Nivel ${level}`, 1800);

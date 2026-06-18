@@ -3,7 +3,8 @@
 export const mostrarToast = (contenedorId, mensaje, tipo = "success") => {
   // Yo busco el contenedor donde voy a mostrar el toast
   const contenedor = document.getElementById(contenedorId);
-  if (!contenedor) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!contenedor) return;
 
   // Yo creo el elemento toast con el mensaje y el tipo (success/error)
   const toast = document.createElement("div");

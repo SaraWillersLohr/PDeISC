@@ -59,6 +59,7 @@ export const indexOfMethod = {
         const arr = [...array];
         
         let ciudadBuscada = "Madrid";
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           ciudadBuscada = inputVal.trim();
         }
@@ -67,6 +68,7 @@ export const indexOfMethod = {
         const indice = arr.indexOf(ciudadBuscada);
         
         let mensaje = "";
+        // Si if (indice !== -1), entonces se ejecuta este bloque.
         if (indice !== -1) {
           mensaje = `indexOf("${ciudadBuscada}") devolvió ${indice}. ¡La ciudad está registrada en el índice ${indice}!`;
         } else {

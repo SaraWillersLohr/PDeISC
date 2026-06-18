@@ -9,6 +9,7 @@ let modalBootstrap = null;
 
 export function initModalTerminos() {
   const modalEl = document.getElementById("modal-terminos");
+  // Si if (!modalEl || typeof bootstrap === "undefined"), entonces se ejecuta este bloque.
   if (!modalEl || typeof bootstrap === "undefined") return;
 
   // Uso la API de Bootstrap para backdrop, ESC y click afuera
@@ -47,6 +48,7 @@ export function initModalTerminos() {
   // Aceptar desde el modal → marca checkbox y cierra
   document.getElementById("btn-aceptar-terminos-modal")?.addEventListener("click", () => {
     const checkbox = document.getElementById("reg-terminos");
+    // Si if (checkbox), entonces se ejecuta este bloque.
     if (checkbox) {
       checkbox.checked = true;
       checkbox.dispatchEvent(new Event("change", { bubbles: true }));
@@ -66,6 +68,7 @@ export function initModalTerminos() {
 
 // acá abro el modal de términos
 export function abrirModalTerminos() {
+  // Si if (!modalBootstrap), entonces se ejecuta este bloque.
   if (!modalBootstrap) return;
   modalBootstrap.show();
   agregarLog("Términos", "Modal de Términos y Condiciones abierto");
@@ -73,6 +76,7 @@ export function abrirModalTerminos() {
 
 // cierro la card emergente
 export function cerrarModalTerminos() {
+  // Si if (!modalBootstrap), entonces se ejecuta este bloque.
   if (!modalBootstrap) return;
   modalBootstrap.hide();
 }

@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /* 
   Este archivo maneja el paso a paso del registro 
   y los cambios de tema (claro/oscuro).
@@ -79,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Le preguntamos a la API si el nombre es real
     const validacion = await validator.isRealName(inputNombre.value);
     
+    // Si if (validacion.valid), entonces se ejecuta este bloque.
     if (validacion.valid) {
       stateManager.update("name", inputNombre.value);
       stateManager.update("currentStep", 2);

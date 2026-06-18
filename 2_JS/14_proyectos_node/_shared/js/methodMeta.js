@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** 
  * ¡Hola! Aquí guardo toda la información (metadatos) de cada método que estamos estudiando.
  * Uso estos datos para armar el banner de cada página y darte pistas en la consola.

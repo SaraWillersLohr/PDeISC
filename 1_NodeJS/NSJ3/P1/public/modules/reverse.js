@@ -58,6 +58,7 @@ export const reverseMethod = {
       run: (array, inputVal) => {
         // En este ejercicio el array inicial no importa tanto, usamos el string del input o default
         let texto = "antigravity";
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           texto = inputVal.trim();
         }

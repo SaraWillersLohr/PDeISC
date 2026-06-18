@@ -29,18 +29,22 @@ function detectarBloques(texto) {
   const bloques = [];
   let indice = 0;
 
+  // Repite mientras la condición sea verdadera.
   while (indice < texto.length) {
-    if (texto[indice] === "(") {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (texto[indice] === "(") {
       const inicio = indice;
       let contenido = "";
       indice += 1;
 
+      // Repite mientras la condición sea verdadera.
       while (indice < texto.length && texto[indice] !== ")") {
         contenido += texto[indice];
         indice += 1;
       }
 
-      if (texto[indice] === ")") {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (texto[indice] === ")") {
         const fin = indice;
         bloques.push({
           inicio,
@@ -124,7 +128,8 @@ function mostrarEstadoInicial() {
 
 // muestro los bloques detectados como tarjetas
 function pintarBloques(bloques) {
-  if (bloques.length === 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (bloques.length === 0) {
     dom.displayBloques.innerHTML =
       '<p class="pipeline-step__content text-muted mb-0">No se encontraron bloques entre paréntesis.</p>';
     return;
@@ -147,7 +152,8 @@ function pintarBloques(bloques) {
 
 // muestro la transformación de cada bloque (contenido e invertido)
 function pintarTransformacion(bloques) {
-  if (bloques.length === 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (bloques.length === 0) {
     dom.displayTransformacion.innerHTML =
       '<p class="pipeline-step__content text-muted mb-0">Sin transformaciones.</p>';
     return;
@@ -187,6 +193,7 @@ function actualizarInterfaz(mensaje, datos) {
 
 // configuro el botón volver arriba
 function initBackToTop() {
+  // Función toggleBtn que organiza esta parte del código.
   const toggleBtn = () => {
     dom.btnBackTop.classList.toggle("btn-back-top--visible", window.scrollY > 280);
   };
@@ -202,7 +209,8 @@ function initBackToTop() {
 dom.btnDecodificar.onclick = () => {
   const mensaje = dom.inputMensaje.value.trim();
 
-  if (!mensaje) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!mensaje) {
     log("Ingresá un mensaje para decodificar.", "warn");
     return;
   }

@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * Gestor del Carrito de Compras
  * Mantiene la lista de productos seleccionados, permite agregar/quitar 
@@ -8,6 +10,7 @@ export const cartManager = {
     
     addItem(product) {
         const existing = this.items.find(item => item.id === product.id);
+        // Si if (existing), entonces se ejecuta este bloque.
         if (existing) {
             existing.quantity += 1;
         } else {

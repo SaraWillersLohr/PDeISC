@@ -65,6 +65,7 @@ export const shiftMethod = {
         
         // Si hay clientes, atendemos al primero
         let mensaje = "";
+        // Si if (arr.length > 0), entonces se ejecuta este bloque.
         if (arr.length > 0) {
           const atendido = arr.shift();
           mensaje = `👩‍💻 Cola de atención: se atendió a "${atendido}". Siguientes en espera: [${arr.join(", ")}]`;

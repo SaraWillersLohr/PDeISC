@@ -60,6 +60,7 @@ const updateUI = () => {
 
 // Caso 1: Me quedo solo con los números mayores a 10.
 dom.btnFilterNums.onclick = () => {
+  // Función mayores que organiza esta parte del código.
   const mayores = numeros.filter((n) => n > 10);
   log(`filter() dejó ${mayores.length} números (> 10)`, "success");
   flowFilter(dom.displayOriginal1, dom.displayResult1, numeros, mayores, "numeros.filter(n => n > 10)");
@@ -68,6 +69,7 @@ dom.btnFilterNums.onclick = () => {
 
 // Caso 2: Filtro palabras largas (más de 5 letras).
 dom.btnFilterWords.onclick = () => {
+  // Función largas que organiza esta parte del código.
   const largas = palabras.filter((p) => p.length > 5);
   log(`filter() dejó ${largas.length} palabras largas`, "success");
   flowFilter(dom.displayOriginal2, dom.displayResult2, palabras, largas, "palabras.filter(p => p.length > 5)");
@@ -76,6 +78,7 @@ dom.btnFilterWords.onclick = () => {
 
 // Caso 3: Solo muestro los usuarios que están activos.
 dom.btnFilterActive.onclick = () => {
+  // Función activos que organiza esta parte del código.
   const activos = usuarios.filter((u) => u.activo);
   log(`filter() dejó ${activos.length} usuarios activos`, "success");
   flowFilter(

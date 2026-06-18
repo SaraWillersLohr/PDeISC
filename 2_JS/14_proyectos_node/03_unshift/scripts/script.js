@@ -51,7 +51,8 @@ const updateUI = () => {
 
 // Caso 1: Agrego tres colores al principio de un array vacío.
 dom.btnCol.onclick = () => {
-  if (colores.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (colores.length) return;
   const antes = [];
   colores.unshift(...POOL_COLORES);
   dom.resCol.className = "feedback-box feedback-success";
@@ -70,7 +71,8 @@ dom.btnCol.onclick = () => {
 // Caso 2: Agrego una tarea nueva, pero la marco como urgente y la pongo primera.
 dom.btnTask.onclick = () => {
   const val = dom.inputTask.value.trim();
-  if (!val) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!val) {
     dom.resTask.className = "feedback-box feedback-danger";
     dom.resTask.textContent = "Escribí una tarea";
     return;
@@ -89,7 +91,8 @@ dom.btnTask.onclick = () => {
 // Caso 3: Un nuevo usuario se conecta y aparece primero en la lista.
 dom.btnUser.onclick = () => {
   const val = dom.inputUser.value.trim();
-  if (!val) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!val) {
     dom.resUser.className = "feedback-box feedback-danger";
     dom.resUser.textContent = "Ingresá un nombre";
     return;

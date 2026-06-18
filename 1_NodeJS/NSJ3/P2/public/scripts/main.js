@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /* 
   Este archivo controla la navegación dinámica. 
   Cargamos las secciones sin que la página se refresque.
@@ -13,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Esta función prepara los eventos de cada página cuando se carga
   const prepararEventosDeSeccion = (nombrePagina) => {
+    // Si if (nombrePagina === "inicio"), entonces se ejecuta este bloque.
     if (nombrePagina === "inicio") {
       const caja = document.getElementById("box-dbclick");
       caja?.addEventListener("dblclick", () => {
@@ -58,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // Llamamos al router para que traiga el HTML
       const cargoBien = await router.loadPage(pagina, contentId);
+      // Si if (cargoBien), entonces se ejecuta este bloque.
       if (cargoBien) {
         prepararEventosDeSeccion(pagina);
       }

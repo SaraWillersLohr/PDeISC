@@ -17,7 +17,8 @@ export class EventConsole {
   log(mensaje) {
     const hora = new Date().toLocaleTimeString("es-AR", { hour12: false });
     this.logs.push(`[${hora}] ${mensaje}`);
-    if (this.logs.length > 100) this.logs.shift();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.logs.length > 100) this.logs.shift();
     sessionStorage.setItem(CLAVE_LOG, JSON.stringify(this.logs));
     this.render();
   }
@@ -25,7 +26,8 @@ export class EventConsole {
   // Yo renderizo todos los logs en el contenedor visual
   // Cada log se muestra en una línea separada y scrolleo hasta el final
   render() {
-    if (!this.cuerpo) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.cuerpo) return;
     this.cuerpo.innerHTML = "";
     this.logs.forEach((linea) => {
       const fila = document.createElement("div");

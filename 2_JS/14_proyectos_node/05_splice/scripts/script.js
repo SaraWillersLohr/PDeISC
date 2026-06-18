@@ -41,7 +41,8 @@ const updateUI = () => {
 
 // Caso 1: Borro elementos. Desde la posición 1, quito 2 letras.
 dom.btnLet.onclick = () => {
-  if (letras.length <= 1) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (letras.length <= 1) return;
   const antes = [...letras];
   const removidos = letras.splice(1, 2);
   log(`splice(1, 2) eliminó [${removidos.join(", ")}]`, "success");
@@ -52,7 +53,8 @@ dom.btnLet.onclick = () => {
 // Caso 2: Inserto sin borrar. Meto un nombre nuevo en la posición 1.
 dom.btnNom.onclick = () => {
   const val = dom.inputNom.value.trim();
-  if (!val) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!val) return;
   const antes = [...nombres];
   nombres.splice(1, 0, val);
   dom.inputNom.value = "";
@@ -62,7 +64,8 @@ dom.btnNom.onclick = () => {
 
 // Caso 3: Reemplazo. Quito 2 elementos y meto 2 nuevos en su lugar.
 dom.btnRep.onclick = () => {
-  if (reemplazo.length <= 2) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (reemplazo.length <= 2) return;
   const antes = [...reemplazo];
   reemplazo.splice(1, 2, "🚀 NUEVO", "✨ NUEVO");
   log("splice(1, 2, …) reemplazó dos elementos", "success");

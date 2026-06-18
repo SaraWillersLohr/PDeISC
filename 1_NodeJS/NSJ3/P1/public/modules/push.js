@@ -46,6 +46,7 @@ export const pushMethod = {
         
         // Si el usuario escribió amigos en el input, los usamos, sino ponemos los default
         let amigosNuevos = ["Lucía", "Esteban", "Valeria"];
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           amigosNuevos = inputVal.split(",").map(n => n.trim()).filter(n => n !== "");
         }
@@ -71,6 +72,7 @@ export const pushMethod = {
         
         // Convertimos el input a número. Si no ingresó nada, usamos 50 como default académico
         let numero = 50;
+        // Si if (inputVal !== undefined && inputVal !== null && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal !== undefined && inputVal !== null && inputVal.trim() !== "") {
           numero = Number(inputVal);
         }

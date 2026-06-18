@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 import { renderer } from "../modules/renderer.js";
 import { cartManager } from "../modules/cart.js";
 import { Notificador } from "../modules/notifications.js";
@@ -25,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Traemos los productos desde nuestro servidor
   try {
     const response = await fetch("/api/products");
+    // Si if (!response.ok) throw new Error("No se pudo obtener la lista"), entonces se ejecuta este bloque.
     if (!response.ok) throw new Error("No se pudo obtener la lista");
     const products = await response.json();
     
@@ -37,6 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Botón final de compra
   document.getElementById("btn-checkout").onclick = () => {
+    // Si if (cartManager.items.length > 0), entonces se ejecuta este bloque.
     if (cartManager.items.length > 0) {
       const total = cartManager.getTotal();
       Notificador.exito(`¡Compra lista! Pagaste $${total}. ¡Gracias!`);

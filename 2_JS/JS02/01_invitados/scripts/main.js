@@ -58,14 +58,19 @@ const validarFormulario = () => {
 // Yo agrego el evento input para validar cada campo mientras el usuario escribe
 formulario.addEventListener("input", (e) => {
   const input = e.target;
-  if (input.type === "checkbox") return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (input.type === "checkbox") return;
 
   let resultado = { valido: true, mensaje: "" };
-  if (input.name === "nombre" || input.name === "apellido")
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (input.name === "nombre" || input.name === "apellido")
     resultado = validarNombreReal(input.value);
-  else if (input.name === "edad") resultado = validarEdad(input.value);
-  else if (input.name === "email") resultado = validarEmail(input.value);
-  else if (input.name === "acompanantes")
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (input.name === "edad") resultado = validarEdad(input.value);
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (input.name === "email") resultado = validarEmail(input.value);
+  // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (input.name === "acompanantes")
     resultado = validarAcompanantes(input.value);
 
   mostrarFeedback(input, resultado);
@@ -88,7 +93,8 @@ document
 // Yo manejo el envío del formulario para agregar un nuevo invitado
 formulario.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (!validarFormulario()) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!validarFormulario()) {
     mostrarToast("toastZone", "Revisá los campos antes de confirmar", "error");
     consola.log("Validación fallida: formulario incompleto");
     return;

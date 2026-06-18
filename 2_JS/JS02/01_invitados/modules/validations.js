@@ -11,6 +11,7 @@ const BASURA = [
   "fake",
   "nombre",
 ];
+// Función tieneVocales que ayuda a entender la lógica.
 const tieneVocales = (txt) => /[aeiouáéíóú]/i.test(txt);
 
 export const validarNombreReal = (texto) => {
@@ -39,7 +40,8 @@ export const validarNombreReal = (texto) => {
 
   // Yo verifico que haya suficiente variedad de letras para que sea un nombre real
   const unicos = new Set(min.replace(/\s/g, "").split(""));
-  if (valor.length >= 6 && unicos.size < 3)
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (valor.length >= 6 && unicos.size < 3)
     return { valido: false, mensaje: "Escribí un nombre real" };
 
   return { valido: true, mensaje: "Nombre válido" };
@@ -65,11 +67,13 @@ export const validarEmail = (email) => {
   if (!valor) return { valido: false, mensaje: "Email obligatorio" };
   // Yo uso un regex para validar el formato estándar de email
   const patron = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!patron.test(valor))
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!patron.test(valor))
     return { valido: false, mensaje: "Formato de email inválido" };
   // Yo verifico que el dominio sea válido
   const dominio = valor.split("@")[1]?.toLowerCase() || "";
-  if (dominio.length < 4 || dominio.startsWith("."))
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dominio.length < 4 || dominio.startsWith("."))
     return { valido: false, mensaje: "Dominio inválido" };
   return { valido: true, mensaje: "Email válido" };
 };

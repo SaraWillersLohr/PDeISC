@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /* 
   Este archivo maneja el envío del formulario,
   mostrando errores o el resumen final.
@@ -22,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mostrarErrores = (errores) => {
     for (const [campo, mensaje] of Object.entries(errores)) {
       const elError = document.getElementById(`err-${campo}`);
+      // Si if (elError), entonces se ejecuta este bloque.
       if (elError) elError.textContent = mensaje;
     }
     Notificador.error("Revisá los campos marcados en rojo.");
@@ -43,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Le pedimos al validador que los revise (incluye la API de nombres)
     const errores = await formValidator.validate(datosForm);
 
+    // Si if (Object.keys(errores).length === 0), entonces se ejecuta este bloque.
     if (Object.keys(errores).length === 0) {
       // Si no hay errores, mostramos el resumen
       const datosFinales = Object.fromEntries(datosForm.entries());

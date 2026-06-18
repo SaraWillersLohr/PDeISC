@@ -25,9 +25,11 @@ export function bindEventos() {
 // Función que ejecuta la acción correspondiente según el botón presionado
 function ejecutar(accion) {
   const zona = document.getElementById("playground-dhtml");
+  // Si if (!zona), entonces se ejecuta este bloque.
   if (!zona) return;
-
+  //agregar h1
   if (accion === "add-h1") {
+    // Si if (estado.h1), entonces se ejecuta este bloque.
     if (estado.h1) {
       mostrarAviso("Ya existe un H1.", "info");
       return;
@@ -39,7 +41,9 @@ function ejecutar(accion) {
     agregarLog("DHTML", "Se agregó el H1 «Hola DOM»");
   }
   // Función que ejecuta la acción correspondiente según el botón presionado
+  //cambiar texto h1
   if (accion === "change-h1-text") {
+    // Si if (!estado.h1), entonces se ejecuta este bloque.
     if (!estado.h1) {
       mostrarAviso("Primero agregá el H1.", "warning");
       return;
@@ -47,12 +51,14 @@ function ejecutar(accion) {
     estado.h1.textContent = "Chau DOM";
     agregarLog("DHTML", "Se cambió el texto del H1 a «Chau DOM»");
   }
-
+  //cambiar color h1
   if (accion === "change-h1-color") {
+    // Si if (!estado.h1), entonces se ejecuta este bloque.
     if (!estado.h1) {
       mostrarAviso("Primero agregá el H1.", "warning");
       return;
     }
+    // Cambio cíclico entre los colores definidos
     estado.colorIndex = (estado.colorIndex + 1) % COLORES.length;
     estado.h1.style.color = COLORES[estado.colorIndex];
     agregarLog(
@@ -60,12 +66,15 @@ function ejecutar(accion) {
       `Se cambió el color del H1 a ${COLORES[estado.colorIndex]}`,
     );
   }
-
+  //agregar imagen
   if (accion === "add-img") {
+    // Si if (estado.img), entonces se ejecuta este bloque.
     if (estado.img) {
       mostrarAviso("Ya hay una imagen.", "info");
       return;
     }
+    //la img se saca de la lista según el índice actual, que empieza en 0 y se incrementa cada vez que se cambia la imagen
+    //el tamaño se maneja igual, con su propio índice
     estado.img = document.createElement("img");
     estado.img.className = "dom-img animate-pop";
     estado.img.src = IMAGENES[0];
@@ -74,8 +83,9 @@ function ejecutar(accion) {
     zona.appendChild(estado.img);
     agregarLog("DHTML", "Se agregó una imagen");
   }
-
+  //cambiar imagen
   if (accion === "change-img") {
+    // Si if (!estado.img), entonces se ejecuta este bloque.
     if (!estado.img) {
       mostrarAviso("Primero agregá la imagen.", "warning");
       return;
@@ -84,8 +94,9 @@ function ejecutar(accion) {
     estado.img.src = IMAGENES[estado.imgIndex];
     agregarLog("DHTML", "Imagen actualizada (nuevo src)");
   }
-
+  //cambiar tamaño imagen
   if (accion === "resize-img") {
+    // Si if (!estado.img), entonces se ejecuta este bloque.
     if (!estado.img) {
       mostrarAviso("Primero agregá la imagen.", "warning");
       return;

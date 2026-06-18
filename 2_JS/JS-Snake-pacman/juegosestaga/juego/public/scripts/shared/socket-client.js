@@ -44,10 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Actualizar título del lobby y label de personaje
   const lobbyTitle = document.getElementById('lobbyTitle');
   const characterLabel = document.getElementById('characterLabel');
-  if (lobbyTitle) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (lobbyTitle) {
     lobbyTitle.textContent = selectedGame === 'pacman' ? 'Configurar Escape Escolar' : 'Configurar Cable Rush';
   }
-  if (characterLabel) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (characterLabel) {
     characterLabel.textContent = selectedGame === 'pacman' ? 'Selecciona tu Personaje' : 'Selecciona tu Tipo de Cable';
   }
 });
@@ -55,14 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Renderizar la selección de personajes dinámicamente
 function renderCharacters() {
   const container = document.getElementById('characterSelectContainer');
-  if (!container) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!container) return;
 
   container.innerHTML = '';
   const list = CHARACTERS[selectedGame] || [];
   container.dataset.count = String(list.length);
 
   const hiddenInput = document.getElementById('selectedCharacter');
-  if (hiddenInput) hiddenInput.value = '';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hiddenInput) hiddenInput.value = '';
 
   list.forEach(char => {
     const col = document.createElement('div');
@@ -72,7 +76,8 @@ function renderCharacters() {
 
     // Support both old format (bars: '████') and new format (value/max/color)
     const statsHtml = (char.stats || []).map(s => {
-      if (s.bars) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (s.bars) {
         // legacy text bars
         return `<li><span class="stat-label">${s.label}</span><span class="char-stat-bar">${s.bars}</span></li>`;
       }
@@ -110,6 +115,7 @@ function renderCharacters() {
   });
 }
 
+// Función selectCharacter(charId) que ayuda a entender la lógica.
 function selectCharacter(charId) {
   document.querySelectorAll('.select-char-card').forEach(c => {
     c.classList.remove('selected');
@@ -117,7 +123,8 @@ function selectCharacter(charId) {
   });
 
   const card = document.getElementById(`char-${charId}`);
-  if (card) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (card) {
     card.classList.add('selected');
     card.setAttribute('aria-pressed', 'true');
   }
@@ -125,7 +132,8 @@ function selectCharacter(charId) {
   document.getElementById('selectedCharacter').value = charId;
   document.getElementById('characterErr').style.display = 'none';
 
-  if (window.audioSynth) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth) {
     window.audioSynth.playCharacterSelect();
   }
 }
@@ -138,12 +146,15 @@ function isMobileDevice() {
 // Configura el modo de juego
 function setActiveButton(buttons, activeBtn) {
   buttons.forEach(btn => {
-    if (!btn) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!btn) return;
     btn.classList.remove('is-active', 'bg-primary', 'text-black');
   });
-  if (activeBtn) activeBtn.classList.add('is-active');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (activeBtn) activeBtn.classList.add('is-active');
 }
 
+// Función setMode(mode) que ayuda a entender la lógica.
 function setMode(mode) {
   gameMode = mode;
   const btn1P = document.getElementById('btnMode1P');
@@ -151,7 +162,8 @@ function setMode(mode) {
   const mpOpts = document.getElementById('multiplayerOptions');
   const startBtn = document.getElementById('btnStartGameLocal');
 
-  if (mode === '1P') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mode === '1P') {
     setActiveButton([btn1P, btn2P], btn1P);
     mpOpts.style.display = 'none';
     startBtn.style.display = 'block';
@@ -172,7 +184,8 @@ function setMultiplayerType(type) {
   const onlineSection = document.getElementById('onlineRoomSection');
   const startBtn = document.getElementById('btnStartGameLocal');
 
-  if (type === 'local') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (type === 'local') {
     setActiveButton([btnLocal, btnOnline], btnLocal);
     onlineSection.style.display = 'none';
     startBtn.style.display = 'block';
@@ -198,21 +211,24 @@ function validateInputs() {
 
   let valid = true;
 
-  if (!nameInput.checkValidity()) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!nameInput.checkValidity()) {
     nameInput.classList.add('is-invalid');
     valid = false;
   } else {
     nameInput.classList.remove('is-invalid');
   }
 
-  if (!character) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!character) {
     document.getElementById('characterErr').style.display = 'block';
     valid = false;
   } else {
     document.getElementById('characterErr').style.display = 'none';
   }
 
-  if (!gameMode) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!gameMode) {
     alert('Debes elegir un modo de juego (1 Jugador o 2 Jugadores).');
     valid = false;
   } else if (gameMode === '2P' && !mpType) {
@@ -225,7 +241,8 @@ function validateInputs() {
 
 // --- LOGICA DE JUEGO LOCAL ---
 function handleStartLocalGame() {
-  if (!validateInputs()) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!validateInputs()) return;
 
   const nickname = document.getElementById('playerName').value;
   const character = document.getElementById('selectedCharacter').value;
@@ -238,9 +255,11 @@ function handleStartLocalGame() {
   };
 
   const startBtn = document.getElementById('btnStartGameLocal');
-  if (startBtn) startBtn.disabled = true;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (startBtn) startBtn.disabled = true;
 
-  if (window.audioSynth) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth) {
     window.audioSynth.playStartGame();
   }
 
@@ -252,17 +271,21 @@ function handleStartLocalGame() {
 
 // --- LOGICA DE SALAS ONLINE (SOCKET.IO) ---
 function handleCreateOnlineRoom() {
-  if (!validateInputs()) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!validateInputs()) return;
   socket.emit('createRoom', { game: selectedGame });
 }
 
+// Función handleJoinOnlineRoom() que ayuda a entender la lógica.
 function handleJoinOnlineRoom() {
-  if (!validateInputs()) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!validateInputs()) return;
 
   const codeInput = document.getElementById('roomCodeInput');
   const code = codeInput.value.toUpperCase();
 
-  if (!code || code.length !== 4 || !/^[A-Z]{4}$/.test(code)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!code || code.length !== 4 || !/^[A-Z]{4}$/.test(code)) {
     codeInput.classList.add('is-invalid');
     document.getElementById('codeErr').style.display = 'block';
     return;
@@ -290,7 +313,8 @@ socket.on('playerJoined', ({ room, player }) => {
   switchToWaitingLobby();
   updatePlayersList();
 
-  if (window.audioSynth) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth) {
     window.audioSynth.playCoin();
   }
 });
@@ -311,7 +335,8 @@ function switchToWaitingLobby() {
 // Re-renderiza la lista de jugadores en la sala
 function updatePlayersList() {
   const container = document.getElementById('onlinePlayersList');
-  if (!container || !activeRoom) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!container || !activeRoom) return;
 
   container.innerHTML = '';
 
@@ -333,7 +358,8 @@ function updatePlayersList() {
     container.appendChild(div);
   });
 
-  if (activeRoom.players.length < 2) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (activeRoom.players.length < 2) {
     const div = document.createElement('div');
     div.className = 'p-2 rounded border border-dashed text-secondary text-center small';
     div.textContent = 'Esperando a que se una el Jugador 2...';
@@ -387,11 +413,13 @@ socket.on('errorMsg', ({ message }) => {
 function showCustomAlert(msg) {
   document.getElementById('customAlertMessage').textContent = msg;
   document.getElementById('customAlertOverlay').classList.add('active');
-  if (window.audioSynth) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth) {
     window.audioSynth.playGameOver();
   }
 }
 
+// Función closeCustomAlert() que ayuda a entender la lógica.
 function closeCustomAlert() {
   document.getElementById('customAlertOverlay').classList.remove('active');
 }

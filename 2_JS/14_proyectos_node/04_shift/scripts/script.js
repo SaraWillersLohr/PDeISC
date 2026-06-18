@@ -45,7 +45,8 @@ const updateUI = () => {
 
 // Caso 1: Saco el primer número de la lista.
 dom.btnNum.onclick = () => {
-  if (!enteros.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!enteros.length) return;
   const antes = [...enteros];
   const sacado = enteros.shift();
   log(`shift() quitó ${sacado} del inicio (enteros)`, "success");
@@ -55,7 +56,8 @@ dom.btnNum.onclick = () => {
 
 // Caso 2: Saco el primer mensaje.
 dom.btnMsg.onclick = () => {
-  if (!mensajes.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!mensajes.length) return;
   const antes = [...mensajes];
   const sacado = mensajes.shift();
   log(`shift() eliminó el mensaje "${sacado}"`, "success");
@@ -65,7 +67,8 @@ dom.btnMsg.onclick = () => {
 
 // Caso 3: Atiendo al primer cliente de la fila y lo saco de la cola.
 dom.btnCola.onclick = () => {
-  if (!cola.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!cola.length) return;
   const antes = [...cola];
   const cliente = cola.shift();
   dom.resCola.className = "feedback-box feedback-success";

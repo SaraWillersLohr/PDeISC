@@ -13,11 +13,13 @@ export const mostrarFeedback = (input, resultado) => {
   const mensaje =
     wrap?.querySelector(".invalid-feedback") ||
     input.parentElement?.querySelector(".invalid-feedback");
-  if (mensaje) mensaje.textContent = resultado.mensaje || "";
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mensaje) mensaje.textContent = resultado.mensaje || "";
 
   // Yo actualizo el ícono visual (✓ para válido, ✕ para inválido)
   const icono = wrap?.querySelector(".field-icon");
-  if (icono) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (icono) {
     icono.textContent = resultado.valido ? "✓" : "✕";
     icono.classList.toggle("icon-ok", resultado.valido);
     icono.classList.toggle("icon-error", !resultado.valido);

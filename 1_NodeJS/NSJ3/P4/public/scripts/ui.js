@@ -2,6 +2,7 @@
 // Función para inicializar el botón "Volver arriba"
 export function initBackToTop() {
   const b = document.getElementById("back-to-top");
+  // Si if (!b), entonces se ejecuta este bloque.
   if (!b) return;
   window.addEventListener("scroll", () => {
     b.style.display = window.scrollY > 300 ? "flex" : "none";
@@ -13,6 +14,7 @@ export function initBackToTop() {
 
 export function logAtributo(textoEnlace, atributo, anterior, nuevo) {
   const log = document.getElementById("attr-log");
+  // Si if (!log), entonces se ejecuta este bloque.
   if (!log) return;
   log.querySelector(".attr-log-empty")?.remove();
   const fila = document.createElement("div");

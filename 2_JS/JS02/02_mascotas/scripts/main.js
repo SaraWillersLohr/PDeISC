@@ -80,7 +80,8 @@ const mapaValidadores = {
 formulario.addEventListener("input", (e) => {
   const input = e.target;
   const validar = mapaValidadores[input.name];
-  if (validar) mostrarFeedback(input, validar(input.value));
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (validar) mostrarFeedback(input, validar(input.value));
   validarTodo();
 });
 
@@ -99,7 +100,8 @@ document
 // Yo manejo el envío del formulario para agregar un nuevo invitado al array
 formulario.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (!validarTodo()) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!validarTodo()) {
     mostrarToast("toastZone", "Hay campos inválidos", "error");
     consola.log("Validación fallida: no se guardó en el array");
     return;
@@ -108,7 +110,8 @@ formulario.addEventListener("submit", (e) => {
   // Yo obtengo el método seleccionado y la estrategia correspondiente
   const metodoKey = selectMetodo.value;
   const estrategia = METODOS_ARRAY[metodoKey];
-  if (!estrategia) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!estrategia) return;
 
   // Yo creo el objeto con los datos del nuevo invitado
   const invitado = {

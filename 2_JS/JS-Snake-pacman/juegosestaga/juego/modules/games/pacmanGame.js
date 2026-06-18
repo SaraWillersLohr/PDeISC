@@ -162,7 +162,8 @@ class PacmanGame {
   loadLevel(levelNum, resetGame = false) {
     this.level = levelNum;
     
-    if (resetGame) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (resetGame) {
       this.score = 0;
     }
     this.lives = 3; // Regenerar 3 vidas al inicio de cada nivel
@@ -182,9 +183,12 @@ class PacmanGame {
     const spawnPoints = [];
     const ghostSpawnPoints = [];
 
+    // Repite este bloque con un bucle for.
     for (let r = 0; r < this.rows; r++) {
+      // Repite este bloque con un bucle for.
       for (let c = 0; c < this.cols; c++) {
-        if (this.map[r][c] === 7) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.map[r][c] === 7) {
           ghostSpawnPoints.push({ x: c, y: r });
         } else if (this.map[r][c] === 2 || this.map[r][c] === 0) {
           spawnPoints.push({ x: c, y: r });
@@ -193,6 +197,7 @@ class PacmanGame {
     }
 
     const ghostSpawns = ghostSpawnPoints.length > 0 ? ghostSpawnPoints : [{ x: Math.floor(this.cols/2), y: Math.floor(this.rows/2) }];
+    // Función playerSpawns que organiza esta parte del código.
     const playerSpawns = spawnPoints.filter(p => Math.abs(p.x - this.cols/2) > 2);
 
     // Inicializar jugadores
@@ -225,7 +230,8 @@ class PacmanGame {
     const ghostNames = ['Esteban', 'Lorena', 'Scaglione'];
     const isHardMode = levelNum >= 3;
     let ghostBaseSpeed;
-    if (levelNum === 1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (levelNum === 1) {
       ghostBaseSpeed = 0.064;
     } else if (levelNum === 2) {
       ghostBaseSpeed = 0.09;
@@ -266,20 +272,25 @@ class PacmanGame {
   }
 
   spawnNextSpecialItem() {
-    if (this.itemQueueIndex >= this.itemQueue.length) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.itemQueueIndex >= this.itemQueue.length) {
       this.fruit = null;
       return;
     }
     const type = this.itemQueue[this.itemQueueIndex];
     const walkables = [];
+    // Repite este bloque con un bucle for.
     for (let r = 0; r < this.rows; r++) {
+      // Repite este bloque con un bucle for.
       for (let c = 0; c < this.cols; c++) {
-        if (this.map[r][c] === 0 || this.map[r][c] === 2) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.map[r][c] === 0 || this.map[r][c] === 2) {
           walkables.push({ x: c, y: r });
         }
       }
     }
-    if (walkables.length > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (walkables.length > 0) {
       const pos = walkables[Math.floor(Math.random() * walkables.length)];
       this.fruit = {
         type,
@@ -292,13 +303,16 @@ class PacmanGame {
   }
 
   _collectSpecialItem(p, fruitType) {
-    if (fruitType === 'Guardapolvo') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (fruitType === 'Guardapolvo') {
       p.hasGuardapolvo = true;
       p.celebrateTimer = 180;
     }
     let pts = 100;
-    if (fruitType === 'Computadora') pts = 500;
-    else if (fruitType === 'Cuaderno') pts = 250;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (fruitType === 'Computadora') pts = 500;
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (fruitType === 'Cuaderno') pts = 250;
     this.score += pts;
     p.score += pts;
     this.fruit = null;
@@ -313,8 +327,10 @@ class PacmanGame {
 
   // Manejar inputs del cliente
   handleInput(socketId, dir) {
+    // Función player que organiza esta parte del código.
     const player = this.players.find(p => p.socketId === socketId);
-    if (player && !player.isDead && this.state === 'playing') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player && !player.isDead && this.state === 'playing') {
       player.nextDir = dir;
     }
   }
@@ -323,36 +339,46 @@ class PacmanGame {
   isWall(x, y) {
     const r = Math.round(y);
     const c = Math.round(x);
-    if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) return true;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) return true;
     return this.map[r][c] === 1;
   }
 
   // Obtener coordenadas vecinas
   getNeighborCoords(x, y, dir) {
     let nx = x, ny = y;
-    if (dir === 'UP') ny--;
-    else if (dir === 'DOWN') ny++;
-    else if (dir === 'LEFT') nx--;
-    else if (dir === 'RIGHT') nx++;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dir === 'UP') ny--;
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dir === 'DOWN') ny++;
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dir === 'LEFT') nx--;
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (dir === 'RIGHT') nx++;
     return { x: nx, y: ny };
   }
 
   // Actualizar posición de entidad
   updateEntityPosition(entity, isGhost = false) {
-    if (entity.isDead || entity.respawnTimer > 0) {
-      if (entity.respawnTimer > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (entity.isDead || entity.respawnTimer > 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (entity.respawnTimer > 0) {
         entity.respawnTimer--;
-        if (entity.respawnTimer === 0) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (entity.respawnTimer === 0) {
           entity.x = entity.spawnX || 1;
           entity.y = entity.spawnY || 1;
           entity.targetX = entity.x;
           entity.targetY = entity.y;
           entity.isDead = false;
-          if (!isGhost) {
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!isGhost) {
             entity.dir = 'NONE';
             entity.nextDir = 'NONE';
           }
-          if (isGhost) entity.mode = 'chase';
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isGhost) entity.mode = 'chase';
         }
       }
       return;
@@ -362,20 +388,25 @@ class PacmanGame {
     const dx = entity.targetX - entity.x;
     const dy = entity.targetY - entity.y;
 
-    if (Math.abs(dx) <= dist && Math.abs(dy) <= dist) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Math.abs(dx) <= dist && Math.abs(dy) <= dist) {
       entity.x = entity.targetX;
       entity.y = entity.targetY;
 
-      if (!isGhost) {
-        if (entity.nextDir !== 'NONE') {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!isGhost) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (entity.nextDir !== 'NONE') {
           const check = this.getNeighborCoords(entity.x, entity.y, entity.nextDir);
-          if (!this.isWall(check.x, check.y)) {
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.isWall(check.x, check.y)) {
             entity.dir = entity.nextDir;
           }
         }
 
         const next = this.getNeighborCoords(entity.x, entity.y, entity.dir);
-        if (!this.isWall(next.x, next.y) && entity.dir !== 'NONE') {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.isWall(next.x, next.y) && entity.dir !== 'NONE') {
           entity.targetX = next.x;
           entity.targetY = next.y;
         } else {
@@ -385,31 +416,38 @@ class PacmanGame {
         this.updateGhostAI(entity);
       }
     } else {
-      if (dx !== 0) entity.x += Math.sign(dx) * dist;
-      if (dy !== 0) entity.y += Math.sign(dy) * dist;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx !== 0) entity.x += Math.sign(dx) * dist;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy !== 0) entity.y += Math.sign(dy) * dist;
     }
   }
 
   // IA de fantasmas
   updateGhostAI(ghost) {
-    if (ghost.mode === 'returning') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.mode === 'returning') {
       const validMoves = [];
       ['UP', 'DOWN', 'LEFT', 'RIGHT'].forEach((d) => {
         const coords = this.getNeighborCoords(ghost.x, ghost.y, d);
-        if (!this.isWall(coords.x, coords.y)) validMoves.push({ dir: d, x: coords.x, y: coords.y });
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.isWall(coords.x, coords.y)) validMoves.push({ dir: d, x: coords.x, y: coords.y });
       });
       let best = null;
       let minDist = Infinity;
       validMoves.forEach((move) => {
         const dist = Math.pow(move.x - ghost.spawnX, 2) + Math.pow(move.y - ghost.spawnY, 2);
-        if (dist < minDist) { minDist = dist; best = move; }
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dist < minDist) { minDist = dist; best = move; }
       });
-      if (best) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (best) {
         ghost.dir = best.dir;
         ghost.targetX = best.x;
         ghost.targetY = best.y;
       }
-      if (Math.abs(ghost.x - ghost.spawnX) < 0.35 && Math.abs(ghost.y - ghost.spawnY) < 0.35) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Math.abs(ghost.x - ghost.spawnX) < 0.35 && Math.abs(ghost.y - ghost.spawnY) < 0.35) {
         ghost.respawnTimer = 90;
         ghost.isDead = true;
         ghost.mode = 'eaten';
@@ -420,27 +458,38 @@ class PacmanGame {
     const directions = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
     const validMoves = [];
     let oppositeDir = 'NONE';
-    if (ghost.dir === 'UP') oppositeDir = 'DOWN';
-    else if (ghost.dir === 'DOWN') oppositeDir = 'UP';
-    else if (ghost.dir === 'LEFT') oppositeDir = 'RIGHT';
-    else if (ghost.dir === 'RIGHT') oppositeDir = 'LEFT';
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.dir === 'UP') oppositeDir = 'DOWN';
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (ghost.dir === 'DOWN') oppositeDir = 'UP';
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (ghost.dir === 'LEFT') oppositeDir = 'RIGHT';
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (ghost.dir === 'RIGHT') oppositeDir = 'LEFT';
 
     directions.forEach(d => {
-      if (d === oppositeDir) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (d === oppositeDir) return;
       const coords = this.getNeighborCoords(ghost.x, ghost.y, d);
-      if (!this.isWall(coords.x, coords.y)) validMoves.push({ dir: d, x: coords.x, y: coords.y });
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.isWall(coords.x, coords.y)) validMoves.push({ dir: d, x: coords.x, y: coords.y });
     });
 
-    if (validMoves.length === 0 && oppositeDir !== 'NONE') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (validMoves.length === 0 && oppositeDir !== 'NONE') {
       const coords = this.getNeighborCoords(ghost.x, ghost.y, oppositeDir);
-      if (!this.isWall(coords.x, coords.y)) validMoves.push({ dir: oppositeDir, x: coords.x, y: coords.y });
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.isWall(coords.x, coords.y)) validMoves.push({ dir: oppositeDir, x: coords.x, y: coords.y });
     }
-    if (validMoves.length === 0) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (validMoves.length === 0) return;
 
     let chosenMove = null;
-    if (ghost.mode === 'frightened') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (ghost.mode === 'frightened') {
       chosenMove = validMoves[Math.floor(Math.random() * validMoves.length)];
     } else {
+      // Función activePlayers que organiza esta parte del código.
       const activePlayers = this.players.filter(p => !p.isDead);
       const targetPlayer = activePlayers[0] || this.players[0];
       chosenMove = updateGhostBehavior(ghost, {
@@ -455,7 +504,8 @@ class PacmanGame {
       });
     }
 
-    if (chosenMove) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (chosenMove) {
       ghost.dir = chosenMove.dir;
       ghost.targetX = chosenMove.x;
       ghost.targetY = chosenMove.y;
@@ -464,12 +514,15 @@ class PacmanGame {
 
   // Tick del juego
   tick() {
-    if (this.state !== 'playing') return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state !== 'playing') return;
     this.tickCount++;
 
-    if (this.frightenedTimer <= 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.frightenedTimer <= 0) {
       this.scatterTimer--;
-      if (this.scatterTimer <= 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.scatterTimer <= 0) {
         this.scatterPhase = !this.scatterPhase;
         this.scatterTimer = this.scatterPhase ? 180 : Math.max(300, 420 - this.level * 25);
       }
@@ -477,7 +530,8 @@ class PacmanGame {
 
     // Actualizar entidades
     this.players.forEach(p => {
-      if (p.celebrateTimer > 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.celebrateTimer > 0) {
         p.celebrateTimer--;
       }
     });
@@ -486,17 +540,22 @@ class PacmanGame {
 
     // Consumir puntos y objetos
     this.players.forEach(p => {
-      if (p.isDead) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.isDead) return;
       
-      if (p.dir === 'LEFT') p.lastHorizontalDir = 'LEFT';
-      if (p.dir === 'RIGHT') p.lastHorizontalDir = 'RIGHT';
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.dir === 'LEFT') p.lastHorizontalDir = 'LEFT';
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.dir === 'RIGHT') p.lastHorizontalDir = 'RIGHT';
       
       const px = Math.round(p.x);
       const py = Math.round(p.y);
 
-      if (px >= 0 && px < this.cols && py >= 0 && py < this.rows) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (px >= 0 && px < this.cols && py >= 0 && py < this.rows) {
         const cell = this.map[py][px];
-        if (cell === 2) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (cell === 2) {
           this.map[py][px] = 0;
           this.score += 10;
           p.score += 10;
@@ -510,13 +569,17 @@ class PacmanGame {
 
       // Consumir fruta/objeto
       if (this.fruit && Math.round(p.x) === this.fruit.x && Math.round(p.y) === this.fruit.y) {
-        if (this.fruit.isSequential) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.fruit.isSequential) {
           this._collectSpecialItem(p, this.fruit.type);
         } else {
-          if (this.fruit.type === 'Guardapolvo') p.hasGuardapolvo = true;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.fruit.type === 'Guardapolvo') p.hasGuardapolvo = true;
           let pts = 100;
-          if (this.fruit.type === 'Computadora') pts = 500;
-          else if (this.fruit.type === 'Cuaderno') pts = 250;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.fruit.type === 'Computadora') pts = 500;
+          // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (this.fruit.type === 'Cuaderno') pts = 250;
           this.score += pts;
           p.score += pts;
           this.fruit = null;
@@ -527,7 +590,8 @@ class PacmanGame {
     // Timer de Hora Libre
     if (this.frightenedTimer > 0) {
       this.frightenedTimer--;
-      if (this.frightenedTimer === 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.frightenedTimer === 0) {
         this.ghosts.forEach(g => { if (g.mode === 'frightened') g.mode = 'chase'; });
       }
     }
@@ -541,15 +605,21 @@ class PacmanGame {
     this.frightenedTimer = 300;
     this.frightenedCount = 0;
     this.ghosts.forEach(g => {
-      if (g.mode !== 'eaten' && g.mode !== 'dead') {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.mode !== 'eaten' && g.mode !== 'dead') {
         g.mode = 'frightened';
         let oppositeDir = 'NONE';
-        if (g.dir === 'UP') oppositeDir = 'DOWN';
-        else if (g.dir === 'DOWN') oppositeDir = 'UP';
-        else if (g.dir === 'LEFT') oppositeDir = 'RIGHT';
-        else if (g.dir === 'RIGHT') oppositeDir = 'LEFT';
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.dir === 'UP') oppositeDir = 'DOWN';
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (g.dir === 'DOWN') oppositeDir = 'UP';
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (g.dir === 'LEFT') oppositeDir = 'RIGHT';
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (g.dir === 'RIGHT') oppositeDir = 'LEFT';
         const coords = this.getNeighborCoords(g.x, g.y, oppositeDir);
-        if (!this.isWall(coords.x, coords.y)) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.isWall(coords.x, coords.y)) {
           g.dir = oppositeDir;
           g.targetX = coords.x;
           g.targetY = coords.y;
@@ -561,12 +631,16 @@ class PacmanGame {
   // Verificar colisiones
   checkCollisions() {
     this.players.forEach(p => {
-      if (p.isDead) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.isDead) return;
       this.ghosts.forEach(g => {
-        if (g.isDead || g.respawnTimer > 0) return;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.isDead || g.respawnTimer > 0) return;
         const dist = Math.sqrt(Math.pow(p.x - g.x, 2) + Math.pow(p.y - g.y, 2));
-        if (dist < 0.6) {
-          if (g.mode === 'frightened') {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dist < 0.6) {
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.mode === 'frightened') {
             g.mode = 'returning';
             g.isDead = false;
             g.respawnTimer = 0;
@@ -583,13 +657,15 @@ class PacmanGame {
             this.spawnNextSpecialItem();
             
             p.lives--;
-            if (p.lives <= 0) {
+            // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.lives <= 0) {
               p.respawnTimer = 0; // Evitar respawn si no le quedan vidas
             }
             
             // Fin de juego si TODOS los jugadores se quedaron sin vidas
             const allDead = this.players.every(pl => pl.lives <= 0);
-            if (allDead) {
+            // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (allDead) {
               this.state = 'game_over';
             }
           }
@@ -601,9 +677,12 @@ class PacmanGame {
   // Contar puntos restantes
   countRemainingPoints() {
     let count = 0;
+    // Repite este bloque con un bucle for.
     for (let r = 0; r < this.rows; r++) {
+      // Repite este bloque con un bucle for.
       for (let c = 0; c < this.cols; c++) {
-        if (this.map[r][c] === 2 || this.map[r][c] === 3) count++;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.map[r][c] === 2 || this.map[r][c] === 3) count++;
       }
     }
     return count;
@@ -612,11 +691,14 @@ class PacmanGame {
   // Verificar si se completó el nivel
   checkLevelCompletion() {
     const remainingPoints = this.countRemainingPoints();
-    if (remainingPoints === 0 && this.itemQueueIndex >= this.itemQueue.length) {
-      if (this.level < MAX_PACMAN_LEVEL) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (remainingPoints === 0 && this.itemQueueIndex >= this.itemQueue.length) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.level < MAX_PACMAN_LEVEL) {
         this.state = 'level_clear';
         setTimeout(() => {
-          if (this.state === 'level_clear') {
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state === 'level_clear') {
             this.loadLevel(this.level + 1, false);
           }
         }, 3000);
@@ -627,7 +709,8 @@ class PacmanGame {
   }
 
   _getMissionText() {
-    if (this.level === 1) return 'Recoge los puntos y busca el elemento';
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.level === 1) return 'Recoge los puntos y busca el elemento';
     return 'Recoge los puntos y busca los elementos';
   }
 
@@ -637,7 +720,8 @@ class PacmanGame {
     const nextBonus = this.itemQueue[this.itemQueueIndex] || null;
     
     let levelMessage = '';
-    if (this.state === 'level_clear') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state === 'level_clear') {
       levelMessage = '¡Nivel completado! Preparate para el siguiente...';
     } else if (remainingPoints > 0 && nextBonus) {
       levelMessage = `Recogé puntos · Bonus: ${nextBonus}`;

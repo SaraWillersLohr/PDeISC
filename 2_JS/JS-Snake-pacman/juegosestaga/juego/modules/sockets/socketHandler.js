@@ -1,15 +1,19 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const roomManager = require('../rooms/roomManager');
 const PacmanGame = require('../games/pacmanGame');
 const { SnakeGame, getTickInterval } = require('../games/snakeGame');
 const leaderboardManager = require('../leaderboard/leaderboardManager');
 
+// Función initSocketHandler(io) que ayuda a entender la lógica.
 function initSocketHandler(io) {
   io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
 
     socket.on('createRoom', ({ game }) => {
       const room = roomManager.createRoom(game);
-      if (!room) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room) {
         return socket.emit('errorMsg', { message: 'No se pudo crear la sala. Juego inválido.' });
       }
 
@@ -20,19 +24,22 @@ function initSocketHandler(io) {
     });
 
     socket.on('joinRoom', ({ code, name, character }) => {
-      if (!name || name.trim().length < 3 || name.trim().length > 10) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!name || name.trim().length < 3 || name.trim().length > 10) {
         return socket.emit('errorMsg', { message: 'El nombre debe tener entre 3 y 10 caracteres.' });
       }
 
       const room = roomManager.getRoom(code);
-      if (room && room.status === 'playing') {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room && room.status === 'playing') {
         return socket.emit('errorMsg', {
           message: 'La partida ya comenzó. Usa reconexión automática desde la pantalla de juego.'
         });
       }
 
       const result = roomManager.joinRoom(code, socket.id, name, character);
-      if (!result.success) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!result.success) {
         return socket.emit('errorMsg', { message: result.error });
       }
 
@@ -48,12 +55,14 @@ function initSocketHandler(io) {
     });
 
     socket.on('rejoinGame', ({ code, name }) => {
-      if (!name || name.trim().length < 3) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!name || name.trim().length < 3) {
         return socket.emit('errorMsg', { message: 'Nombre inválido para reconexión.' });
       }
 
       const result = roomManager.rejoinRoom(code, socket.id, name);
-      if (!result.success) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!result.success) {
         return socket.emit('errorMsg', { message: result.error });
       }
 
@@ -63,11 +72,13 @@ function initSocketHandler(io) {
 
       console.log(`Usuario ${name} reconectado a partida en sala: ${code}`);
 
-      if (room.gameInstance) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInstance) {
         socket.emit('gameState', room.gameInstance.getSerializedState());
       }
 
-      if (roomManager.allPlayersConnected(room) && !room.gameInterval && room.gameInstance) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (roomManager.allPlayersConnected(room) && !room.gameInterval && room.gameInstance) {
         resumeGameLoop(io, room);
         io.to(code).emit('gameResumed', { message: 'Conexión restablecida. ¡A jugar!' });
       } else {
@@ -81,16 +92,19 @@ function initSocketHandler(io) {
 
     socket.on('ready', () => {
       const code = socket.roomCode;
-      if (!code) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!code) return;
 
       const room = roomManager.getRoom(code);
-      if (!room) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room) return;
 
       const allReady = roomManager.setPlayerReady(code, socket.id);
 
       io.to(code).emit('roomUpdated', serializeRoom(room));
 
-      if (allReady) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (allReady) {
         console.log(`Comenzando partida multijugador en sala: ${code}`);
         startGame(io, room);
       }
@@ -98,22 +112,27 @@ function initSocketHandler(io) {
 
     socket.on('playerMove', (direction) => {
       const code = socket.roomCode;
-      if (!code) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!code) return;
 
       const room = roomManager.getRoom(code);
-      if (!room || !room.gameInstance) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room || !room.gameInstance) return;
 
       room.gameInstance.handleInput(socket.id, direction);
     });
 
     socket.on('restartGame', () => {
       const code = socket.roomCode;
-      if (!code) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!code) return;
 
       const room = roomManager.getRoom(code);
-      if (!room) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room) return;
 
-      if (room.gameInterval) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInterval) {
         clearTimeout(room.gameInterval);
         room.gameInterval = null;
       }
@@ -132,11 +151,13 @@ function initSocketHandler(io) {
       console.log(`Usuario desconectado: ${socket.id}`);
 
       const leaveResult = roomManager.removePlayer(socket.id);
-      if (leaveResult) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (leaveResult) {
         const { code, room, destroyed, disconnectedPlayerName, paused } = leaveResult;
         console.log(`Jugador ${disconnectedPlayerName} abandonó la sala ${code}`);
 
-        if (destroyed) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (destroyed) {
           console.log(`Sala ${code} destruida por falta de jugadores.`);
         } else if (paused && room) {
           io.to(code).emit('playerDisconnected', {
@@ -155,6 +176,7 @@ function initSocketHandler(io) {
   });
 }
 
+// Función serializeRoom(room) que ayuda a entender la lógica.
 function serializeRoom(room) {
   return {
     code: room.code,
@@ -170,22 +192,27 @@ function serializeRoom(room) {
   };
 }
 
+// Función getSnakeTickInterval(level) que ayuda a entender la lógica.
 function getSnakeTickInterval(level) {
   return getTickInterval(level);
 }
 
+// Función stopGameLoop(room) que ayuda a entender la lógica.
 function stopGameLoop(room) {
-  if (room.gameInterval) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInterval) {
     clearTimeout(room.gameInterval);
     room.gameInterval = null;
   }
 }
 
+// Función startGame(io, que ayuda a entender la lógica.
 function startGame(io, room) {
   room.savedLeaderboard = false;
   room.players.forEach((p) => { p.connected = true; });
 
-  if (room.game === 'pacman') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.game === 'pacman') {
     room.gameInstance = new PacmanGame(room.code, room.players);
   } else {
     room.gameInstance = new SnakeGame(room.code, room.players);
@@ -199,24 +226,29 @@ function startGame(io, room) {
   resumeGameLoop(io, room);
 }
 
+// Función resumeGameLoop(io, que ayuda a entender la lógica.
 function resumeGameLoop(io, room) {
   stopGameLoop(room);
 
   let intervalMs = room.game === 'snake' ? 100 : Math.round(1000 / 30);
   let lastLevel = room.gameInstance?.level || 1;
 
+  // Función tick que organiza esta parte del código.
   const tick = () => {
-    if (!room.gameInstance) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room.gameInstance) return;
 
     room.gameInstance.tick();
     const state = room.gameInstance.getSerializedState();
 
     io.to(room.code).emit('gameState', state);
 
-    if (state.state === 'game_over' || state.state === 'victory') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.state === 'game_over' || state.state === 'victory') {
       stopGameLoop(room);
 
-      if (!room.savedLeaderboard) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room.savedLeaderboard) {
         room.savedLeaderboard = true;
         saveScoresToLeaderboard(room, state);
       }
@@ -225,7 +257,8 @@ function resumeGameLoop(io, room) {
       return;
     }
 
-    if (room.game === 'snake' && state.level !== lastLevel) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.game === 'snake' && state.level !== lastLevel) {
       lastLevel = state.level;
       intervalMs = getSnakeTickInterval(lastLevel);
     }
@@ -236,10 +269,12 @@ function resumeGameLoop(io, room) {
   room.gameInterval = setTimeout(tick, intervalMs);
 }
 
+// Función saveScoresToLeaderboard(room, que ayuda a entender la lógica.
 function saveScoresToLeaderboard(room, finalState) {
   const game = room.game;
 
-  if (game === 'pacman') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (game === 'pacman') {
     finalState.players.forEach((p) => {
       leaderboardManager.addScore('pacman', {
         name: p.name,

@@ -20,6 +20,7 @@ let touchActivePlayer = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 
+// Función initClient() que ayuda a entender la lógica.
 function initClient() {
   canvas = document.getElementById('gameCanvas');
   ctx = canvas.getContext('2d');
@@ -29,7 +30,8 @@ function initClient() {
   observeGameLayoutResize(resizeCanvas);
 
   const configStr = sessionStorage.getItem('gameConfig');
-  if (!configStr) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!configStr) {
     window.location.href = '/';
     return;
   }
@@ -41,17 +43,22 @@ function initClient() {
   connectionBanner = document.getElementById('connectionBanner');
   startRenderLoop();
 
-  if (gameConfig.multiplayer === 'online') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.multiplayer === 'online') {
     setupOnlineGame();
   } else {
     runCountdown(() => setupLocalGame());
   }
 }
 
+// Función startRenderLoop() que ayuda a entender la lógica.
 function startRenderLoop() {
-  if (rafId) cancelAnimationFrame(rafId);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (rafId) cancelAnimationFrame(rafId);
+  // Función loop que organiza esta parte del código.
   const loop = () => {
-    if (lastState && canvas && ctx) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (lastState && canvas && ctx) {
       drawSnakeGame(canvas, ctx, enrichState(lastState));
     }
     rafId = requestAnimationFrame(loop);
@@ -59,21 +66,27 @@ function startRenderLoop() {
   rafId = requestAnimationFrame(loop);
 }
 
+// Función runCountdown(onDone) que ayuda a entender la lógica.
 function runCountdown(onDone) {
   const badge = document.getElementById('countdownBadge');
-  if (!badge) { onDone(); return; }
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!badge) { onDone(); return; }
   const steps = ['3', '2', '1', '¡GO!'];
   let i = 0;
   badge.style.display = 'block';
+  // Función tick que organiza esta parte del código.
   const tick = () => {
-    if (i >= steps.length) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (i >= steps.length) {
       badge.style.display = 'none';
       onDone();
       return;
     }
     badge.textContent = steps[i];
-    if (window.audioSynth && i < 3) window.audioSynth.playSelect();
-    if (i === 3 && window.audioSynth) window.audioSynth.playStartGame();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth && i < 3) window.audioSynth.playSelect();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (i === 3 && window.audioSynth) window.audioSynth.playStartGame();
     i++;
     setTimeout(tick, i === steps.length ? 400 : 650);
   };
@@ -81,13 +94,18 @@ function runCountdown(onDone) {
 }
 
 window.togglePause = function togglePause() {
-  if (gameOverHandled || !lastState || lastState.state === 'game_over') return;
-  if (gameConfig.multiplayer === 'online') return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameOverHandled || !lastState || lastState.state === 'game_over') return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.multiplayer === 'online') return;
   isPaused = !isPaused;
   const badge = document.getElementById('pauseBadge');
-  if (badge) badge.style.display = isPaused ? 'block' : 'none';
-  if (isPaused) {
-    if (localIntervalId) { clearInterval(localIntervalId); localIntervalId = null; }
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (badge) badge.style.display = isPaused ? 'block' : 'none';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isPaused) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (localIntervalId) { clearInterval(localIntervalId); localIntervalId = null; }
     window.audioSynth && window.audioSynth.stopBGM();
   } else {
     resumeLocalLoop();
@@ -96,35 +114,44 @@ window.togglePause = function togglePause() {
 };
 
 window.restartGame = function restartGame() {
-  if (gameConfig.multiplayer === 'online') {
-    if (socketConn) socketConn.emit('restartGame');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.multiplayer === 'online') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (socketConn) socketConn.emit('restartGame');
     window.location.href = '/lobby';
     return;
   }
   isPaused = false;
   const badge = document.getElementById('pauseBadge');
-  if (badge) badge.style.display = 'none';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (badge) badge.style.display = 'none';
   document.getElementById('gameOverlay').classList.remove('active');
   resetSnakeRenderer && resetSnakeRenderer();
   runCountdown(() => setupLocalGame());
 };
 
+// Función setupHud() que ayuda a entender la lógica.
 function setupHud() {
   const cable = getCable(gameConfig.p1Character);
   document.getElementById('hudP1Name').textContent = `${gameConfig.p1Name} (${cable.name})`;
 
-  if (gameConfig.mode === '2P') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.mode === '2P') {
     document.getElementById('hudP2Container').style.display = 'flex';
     document.getElementById('p2ControlInfo').style.display = 'inline';
 
-    if (gameConfig.multiplayer === 'local') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.multiplayer === 'local') {
       const rival = getRivalCable(gameConfig.p1Character);
       document.getElementById('hudP2Name').textContent = `J2 (${getCable(rival).name})`;
       const hint = document.getElementById('touchPlayerHint');
-      if (hint) hint.style.display = 'inline';
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hint) hint.style.display = 'inline';
     } else {
+      // Función rival que organiza esta parte del código.
       const rival = gameConfig.players.find((p) => p.playerIndex !== gameConfig.myIndex);
-      if (rival) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (rival) {
         document.getElementById('hudP2Name').textContent = `${rival.name} (${getCable(rival.character).name})`;
       }
       document.getElementById('hudRoomInfo').style.display = 'flex';
@@ -133,18 +160,24 @@ function setupHud() {
   }
 }
 
+// Función showConnectionBanner(msg, que ayuda a entender la lógica.
 function showConnectionBanner(msg, type = 'warning') {
-  if (!connectionBanner) connectionBanner = document.getElementById('connectionBanner');
-  if (!connectionBanner) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!connectionBanner) connectionBanner = document.getElementById('connectionBanner');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!connectionBanner) return;
   connectionBanner.textContent = msg;
   connectionBanner.className = `snake-connection-banner snake-connection-banner--${type}`;
   connectionBanner.style.display = 'block';
 }
 
+// Función hideConnectionBanner() que ayuda a entender la lógica.
 function hideConnectionBanner() {
-  if (connectionBanner) connectionBanner.style.display = 'none';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (connectionBanner) connectionBanner.style.display = 'none';
 }
 
+// Función setupOnlineGame() que ayuda a entender la lógica.
 function setupOnlineGame() {
   const myPlayer = gameConfig.players[gameConfig.myIndex];
 
@@ -169,7 +202,8 @@ function setupOnlineGame() {
   });
 
   socketConn.on('disconnect', (reason) => {
-    if (reason === 'io server disconnect') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (reason === 'io server disconnect') {
       showConnectionBanner('Desconectado del servidor.', 'error');
     } else {
       showConnectionBanner('Conexión perdida. Reconectando...', 'warning');
@@ -196,36 +230,43 @@ function setupOnlineGame() {
   });
 
   socketConn.on('playerDisconnected', ({ message, paused }) => {
-    if (paused) showConnectionBanner(message, 'warning');
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (paused) showConnectionBanner(message, 'warning');
   });
 
   socketConn.on('errorMsg', ({ message }) => {
     showConnectionBanner(message, 'error');
   });
 
-  if (window.audioSynth) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth) {
     window.audioSynth.startBGM('normal');
   }
 
   document.getElementById('btnOverlayAction').textContent = 'Volver al Lobby';
   document.getElementById('btnOverlayAction').onclick = () => {
-    if (socketConn) socketConn.disconnect();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (socketConn) socketConn.disconnect();
     window.location.href = '/lobby';
   };
 }
 
+// Función resizeCanvas() que ayuda a entender la lógica.
 function resizeCanvas() {
-  if (!canvas) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!canvas) return;
   const gridW = lastState?.width || localGameInstance?.width || getSnakeGridDimensions(false).width;
   const gridH = lastState?.height || localGameInstance?.height || getSnakeGridDimensions(false).height;
   const aspect = gridW / gridH;
   const { w, h } = computeFullscreenCanvasSize(aspect, 'snake');
   applyCanvasPixelSize(canvas, w, h);
-  if (lastState) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (lastState) {
     drawSnakeGame(canvas, ctx, enrichState(lastState));
   }
 }
 
+// Función enrichState(state) que ayuda a entender la lógica.
 function enrichState(state) {
   return {
     ...state,
@@ -233,6 +274,7 @@ function enrichState(state) {
   };
 }
 
+// Función setupLocalGame() que ayuda a entender la lógica.
 function setupLocalGame() {
   gameOverHandled = false;
   isPaused = false;
@@ -241,7 +283,8 @@ function setupLocalGame() {
   touchActivePlayer = 0;
   document.body.classList.remove('level-danger');
 
-  if (localIntervalId) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (localIntervalId) {
     clearInterval(localIntervalId);
     localIntervalId = null;
   }
@@ -250,7 +293,8 @@ function setupLocalGame() {
     { socketId: 'local_p1', name: gameConfig.p1Name, character: gameConfig.p1Character, playerIndex: 0 }
   ];
 
-  if (gameConfig.mode === '2P') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.mode === '2P') {
     playersList.push({
       socketId: 'local_p2',
       name: 'Jugador 2',
@@ -265,7 +309,8 @@ function setupLocalGame() {
   document.getElementById('hudLevel').textContent = '1';
   updateLevelStatus('Conectá el cable · Recogé datos y energía');
 
-  if (window.audioSynth) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.audioSynth) {
     window.audioSynth.stopBGM();
     window.audioSynth.startBGM('normal');
   }
@@ -277,8 +322,10 @@ function setupLocalGame() {
   actionBtn.onclick = () => window.restartGame();
 }
 
+// Función resumeLocalLoop() que ayuda a entender la lógica.
 function resumeLocalLoop() {
-  if (!localGameInstance || isPaused) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!localGameInstance || isPaused) return;
 
   // Obtener el intervalMs correcto para el nivel actual
   const getCurrentInterval = () => {
@@ -288,24 +335,30 @@ function resumeLocalLoop() {
 
   let currentInterval = getCurrentInterval();
 
+  // Función startLoop que ayuda a entender la lógica.
   const startLoop = (intervalMs) => {
-    if (localIntervalId) clearInterval(localIntervalId);
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (localIntervalId) clearInterval(localIntervalId);
     localIntervalId = setInterval(() => {
-      if (isPaused) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isPaused) return;
       localGameInstance.tick();
       const state = localGameInstance.getSerializedState();
 
-      if (state.level !== undefined && state.level !== lastLevel) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.level !== undefined && state.level !== lastLevel) {
         const prev = lastLevel;
         lastLevel = state.level;
-        if (prev > 0 && state.level > prev) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (prev > 0 && state.level > prev) {
           showLevelUpToast(state.level, false);
         }
         document.getElementById('hudLevel').textContent = String(state.level);
         document.body.classList.toggle('level-danger', state.level >= 4);
 
         const newMs = getCurrentInterval();
-        if (state.level >= 4) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.level >= 4) {
           updateLevelStatus('⚠ Nivel crítico — velocidad máxima');
           window.audioSynth && window.audioSynth.playDangerAlert();
           window.audioSynth && window.audioSynth.switchBGM('danger');
@@ -314,7 +367,8 @@ function resumeLocalLoop() {
           window.audioSynth && window.audioSynth.playLevelUp();
         }
 
-        if (newMs !== currentInterval) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (newMs !== currentInterval) {
           currentInterval = newMs;
           startLoop(currentInterval);
           return; // el nuevo setInterval ya maneja el estado siguiente
@@ -323,7 +377,8 @@ function resumeLocalLoop() {
 
       handleStateUpdate(state);
 
-      if (state.state === 'game_over') {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.state === 'game_over') {
         clearInterval(localIntervalId);
         localIntervalId = null;
         window.audioSynth && window.audioSynth.stopBGM();
@@ -335,13 +390,17 @@ function resumeLocalLoop() {
   startLoop(currentInterval);
 }
 
+// Función updateLevelStatus(msg) que ayuda a entender la lógica.
 function updateLevelStatus(msg) {
   const el = document.getElementById('levelStatus');
-  if (el) el.textContent = msg;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (el) el.textContent = msg;
 }
 
 async function saveLocalScore(state) {
-  try {
+  // try: prueba este bloque y permite capturar errores con catch.
+try {
+    // Repite este bloque con un bucle for.
     for (const p of state.players) {
       const isWinner = state.winner === p.socketId;
       const isDraw = state.winner === 'draw';
@@ -363,44 +422,59 @@ async function saveLocalScore(state) {
 }
 
 let globalTickId = 0;
+// Función handleStateUpdate(state) que ayuda a entender la lógica.
 function handleStateUpdate(state) {
   globalTickId++;
   state.tickId = globalTickId;
-  if (lastState) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (lastState) {
+    // Función currentLen que organiza esta parte del código.
     const currentLen = state.players.reduce((sum, p) => sum + p.segments.length, 0);
+    // Función lastLen que organiza esta parte del código.
     const lastLen = lastState.players.reduce((sum, p) => sum + p.segments.length, 0);
-    if (currentLen > lastLen) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (currentLen > lastLen) {
       window.audioSynth && window.audioSynth.playCoin();
       eatFlashUntil = Date.now();
     }
 
+    // Función deadCountNow que organiza esta parte del código.
     const deadCountNow = state.players.filter((p) => p.isDead).length;
+    // Función deadCountLast que organiza esta parte del código.
     const deadCountLast = lastState.players.filter((p) => p.isDead).length;
-    if (deadCountNow > deadCountLast) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (deadCountNow > deadCountLast) {
       window.audioSynth && window.audioSynth.playCrash();
     }
 
     const myIdx = gameConfig.multiplayer === 'online' ? gameConfig.myIndex : 0;
+    // Función meLast que organiza esta parte del código.
     const meLast = lastState.players.find((p) => p.playerIndex === myIdx);
+    // Función meNow que organiza esta parte del código.
     const meNow = state.players.find((p) => p.playerIndex === myIdx);
-    if (meLast && meNow) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (meLast && meNow) {
       const gotPowerup =
         (meNow.overclock && !meLast.overclock) ||
         (meNow.firewall && !meLast.firewall) ||
         (meNow.magnet && !meLast.magnet) ||
         (meNow.emp && !meLast.emp);
-      if (gotPowerup) window.audioSynth && window.audioSynth.playPowerup();
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gotPowerup) window.audioSynth && window.audioSynth.playPowerup();
     }
 
-    if (state.level !== undefined && state.level !== lastLevel && gameConfig.multiplayer === 'online') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.level !== undefined && state.level !== lastLevel && gameConfig.multiplayer === 'online') {
       const prev = lastLevel;
       lastLevel = state.level;
-      if (prev > 0 && state.level > prev) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (prev > 0 && state.level > prev) {
         showLevelUpToast(state.level, false);
       }
       document.getElementById('hudLevel').textContent = String(state.level);
       document.body.classList.toggle('level-danger', state.level >= 4);
-      if (state.level >= 4) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.level >= 4) {
         updateLevelStatus('⚠ Nivel crítico');
         window.audioSynth && window.audioSynth.playDangerAlert();
         window.audioSynth && window.audioSynth.switchBGM('danger');
@@ -414,46 +488,64 @@ function handleStateUpdate(state) {
   lastState = state;
 
   document.getElementById('hudDuration').textContent = `${state.duration}s`;
-  if (state.level !== undefined) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.level !== undefined) {
     document.getElementById('hudLevel').textContent = String(state.level);
   }
 
+  // Función p1 que organiza esta parte del código.
   const p1 = state.players.find((p) => p.playerIndex === 0);
-  if (p1) document.getElementById('hudP1Score').textContent = p1.score;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p1) document.getElementById('hudP1Score').textContent = p1.score;
 
+  // Función p2 que organiza esta parte del código.
   const p2 = state.players.find((p) => p.playerIndex === 1);
-  if (p2) document.getElementById('hudP2Score').textContent = p2.score;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p2) document.getElementById('hudP2Score').textContent = p2.score;
 
   const myIndex = gameConfig.multiplayer === 'online' ? gameConfig.myIndex : 0;
+  // Función me que organiza esta parte del código.
   const me = state.players.find((p) => p.playerIndex === myIndex);
   updatePowerupBadges(me);
 
-  if (state.state === 'game_over' && !gameOverHandled) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.state === 'game_over' && !gameOverHandled) {
     gameOverHandled = true;
     showGameOverOverlay(state, p1, p2);
     window.audioSynth && window.audioSynth.stopBGM();
+    // Función myPlayer que organiza esta parte del código.
     const myPlayer = state.players.find((p) => p.playerIndex === myIndex);
     const iWon = myPlayer && state.winner === myPlayer.socketId;
     const isDraw = state.winner === 'draw';
-    if (iWon && !isDraw) window.audioSynth && window.audioSynth.playVictory();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (iWon && !isDraw) window.audioSynth && window.audioSynth.playVictory();
     else window.audioSynth && window.audioSynth.playGameOver();
   }
 }
 
+// Función updatePowerupBadges(me) que ayuda a entender la lógica.
 function updatePowerupBadges(me) {
   const puContainer = document.getElementById('powerupIndicators');
-  if (!puContainer) return;
-  if (!me) { puContainer.innerHTML = ''; return; }
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!puContainer) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!me) { puContainer.innerHTML = ''; return; }
 
   const badges = [];
-  if (me.overclock) badges.push('<span class="powerup-badge badge-overclock">⚡ OVERCLOCK</span>');
-  if (me.firewall) badges.push('<span class="powerup-badge badge-firewall">🛡️ FIREWALL</span>');
-  if (me.magnet) badges.push('<span class="powerup-badge badge-emp">🧲 IMÁN ACTIVO</span>');
-  if (me.emp) badges.push('<span class="powerup-badge badge-emp">❄️ CONGELADO</span>');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (me.overclock) badges.push('<span class="powerup-badge badge-overclock">⚡ OVERCLOCK</span>');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (me.firewall) badges.push('<span class="powerup-badge badge-firewall">🛡️ FIREWALL</span>');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (me.magnet) badges.push('<span class="powerup-badge badge-emp">🧲 IMÁN ACTIVO</span>');
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (me.emp) badges.push('<span class="powerup-badge badge-emp">❄️ CONGELADO</span>');
   const html = badges.join('');
-  if (puContainer.innerHTML !== html) puContainer.innerHTML = html;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (puContainer.innerHTML !== html) puContainer.innerHTML = html;
 }
 
+// Función showGameOverOverlay(state, que ayuda a entender la lógica.
 function showGameOverOverlay(state, p1, p2) {
   const overlay = document.getElementById('gameOverlay');
   const title = document.getElementById('overlayTitle');
@@ -465,15 +557,18 @@ function showGameOverOverlay(state, p1, p2) {
   const name1 = p1 ? p1.name : 'J1';
   const name2 = p2 ? p2.name : 'J2';
 
-  if (state.winner === 'draw') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (state.winner === 'draw') {
     title.textContent = '¡Empate Técnico!';
     title.className = 'display-5 text-warning animate-pulse';
   } else if (state.winner === 'none') {
     title.textContent = '¡Cable Desconectado!';
     title.className = 'display-5 text-danger animate-pulse';
   } else {
+    // Función winnerPlayer que organiza esta parte del código.
     const winnerPlayer = state.players.find((p) => p.socketId === state.winner);
-    if (winnerPlayer) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (winnerPlayer) {
       title.textContent = `¡Ganador: ${winnerPlayer.name}!`;
       title.className = 'display-5 text-success animate-pulse';
     } else {
@@ -490,15 +585,18 @@ function showGameOverOverlay(state, p1, p2) {
   `;
 }
 
+// Función setupKeyboardInput() que ayuda a entender la lógica.
 function setupKeyboardInput() {
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (e.code === 'Escape') {
       e.preventDefault();
       window.togglePause();
       return;
     }
 
-    if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (e.code === 'KeyW' || e.code === 'ArrowUp') {
       e.preventDefault();
       sendMove(e.code === 'KeyW' ? 0 : 1, 'UP');
     } else if (e.code === 'KeyS' || e.code === 'ArrowDown') {
@@ -514,9 +612,12 @@ function setupKeyboardInput() {
   });
 }
 
+// Función sendMove(playerIdx, que ayuda a entender la lógica.
 function sendMove(playerIdx, direction) {
-  if (gameConfig.multiplayer === 'online') {
-    if (playerIdx === gameConfig.myIndex && socketConn && socketConn.connected) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameConfig.multiplayer === 'online') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (playerIdx === gameConfig.myIndex && socketConn && socketConn.connected) {
       socketConn.emit('playerMove', direction);
     }
   } else if (localGameInstance) {
@@ -525,6 +626,7 @@ function sendMove(playerIdx, direction) {
   }
 }
 
+// Función setupTouchInput() que ayuda a entender la lógica.
 function setupTouchInput() {
   const btnUp = document.getElementById('tBtnUp');
   const btnDown = document.getElementById('tBtnDown');
@@ -532,6 +634,7 @@ function setupTouchInput() {
   const btnRight = document.getElementById('tBtnRight');
   const btnSwitch = document.getElementById('tBtnSwitch');
 
+  // Función pressBtn que ayuda a entender la lógica.
   const pressBtn = (btn, fn) => {
     btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
@@ -542,17 +645,23 @@ function setupTouchInput() {
     btn.addEventListener('pointerleave', () => btn.classList.remove('is-pressed'));
   };
 
+  // Función handleTouch que ayuda a entender la lógica.
   const handleTouch = (dir) => {
     let idx = gameConfig.multiplayer === 'online' ? gameConfig.myIndex : touchActivePlayer;
     sendMove(idx, dir);
   };
 
-  if (btnUp) pressBtn(btnUp, () => handleTouch('UP'));
-  if (btnDown) pressBtn(btnDown, () => handleTouch('DOWN'));
-  if (btnLeft) pressBtn(btnLeft, () => handleTouch('LEFT'));
-  if (btnRight) pressBtn(btnRight, () => handleTouch('RIGHT'));
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (btnUp) pressBtn(btnUp, () => handleTouch('UP'));
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (btnDown) pressBtn(btnDown, () => handleTouch('DOWN'));
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (btnLeft) pressBtn(btnLeft, () => handleTouch('LEFT'));
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (btnRight) pressBtn(btnRight, () => handleTouch('RIGHT'));
 
-  if (btnSwitch && gameConfig.mode === '2P' && gameConfig.multiplayer === 'local') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (btnSwitch && gameConfig.mode === '2P' && gameConfig.multiplayer === 'local') {
     btnSwitch.addEventListener('click', () => {
       touchActivePlayer = touchActivePlayer === 0 ? 1 : 0;
       btnSwitch.textContent = touchActivePlayer === 0 ? 'J1' : 'J2';
@@ -564,17 +673,21 @@ function setupTouchInput() {
   }
 
   window.addEventListener('touchstart', (e) => {
-    if (e.target.closest('.d-btn, .btn-hud, .overlay, .header-nav')) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (e.target.closest('.d-btn, .btn-hud, .overlay, .header-nav')) return;
     touchStartX = e.changedTouches[0].screenX;
     touchStartY = e.changedTouches[0].screenY;
   }, { passive: true });
 
   window.addEventListener('touchend', (e) => {
-    if (e.target.closest('.d-btn, .btn-hud, .overlay, .header-nav')) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (e.target.closest('.d-btn, .btn-hud, .overlay, .header-nav')) return;
     const diffX = e.changedTouches[0].screenX - touchStartX;
     const diffY = e.changedTouches[0].screenY - touchStartY;
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      if (Math.abs(diffX) > 40) handleTouch(diffX > 0 ? 'RIGHT' : 'LEFT');
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Math.abs(diffX) > Math.abs(diffY)) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Math.abs(diffX) > 40) handleTouch(diffX > 0 ? 'RIGHT' : 'LEFT');
     } else if (Math.abs(diffY) > 40) {
       handleTouch(diffY > 0 ? 'DOWN' : 'UP');
     }
@@ -593,14 +706,18 @@ const SNAKE_LEVELS = [
   /* 8 */ { tickInterval:  52, duration: 160, obstacles: 28, bonusChance: 0.40 },
 ];
 
+// Función _snakeLevelConfig(level) que ayuda a entender la lógica.
 function _snakeLevelConfig(level) {
   return SNAKE_LEVELS[Math.min(level - 1, SNAKE_LEVELS.length - 1)];
 }
 
+// Función _calcSnakeLevel(duration) que ayuda a entender la lógica.
 function _calcSnakeLevel(duration) {
   let lv = 1;
+  // Repite este bloque con un bucle for.
   for (let i = SNAKE_LEVELS.length - 1; i >= 0; i--) {
-    if (duration >= SNAKE_LEVELS[i].duration) { lv = i + 1; break; }
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (duration >= SNAKE_LEVELS[i].duration) { lv = i + 1; break; }
   }
   return lv;
 }
@@ -632,6 +749,7 @@ class LocalSnakeEngine {
       const initialDir = isFirst ? 'RIGHT' : 'LEFT';
 
       const segments = [];
+      // Repite este bloque con un bucle for.
       for (let i = 0; i < 3; i++) {
         segments.push({ x: startX - (isFirst ? i : -i), y: startY });
       }
@@ -656,28 +774,37 @@ class LocalSnakeEngine {
     this.obstacles = [];
     this.items    = [];
     this.powerups = [];
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < 3; i++) this.spawnItem();
     this.spawnPowerup();
     this._syncObstacles();
   }
 
   handleInput(socketId, dir) {
+    // Función player que organiza esta parte del código.
     const player = this.players.find((p) => p.socketId === socketId);
-    if (!player || player.isDead || player.empTicks > 0) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!player || player.isDead || player.empTicks > 0) return;
     const curDir = player.dir;
-    if (dir === 'UP'    && curDir === 'DOWN')  return;
-    if (dir === 'DOWN'  && curDir === 'UP')    return;
-    if (dir === 'LEFT'  && curDir === 'RIGHT') return;
-    if (dir === 'RIGHT' && curDir === 'LEFT')  return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dir === 'UP'    && curDir === 'DOWN')  return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dir === 'DOWN'  && curDir === 'UP')    return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dir === 'LEFT'  && curDir === 'RIGHT') return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dir === 'RIGHT' && curDir === 'LEFT')  return;
     player.nextDir = dir;
   }
 
   // ─── Obstáculos ────────────────────────────────────────────────────────────
   _syncObstacles() {
     const target = _snakeLevelConfig(this.level).obstacles;
+    // Repite mientras la condición sea verdadera.
     while (this.obstacles.length < target) {
       const tile = this._getRandomFreeTileForObstacle();
-      if (tile) this.obstacles.push(tile);
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (tile) this.obstacles.push(tile);
       else break;
     }
   }
@@ -685,11 +812,13 @@ class LocalSnakeEngine {
   _getRandomFreeTileForObstacle() {
     const safeZone = 5;
     let x, y, attempts = 0;
+    // Ejecuta este bloque al menos una vez y luego repite mientras la condición sea verdadera.
     do {
       x = Math.floor(Math.random() * (this.width  - 4)) + 2;
       y = Math.floor(Math.random() * (this.height - 4)) + 2;
       attempts++;
-      if (attempts > 200) return null;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (attempts > 200) return null;
     } while (
       this.isTileOccupied(x, y) ||
       this.isObstacle(x, y)     ||
@@ -715,11 +844,13 @@ class LocalSnakeEngine {
 
   getRandomFreeTile() {
     let x, y, attempts = 0;
+    // Ejecuta este bloque al menos una vez y luego repite mientras la condición sea verdadera.
     do {
       x = Math.floor(Math.random() * (this.width  - 2)) + 1;
       y = Math.floor(Math.random() * (this.height - 2)) + 1;
       attempts++;
-      if (attempts > 200) break;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (attempts > 200) break;
     } while (
       this.isTileOccupied(x, y)  ||
       this.isObstacle(x, y)      ||
@@ -735,15 +866,18 @@ class LocalSnakeEngine {
     const tile = this.getRandomFreeTile();
     const cfg  = _snakeLevelConfig(this.level);
     const rand = Math.random();
-    if (rand < cfg.bonusChance) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (rand < cfg.bonusChance) {
       const ttl = 8000 + Math.random() * 4000;
       this.items.push({ x: tile.x, y: tile.y, type: 'bonus', expiresAt: Date.now() + ttl });
       return;
     }
     const r2 = Math.random();
     let type = 'datos';
-    if (r2 > 0.6 && r2 <= 0.9) type = 'energia';
-    else if (r2 > 0.9)          type = 'nodo';
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (r2 > 0.6 && r2 <= 0.9) type = 'energia';
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (r2 > 0.9)          type = 'nodo';
     this.items.push({ x: tile.x, y: tile.y, type });
   }
 
@@ -760,9 +894,11 @@ class LocalSnakeEngine {
   }
 
   schedulePowerupRespawn() {
-    if (this.powerupSpawnTimer) clearTimeout(this.powerupSpawnTimer);
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.powerupSpawnTimer) clearTimeout(this.powerupSpawnTimer);
     this.powerupSpawnTimer = setTimeout(() => {
-      if (this.state === 'playing') this.spawnPowerup();
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state === 'playing') this.spawnPowerup();
     }, 8000);
   }
 
@@ -770,25 +906,35 @@ class LocalSnakeEngine {
 
   applyMagnetAttraction() {
     this.players.forEach((player) => {
-      if (player.isDead || !(player.magnetTicks > 0)) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead || !(player.magnetTicks > 0)) return;
       const head   = player.segments[0];
       const radius = 5.5;
       this.items.forEach((item) => {
         let dx = head.x - item.x;
         let dy = head.y - item.y;
-        if (dx >  this.width  / 2) dx -= this.width;
-        if (dx < -this.width  / 2) dx += this.width;
-        if (dy >  this.height / 2) dy -= this.height;
-        if (dy < -this.height / 2) dy += this.height;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx >  this.width  / 2) dx -= this.width;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx < -this.width  / 2) dx += this.width;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy >  this.height / 2) dy -= this.height;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy < -this.height / 2) dy += this.height;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > 0 && dist <= radius) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dist > 0 && dist <= radius) {
           const force = 0.15 + (1 - dist / radius) * 0.35;
           item.x += (dx / dist) * force;
           item.y += (dy / dist) * force;
-          if (item.x < 0)             item.x += this.width;
-          if (item.x >= this.width)   item.x -= this.width;
-          if (item.y < 0)             item.y += this.height;
-          if (item.y >= this.height)  item.y -= this.height;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.x < 0)             item.x += this.width;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.x >= this.width)   item.x -= this.width;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.y < 0)             item.y += this.height;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (item.y >= this.height)  item.y -= this.height;
         }
       });
     });
@@ -797,36 +943,47 @@ class LocalSnakeEngine {
   // ─── Tick ──────────────────────────────────────────────────────────────────
 
   tick() {
-    if (this.state !== 'playing') return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.state !== 'playing') return;
 
     this.tickCount++;
-    if (this.tickCount % 10 === 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.tickCount % 10 === 0) {
       this.duration++;
       const newLevel = _calcSnakeLevel(this.duration);
-      if (newLevel !== this.level) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (newLevel !== this.level) {
         this.level = newLevel;
         this._syncObstacles();
       }
     }
 
-    if (this.tickCount % 5 === 0) this._cleanExpiredBonus();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.tickCount % 5 === 0) this._cleanExpiredBonus();
 
     this.applyMagnetAttraction();
 
     this.players.forEach((player) => {
-      if (player.isDead) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead) return;
 
-      if (player.overclockTicks > 0) player.overclockTicks--;
-      if (player.firewallTicks  > 0) player.firewallTicks--;
-      if (player.empTicks > 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.overclockTicks > 0) player.overclockTicks--;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks  > 0) player.firewallTicks--;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.empTicks > 0) {
         player.empTicks--;
         return;
       }
-      if (player.magnetTicks > 0) player.magnetTicks--;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.magnetTicks > 0) player.magnetTicks--;
 
       const steps = player.overclockTicks > 0 ? 2 : 1;
+      // Repite este bloque con un bucle for.
       for (let step = 0; step < steps; step++) {
-        if (player.isDead) break;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.isDead) break;
         this._stepPlayer(player);
       }
     });
@@ -839,27 +996,39 @@ class LocalSnakeEngine {
     player.dir = player.nextDir;
 
     const head = { ...player.segments[0] };
-    if (player.dir === 'UP')    head.y--;
-    if (player.dir === 'DOWN')  head.y++;
-    if (player.dir === 'LEFT')  head.x--;
-    if (player.dir === 'RIGHT') head.x++;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'UP')    head.y--;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'DOWN')  head.y++;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'LEFT')  head.x--;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.dir === 'RIGHT') head.x++;
 
     const outOfBounds = head.x < 0 || head.x >= this.width || head.y < 0 || head.y >= this.height;
-    if (outOfBounds) {
-      if (player.firewallTicks > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (outOfBounds) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks > 0) {
         player.firewallTicks = 0;
-        if      (head.x < 0)            head.x = this.width  - 1;
-        else if (head.x >= this.width)  head.x = 0;
-        else if (head.y < 0)            head.y = this.height - 1;
-        else if (head.y >= this.height) head.y = 0;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (head.x < 0)            head.x = this.width  - 1;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (head.x >= this.width)  head.x = 0;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (head.y < 0)            head.y = this.height - 1;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (head.y >= this.height) head.y = 0;
       } else {
         player.isDead = true;
         return;
       }
     }
 
-    if (this.isObstacle(head.x, head.y)) {
-      if (player.firewallTicks > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.isObstacle(head.x, head.y)) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks > 0) {
         player.firewallTicks = 0;
       } else {
         player.isDead = true;
@@ -870,15 +1039,19 @@ class LocalSnakeEngine {
     let hitCable = false;
     this.players.forEach((other) => {
       other.segments.forEach((seg, sIdx) => {
-        if (seg.x === head.x && seg.y === head.y) {
-          if (other.socketId === player.socketId && sIdx === 0) return;
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (seg.x === head.x && seg.y === head.y) {
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (other.socketId === player.socketId && sIdx === 0) return;
           hitCable = true;
         }
       });
     });
 
-    if (hitCable) {
-      if (player.firewallTicks > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hitCable) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player.firewallTicks > 0) {
         player.firewallTicks = 0;
       } else {
         player.isDead = true;
@@ -890,58 +1063,80 @@ class LocalSnakeEngine {
 
     let ate = false;
 
+    // Función itemIdx que organiza esta parte del código.
     const itemIdx = this.items.findIndex((item) => {
       let dx = head.x - item.x;
       let dy = head.y - item.y;
-      if (dx >  this.width  / 2) dx -= this.width;
-      if (dx < -this.width  / 2) dx += this.width;
-      if (dy >  this.height / 2) dy -= this.height;
-      if (dy < -this.height / 2) dy += this.height;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx >  this.width  / 2) dx -= this.width;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx < -this.width  / 2) dx += this.width;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy >  this.height / 2) dy -= this.height;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy < -this.height / 2) dy += this.height;
       return Math.abs(dx) < 0.55 && Math.abs(dy) < 0.55;
     });
 
-    if (itemIdx !== -1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (itemIdx !== -1) {
       const item = this.items.splice(itemIdx, 1)[0];
       ate = true;
       let scoreAdd     = 10;
       let growSegments = 1;
-      if      (item.type === 'energia') { scoreAdd = 25;  growSegments = 2; }
-      else if (item.type === 'nodo')    { scoreAdd = 50;  growSegments = 3; }
-      else if (item.type === 'bonus')   { scoreAdd = 100; growSegments = 1; }
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (item.type === 'energia') { scoreAdd = 25;  growSegments = 2; }
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (item.type === 'nodo')    { scoreAdd = 50;  growSegments = 3; }
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (item.type === 'bonus')   { scoreAdd = 100; growSegments = 1; }
       player.score += scoreAdd;
+      // Repite este bloque con un bucle for.
       for (let i = 1; i < growSegments; i++) {
         player.segments.push({ ...player.segments[player.segments.length - 1] });
       }
       this.spawnItem();
     }
 
+    // Función puIdx que organiza esta parte del código.
     const puIdx = this.powerups.findIndex((pu) => pu.x === head.x && pu.y === head.y);
-    if (puIdx !== -1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (puIdx !== -1) {
       const pu = this.powerups.splice(puIdx, 1)[0];
       ate = true;
-      if (pu.type === 'overclock') player.overclockTicks = 50;
-      else if (pu.type === 'firewall') player.firewallTicks = 80;
-      else if (pu.type === 'emp') {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (pu.type === 'overclock') player.overclockTicks = 50;
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (pu.type === 'firewall') player.firewallTicks = 80;
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (pu.type === 'emp') {
         player.magnetTicks = 80;
         this.players.forEach((other) => {
-          if (other.socketId !== player.socketId) other.empTicks = 20;
+          // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (other.socketId !== player.socketId) other.empTicks = 20;
         });
       }
       this.schedulePowerupRespawn();
     }
 
-    if (!ate) player.segments.pop();
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!ate) player.segments.pop();
   }
 
   checkGameOver() {
+    // Función alive que organiza esta parte del código.
     const alive = this.players.filter((p) => !p.isDead);
-    if (alive.length === 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (alive.length === 0) {
       this.state = 'game_over';
       const p1 = this.players[0];
       const p2 = this.players[1];
-      if (p1 && p2) {
-        if      (p1.score > p2.score) this.winner = p1.socketId;
-        else if (p2.score > p1.score) this.winner = p2.socketId;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p1 && p2) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (p1.score > p2.score) this.winner = p1.socketId;
+        // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (p2.score > p1.score) this.winner = p2.socketId;
         else                          this.winner = 'draw';
       } else if (p1) {
         this.winner = 'none';

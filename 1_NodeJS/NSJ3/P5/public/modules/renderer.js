@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /* 
   Este módulo se encarga de "dibujar" los productos 
   y el carrito en la pantalla.

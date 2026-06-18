@@ -20,11 +20,14 @@ export const aplicarReglasPais = (formulario, consola) => {
     prefijo.value = "";
     telefono.maxLength = 15;
     documento.maxLength = 11;
-    if (hintDoc)
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hintDoc)
       hintDoc.textContent =
         "Elegí nacionalidad para ver el formato del documento";
-    if (hintTel) hintTel.textContent = "";
-    if (contador) contador.textContent = "";
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hintTel) hintTel.textContent = "";
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (contador) contador.textContent = "";
     return;
   }
 
@@ -35,7 +38,8 @@ export const aplicarReglasPais = (formulario, consola) => {
 
   // Yo actualizo los mensajes de ayuda (hints)
   if (hintDoc) hintDoc.textContent = config.documento.mensaje;
-  if (hintTel) hintTel.textContent = config.telefono.mensaje;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hintTel) hintTel.textContent = config.telefono.mensaje;
   actualizarContadorTelefono(telefono, config.telefono.max, contador);
 
   // Yo valido los campos con las nuevas reglas del país
@@ -46,7 +50,8 @@ export const aplicarReglasPais = (formulario, consola) => {
 
 // Yo actualizo el contador de dígitos del teléfono en tiempo real
 export const actualizarContadorTelefono = (input, max, contadorEl) => {
-  if (!contadorEl) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!contadorEl) return;
   const len = input.value.replace(/\D/g, "").length;
   contadorEl.textContent = `${len} / ${max} dígitos`;
   contadorEl.classList.toggle("text-danger", len > max);
@@ -55,5 +60,6 @@ export const actualizarContadorTelefono = (input, max, contadorEl) => {
 // Yo filtro el input para permitir solo números
 export const soloNumeros = (input) => {
   const limpio = input.value.replace(/\D/g, "");
-  if (input.value !== limpio) input.value = limpio;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (input.value !== limpio) input.value = limpio;
 };

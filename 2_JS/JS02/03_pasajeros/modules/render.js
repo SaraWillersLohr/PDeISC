@@ -6,13 +6,16 @@ export const dibujarListaPersonas = (lista, contenedor, onBorrar, consola) => {
 
   // Yo actualizo el contador de personas en la interfaz
   const contador = document.getElementById("peopleCount");
-  if (contador) contador.textContent = String(lista.length);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (contador) contador.textContent = String(lista.length);
 
   // Yo actualizo la lista lateral de nombres
   const nombresLista = document.getElementById("namesList");
-  if (nombresLista) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (nombresLista) {
     nombresLista.innerHTML = "";
-    if (!lista.length) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!lista.length) {
       nombresLista.innerHTML =
         '<li class="names-empty">Sin nombres guardados todavía</li>';
     } else {

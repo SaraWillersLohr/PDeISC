@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 import { agregarLog } from "./consola.js";
 import {
   validarFormulario,
@@ -13,6 +15,7 @@ import { abrirModalTerminos } from "./terminos.js";
 
 export function bindEventos() {
   const form = document.getElementById("registro-form");
+  // Si if (!form), entonces se ejecuta este bloque.
   if (!form) return;
 
   form.querySelector("#reg-nombre")?.addEventListener("input", (e) => {
@@ -33,6 +36,7 @@ export function bindEventos() {
   // Cuando marca/desmarca el checkbox, actualizo el estado visual
   const checkboxTerminos = form.querySelector("#reg-terminos");
   checkboxTerminos?.addEventListener("change", () => {
+    // Si if (validarTerminosAceptados()), entonces se ejecuta este bloque.
     if (validarTerminosAceptados()) {
       marcarBloqueTerminos(true);
       agregarLog("Términos", "Checkbox de aceptación marcado");
@@ -58,6 +62,7 @@ export function bindEventos() {
       return;
     }
 
+    // Si if (Object.keys(errores).length > 0), entonces se ejecuta este bloque.
     if (Object.keys(errores).length > 0) {
       agregarLog("Formulario", "Envío con errores en otros campos");
       return;

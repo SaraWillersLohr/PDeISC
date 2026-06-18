@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * Gestor de Estado (State Manager)
  * Centraliza los datos de la aplicación (como el nombre del usuario o el tema) 

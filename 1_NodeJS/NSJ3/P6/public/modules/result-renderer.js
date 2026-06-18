@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * Renderizador de Resultados
  * Toma los datos validados del formulario y los muestra de forma prolija 

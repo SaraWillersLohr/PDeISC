@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * acá manejo toda la lógica del analizador de números.
  * proceso los archivos subidos, resuelvo ambigüedades y calculo estadísticas.
@@ -39,7 +41,8 @@ const visorPorcentaje = document.getElementById('stat-porcentaje');
 
 // inicio la configuración visual
 async function cargarPreferencias() {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const respuesta = await fetch('/api/configuracion');
         const datosConfiguracion = await respuesta.json();
         aplicarTema(datosConfiguracion.tema || 'dark');
@@ -53,11 +56,13 @@ async function cargarPreferencias() {
  * traigo la lista de archivos que ya están en la carpeta del servidor
  */
 async function cargarListaDeArchivos() {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const respuesta = await fetch('/api/listar-archivos');
         const data = await respuesta.json();
         
-        if (data.success && data.archivos.length > 0) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (data.success && data.archivos.length > 0) {
             selectorArchivos.innerHTML = '<option value="">-- Seleccionar un archivo --</option>' + 
                 data.archivos.map(f => `<option value="${f}">${f}</option>`).join('');
         } else {
@@ -72,14 +77,17 @@ async function cargarListaDeArchivos() {
  * esta función carga un archivo específico seleccionado del servidor
  */
 async function seleccionarArchivoDelServidor(nombre) {
-    if (!nombre) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!nombre) return;
     
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         feedbackArchivo.innerHTML = `<div class="text-primary small fade-in"><i class="fa-solid fa-sync fa-spin me-1"></i> Cargando desde el servidor...</div>`;
         const respuesta = await fetch(`/api/leer-archivo/${nombre}`);
         const data = await respuesta.json();
         
-        if (data.success) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (data.success) {
             feedbackArchivo.innerHTML = `<div class="text-success small fade-in"><i class="fa-solid fa-check-double me-1"></i> Archivo del servidor cargado</div>`;
             lineasBrutas = data.lineas;
             
@@ -96,6 +104,7 @@ async function seleccionarArchivoDelServidor(nombre) {
     }
 }
 
+// Función aplicarTema(tema) que ayuda a entender la lógica.
 function aplicarTema(tema) {
     temaVisual = tema;
     enlaceTema.href = `/estilos/${tema}.css`;
@@ -116,16 +125,20 @@ async function cambiarModoVisual() {
 /**
  * valido el archivo antes de mandarlo al servidor
  */
+// Función esArchivoValido(archivo) que ayuda a entender la lógica.
 function esArchivoValido(archivo) {
-    if (!archivo) return false;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!archivo) return false;
     const extension = archivo.name.split('.').pop().toLowerCase();
     
-    if (extension !== 'txt') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (extension !== 'txt') {
         mostrarErrorVisual("Solo aceptamos archivos .txt reales.");
         return false;
     }
     
-    if (archivo.size > 2 * 1024 * 1024) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (archivo.size > 2 * 1024 * 1024) {
         mostrarErrorVisual("El archivo es muy pesado para ser solo texto.");
         return false;
     }
@@ -133,6 +146,7 @@ function esArchivoValido(archivo) {
     return true;
 }
 
+// Función mostrarErrorVisual(mensaje) que ayuda a entender la lógica.
 function mostrarErrorVisual(mensaje) {
     feedbackArchivo.innerHTML = `
         <div class="alert alert-danger fade-in py-2 px-3 small d-flex align-items-center rounded-3">
@@ -149,20 +163,23 @@ function mostrarErrorVisual(mensaje) {
  * subo el archivo al servidor y espero las líneas
  */
 async function procesarSubidaDeArchivo(archivo) {
-    if (!esArchivoValido(archivo)) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!esArchivoValido(archivo)) return;
 
     feedbackArchivo.innerHTML = `<div class="text-primary small fade-in"><i class="fa-solid fa-sync fa-spin me-1"></i> Validando: ${archivo.name}</div>`;
     
     const formulario = new FormData();
     formulario.append('archivo', archivo);
 
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         contenedorResultados.innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-magnifying-glass fa-spin fa-2x mb-3"></i><p>Escaneando contenido...</p></div>';
         
         const respuesta = await fetch('/api/subir-archivo', { method: 'POST', body: formulario });
         const data = await respuesta.json();
 
-        if (data.success) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (data.success) {
             feedbackArchivo.innerHTML = `<div class="text-success small fade-in"><i class="fa-solid fa-check-double me-1"></i> Archivo cargado correctamente</div>`;
             lineasBrutas = data.lineas;
             
@@ -183,8 +200,10 @@ async function procesarSubidaDeArchivo(archivo) {
 /**
  * esta sección renderiza la vista previa del contenido bruto
  */
+// Función mostrarVistaPrevia() que ayuda a entender la lógica.
 function mostrarVistaPrevia() {
-    if (lineasBrutas.length === 0) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (lineasBrutas.length === 0) return;
     
     // limpio y preparo el contenido real del txt dentro del modal
     contenedorVistaPrevia.textContent = lineasBrutas.join('\n');
@@ -196,20 +215,23 @@ function mostrarVistaPrevia() {
 /**
  * acá empiezo a analizar línea por línea y detecto ambigüedades
  */
+// Función comenzarAnalisisProfundo() que ayuda a entender la lógica.
 function comenzarAnalisisProfundo() {
     objetosProcesados = [];
     indicesAmbiguos = [];
     
     lineasBrutas.forEach((linea, pos) => {
         const info = procesarDato(linea);
-        if (info.esAmbiguo) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (info.esAmbiguo) {
             indicesAmbiguos.push(pos);
         } else {
             objetosProcesados[pos] = info;
         }
     });
 
-    if (indicesAmbiguos.length > 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (indicesAmbiguos.length > 0) {
         indiceDudaActual = 0;
         pedirResolucionAlUsuario();
     } else {
@@ -250,7 +272,8 @@ window.resolverDuda = (tipoElegido) => {
     objetosProcesados[posActual] = procesarDato(textoLinea, tipoElegido);
     
     indiceDudaActual++;
-    if (indiceDudaActual < indicesAmbiguos.length) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (indiceDudaActual < indicesAmbiguos.length) {
         pedirResolucionAlUsuario();
     } else {
         finalizarYMostrarEstadisticas();
@@ -260,7 +283,9 @@ window.resolverDuda = (tipoElegido) => {
 /**
  * acá termino el proceso, dibujo todo y calculo las métricas finales
  */
+// Función finalizarYMostrarEstadisticas() que ayuda a entender la lógica.
 function finalizarYMostrarEstadisticas() {
+    // Función listaFinal que organiza esta parte del código.
     const listaFinal = objetosProcesados.filter(item => item !== undefined);
     
     // dibujo los resultados generales
@@ -285,7 +310,8 @@ function finalizarYMostrarEstadisticas() {
             return valA - valB;
         });
 
-    if (utilesFiltrados.length === 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (utilesFiltrados.length === 0) {
         contenedorUtiles.innerHTML = '<div class="text-center py-5 opacity-25"><p>No hay números útiles</p></div>';
     } else {
         contenedorUtiles.innerHTML = utilesFiltrados.map(u => `
@@ -301,8 +327,11 @@ function finalizarYMostrarEstadisticas() {
 
     // actualizo los numeritos de las tarjetas
     const cantidadUtiles = utilesFiltrados.length;
+    // Función cantidadNoUtiles que organiza esta parte del código.
     const cantidadNoUtiles = listaFinal.filter(d => d.valido && !d.esUtil).length;
+    // Función cantidadInvalidos que organiza esta parte del código.
     const cantidadInvalidos = listaFinal.filter(d => !d.valido).length;
+    // Función cantidadFactoriales que organiza esta parte del código.
     const cantidadFactoriales = listaFinal.filter(d => d.esFactorial).length;
     const totalLineas = listaFinal.length;
     
@@ -329,9 +358,11 @@ async function exportarResultadosUtiles() {
         })
         .map(u => u.valor.toString());
 
-    if (soloValoresUtiles.length === 0) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (soloValoresUtiles.length === 0) return;
 
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         botonExportar.disabled = true;
         const respuesta = await fetch('/api/exportar-resultados', {
             method: 'POST',
@@ -339,13 +370,15 @@ async function exportarResultadosUtiles() {
             body: JSON.stringify({ datos: soloValoresUtiles })
         });
         const data = await respuesta.json();
-        if (data.success) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (data.success) {
             window.location.href = `/api/descargar/${data.fileName}`;
             // actualizo la lista del servidor para que el nuevo archivo aparezca en el select
             cargarListaDeArchivos();
         }
     } catch (e) { console.error('error al exportar:', e); } 
-    finally { botonExportar.disabled = false; }
+    // finally: siempre se ejecuta al final, con o sin error.
+finally { botonExportar.disabled = false; }
 }
 
 // manejo de drag & drop
@@ -372,7 +405,8 @@ interruptorTema.addEventListener('click', cambiarModoVisual);
 
 // botón volver arriba
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.scrollY > 300) {
         botonIrArriba.style.display = 'flex';
     } else {
         botonIrArriba.style.display = 'none';

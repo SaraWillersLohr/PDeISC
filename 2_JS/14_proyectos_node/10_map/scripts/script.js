@@ -61,6 +61,7 @@ const updateUI = () => {
 
 // Caso 1: Triplico cada número.
 dom.btnMapX3.onclick = () => {
+  // Función triplicados que organiza esta parte del código.
   const triplicados = numeros.map((n) => n * 3);
   log(`map() creó un nuevo array con ${triplicados.length} números (×3)`, "success");
   flowMap(dom.displayOriginal1, dom.displayResult1, numeros, triplicados, "numeros.map(n => n * 3)");
@@ -69,6 +70,7 @@ dom.btnMapX3.onclick = () => {
 
 // Caso 2: Convierto todos los nombres a MAYÚSCULAS.
 dom.btnMapUpper.onclick = () => {
+  // Función mayusculas que organiza esta parte del código.
   const mayusculas = nombres.map((nombre) => nombre.toUpperCase());
   log(`map() convirtió ${mayusculas.length} nombres a mayúsculas`, "success");
   flowMap(dom.displayOriginal2, dom.displayResult2, nombres, mayusculas, "nombres.map(n => n.toUpperCase())");
@@ -77,6 +79,7 @@ dom.btnMapUpper.onclick = () => {
 
 // Caso 3: Calculo el IVA (21%) para cada precio de mi lista.
 dom.btnMapIVA.onclick = () => {
+  // Función preciosConIVA que organiza esta parte del código.
   const preciosConIVA = precios.map((precio) => Number((precio * 1.21).toFixed(2)));
   log(`map() calculó IVA en ${preciosConIVA.length} precios`, "success");
   flowMap(

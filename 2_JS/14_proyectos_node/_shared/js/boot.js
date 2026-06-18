@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** 
  * ¡Hola! Este es el archivo de arranque (boot). 
  * Se encarga de inicializar todo lo necesario cuando carga la página de un TP.

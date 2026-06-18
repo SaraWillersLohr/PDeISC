@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** 
  * ¡Hola! Este es mi gestor de temas (claro/oscuro).
  * Uso localStorage para que, si elegís el modo oscuro, se mantenga así aunque recargues la página.
@@ -15,7 +17,8 @@ export function initTheme() {
 
   // Configuro el botón para que al hacer click cambie el tema.
   const btn = document.getElementById("themeToggle");
-  if (btn && !btn.dataset.bound) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (btn && !btn.dataset.bound) {
     btn.dataset.bound = "1";
     btn.addEventListener("click", () => {
       const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
@@ -27,10 +30,12 @@ export function initTheme() {
 // Esta función aplica el tema al documento y actualiza el icono del botón.
 function applyTheme(theme, persist) {
   document.documentElement.setAttribute("data-theme", theme);
-  if (persist) localStorage.setItem(STORAGE_KEY, theme);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (persist) localStorage.setItem(STORAGE_KEY, theme);
 
   const btn = document.getElementById("themeToggle");
-  if (!btn) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!btn) return;
 
   const isDark = theme === "dark";
   btn.innerHTML = isDark

@@ -7,7 +7,8 @@ export const mostrarFeedback = (input, resultado) => {
   input.classList.toggle("is-invalid", !resultado.valido);
   // Yo busco el elemento de mensaje de error y actualizo su texto
   const mensaje = input.parentElement?.querySelector(".invalid-feedback");
-  if (mensaje) mensaje.textContent = resultado.mensaje || "";
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mensaje) mensaje.textContent = resultado.mensaje || "";
 };
 
 // Yo limpio todo el feedback visual del formulario cuando se resetea

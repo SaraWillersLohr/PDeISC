@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /* 
   Este módulo se encarga de revisar que los datos 
   que pone el usuario tengan sentido.
@@ -25,20 +27,24 @@ export const validator = {
     if (partes.length < 2)
       return { valid: false, message: "Poné tu nombre y apellido, por favor." };
 
+    // Si if (!letrasSolo.test(limpio)), entonces se ejecuta este bloque.
     if (!letrasSolo.test(limpio))
       return { valid: false, message: "Usá solo letras, por favor." };
 
+    // Si if (repetidas.test(limpio)), entonces se ejecuta este bloque.
     if (repetidas.test(limpio))
       return { valid: false, message: "Hay demasiadas letras repetidas." };
 
     // Revisamos cada palabra
     for (const palabra of partes) {
+      // Si if (palabra.length < 2), entonces se ejecuta este bloque.
       if (palabra.length < 2)
         return {
           valid: false,
           message: "Cada palabra debe tener al menos 2 letras.",
         };
 
+      // Si if (!vocales.test(palabra)), entonces se ejecuta este bloque.
       if (!vocales.test(palabra))
         return {
           valid: false,
@@ -54,6 +60,7 @@ export const validator = {
       const respuesta = await fetch(
         `https://gender-api.com/get?name=${primerNombre}&key=${API_KEY}`,
       );
+      // Si if (!respuesta.ok) throw new Error("API caída"), entonces se ejecuta este bloque.
       if (!respuesta.ok) throw new Error("API caída");
 
       const datos = await respuesta.json();

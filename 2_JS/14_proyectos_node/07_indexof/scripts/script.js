@@ -40,13 +40,16 @@ const pintarBusqueda = (container, arr, busqueda, indice, resEl) => {
   });
 
   const badges = container.querySelector('[data-role="after-badges"]');
-  if (badges && indice >= 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (badges && indice >= 0) {
     renderBadges(badges, arr, { highlightLast: false });
     const badge = badges.querySelector(`[data-idx="${indice}"]`);
-    if (badge) badge.classList.add("array-badge--highlight");
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (badge) badge.classList.add("array-badge--highlight");
   }
 
-  if (resEl) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (resEl) {
     resEl.className = `feedback-box ${indice >= 0 ? "feedback-success" : "feedback-danger"}`;
     resEl.innerHTML =
       indice >= 0

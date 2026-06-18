@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const fs = require('fs');
 const path = require('path');
 
@@ -5,8 +7,10 @@ const LEADERBOARD_PATH = path.join(__dirname, '../../data/leaderboard.json');
 
 // Lee las puntuaciones desde el archivo JSON
 function readLeaderboard() {
-  try {
-    if (!fs.existsSync(LEADERBOARD_PATH)) {
+  // try: prueba este bloque y permite capturar errores con catch.
+try {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!fs.existsSync(LEADERBOARD_PATH)) {
       const initial = { pacman: [], snake: [] };
       fs.writeFileSync(LEADERBOARD_PATH, JSON.stringify(initial, null, 2));
       return initial;
@@ -21,7 +25,8 @@ function readLeaderboard() {
 
 // Guarda las puntuaciones en el archivo JSON
 function writeLeaderboard(data) {
-  try {
+  // try: prueba este bloque y permite capturar errores con catch.
+try {
     fs.writeFileSync(LEADERBOARD_PATH, JSON.stringify(data, null, 2));
     return true;
   } catch (error) {
@@ -43,7 +48,8 @@ function getTop10(game) {
 
 // Agrega una nueva puntuación con validación en el Backend
 function addScore(game, entry) {
-  if (game !== 'pacman' && game !== 'snake') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (game !== 'pacman' && game !== 'snake') {
     return { success: false, error: 'Juego inválido' };
   }
 
@@ -64,7 +70,8 @@ function addScore(game, entry) {
   if (game === 'pacman' && character !== 'Sara' && character !== 'Male') {
     return { success: false, error: 'Personaje de PacMan inválido.' };
   }
-  if (game === 'snake' && character !== 'USB' && character !== 'HDMI' && character !== 'Ethernet') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (game === 'snake' && character !== 'USB' && character !== 'HDMI' && character !== 'Ethernet') {
     return { success: false, error: 'Tipo de cable de Snake inválido.' };
   }
 
@@ -72,7 +79,8 @@ function addScore(game, entry) {
   if (typeof duration !== 'number' || duration < 0) {
     return { success: false, error: 'Duración inválida.' };
   }
-  if (typeof victories !== 'number' || victories < 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (typeof victories !== 'number' || victories < 0) {
     return { success: false, error: 'Victorias inválidas.' };
   }
 

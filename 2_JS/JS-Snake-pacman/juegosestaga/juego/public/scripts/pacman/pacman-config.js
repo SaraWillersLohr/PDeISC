@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** Constantes compartidas Escape Escolar (Pac-Man) */
 const LEVEL_ITEM_QUEUE = {
   1: ['Guardapolvo'],
@@ -12,10 +14,12 @@ const MAX_PACMAN_LEVEL = 6;
 
 const PACMAN_GHOST_NAMES = ['Lorena', 'Scaglione', 'Esteban'];
 
+// Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { LEVEL_ITEM_QUEUE, MAX_PACMAN_LEVEL, PACMAN_GHOST_NAMES };
 }
 
+// Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (typeof window !== 'undefined') {
   window.LEVEL_ITEM_QUEUE = LEVEL_ITEM_QUEUE;
   window.MAX_PACMAN_LEVEL = MAX_PACMAN_LEVEL;

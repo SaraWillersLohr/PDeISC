@@ -43,7 +43,8 @@ const server = http.createServer((req, res) => {
 
   // Yo leo el archivo del sistema de archivos de forma asíncrona
   fs.readFile(filePath, (err, data) => {
-    if (err) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (err) {
       // Si hay un error (archivo no encontrado), devuelvo un 404
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("404 Error: Archivo no encontrado");

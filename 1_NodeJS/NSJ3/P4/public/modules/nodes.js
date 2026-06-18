@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /* 
   Este pequeño módulo ayuda a crear y editar etiquetas 
   del tipo <a> (enlaces) de forma fácil.

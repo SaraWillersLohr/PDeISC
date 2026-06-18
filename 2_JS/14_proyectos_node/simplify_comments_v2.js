@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * ¡Hola! Este script lo usé en algún momento para simplificar los comentarios de mis scripts.
  * Básicamente, busca patrones y los reemplaza por otros más cortitos y fáciles de leer.
@@ -43,7 +45,8 @@ const folders = fs.readdirSync(rootDir).filter(f => fs.statSync(path.join(rootDi
 // Recorro cada carpeta y, si tiene un script.js, le aplico la simplificación.
 folders.forEach(folder => {
     const scriptPath = path.join(rootDir, folder, 'scripts', 'script.js');
-    if (fs.existsSync(scriptPath)) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (fs.existsSync(scriptPath)) {
         let content = fs.readFileSync(scriptPath, 'utf8');
         content = simplifyScriptComments(content, folder);
         fs.writeFileSync(scriptPath, content);

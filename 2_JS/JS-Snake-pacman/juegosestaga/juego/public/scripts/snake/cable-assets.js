@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * Configuración centralizada de cables para Cable Rush (Snake).
  * Una única fuente de verdad para sprites, colores y metadatos.
@@ -45,6 +47,7 @@ const CABLES = {
 const CABLE_LIST = Object.values(CABLES);
 
 /** Formato lobby — una sola fuente de verdad */
+// Función getLobbyCharacters() que ayuda a entender la lógica.
 function getLobbyCharacters() {
   return CABLE_LIST.map((c) => ({
     id: c.id,
@@ -57,13 +60,16 @@ function getLobbyCharacters() {
 }
 
 /** Obtiene la config de un cable por id; fallback USB */
+// Función getCable(character) que ayuda a entender la lógica.
 function getCable(character) {
   return CABLES[character] || CABLES.USB;
 }
 
 /** Rota un vector de dirección de grid a ángulo en radianes (sprite base apunta hacia arriba) */
+// Función dirToAngle(dir) que ayuda a entender la lógica.
 function dirToAngle(dir) {
-  switch (dir) {
+  // switch: elige una rama según el valor y ejecuta la acción correcta.
+switch (dir) {
     case 'UP':    return 0;
     case 'RIGHT': return Math.PI / 2;
     case 'DOWN':  return Math.PI;
@@ -73,18 +79,26 @@ function dirToAngle(dir) {
 }
 
 /** Dirección entre dos celdas adyacentes */
+// Función vecToDir(dx, que ayuda a entender la lógica.
 function vecToDir(dx, dy) {
-  if (dx === 1)  return 'RIGHT';
-  if (dx === -1) return 'LEFT';
-  if (dy === 1)  return 'DOWN';
-  if (dy === -1) return 'UP';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx === 1)  return 'RIGHT';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dx === -1) return 'LEFT';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy === 1)  return 'DOWN';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dy === -1) return 'UP';
   return null;
 }
 
 /** Cable rival para modo local 2P */
+// Función getRivalCable(character) que ayuda a entender la lógica.
 function getRivalCable(character) {
-  if (character === 'USB') return 'HDMI';
-  if (character === 'HDMI') return 'Ethernet';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (character === 'USB') return 'HDMI';
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (character === 'HDMI') return 'Ethernet';
   return 'USB';
 }
 

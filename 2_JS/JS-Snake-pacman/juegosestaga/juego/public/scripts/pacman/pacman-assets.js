@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** Rutas de assets Escape Escolar — carpeta img-pacman */
 const PACMAN_ASSETS = {
   saraLeft: '/assets/img-pacman/sarapix-paralaizq.png',
@@ -31,11 +33,13 @@ const GHOST_PROFILES = {
   Scaglione: { behavior: 'PATROL', label: 'Patrulla', color: '#a855f7', desc: 'Protege zonas clave' }
 };
 
+// Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (typeof window !== 'undefined') {
   window.PACMAN_ASSETS = PACMAN_ASSETS;
   window.GHOST_PROFILES = GHOST_PROFILES;
 }
 
+// Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { PACMAN_ASSETS, GHOST_PROFILES };
 }

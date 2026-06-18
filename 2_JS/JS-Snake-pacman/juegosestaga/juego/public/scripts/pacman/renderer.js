@@ -5,14 +5,17 @@
 // ── Partículas flotantes ───────────────────────────────────────────
 const _pxp = []; // particle pool
 
+// Función _pxpAdd(x, que ayuda a entender la lógica.
 function _pxpAdd(x, y, text, color) {
   _pxp.push({ x, y, text, color, age: 0, maxAge: 70, vy: -1.3 });
 }
 
 // ── Caché de imágenes ───────────────────────────────────────────
 const _pxCache = {};
+// Función _pxImg(src) que ayuda a entender la lógica.
 function _pxImg(src) {
-  if (!_pxCache[src]) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!_pxCache[src]) {
     const img = new Image();
     img.src = src;
     _pxCache[src] = img;
@@ -60,7 +63,8 @@ let _pxLastScore = -1;
 // ================================================================
 function drawPacmanGame(canvas, ctx, state) {
   const map = state.map;
-  if (!map || !map.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!map || !map.length) return;
 
   const rows = map.length;
   const cols = map[0].length;
@@ -90,9 +94,11 @@ function drawPacmanGame(canvas, ctx, state) {
   ctx.strokeStyle = 'rgba(255,255,255,0.04)';
   ctx.lineWidth = 1;
   const bSize = Math.max(tW, 32);
+  // Repite este bloque con un bucle for.
   for (let cx2 = 0; cx2 <= canvas.width; cx2 += bSize) {
     ctx.beginPath(); ctx.moveTo(cx2, 0); ctx.lineTo(cx2, canvas.height); ctx.stroke();
   }
+  // Repite este bloque con un bucle for.
   for (let cy2 = 0; cy2 <= canvas.height; cy2 += bSize) {
     ctx.beginPath(); ctx.moveTo(0, cy2); ctx.lineTo(canvas.width, cy2); ctx.stroke();
   }
@@ -101,7 +107,8 @@ function drawPacmanGame(canvas, ctx, state) {
   // Mapa ilustrado superpuesto
   const mapKey = `mapa${Math.min(level, 6)}`;
   const mapImg = _pxImg(spritePaths[mapKey]);
-  if (mapImg.complete && mapImg.naturalWidth > 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mapImg.complete && mapImg.naturalWidth > 0) {
     ctx.save();
     ctx.globalAlpha = 0.28;
     ctx.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
@@ -110,13 +117,17 @@ function drawPacmanGame(canvas, ctx, state) {
 
   // ── 2. CELDAS DEL MAPA ────────────────────────────────────────
   for (let r = 0; r < rows; r++) {
+    // Repite este bloque con un bucle for.
     for (let c = 0; c < cols; c++) {
       const cell = map[r][c];
       const x = c * tW;
       const y = r * tH;
-      if      (cell === 1) _drawLocker(ctx, x, y, tW, tH);
-      else if (cell === 2) _drawDot(ctx, x, y, tW, tH);
-      else if (cell === 3) _drawApple(ctx, x, y, tW, tH);
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if      (cell === 1) _drawLocker(ctx, x, y, tW, tH);
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (cell === 2) _drawDot(ctx, x, y, tW, tH);
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (cell === 3) _drawApple(ctx, x, y, tW, tH);
     }
   }
 
@@ -127,13 +138,15 @@ function drawPacmanGame(canvas, ctx, state) {
 
   // ── 4. FANTASMAS ───────────────────────────────────────────────
   state.ghosts.forEach(g => {
-    if (g.isDead) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.isDead) return;
     _drawGhost(ctx, g, tW, tH, state.frightenedTimer || 0);
   });
 
   // ── 5. JUGADORES ───────────────────────────────────────────────
   state.players.forEach(p => {
-    if (p.isDead) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.isDead) return;
     _drawPlayer(ctx, p, tW, tH);
   });
 
@@ -204,6 +217,7 @@ function _drawLocker(ctx, x, y, tW, tH) {
     ctx.lineWidth = 1.2;
     ctx.shadowBlur = 0;
     const vents = Math.floor(tH / 8);
+    // Repite este bloque con un bucle for.
     for (let v = 1; v <= vents && v <= 3; v++) {
       const vy = y + (tH / (vents + 1)) * v;
       ctx.beginPath();
@@ -274,7 +288,8 @@ function _drawSpecialItem(ctx, fx, fy, type, tW, tH) {
   const size = Math.min(tW, tH) * 0.9;
   let imgSrc = null;
   let glowColor = null;
-  switch(type) {
+  // switch: elige una rama según el valor y ejecuta la acción correcta.
+switch(type) {
     case 'Guardapolvo':
       imgSrc = spritePaths.guardapolvo;
       glowColor = '#60a5fa';
@@ -288,9 +303,11 @@ function _drawSpecialItem(ctx, fx, fy, type, tW, tH) {
       glowColor = '#a78bfa';
       break;
   }
-  if (imgSrc) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (imgSrc) {
     const img = _pxImg(imgSrc);
-    if (img.complete) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (img.complete) {
       ctx.shadowBlur = 20;
       ctx.shadowColor = glowColor;
       ctx.drawImage(img, cx - size / 2, cy - size / 2, size, size);
@@ -327,17 +344,21 @@ function _drawPlayer(ctx, p, tW, tH) {
   const isSara = p.character === 'Sara';
   const facingRight = p.lastHorizontalDir === 'RIGHT';
   let imgSrc;
-  if (p.hasGuardapolvo) {
-    if (isSara) imgSrc = facingRight ? spritePaths.saraCelebrateRight : spritePaths.saraCelebrateLeft;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.hasGuardapolvo) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isSara) imgSrc = facingRight ? spritePaths.saraCelebrateRight : spritePaths.saraCelebrateLeft;
     else imgSrc = facingRight ? spritePaths.maleCelebrateRight : spritePaths.maleCelebrateLeft;
   } else {
-    if (isSara) imgSrc = facingRight ? spritePaths.saraRight : spritePaths.saraLeft;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isSara) imgSrc = facingRight ? spritePaths.saraRight : spritePaths.saraLeft;
     else imgSrc = facingRight ? spritePaths.maleRight : spritePaths.maleLeft;
   }
   const img = _pxImg(imgSrc);
   ctx.save();
   ctx.translate(cx, cy);
-  if (img.complete && img.naturalWidth > 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (img.complete && img.naturalWidth > 0) {
     ctx.shadowBlur = 10;
     ctx.shadowColor = isSara ? 'rgba(255,0,127,0.5)' : 'rgba(0,229,255,0.5)';
     ctx.drawImage(img, -size / 2, -size / 2, size, size);
@@ -372,13 +393,17 @@ function _drawGhost(ctx, g, tW, tH, frightenedTimer) {
   const returning = g.mode === 'returning';
   let imgSrc = null;
   let glowColor = null;
-  if (frightened || returning) {
-    if (g.name === 'Esteban') imgSrc = spritePaths.estebanWeak;
-    else if (g.name === 'Lorena') imgSrc = spritePaths.lorenaWeak;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (frightened || returning) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.name === 'Esteban') imgSrc = spritePaths.estebanWeak;
+    // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (g.name === 'Lorena') imgSrc = spritePaths.lorenaWeak;
     else imgSrc = spritePaths.scaglioneWeak;
     glowColor = returning ? '#6366f1' : '#1d4ed8';
   } else {
-    if (g.name === 'Esteban') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.name === 'Esteban') {
       imgSrc = spritePaths.esteban;
       glowColor = '#f97316';
     } else if (g.name === 'Lorena') {
@@ -391,11 +416,14 @@ function _drawGhost(ctx, g, tW, tH, frightenedTimer) {
   }
   const img = _pxImg(imgSrc);
   ctx.save();
-  if (returning) ctx.globalAlpha = 0.55;
-  if (frightened && frightenedTimer < 120 && Math.floor(Date.now() / 150) % 2 === 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (returning) ctx.globalAlpha = 0.55;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (frightened && frightenedTimer < 120 && Math.floor(Date.now() / 150) % 2 === 0) {
     ctx.globalAlpha = 0.5;
   }
-  if (img.complete && img.naturalWidth > 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (img.complete && img.naturalWidth > 0) {
     ctx.shadowBlur = 10;
     ctx.shadowColor = glowColor;
     ctx.drawImage(img, cx - size / 2, cy - size / 2, size, size);
@@ -405,11 +433,14 @@ function _drawGhost(ctx, g, tW, tH, frightenedTimer) {
     const wobble = Math.sin(Date.now() / 200) * 0.03;
     ctx.translate(0, wobble * radius);
     let bodyColor;
-    if (frightened) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (frightened) {
       bodyColor = '#1d4ed8';
     } else {
-      if (g.name === 'Lorena') bodyColor = '#a855f7';
-      else if (g.name === 'Scaglione') bodyColor = '#64748b';
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (g.name === 'Lorena') bodyColor = '#a855f7';
+      // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
+else if (g.name === 'Scaglione') bodyColor = '#64748b';
       else bodyColor = '#f97316';
     }
     ctx.shadowBlur = 22;
@@ -420,6 +451,7 @@ function _drawGhost(ctx, g, tW, tH, frightenedTimer) {
     ctx.arc(cx, cy - radius * 0.15, radius, Math.PI, 0, false);
     ctx.lineTo(cx + radius, cy + radius * 0.9);
     const bW = (radius * 2) / 3;
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < 3; i++) {
       const bx = cx + radius - i * bW;
       ctx.arc(bx - bW / 2, cy + radius * 0.9, bW / 2, 0, Math.PI, true);
@@ -435,6 +467,7 @@ function _drawGhost(ctx, g, tW, tH, frightenedTimer) {
 // PARTÍCULAS DE PUNTAJE
 // ================================================================
 function _drawParticles(ctx) {
+  // Repite este bloque con un bucle for.
   for (let i = _pxp.length - 1; i >= 0; i--) {
     const p = _pxp[i];
     p.age++;
@@ -453,6 +486,7 @@ function _drawParticles(ctx) {
     ctx.textBaseline = 'middle';
     ctx.fillText(p.text, 0, 0);
     ctx.restore();
-    if (p.age >= p.maxAge) _pxp.splice(i, 1);
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (p.age >= p.maxAge) _pxp.splice(i, 1);
   }
 }

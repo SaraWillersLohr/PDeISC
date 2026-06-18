@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const STORAGE_KEY = "p5_console_history";
 export function initConsole(){document.getElementById("btn-clear-console")?.addEventListener("click",()=>{document.getElementById("console-body").innerHTML='<div class="console-placeholder text-muted fst-italic fs-7">Consola vaciada.</div>';sessionStorage.removeItem(STORAGE_KEY);});cargar();}
 export function agregarLog(modulo,mensaje){const c=document.getElementById("console-body");if(!c)return;c.querySelector(".console-placeholder")?.remove();const t=new Date(),ts=`[${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}:${String(t.getSeconds()).padStart(2,"0")}]`;try{const h=JSON.parse(sessionStorage.getItem(STORAGE_KEY))||[];h.push({timestamp:ts,modulo,mensaje});sessionStorage.setItem(STORAGE_KEY,JSON.stringify(h));}catch(_){}const d=document.createElement("div");d.className="console-line";d.innerHTML=`<span class="console-time">${ts}</span><span class="console-method">${modulo}</span><span class="console-text">${mensaje}</span>`;c.appendChild(d);c.scrollTop=c.scrollHeight;}

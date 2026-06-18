@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * Módulo de enrutamiento (Router)
  * Se encarga de cargar archivos HTML externos en el contenedor principal 
@@ -8,6 +10,7 @@ export const router = {
         const container = document.getElementById(containerId);
         try {
             const response = await fetch(`../pages/${pageName}.html`);
+            // Si if (!response.ok) throw new Error('Error al cargar la página'), entonces se ejecuta este bloque.
             if (!response.ok) throw new Error('Error al cargar la página');
             const html = await response.text();
             

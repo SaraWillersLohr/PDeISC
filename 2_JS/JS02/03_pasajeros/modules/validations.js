@@ -19,6 +19,7 @@ const LISTA_NEGRA = [
   "abc",
 ];
 
+// Función tieneVocales que ayuda a entender la lógica.
 const tieneVocales = (t) => /[aeiouáéíóú]/i.test(t);
 
 // Yo calculo la edad real usando el objeto Date (año, mes y día)
@@ -66,7 +67,8 @@ export const validarNombreReal = (texto) => {
 
   // Yo verifico que haya suficiente variedad de letras para que sea un nombre real
   const unicos = new Set(min.split(""));
-  if (min.length >= 6 && unicos.size < 3)
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (min.length >= 6 && unicos.size < 3)
     return { valido: false, mensaje: "Parece texto basura" };
 
   return { valido: true, mensaje: "Nombre válido" };
@@ -82,7 +84,8 @@ export const validarNacionalidad = (codigo) => {
 
 export const validarDocumento = (documento, codigoPais) => {
   const pais = obtenerConfigPais(codigoPais);
-  if (!pais) return { valido: false, mensaje: "Primero elegí la nacionalidad" };
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!pais) return { valido: false, mensaje: "Primero elegí la nacionalidad" };
 
   const limpio = documento.trim();
   // Yo verifico que el documento no esté vacío
@@ -110,7 +113,8 @@ export const validarDocumento = (documento, codigoPais) => {
 
 export const validarTelefono = (telefono, codigoPais) => {
   const pais = obtenerConfigPais(codigoPais);
-  if (!pais)
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!pais)
     return {
       valido: false,
       mensaje: "Elegí nacionalidad para validar teléfono",
@@ -189,7 +193,8 @@ export const validarEdadYFecha = (edad, fechaNac) => {
 
   // Yo verifico que la edad coincida con la fecha de nacimiento
   const edadReal = calcularEdadDesdeFecha(fechaNac);
-  if (edadReal !== numEdad) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (edadReal !== numEdad) {
     return {
       valido: false,
       mensaje: "La edad no coincide con la fecha de nacimiento",
@@ -220,17 +225,20 @@ export const validarEmail = (email) => {
   // Yo verifico que el dominio sea válido
   if (!dominio || !dominio.includes("."))
     return { valido: false, mensaje: "Dominio incompleto" };
-  if (dominio.endsWith("."))
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dominio.endsWith("."))
     return { valido: false, mensaje: "Dominio incompleto (ej: @gmail.)" };
 
   // Yo uso un regex para validar el formato estándar de email
   const patron = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!patron.test(valor))
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!patron.test(valor))
     return { valido: false, mensaje: "Formato de email inválido" };
 
   // Yo verifico que la extensión del dominio sea válida
   const tld = dominio.split(".").pop();
-  if (!tld || tld.length < 2)
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!tld || tld.length < 2)
     return { valido: false, mensaje: "Extensión del dominio inválida" };
 
   return { valido: true, mensaje: "Email válido" };

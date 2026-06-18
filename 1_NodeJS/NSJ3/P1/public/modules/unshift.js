@@ -43,6 +43,7 @@ export const unshiftMethod = {
         
         // Tarea por defecto o la que ingrese el usuario
         let tareaUrgente = "⚠️ COMPRAR COMIDA (URGENTE)";
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           tareaUrgente = "⚠️ " + inputVal.trim();
         }
@@ -67,6 +68,7 @@ export const unshiftMethod = {
         const arr = [...array];
         
         let nuevoUsuario = "admin_antigravity";
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           nuevoUsuario = inputVal.trim();
         }

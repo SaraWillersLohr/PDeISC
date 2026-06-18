@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * ¡Hola! Este script lo uso para inyectar etiquetas y clases comunes en todos mis archivos HTML.
  * Así me aseguro de que todos los TPs tengan la misma fuente, los mismos estilos compartidos y animaciones.
@@ -36,7 +38,8 @@ const folders = Object.keys(methodMap);
 // Recorro cada carpeta y aplico los parches.
 folders.forEach((folder) => {
   const htmlPath = path.join(root, folder, "pages", "index.html");
-  if (!fs.existsSync(htmlPath)) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!fs.existsSync(htmlPath)) return;
 
   let html = fs.readFileSync(htmlPath, "utf8");
   const methodId = methodMap[folder];

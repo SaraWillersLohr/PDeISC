@@ -40,6 +40,7 @@ export const spliceMethod = {
         const arr = [...array];
         
         let nuevoNombre = "Leticia";
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           nuevoNombre = inputVal.trim();
         }
@@ -65,6 +66,7 @@ export const spliceMethod = {
         
         // Vamos a reemplazar desde el índice 1 (donde está "Plato"), quitamos 2 items y metemos nuevos
         let nuevosItems = ["Cuchara", "Cuchillo"];
+        // Si if (inputVal && inputVal.trim() !== ""), entonces se ejecuta este bloque.
         if (inputVal && inputVal.trim() !== "") {
           nuevosItems = inputVal.split(",").map(i => i.trim()).filter(i => i !== "");
         }

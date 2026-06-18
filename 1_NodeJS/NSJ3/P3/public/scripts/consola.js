@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const STORAGE_KEY = "p3_console_history";
 
 export function initConsole() {
@@ -7,6 +9,7 @@ export function initConsole() {
 
 export function agregarLog(modulo, mensaje) {
   const cuerpo = document.getElementById("console-body");
+  // Si if (!cuerpo), entonces se ejecuta este bloque.
   if (!cuerpo) return;
   cuerpo.querySelector(".console-placeholder")?.remove();
   const ahora = new Date();
@@ -26,15 +29,18 @@ export function agregarLog(modulo, mensaje) {
 
 function limpiarConsola() {
   const c = document.getElementById("console-body");
+  // Si if (c), entonces se ejecuta este bloque.
   if (c) c.innerHTML = `<div class="console-placeholder text-muted fst-italic fs-7">Consola vaciada.</div>`;
   sessionStorage.removeItem(STORAGE_KEY);
 }
 
 function cargarHistorial() {
   const c = document.getElementById("console-body");
+  // Si if (!c), entonces se ejecuta este bloque.
   if (!c) return;
   try {
     const h = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [];
+    // Si if (h.length), entonces se ejecuta este bloque.
     if (h.length) {
       c.innerHTML = "";
       h.forEach((log) => {

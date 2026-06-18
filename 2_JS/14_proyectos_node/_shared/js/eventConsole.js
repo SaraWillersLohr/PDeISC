@@ -1,14 +1,18 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** 
  * ¡Hola! Este es el código de mi consola de eventos visual.
  * Me permite mostrar mensajitos en la página para que sepas qué está pasando con el código.
  */
+// Función function que ayuda a entender la lógica.
 export function createEventConsole(rootSelector = "#eventConsole") {
   let root = document.querySelector(rootSelector);
   const history = [];
 
   // Esta función se asegura de que el elemento de la consola exista en la página.
   const ensureRoot = () => {
-    if (root) return root;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (root) return root;
 
     // Si no existe, lo creo desde cero con JavaScript.
     root = document.createElement("aside");
@@ -32,7 +36,8 @@ export function createEventConsole(rootSelector = "#eventConsole") {
     root.querySelector("#btnClearConsole")?.addEventListener("click", () => {
       history.length = 0;
       const body = root.querySelector("#eventConsoleBody");
-      if (body) body.innerHTML = "";
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (body) body.innerHTML = "";
       log("Historial limpiado", "system");
     });
 
@@ -56,7 +61,8 @@ export function createEventConsole(rootSelector = "#eventConsole") {
   const log = (message, type = "info") => {
     ensureRoot();
     const body = root.querySelector("#eventConsoleBody");
-    if (!body) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!body) return;
 
     const entry = document.createElement("div");
     entry.className = `event-console__line event-console__line--${type}`;

@@ -15,20 +15,23 @@ class AudioSynth {
 
   // Inicializa el AudioContext en la primera interacción del usuario
   init() {
-    if (!this.ctx) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.value = 0.95; // Volumen aumentado significativamente
       this.masterGain.connect(this.ctx.destination);
     }
-    if (this.ctx.state === 'suspended') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
   }
 
   // Helper: crear un oscilador y conectarlo al master con mayor calidad
   _osc(type, freq, gainVal, startTime, duration, freqRamp = null) {
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     
@@ -39,7 +42,8 @@ class AudioSynth {
 
     osc.type = type;
     osc.frequency.setValueAtTime(freq, startTime);
-    if (freqRamp) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (freqRamp) {
       osc.frequency.linearRampToValueAtTime(freqRamp.to, startTime + freqRamp.time);
     }
 
@@ -60,7 +64,8 @@ class AudioSynth {
   // Recoger moneda / punto — más brillante y fuerte
   playCoin() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     this._osc('sine', 660, 0.08, now, 0.09);
     this._osc('sine', 990, 0.07, now + 0.06, 0.11);
@@ -74,7 +79,8 @@ class AudioSynth {
 
   playCharacterSelect() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     this._osc('square', 880, 0.08, now, 0.07);
     this._osc('triangle', 1174.66, 0.07, now + 0.04, 0.1);
@@ -85,7 +91,8 @@ class AudioSynth {
   // Confirmación al iniciar partida
   playStartGame() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const notes = [392, 523.25, 659.25, 783.99, 1046.5];
     notes.forEach((f, i) => {
@@ -97,7 +104,8 @@ class AudioSynth {
   // Power-up / Hora Libre — más épico
   playPowerup() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     this._osc('triangle', 250, 0.12, now, 0.5, { to: 1500, time: 0.45 });
     this._osc('sine', 750, 0.06, now + 0.12, 0.4, { to: 1800, time: 0.35 });
@@ -107,7 +115,8 @@ class AudioSynth {
   // Game Over — más dramático
   playGameOver() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const notes = [350, 280, 210, 130];
     notes.forEach((f, i) => {
@@ -119,7 +128,8 @@ class AudioSynth {
   // Comer fantasma — más satisfactorio
   playEatGhost() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     this._osc('sine', 900, 0.12, now, 0.1);
     this._osc('sine', 1350, 0.11, now + 0.07, 0.14);
@@ -130,7 +140,8 @@ class AudioSynth {
   // Victoria — más alegre
   playVictory() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const melody = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.5];
     melody.forEach((freq, idx) => {
@@ -143,8 +154,10 @@ class AudioSynth {
   // Choque / muerte en Snake — más impactante
   playCrash() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < 5; i++) {
       this._osc('sawtooth', 180 + Math.random() * 120, 0.09, now + i * 0.035, 0.15, { to: 35 + Math.random() * 50, time: 0.18 });
     }
@@ -154,7 +167,8 @@ class AudioSynth {
   // Subida de nivel — más emocionante
   playLevelUp() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const melody = [392, 523.25, 659.25, 783.99, 1046.5, 1318.5];
     melody.forEach((f, i) => {
@@ -166,8 +180,10 @@ class AudioSynth {
   // Aviso nivel 3 — estilo "alarma de peligro" más intensa
   playDangerAlert() {
     this.init();
-    if (!this.ctx) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx) return;
     const now = this.ctx.currentTime;
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < 4; i++) {
       this._osc('sawtooth', 950, 0.13, now + i * 0.18, 0.18);
       this._osc('square', 475, 0.09, now + i * 0.18 + 0.07, 0.13);
@@ -179,7 +195,8 @@ class AudioSynth {
 
   startBGM(style = 'normal') {
     this.init();
-    if (!this.ctx || this.bgmPlaying) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.ctx || this.bgmPlaying) return;
     this.bgmPlaying = true;
     this.bgmStep = 0;
 
@@ -196,8 +213,10 @@ class AudioSynth {
     const bpmMs = style === 'danger' ? 85 : 125; // velocidad ajustada
     const stepMs = (60 / bpmMs) * 500; // corcheas
 
+    // Función playStep que organiza esta parte del código.
     const playStep = () => {
-      if (!this.bgmPlaying || !this.ctx) return;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!this.bgmPlaying || !this.ctx) return;
 
       const now = this.ctx.currentTime;
       const step = this.bgmStep % pattern.length;
@@ -216,7 +235,8 @@ class AudioSynth {
       if (step % 4 === 0) {
         this._osc('sawtooth', 85, 0.055, now, 0.045, { to: 32, time: 0.045 });
       }
-      if (step % 4 === 2) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (step % 4 === 2) {
         this._osc('square', 210, 0.035, now, 0.035, { to: 155, time: 0.035 });
       }
 
@@ -229,7 +249,8 @@ class AudioSynth {
 
   stopBGM() {
     this.bgmPlaying = false;
-    if (this.bgmTimer) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.bgmTimer) {
       clearTimeout(this.bgmTimer);
       this.bgmTimer = null;
     }
@@ -244,7 +265,8 @@ class AudioSynth {
   // Volumen master
   setVolume(val) {
     this.init();
-    if (this.masterGain) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (this.masterGain) {
       this.masterGain.gain.setTargetAtTime(val, this.ctx.currentTime, 0.05);
     }
   }

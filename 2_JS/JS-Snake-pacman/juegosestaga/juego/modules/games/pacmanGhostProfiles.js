@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const GHOST_PROFILES = {
   Esteban: { behavior: 'HUNTER', label: 'Cazador', color: '#f97316' },
   Lorena: { behavior: 'INTERCEPT', label: 'Emboscador', color: '#ff007f' },

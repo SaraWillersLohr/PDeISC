@@ -1,9 +1,12 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 import { agregarLog } from "./consola.js";
 
 export function bindEventos() {
   document.getElementById("btn-count-children")?.addEventListener("click", () => {
     const padre = document.getElementById("children-demo");
     const resultado = document.getElementById("children-result");
+    // Si if (!padre || !resultado), entonces se ejecuta este bloque.
     if (!padre || !resultado) return;
 
     const cantidad = padre.children.length;

@@ -23,6 +23,7 @@ const server = app.listen(PORT, () => {
 });
 
 server.on("error", (err) => {
+  // Si if (err.code === "EADDRINUSE"), entonces se ejecuta este bloque.
   if (err.code === "EADDRINUSE") {
     console.error(
       `El puerto ${PORT} ya está en uso. Cerrá el otro proceso o cambiá PORT.`,

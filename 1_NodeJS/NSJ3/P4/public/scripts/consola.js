@@ -9,6 +9,7 @@ export function initConsole() {
 }
 export function agregarLog(m, msg) {
   const c = document.getElementById("console-body");
+  // Si if (!c), entonces se ejecuta este bloque.
   if (!c) return;
   c.querySelector(".console-placeholder")?.remove();
   const t = new Date(),
@@ -31,6 +32,7 @@ function limpiar() {
 }
 function cargar() {
   const c = document.getElementById("console-body");
+  // Si if (!c), entonces se ejecuta este bloque.
   if (!c) return;
   try {
     JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]").forEach((log) => {

@@ -31,7 +31,8 @@ export const leerConFormData = (formulario) => {
 // Yo renderizo visualmente los resultados de los diferentes métodos de lectura
 // Esto ayuda a entender cómo cada método obtiene los datos
 export const renderizarLecturaMetodos = (contenedor, lecturas) => {
-  if (!contenedor) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!contenedor) return;
   contenedor.innerHTML = "";
 
   lecturas.forEach((item) => {

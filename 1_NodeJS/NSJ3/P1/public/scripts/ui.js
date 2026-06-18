@@ -1,6 +1,7 @@
 // UI auxiliar P1 — botón volver arriba
 export function initBackToTop() {
   const btn = document.getElementById("back-to-top");
+  // Si if (!btn), entonces se ejecuta este bloque.
   if (!btn) return;
   window.addEventListener("scroll", () => {
     btn.style.display = window.scrollY > 300 ? "flex" : "none";
@@ -12,8 +13,10 @@ export function initBackToTop() {
 // Función para registrar cambios de atributos en la interfaz
 export function mostrarAviso(mensaje, tipo = "warning") {
   const zona = document.querySelector(".glass-panel");
+  // Si if (!zona), entonces se ejecuta este bloque.
   if (!zona) return;
   const prev = document.getElementById("aviso-temporal");
+  // Si if (prev) prev.remove(), entonces se ejecuta este bloque.
   if (prev) prev.remove();
   const aviso = document.createElement("div");
   aviso.id = "aviso-temporal";

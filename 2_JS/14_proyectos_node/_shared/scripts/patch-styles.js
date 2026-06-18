@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * ¡Hola! Este script lo uso para resetear o limpiar los archivos de estilos locales de cada TP.
  */
@@ -17,7 +19,8 @@ const styleContent = `/* Overrides locales del ejercicio (si hace falta) */
 // Recorro cada carpeta y sobreescribo el archivo style.css local.
 folders.forEach((folder) => {
   const stylePath = path.join(root, folder, "styles", "style.css");
-  if (fs.existsSync(stylePath)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (fs.existsSync(stylePath)) {
     fs.writeFileSync(stylePath, styleContent);
     console.log("style.css →", folder);
   }

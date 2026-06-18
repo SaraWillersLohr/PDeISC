@@ -2,6 +2,7 @@
 // Esto evita que el usuario ingrese datos falsos o incorrectos
 const BASURA = ["asdf", "qwerty", "test", "xxx", "spam", "fake", "lorem"];
 
+// Función tieneVocales que ayuda a entender la lógica.
 const tieneVocales = (t) => /[aeiouáéíóú]/i.test(t);
 
 export const validarNombre = (texto) => {
@@ -31,11 +32,13 @@ export const validarEmail = (email) => {
   if (!valor) return { valido: false, mensaje: "Email obligatorio" };
   // Yo uso un regex para validar el formato estándar de email
   const patron = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!patron.test(valor))
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!patron.test(valor))
     return { valido: false, mensaje: "Formato inválido" };
   // Yo verifico que el dominio sea válido
   const dominio = valor.split("@")[1] || "";
-  if (dominio.length < 4 || !dominio.includes("."))
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dominio.length < 4 || !dominio.includes("."))
     return { valido: false, mensaje: "Dominio inválido" };
   return { valido: true, mensaje: "Email válido" };
 };

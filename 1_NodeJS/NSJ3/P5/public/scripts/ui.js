@@ -1,6 +1,7 @@
 // UI auxiliar — botón volver arriba
 export function initBackToTop() {
   const btn = document.getElementById("back-to-top");
+  // Si if (!btn), entonces se ejecuta este bloque.
   if (!btn) return;
 
   // muestro el botón al hacer scroll

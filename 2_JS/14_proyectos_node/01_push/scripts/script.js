@@ -43,7 +43,8 @@ const pintarFrutas = (antes, operacion) => {
     after: [...frutas],
     note: "push() modifica el mismo array (mutación).",
   });
-  if (dom.contFrutas) dom.contFrutas.textContent = `${frutas.length} ITEMS`;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dom.contFrutas) dom.contFrutas.textContent = `${frutas.length} ITEMS`;
 };
 
 // Lo mismo para mis amigos, para ver cómo crece la lista.
@@ -54,7 +55,8 @@ const pintarAmigos = (antes, operacion) => {
     after: [...amigos],
     note: "Parto de un array con un amigo y hago push de tres más.",
   });
-  if (dom.contAmigos) dom.contAmigos.textContent = `${amigos.length} ITEMS`;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dom.contAmigos) dom.contAmigos.textContent = `${amigos.length} ITEMS`;
 };
 
 // Y aquí manejo la visualización de mis números.
@@ -65,7 +67,8 @@ const pintarNums = (antes, operacion) => {
     after: [...numeros],
     note: "Solo hago push si el número es mayor al último.",
   });
-  if (dom.contNums)
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (dom.contNums)
     dom.contNums.textContent = `${numeros.length} ITEM${numeros.length === 1 ? "" : "S"}`;
 };
 
@@ -86,7 +89,8 @@ const updateUI = () => {
 
 // Caso 1: Mi array de frutas empieza vacío y le agrego tres de un tirón.
 dom.btnFrutas.onclick = () => {
-  if (frutas.length > 0) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (frutas.length > 0) return;
   const antes = [];
   frutas.push(...FRUTAS_POOL);
   log(`push() agregó ${FRUTAS_POOL.length} frutas al final`, "success");
@@ -96,7 +100,8 @@ dom.btnFrutas.onclick = () => {
 
 // Caso 2: Aquí ya tengo un amigo y le sumo otros tres amigos nuevos.
 dom.btnAmigos.onclick = () => {
-  if (amigos.length !== 1) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (amigos.length !== 1) return;
   const antes = [...amigos];
   amigos.push(...AMIGOS_POOL);
   log(`push() agregó "${AMIGOS_POOL.join('", "')}"`, "success");
@@ -107,12 +112,14 @@ dom.btnAmigos.onclick = () => {
 // Caso 3: Solo voy a permitir agregar un número si es más grande que el último que puse.
 dom.btnNum.onclick = () => {
   const val = parseInt(dom.inputNum.value, 10);
-  if (Number.isNaN(val)) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Number.isNaN(val)) return;
 
   const antes = [...numeros];
   const ultimo = numeros[numeros.length - 1];
 
-  if (val > ultimo) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (val > ultimo) {
     numeros.push(val);
     log(`push(${val}) exitoso`, "success");
     pintarNums(antes, `push(${val})`);

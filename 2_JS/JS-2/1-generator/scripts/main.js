@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * acá manejo toda la lógica del generador de números.
  * controlo el ingreso, las validaciones y la comunicación con el servidor.
@@ -26,7 +28,8 @@ const botonSubir = document.getElementById('back-to-top');
 
 // inicio la configuración trayendo el tema guardado del servidor
 async function iniciarConfiguracion() {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         const respuesta = await fetch('/api/configuracion');
         const datosConfiguracion = await respuesta.json();
         cambiarTema(datosConfiguracion.tema || 'dark');
@@ -96,7 +99,8 @@ window.resolverAmbiguedad = (tipoElegido) => {
 function renderizarPrevisualizacionResuelta(datos) {
     let htmlResultado = '';
     
-    if (datos.tipo === 'complejo' || datos.tipo === 'imaginario') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (datos.tipo === 'complejo' || datos.tipo === 'imaginario') {
         htmlResultado = `
             <div class="tech-label">Parte Real:</div>
             <div class="tech-value">${datos.parteReal}</div>
@@ -138,7 +142,8 @@ function actualizarPrevisualizacion() {
     const texto = inputNumero.value.trim();
     seleccionActual = null;
 
-    if (!texto) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!texto) {
         visualizadorTransformacion.innerHTML = `
             <div class="text-center py-5 opacity-25">
                 <i class="fa-solid fa-microchip fa-3x mb-3"></i>
@@ -153,7 +158,8 @@ function actualizarPrevisualizacion() {
 
     const analisis = procesarDato(texto);
     
-    if (!analisis.valido) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!analisis.valido) {
         inputNumero.classList.add('is-invalid');
         inputNumero.classList.remove('is-valid');
         feedbackInput.innerHTML = '<span class="text-danger">Formato no soportado</span>';
@@ -173,7 +179,8 @@ function actualizarPrevisualizacion() {
 
 // agrego el número a la lista definitiva
 function agregarNumeroALista() {
-    if (!seleccionActual || listaDeNumeros.length >= 20) return;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!seleccionActual || listaDeNumeros.length >= 20) return;
 
     listaDeNumeros.push(seleccionActual);
     renderizarConjunto();
@@ -185,7 +192,8 @@ function agregarNumeroALista() {
 
 // dibujo la lista de números que ya cargó el usuario
 function renderizarConjunto() {
-    if (listaDeNumeros.length === 0) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (listaDeNumeros.length === 0) {
         contenedorConjuntoActual.innerHTML = '<div class="text-center py-5 opacity-25"><p>No hay números cargados</p></div>';
         return;
     }
@@ -218,7 +226,8 @@ function verificarLimites() {
     const porcentaje = (cantidad / 20) * 100;
     barraProgreso.style.width = `${porcentaje}%`;
 
-    if (cantidad >= 10) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (cantidad >= 10) {
         seccionGenerar.classList.remove('d-none');
     } else {
         seccionGenerar.classList.add('d-none');
@@ -229,7 +238,8 @@ function verificarLimites() {
 
 // le pido al servidor que me genere el archivo txt con los números
 async function generarArchivoTxt() {
-    try {
+    // try: prueba este bloque y permite capturar errores con catch.
+try {
         botonGenerar.disabled = true;
         botonGenerar.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Generando...';
         
@@ -245,7 +255,8 @@ async function generarArchivoTxt() {
         });
 
         const data = await respuesta.json();
-        if (data.success) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (data.success) {
             window.location.href = `/api/descargar/${data.fileName}`;
         }
     } catch (error) { 
@@ -258,7 +269,8 @@ async function generarArchivoTxt() {
 
 // manejo el botón de volver arriba
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (window.scrollY > 300) {
         botonSubir.style.display = 'flex';
     } else {
         botonSubir.style.display = 'none';

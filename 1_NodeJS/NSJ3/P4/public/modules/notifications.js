@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /**
  * Un pequeño ayudante para mostrar mensajes en la pantalla
  * sin usar el alert() feo del navegador.
@@ -6,6 +8,7 @@ export const Notificador = {
   // Crea el contenedor si no existe
   obtenerContenedor() {
     let contenedor = document.getElementById('notificaciones-web');
+    // Si if (!contenedor), entonces se ejecuta este bloque.
     if (!contenedor) {
       contenedor = document.createElement('div');
       contenedor.id = 'notificaciones-web';

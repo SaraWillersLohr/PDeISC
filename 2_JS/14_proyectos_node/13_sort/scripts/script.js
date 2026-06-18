@@ -67,6 +67,7 @@ dom.btnSortWords.onclick = () => {
 
 // Caso 3: Ordeno objetos (personas) por su edad.
 dom.btnSortObj.onclick = () => {
+  // Función antes que organiza esta parte del código.
   const antes = objetos.map((o) => ({ ...o }));
   objetos.sort((a, b) => a.edad - b.edad);
   log(`sort() ordenó objetos por edad`, "success");

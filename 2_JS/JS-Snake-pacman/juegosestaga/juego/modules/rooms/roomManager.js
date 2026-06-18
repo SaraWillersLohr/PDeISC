@@ -1,11 +1,15 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const rooms = {};
 
 // Genera un código de sala aleatorio de 4 letras mayúsculas
 function generateRoomCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let code = '';
+  // Ejecuta este bloque al menos una vez y luego repite mientras la condición sea verdadera.
   do {
     code = '';
+    // Repite este bloque con un bucle for.
     for (let i = 0; i < 4; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -15,7 +19,8 @@ function generateRoomCode() {
 
 // Crea una nueva sala
 function createRoom(game) {
-  if (game !== 'pacman' && game !== 'snake') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (game !== 'pacman' && game !== 'snake') {
     return null;
   }
   const code = generateRoomCode();
@@ -34,10 +39,12 @@ function createRoom(game) {
 // Une un jugador a la sala
 function joinRoom(code, socketId, name, character) {
   const room = rooms[code];
-  if (!room) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room) {
     return { success: false, error: 'La sala no existe.' };
   }
-  if (room.players.length >= 2) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.players.length >= 2) {
     return { success: false, error: 'La sala está completa (máximo 2 jugadores).' };
   }
   
@@ -45,18 +52,22 @@ function joinRoom(code, socketId, name, character) {
   if (room.game === 'pacman' && character !== 'Sara' && character !== 'Male') {
     return { success: false, error: 'Personaje incorrecto para Escape Escolar (debe ser Sara o Male).' };
   }
-  if (room.game === 'snake' && character !== 'USB' && character !== 'HDMI' && character !== 'Ethernet') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.game === 'snake' && character !== 'USB' && character !== 'HDMI' && character !== 'Ethernet') {
     return { success: false, error: 'Cable incorrecto para Cable Rush (debe ser USB, HDMI o Ethernet).' };
   }
 
+  // Función cableTaken que organiza esta parte del código.
   const cableTaken = room.players.some((p) => p.character === character);
-  if (room.game === 'snake' && cableTaken) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.game === 'snake' && cableTaken) {
     return { success: false, error: 'Ese cable ya está en uso en la sala. Elegí otro.' };
   }
 
   // Evitar nombres repetidos en la sala
   const nameExists = room.players.some(p => p.name.toLowerCase() === name.toLowerCase());
-  if (nameExists) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (nameExists) {
     return { success: false, error: 'Ya hay un jugador con ese nombre en la sala.' };
   }
 
@@ -79,33 +90,39 @@ function joinRoom(code, socketId, name, character) {
 // Reconectar jugador en partida activa (tras navegar a la página del juego)
 function rejoinRoom(code, socketId, name) {
   const room = rooms[code];
-  if (!room) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room) {
     return { success: false, error: 'La sala no existe.' };
   }
-  if (room.status !== 'playing') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.status !== 'playing') {
     return { success: false, error: 'La partida aún no ha comenzado.' };
   }
 
   const player = room.players.find(
     (p) => p.name.toLowerCase() === name.trim().toLowerCase()
   );
-  if (!player) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!player) {
     return { success: false, error: 'No estás registrado en esta partida.' };
   }
 
   player.socketId = socketId;
   player.connected = true;
 
-  if (room.gameInstance) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInstance) {
     const gp = room.gameInstance.players.find(
       (p) => p.name.toLowerCase() === name.trim().toLowerCase()
     );
-    if (gp) gp.socketId = socketId;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gp) gp.socketId = socketId;
   }
 
   return { success: true, room, player };
 }
 
+// Función allPlayersConnected(room) que ayuda a entender la lógica.
 function allPlayersConnected(room) {
   return room.players.length > 0 && room.players.every((p) => p.connected);
 }
@@ -113,16 +130,20 @@ function allPlayersConnected(room) {
 // Marca un jugador como listo
 function setPlayerReady(code, socketId) {
   const room = rooms[code];
-  if (!room) return false;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!room) return false;
 
+  // Función player que organiza esta parte del código.
   const player = room.players.find(p => p.socketId === socketId);
-  if (player) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (player) {
     player.ready = true;
   }
 
   // Si hay exactamente 2 jugadores y ambos están ready
   const allReady = room.players.length === 2 && room.players.every(p => p.ready);
-  if (allReady) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (allReady) {
     room.status = 'playing';
     return true; // Comenzar partida
   }
@@ -131,16 +152,20 @@ function setPlayerReady(code, socketId) {
 
 // Maneja la desconexión de un jugador y retorna la sala afectada si existe
 function removePlayer(socketId) {
+  // Repite este bloque con un bucle for.
   for (const code in rooms) {
     const room = rooms[code];
+    // Función index que organiza esta parte del código.
     const index = room.players.findIndex(p => p.socketId === socketId);
-    if (index !== -1) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (index !== -1) {
       const removedPlayer = room.players[index];
 
       // Partida en curso: pausar sin destruir sala (permite rejoin al cargar snake.html)
       if (room.status === 'playing') {
         removedPlayer.connected = false;
-        if (room.gameInterval) {
+        // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInterval) {
           clearTimeout(room.gameInterval);
           room.gameInterval = null;
         }
@@ -155,12 +180,14 @@ function removePlayer(socketId) {
 
       room.players.splice(index, 1);
 
-      if (room.gameInterval) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInterval) {
         clearTimeout(room.gameInterval);
         room.gameInterval = null;
       }
 
-      if (room.players.length > 0) {
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.players.length > 0) {
         room.players[0].playerIndex = 0;
         room.players[0].ready = false;
         room.status = 'waiting';
@@ -174,14 +201,18 @@ function removePlayer(socketId) {
   return null;
 }
 
+// Función getRoom(code) que ayuda a entender la lógica.
 function getRoom(code) {
   return rooms[code] || null;
 }
 
+// Función deleteRoom(code) que ayuda a entender la lógica.
 function deleteRoom(code) {
   const room = rooms[code];
-  if (room) {
-    if (room.gameInterval) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (room.gameInterval) {
       clearTimeout(room.gameInterval);
     }
     delete rooms[code];

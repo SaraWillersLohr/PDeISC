@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 import { agregarLog } from "./consola.js";
 
 const BLOQUES = {
@@ -13,6 +15,7 @@ export function bindEventos() {
     btn.addEventListener("click", () => {
       const tipo = btn.dataset.inner;
       const zona = document.getElementById("inner-zone");
+      // Si if (!zona || !BLOQUES[tipo]), entonces se ejecuta este bloque.
       if (!zona || !BLOQUES[tipo]) return;
       zona.insertAdjacentHTML("beforeend", BLOQUES[tipo]);
       agregarLog("innerHTML", `Agregado: ${tipo}`);
@@ -21,6 +24,7 @@ export function bindEventos() {
 
   document.getElementById("btn-clear-inner")?.addEventListener("click", () => {
     const zona = document.getElementById("inner-zone");
+    // Si if (zona), entonces se ejecuta este bloque.
     if (zona) zona.innerHTML = "";
     agregarLog("innerHTML", "Zona limpiada");
   });

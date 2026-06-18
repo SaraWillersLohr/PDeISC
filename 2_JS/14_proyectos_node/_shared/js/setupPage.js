@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** 
  * ¡Hola! Este archivo es el decorador de mis páginas.
  * Se encarga de inyectar el banner del método, el botón de tema y preparar la consola.
@@ -18,7 +20,8 @@ export function setupPage(methodId) {
 
 // Inyecto el botoncito para cambiar entre modo claro y oscuro.
 function injectThemeToggle() {
-  if (document.getElementById("themeToggle")) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (document.getElementById("themeToggle")) return;
 
   const btn = document.createElement("button");
   btn.type = "button";
@@ -31,7 +34,8 @@ function injectThemeToggle() {
 // Aquí armo el banner superior que te dice si el método muta el array o no.
 function injectMethodBanner(meta) {
   const header = document.querySelector(".tp-header, header.text-center, header");
-  if (!header || document.getElementById("methodBanner")) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!header || document.getElementById("methodBanner")) return;
 
   const mutateClass = meta.mutates ? "mutates-yes" : "mutates-no";
   const mutateText = meta.mutates
@@ -55,7 +59,8 @@ function injectMethodBanner(meta) {
 
 // Me aseguro de que haya un lugar donde enganchar la consola de eventos.
 function ensureConsolePlaceholder() {
-  if (document.getElementById("eventConsole")) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (document.getElementById("eventConsole")) return;
   const placeholder = document.createElement("div");
   placeholder.id = "eventConsoleMount";
   document.body.appendChild(placeholder);

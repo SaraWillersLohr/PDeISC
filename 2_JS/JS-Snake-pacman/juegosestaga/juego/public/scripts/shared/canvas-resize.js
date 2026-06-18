@@ -1,25 +1,35 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 /** Mobile-first canvas sizing — Snake + Pac-Man */
 
+// Función isMobileGameViewport() que ayuda a entender la lógica.
 function isMobileGameViewport() {
   return window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches;
 }
 
 /** Altura del chrome (header + HUD + dock fijo) */
+// Función measureGameChromeHeight(gameId) que ayuda a entender la lógica.
 function measureGameChromeHeight(gameId) {
   let chrome = 0;
   const header = document.querySelector('.header-nav');
-  if (header) chrome += header.offsetHeight;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (header) chrome += header.offsetHeight;
 
-  if (gameId === 'pacman') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (gameId === 'pacman') {
     const hud = document.querySelector('.pacman-hud');
-    if (hud && getComputedStyle(hud).display !== 'none') chrome += hud.offsetHeight;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hud && getComputedStyle(hud).display !== 'none') chrome += hud.offsetHeight;
   } else {
     const hud = document.querySelector('.hud-bar');
-    if (hud && getComputedStyle(hud).display !== 'none') chrome += hud.offsetHeight;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (hud && getComputedStyle(hud).display !== 'none') chrome += hud.offsetHeight;
     const powerups = document.getElementById('powerupIndicators');
-    if (powerups && powerups.offsetHeight > 0) chrome += powerups.offsetHeight;
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (powerups && powerups.offsetHeight > 0) chrome += powerups.offsetHeight;
     const banner = document.getElementById('connectionBanner');
-    if (banner && banner.offsetHeight > 0 && banner.style.display !== 'none') {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (banner && banner.offsetHeight > 0 && banner.style.display !== 'none') {
       chrome += banner.offsetHeight;
     }
   }
@@ -27,16 +37,19 @@ function measureGameChromeHeight(gameId) {
   const mobileStack = document.querySelector('.mobile-controls-stack');
   const shell = document.querySelector('.game-shell');
   let hasShellPadding = false;
-  if (shell) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (shell) {
     const ss = getComputedStyle(shell);
     hasShellPadding = (parseFloat(ss.paddingBottom) || 0) > 0;
     chrome += (parseFloat(ss.paddingTop) || 0) + (parseFloat(ss.paddingBottom) || 0);
     chrome += (parseFloat(ss.gap) || 0);
   }
 
-  if (mobileStack && isMobileGameViewport()) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mobileStack && isMobileGameViewport()) {
     const st = getComputedStyle(mobileStack);
-    if (st.position === 'fixed' && st.display !== 'none' && !hasShellPadding) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (st.position === 'fixed' && st.display !== 'none' && !hasShellPadding) {
       chrome += mobileStack.offsetHeight;
     }
   }
@@ -48,6 +61,7 @@ function measureGameChromeHeight(gameId) {
  * Tamaño del canvas fullscreen.
  * Regla: min(anchoPantalla, altoPantalla * 0.85) — en mobile width = 100vw.
  */
+// Función computeFullscreenCanvasSize(aspectRatio, que ayuda a entender la lógica.
 function computeFullscreenCanvasSize(aspectRatio, gameId) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -57,7 +71,8 @@ function computeFullscreenCanvasSize(aspectRatio, gameId) {
   let maxW;
   let maxH;
 
-  if (mobile) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mobile) {
     maxW = vw * 0.98;
     maxH = Math.max(100, vh - chrome - 6);
   } else if (vw < 992) {
@@ -72,20 +87,24 @@ function computeFullscreenCanvasSize(aspectRatio, gameId) {
     maxH = Math.max(120, vh - chrome - 20);
   }
 
-  if (!aspectRatio || aspectRatio <= 0) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!aspectRatio || aspectRatio <= 0) {
     return { w: Math.floor(maxW), h: Math.floor(maxH) };
   }
   return fitCanvasToAspect(aspectRatio, maxW, maxH);
 }
 
 /** Grid Snake: celdas reducidas para que el personaje se vea grande y claro */
+// Función getSnakeGridDimensions(isOnline) que ayuda a entender la lógica.
 function getSnakeGridDimensions(isOnline) {
-  if (isOnline) return { width: 20, height: 13 };
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (isOnline) return { width: 20, height: 13 };
 
   const vw     = window.innerWidth;
   const mobile = isMobileGameViewport();
 
-  if (mobile) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mobile) {
     // Mobile: muy pocas celdas para sprites grandes y táctiles
     const width  = Math.min(16, Math.max(12, Math.round(vw / 28)));
     const height = Math.min(11, Math.max(8,  Math.round(width * 0.65)));
@@ -99,6 +118,7 @@ function getSnakeGridDimensions(isOnline) {
 }
 
 /** Aplica tamaño interno + CSS al canvas */
+// Función applyCanvasPixelSize(canvas, que ayuda a entender la lógica.
 function applyCanvasPixelSize(canvas, w, h) {
   canvas.width = w;
   canvas.height = h;
@@ -109,6 +129,7 @@ function applyCanvasPixelSize(canvas, w, h) {
 }
 
 /** @deprecated — usar computeFullscreenCanvasSize */
+// Función getAvailableCanvasBounds(maxContainerWidth) que ayuda a entender la lógica.
 function getAvailableCanvasBounds(maxContainerWidth) {
   const mobile = isMobileGameViewport();
   const vw = window.innerWidth;
@@ -120,10 +141,12 @@ function getAvailableCanvasBounds(maxContainerWidth) {
   };
 }
 
+// Función fitCanvasToAspect(aspect, que ayuda a entender la lógica.
 function fitCanvasToAspect(aspect, maxW, maxH) {
   let w;
   let h;
-  if (maxW / aspect <= maxH) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (maxW / aspect <= maxH) {
     w = maxW;
     h = Math.round(maxW / aspect);
   } else {
@@ -133,17 +156,22 @@ function fitCanvasToAspect(aspect, maxW, maxH) {
   return { w: Math.floor(w), h: Math.floor(h) };
 }
 
+// Función observeGameLayoutResize(onResize) que ayuda a entender la lógica.
 function observeGameLayoutResize(onResize) {
   const shell = document.querySelector('.game-shell');
   const mobileStack = document.querySelector('.mobile-controls-stack');
-  if (typeof ResizeObserver === 'undefined') return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (typeof ResizeObserver === 'undefined') return;
 
+  // Función ro que organiza esta parte del código.
   const ro = new ResizeObserver(() => onResize());
 
-  if (shell) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (shell) {
     ro.observe(shell);
     [...shell.children].forEach((child) => ro.observe(child));
   }
-  if (mobileStack) ro.observe(mobileStack);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (mobileStack) ro.observe(mobileStack);
   window.addEventListener('orientationchange', onResize);
 }

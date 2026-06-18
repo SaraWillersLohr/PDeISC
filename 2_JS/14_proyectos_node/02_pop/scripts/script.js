@@ -46,7 +46,8 @@ const updateUI = () => {
 
 // Caso 1: Borro un animal del final. ¡Chau pez!
 dom.btnAni.onclick = () => {
-  if (!animales.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!animales.length) return;
   const antes = [...animales];
   animales.pop();
   log(`pop() eliminó el último de animales (quedan ${animales.length})`, "success");
@@ -56,7 +57,8 @@ dom.btnAni.onclick = () => {
 
 // Caso 2: Borro algo de las compras pero guardo qué fue lo que borré.
 dom.btnCom.onclick = () => {
-  if (!compras.length) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!compras.length) return;
   const antes = [...compras];
   const eliminado = compras.pop();
   dom.resCom.className = "feedback-box feedback-danger";
@@ -69,8 +71,10 @@ dom.btnCom.onclick = () => {
 // Caso 3: Vaciado automático usando un intervalo (como si fuera un loop).
 dom.btnVac.onclick = () => {
   dom.btnVac.disabled = true;
+  // Función interval que organiza esta parte del código.
   const interval = setInterval(() => {
-    if (!vaciado.length) {
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!vaciado.length) {
       clearInterval(interval);
       log("while terminó: array vacío con pop()", "system");
       updateUI();

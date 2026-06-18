@@ -11,7 +11,8 @@ export const dibujarInvitados = (
 
   // Yo actualizo el contador de invitados en la interfaz
   const contador = document.getElementById("guestCount");
-  if (contador) contador.textContent = String(invitados.length);
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (contador) contador.textContent = String(invitados.length);
 
   // Si no hay invitados, muestro un mensaje de estado vacío
   if (invitados.length === 0) {

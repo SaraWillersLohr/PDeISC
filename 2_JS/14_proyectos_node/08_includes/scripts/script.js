@@ -39,7 +39,8 @@ const flowCheck = (el, arr, valor, resultado, resEl) => {
     after: arr,
     note: "includes no modifica el array.",
   });
-  if (resEl) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (resEl) {
     resEl.className = `feedback-box ${resultado ? "feedback-success" : "feedback-danger"}`;
     resEl.innerHTML = resultado
       ? `<i class="fas fa-check me-2"></i>Sí está: <strong>${valor}</strong>`
@@ -85,14 +86,16 @@ dom.btnCheckVerde.onclick = () => {
 // Caso 3: Uso includes() para evitar agregar números duplicados. ¡Súper útil!
 dom.btnAddNumero.onclick = () => {
   const val = parseInt(dom.inputNumero.value, 10);
-  if (Number.isNaN(val)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (Number.isNaN(val)) {
     dom.resNumero.className = "feedback-box feedback-danger";
     dom.resNumero.textContent = "Número inválido";
     return;
   }
 
   const antes = [...numeros];
-  if (numeros.includes(val)) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (numeros.includes(val)) {
     log(`includes(${val}) → true, no agregué duplicado`, "warn");
     dom.resNumero.className = "feedback-box feedback-danger";
     dom.resNumero.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${val} ya existe.`;

@@ -4,12 +4,14 @@ const API_KEY =
 
 // Yo exporto esta función para usarla en otros archivos del proyecto
 export const checkGender = async (name) => {
-  try {
+  // try: prueba este bloque y permite capturar errores con catch.
+try {
     // Yo llamo a la API externa para obtener datos sobre el género del nombre
     const response = await fetch(
       `https://gender-api.com/get?name=${name}&key=${API_KEY}`,
     );
-    if (!response.ok) throw new Error("Error en la respuesta de la API");
+    // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!response.ok) throw new Error("Error en la respuesta de la API");
     const data = await response.json();
     return data; // Estructura: { name, gender, accuracy, ... }
   } catch (error) {

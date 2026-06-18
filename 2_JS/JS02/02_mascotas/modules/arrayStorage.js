@@ -49,7 +49,8 @@ export const METODOS_ARRAY = {
 
 // Yo renderizo el estado actual del array en pantalla para que se vea visualmente
 export const renderizarEstadoArray = (contenedor, lista, info) => {
-  if (!contenedor) return;
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!contenedor) return;
   // Yo muestro el método usado, la cantidad de registros y el contenido del array
   contenedor.innerHTML = `
     <div class="array-block">

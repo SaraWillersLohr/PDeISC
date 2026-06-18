@@ -1,3 +1,5 @@
+// Comentarios claros: este archivo explica la lógica paso a paso.
+
 const express = require('express');
 const http = require('http');
 const path = require('path');
@@ -40,7 +42,8 @@ app.get('/leaderboard', (req, res) => {
 // Obtener top 10
 app.get('/api/leaderboard/:game', (req, res) => {
   const { game } = req.params;
-  if (game !== 'pacman' && game !== 'snake') {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (game !== 'pacman' && game !== 'snake') {
     return res.status(400).json({ error: 'Juego no soportado.' });
   }
   const top10 = leaderboardManager.getTop10(game);
@@ -53,7 +56,8 @@ app.post('/api/leaderboard/:game', (req, res) => {
   const entry = req.body;
   
   const result = leaderboardManager.addScore(game, entry);
-  if (!result.success) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (!result.success) {
     return res.status(400).json({ error: result.error });
   }
   res.json(result.entry);
@@ -64,11 +68,15 @@ initSocketHandler(io);
 
 const os = require('os');
 
+// Función getLocalIP() que ayuda a entender la lógica.
 function getLocalIP() {
   const nets = os.networkInterfaces();
+  // Repite este bloque con un bucle for.
   for (const name of Object.keys(nets)) {
+    // Repite este bloque con un bucle for.
     for (const net of nets[name]) {
-      if (net.family === 'IPv4' && !net.internal) return net.address;
+      // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (net.family === 'IPv4' && !net.internal) return net.address;
     }
   }
   return 'localhost';

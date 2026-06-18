@@ -42,7 +42,8 @@ const flowReduce = (origEl, resEl, arr, valor, operacion) => {
     after: arr,
     note: "reduce no modifica el array.",
   });
-  if (resEl) {
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (resEl) {
     resEl.className = "result-box feedback-success";
     resEl.innerHTML = `<span class="flow-label">RESULTADO ÚNICO</span><br><strong>${valor}</strong><br><small>Array sigue: ${formatArrayLiteral(arr)}</small>`;
   }
@@ -73,6 +74,7 @@ const updateUI = () => {
 
 // Caso 1: Sumo todos los números del array.
 dom.btnSum.onclick = () => {
+  // Función suma que organiza esta parte del código.
   const suma = elementos.reduce((acc, curr) => acc + curr, 0);
   log(`reduce() sumó → ${suma}`, "success");
   flowReduce(dom.displayOriginal1, dom.resSum, elementos, suma, "reduce suma");
@@ -81,6 +83,7 @@ dom.btnSum.onclick = () => {
 
 // Caso 2: Multiplico todos los números (producto).
 dom.btnMult.onclick = () => {
+  // Función producto que organiza esta parte del código.
   const producto = enteros.reduce((acc, curr) => acc * curr, 1);
   log(`reduce() multiplicó → ${producto}`, "success");
   flowReduce(dom.displayOriginal2, dom.resMult, enteros, producto, "reduce producto");
@@ -89,6 +92,7 @@ dom.btnMult.onclick = () => {
 
 // Caso 3: Sumo los precios de una lista de objetos (como un carrito de compras).
 dom.btnTotalObj.onclick = () => {
+  // Función total que organiza esta parte del código.
   const total = carrito.reduce((acc, curr) => acc + curr.precio, 0);
   log(`reduce() total carrito → $${total}`, "success");
   flowReduce(dom.displayOriginal3, dom.resTotalObj, carrito, `$${total}`, "reduce precios");

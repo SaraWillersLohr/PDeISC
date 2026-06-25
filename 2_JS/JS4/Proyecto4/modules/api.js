@@ -33,6 +33,11 @@ export async function eliminarEmpleadoConFetch(id) {
     method: "DELETE",
   });
 
+  // si el empleado ya no existe (404), lo tratamos como eliminación exitosa
+  if (respuesta.status === 404) {
+    return { mensaje: "El empleado ya no existe.", eliminado: null };
+  }
+
   if (!respuesta.ok) {
     let mensaje = `Error fetch DELETE: ${respuesta.status}`;
     try {
@@ -47,6 +52,12 @@ export async function eliminarEmpleadoConFetch(id) {
 
 // misma petición DELETE pero con axios
 export async function eliminarEmpleadoConAxios(id) {
-  const respuesta = await axios.delete(`${API_EMPLEADOS}/${id}`);
-  return respuesta.data;
+  try {
+    const respuesta = await axios.delete(`${API_EMPLEADOS}/${id}`);
+    return respuesta.data;
+  } catch (error) {
+    // si el servidor devuelve 404 es porque fetch ya lo eliminó — no es un error real
+    if (error?.response?.status === 404) return { mensaje: "El empleado ya no existe." };
+    throw error;
+  }
 }

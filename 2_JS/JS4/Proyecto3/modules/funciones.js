@@ -83,11 +83,15 @@ export function actualizarBotonesEnvio(habilitado) {
 export function mostrarResultadoCreacion(resultado, metodo, contenedor) {
   if (!contenedor) return;
 
-  const { enviado } = resultado;
+  const { enviado, respuesta } = resultado;
 
   contenedor.innerHTML = `
     <section class="userhub-panel userhub-register-result userhub-fade-in mt-4">
       <h2 class="h5 mb-3"><i class="bi bi-check-circle text-success"></i> Usuario enviado correctamente</h2>
+      <div class="userhub-resultado-row">
+        <span class="userhub-resultado-label">ID de respuesta</span>
+        <span>${respuesta.id}</span>
+      </div>
       <div class="userhub-resultado-row">
         <span class="userhub-resultado-label">Nombre</span>
         <span>${enviado.name}</span>

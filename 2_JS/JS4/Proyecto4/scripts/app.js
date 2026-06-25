@@ -79,21 +79,24 @@ async function confirmarEliminar() {
     logConsola("DELETE", [
       `fetch DELETE devolvió confirmación del servidor`,
       `${empleado.nombre} fue eliminado del archivo empleados.json`,
-      "Recargando la tabla con los datos actualizados...",
+      "Actualizando la tabla con los datos actualizados...",
     ]);
 
-    // también valido con axios que los datos coincidan después de la eliminación
-    logConsola("AXIOS", [
-      `Se ejecutó axios.delete() para validar la eliminación de ${empleado.nombre}`,
-    ]);
+    // actualizo el array local de inmediato para que la UI responda sin esperar
+    empleados = empleados.filter((e) => e.id !== empleado.id);
+    actualizarVista("fetch()");
 
     // limpio el perfil porque el empleado ya no existe
     renderPerfil(null, document.getElementById("panel-perfil"));
 
-    // recargo desde el servidor para mostrar el estado real del json
-    await cargarEmpleados(false);
-
     mostrarEstado(`${empleado.nombre} eliminado correctamente.`, "exito");
+
+    // también valido con axios que los datos del servidor coincidan
+    logConsola("AXIOS", [
+      `Se ejecutó axios.delete() para validar la eliminación de ${empleado.nombre}`,
+    ]);
+
+    await eliminarEmpleadoConAxios(empleado.id);
   } catch (error) {
     mostrarEstado(`Error al eliminar: ${error.message}`, "error");
     logConsola("INFO", [`Error al eliminar: ${error.message}`]);

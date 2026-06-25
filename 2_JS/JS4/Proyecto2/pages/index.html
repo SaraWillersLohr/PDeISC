@@ -1,238 +1,149 @@
 <!DOCTYPE html>
-
 <html lang="es" data-tema="claro">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>UserHub Search</title>
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link id="estilos-tema" rel="stylesheet" href="../styles/claro.css">
-
 </head>
-
 <body>
 
-
-
   <nav class="navbar navbar-expand-lg userhub-navbar">
-
     <div class="container-xl">
-
       <a class="navbar-brand" href="http://localhost:3001">User<span>Hub</span></a>
-
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-
         <span class="navbar-toggler-icon"></span>
-
       </button>
-
       <div class="collapse navbar-collapse" id="navMenu">
-
         <ul class="navbar-nav me-auto userhub-nav-modules">
-
           <li class="nav-item"><a class="nav-link" href="http://localhost:3001">Explorer</a></li>
-
           <li class="nav-item"><a class="nav-link active" href="http://localhost:3002">Search</a></li>
-
           <li class="nav-item"><a class="nav-link" href="http://localhost:3003">Register</a></li>
-
           <li class="nav-item"><a class="nav-link" href="http://localhost:3004">API Enterprise</a></li>
-
         </ul>
-
         <button id="btn-tema" class="btn btn-userhub-outline btn-sm">Modo oscuro</button>
-
       </div>
-
     </div>
-
   </nav>
 
-
-
   <main class="userhub-main userhub-search-main">
-
     <div class="container-xl">
 
-
-
       <section class="userhub-hero">
-
         <h1><i class="bi bi-search"></i> UserHub Search</h1>
-
         <p>Filtrá usuarios por nombre o apodo en tiempo real con <code>filter()</code>. Los datos se cargan con fetch y se validan con axios.</p>
-
       </section>
-
-
 
       <div class="userhub-layout-grid">
 
-
-
         <div class="userhub-layout-main">
-
-
 
           <div id="estado-carga" class="alert alert-info d-none" role="status"></div>
 
-
-
           <section class="userhub-panel">
-
             <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
-
               <div class="d-flex flex-wrap align-items-center gap-3">
-
                 <span class="text-muted">Método activo:</span>
-
                 <span id="metodo-activo" class="userhub-metodo-badge vacio">Sin cargar</span>
-
               </div>
-
               <span id="verificacion-axios" class="userhub-badge d-none">Verificado con axios</span>
-
             </div>
-
           </section>
-
-
 
           <div id="panel-flujo" class="userhub-flow d-none" aria-live="polite">
-
             <span class="userhub-flow-step" data-paso="api"><i class="bi bi-database"></i> API</span>
-
             <span class="userhub-flow-arrow">→</span>
-
             <span class="userhub-flow-step" data-paso="metodo"><i class="bi bi-plug"></i> <span id="flujo-metodo">—</span></span>
-
             <span class="userhub-flow-arrow">→</span>
-
             <span class="userhub-flow-step" data-paso="array"><i class="bi bi-list-ul"></i> Array (<span id="flujo-cantidad">0</span>)</span>
-
             <span class="userhub-flow-arrow">→</span>
-
             <span class="userhub-flow-step" data-paso="dom"><i class="bi bi-window"></i> DOM</span>
-
           </div>
 
-
-
           <section class="userhub-panel userhub-search-panel">
-
             <label for="input-buscar" class="form-label fw-semibold">Buscar por nombre o apodo</label>
-
             <div class="input-group mb-3">
-
               <span class="input-group-text"><i class="bi bi-search"></i></span>
-
               <input
-
                 type="search"
-
                 id="input-buscar"
-
                 class="form-control"
-
                 placeholder="Escribí un nombre o apodo..."
-
                 autocomplete="off"
-
               >
-
             </div>
-
             <div class="d-flex justify-content-between align-items-center mb-3">
-
               <span class="userhub-contador"><strong id="contador-resultados">0</strong> resultados</span>
-
               <span class="userhub-badge"><span id="contador-total">0</span> usuarios en total</span>
-
             </div>
-
             <div id="tabla-resultados"></div>
-
           </section>
-
-
 
         </div>
 
-
-
         <aside class="userhub-sidebar">
-
           <section class="userhub-panel userhub-perfil-panel">
-
             <h2 class="userhub-sidebar-title"><i class="bi bi-person-badge"></i> Perfil del usuario</h2>
-
             <div id="panel-perfil">
-
               <p class="userhub-perfil-placeholder">Aquí aparecerá la información seleccionada</p>
-
             </div>
-
           </section>
-
           <section class="userhub-panel userhub-consola-panel">
-
             <h2 class="userhub-sidebar-title"><i class="bi bi-terminal"></i> Consola UserHub</h2>
-
             <div id="consola-userhub" class="userhub-consola" aria-live="polite"></div>
-
           </section>
-
         </aside>
-
-
 
       </div>
 
-
-
     </div>
-
   </main>
 
-
+  <!-- Modal de confirmación para eliminar usuario -->
+  <div class="modal fade" id="modal-confirmar-eliminar" tabindex="-1" aria-labelledby="modal-eliminar-titulo" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content userhub-modal">
+        <div class="modal-header userhub-modal-header">
+          <h5 class="modal-title" id="modal-eliminar-titulo"><i class="bi bi-exclamation-triangle"></i> ¿Estás seguro?</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body userhub-modal-body">
+          <p>Vas a eliminar este usuario. Esta acción quitará el registro de la lista actual.</p>
+          <div class="userhub-modal-detalle">
+            <div class="userhub-modal-fila">
+              <span class="userhub-modal-label">Nombre</span>
+              <span id="modal-eliminar-nombre" class="userhub-modal-valor">—</span>
+            </div>
+            <div class="userhub-modal-fila">
+              <span class="userhub-modal-label">Email</span>
+              <span id="modal-eliminar-email" class="userhub-modal-valor">—</span>
+            </div>
+          </div>
+          <p class="userhub-modal-nota">Nota: jsonplaceholder no elimina datos reales. La eliminación solo afecta la sesión actual.</p>
+        </div>
+        <div class="modal-footer userhub-modal-footer">
+          <button type="button" class="btn btn-userhub-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-userhub-eliminar" id="btn-confirmar-eliminar">Confirmar eliminación</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer class="userhub-footer">
-
     <div class="container-xl">
-
       UserHub Search &mdash; Filtrar usuarios por nombre
-
     </div>
-
   </footer>
 
-
-
   <button id="btn-scroll-top" class="userhub-scroll-top" type="button" aria-label="Subir arriba">
-
     <i class="bi bi-arrow-up"></i>
-
   </button>
 
-
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script type="module" src="../scripts/app.js"></script>
-
 </body>
-
 </html>
-

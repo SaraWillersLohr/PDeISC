@@ -1,4 +1,5 @@
 // acá calculo cantidad de empleados y departamentos distintos
+// Set elimina duplicados y spread lo convierte en array para contar
 export function calcularEstadisticas(empleados) {
   const departamentos = [...new Set(empleados.map((e) => e.departamento))];
 
@@ -31,8 +32,10 @@ export function renderizarEstadisticas(stats, contenedor) {
     .join("");
 }
 
-// acá recorro los empleados para armar la tabla corporativa
-export function renderizarTablaEmpleados(empleados, contenedor, alSeleccionar) {
+// acá recorro los empleados para armar la tabla corporativa con botón de eliminar
+// alSeleccionar se llama al hacer click en la fila
+// alEliminar se llama al hacer click en el botón Eliminar
+export function renderizarTablaEmpleados(empleados, contenedor, alSeleccionar, alEliminar) {
   if (!contenedor) return;
 
   if (empleados.length === 0) {
@@ -49,6 +52,7 @@ export function renderizarTablaEmpleados(empleados, contenedor, alSeleccionar) {
             <th>Cargo</th>
             <th>Departamento</th>
             <th>Email</th>
+            <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -60,6 +64,11 @@ export function renderizarTablaEmpleados(empleados, contenedor, alSeleccionar) {
               <td>${empleado.cargo}</td>
               <td>${empleado.departamento}</td>
               <td>${empleado.email}</td>
+              <td class="text-end">
+                <button class="btn btn-userhub-danger btn-sm btn-eliminar-fila" data-id="${empleado.id}" type="button">
+                  <i class="bi bi-trash"></i> Eliminar
+                </button>
+              </td>
             </tr>`
             )
             .join("")}
@@ -67,17 +76,34 @@ export function renderizarTablaEmpleados(empleados, contenedor, alSeleccionar) {
       </table>
     </div>`;
 
+  // evento en las filas: click en cualquier celda excepto el botón selecciona al empleado
   contenedor.querySelectorAll(".userhub-row-clickable").forEach((fila) => {
     const id = Number(fila.dataset.empleadoId);
     const empleado = empleados.find((e) => e.id === id);
     if (!empleado) return;
 
-    fila.addEventListener("click", () => alSeleccionar?.(empleado, fila));
+    fila.addEventListener("click", (evento) => {
+      if (evento.target.closest("button")) return;
+      alSeleccionar?.(empleado, fila);
+    });
+
     fila.addEventListener("keydown", (evento) => {
       if (evento.key === "Enter" || evento.key === " ") {
         evento.preventDefault();
         alSeleccionar?.(empleado, fila);
       }
+    });
+  });
+
+  // evento en el botón Eliminar: abre el modal de confirmación
+  contenedor.querySelectorAll(".btn-eliminar-fila").forEach((btn) => {
+    const id = Number(btn.dataset.id);
+    const empleado = empleados.find((e) => e.id === id);
+    if (!empleado) return;
+
+    btn.addEventListener("click", (evento) => {
+      evento.stopPropagation();
+      alEliminar?.(empleado);
     });
   });
 }

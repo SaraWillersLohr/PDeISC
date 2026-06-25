@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UserHub Explorer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link id="estilos-tema" rel="stylesheet" href="../styles/claro.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg userhub-navbar">
+    <div class="container-xl">
+      <a class="navbar-brand" href="http://localhost:3001">User<span>Hub</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto userhub-nav-modules">
+          <li class="nav-item"><a class="nav-link active" href="http://localhost:3001">Explorer</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:3002">Search</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:3003">Register</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:3004">API Enterprise</a></li>
+        </ul>
+        <button id="btn-tema" class="btn btn-userhub-outline btn-sm">Modo oscuro</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="userhub-main">
+    <div class="container-xl">
+
+      <section class="userhub-hero">
+        <h1><i class="bi bi-compass"></i> UserHub Explorer</h1>
+        <p>Consumí la API pública con <code>fetch()</code> y después con <code>axios</code> para comparar métodos. Solo nombre y email.</p>
+      </section>
+
+      <div class="userhub-layout-grid">
+
+        <div class="userhub-layout-main">
+
+          <section class="userhub-panel">
+            <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <span class="text-muted">Método activo:</span>
+                <span id="metodo-activo" class="userhub-metodo-badge vacio">Sin cargar</span>
+                <span class="userhub-contador"><strong id="contador-usuarios">0</strong> usuarios</span>
+              </div>
+              <span id="verificacion-axios" class="userhub-badge d-none">Verificado con axios</span>
+            </div>
+          </section>
+
+          <div id="panel-flujo" class="userhub-flow d-none" aria-live="polite">
+            <span class="userhub-flow-step" data-paso="api"><i class="bi bi-database"></i> API</span>
+            <span class="userhub-flow-arrow">→</span>
+            <span class="userhub-flow-step" data-paso="metodo"><i class="bi bi-plug"></i> <span id="flujo-metodo">—</span></span>
+            <span class="userhub-flow-arrow">→</span>
+            <span class="userhub-flow-step" data-paso="array"><i class="bi bi-list-ul"></i> Array (<span id="flujo-cantidad">0</span>)</span>
+            <span class="userhub-flow-arrow">→</span>
+            <span class="userhub-flow-step" data-paso="dom"><i class="bi bi-window"></i> DOM</span>
+          </div>
+
+          <div id="estado-carga" class="alert alert-info d-none" role="status"></div>
+
+          <section>
+            <h2 class="h5 mb-3">Usuarios de la API</h2>
+            <div id="lista-usuarios" class="row g-3">
+              <p class="text-muted text-center py-4">Cargando usuarios...</p>
+            </div>
+          </section>
+
+        </div>
+
+        <aside class="userhub-sidebar">
+          <section class="userhub-panel userhub-perfil-panel">
+            <h2 class="userhub-sidebar-title"><i class="bi bi-person-badge"></i> Perfil del usuario</h2>
+            <div id="panel-perfil">
+              <p class="userhub-perfil-placeholder">Aquí aparecerá la información seleccionada</p>
+            </div>
+          </section>
+          <section class="userhub-panel userhub-consola-panel">
+            <h2 class="userhub-sidebar-title"><i class="bi bi-terminal"></i> Consola UserHub</h2>
+            <div id="consola-userhub" class="userhub-consola" aria-live="polite"></div>
+          </section>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="userhub-footer">
+    <div class="container-xl">
+      UserHub Explorer &mdash; Consumir API y comparar fetch vs axios
+    </div>
+  </footer>
+
+  <button id="btn-scroll-top" class="userhub-scroll-top" type="button" aria-label="Subir arriba">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../scripts/app.js"></script>
+</body>
+</html>

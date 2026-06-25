@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "nombre": "Lara Marquéz",
+    "cargo": "Analista",
+    "departamento": "Tecnología",
+    "email": "lara@empresa.com",
+    "sede": "Buenos Aires"
+  },
+  {
+    "id": 2,
+    "nombre": "Manuel Rodriguez",
+    "cargo": "Desarrollador",
+    "departamento": "Tecnología",
+    "email": "juanmanuel@empresa.com",
+    "sede": "Córdoba"
+  },
+  {
+    "id": 3,
+    "nombre": "Carolina García",
+    "cargo": "Diseñadora UX",
+    "departamento": "Producto",
+    "email": "carolina@empresa.com",
+    "sede": "Rosario"
+  },
+  {
+    "id": 4,
+    "nombre": "Patricia González",
+    "cargo": "Coordinadora",
+    "departamento": "Recursos Humanos",
+    "email": "patricia@empresa.com",
+    "sede": "Buenos Aires"
+  },
+  {
+    "id": 5,
+    "nombre": "Lucía Rodríguez",
+    "cargo": "Gerente Comercial",
+    "departamento": "Ventas",
+    "email": "lucia@empresa.com",
+    "sede": "Mendoza"
+  },
+  {
+    "id": 6,
+    "nombre": "Diana Torres",
+    "cargo": "Contadora",
+    "departamento": "Finanzas",
+    "email": "diana@empresa.com",
+    "sede": "Buenos Aires"
+  },
+  {
+    "id": 7,
+    "nombre": "Pedro Ramírez",
+    "cargo": "Ingeniero DevOps",
+    "departamento": "Tecnología",
+    "email": "pedro@empresa.com",
+    "sede": "Córdoba"
+  },
+  {
+    "id": 8,
+    "nombre": "María López",
+    "cargo": "Analista de Datos",
+    "departamento": "Tecnología",
+    "email": "maria@empresa.com",
+    "sede": "Rosario"
+  },
+  {
+    "id": 9,
+    "nombre": "Juan Pérez",
+    "cargo": "Especialista Marketing",
+    "departamento": "Marketing",
+    "email": "juan@empresa.com",
+    "sede": "Buenos Aires"
+  },
+  {
+    "id": 10,
+    "nombre": "Sara González",
+    "cargo": "Directora Legal",
+    "departamento": "Legal",
+    "email": "sara@empresa.com",
+    "sede": "Mendoza"
+  }
+]

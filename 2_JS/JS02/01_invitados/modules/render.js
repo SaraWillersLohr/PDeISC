@@ -1,11 +1,6 @@
 // Yo renderizo la lista de invitados sin recargar la página
 // Esto hace que la aplicación sea más rápida y fluida para el usuario
-export const dibujarInvitados = (
-  invitados,
-  contenedor,
-  callbackBorrar,
-  consola,
-) => {
+export const dibujarInvitados = (invitados, contenedor, callbackBorrar) => {
   // Yo limpio el contenedor antes de volver a dibujar
   contenedor.innerHTML = "";
 
@@ -17,10 +12,9 @@ if (contador) contador.textContent = String(invitados.length);
   // Si no hay invitados, muestro un mensaje de estado vacío
   if (invitados.length === 0) {
     const vacio = document.createElement("div");
-    vacio.className = "col-12 empty-state glass-panel";
+    vacio.className = "col-12 empty-state";
     vacio.innerHTML = `<p>Todavía no hay invitados confirmados.</p>`;
     contenedor.appendChild(vacio);
-    consola?.log("Listado renderizado: sin registros");
     return;
   }
 
@@ -48,15 +42,9 @@ if (contador) contador.textContent = String(invitados.length);
     // Yo agrego el evento click al botón de eliminar para poder borrar el invitado
     tarjeta.querySelector(".btn-borrar").addEventListener("click", () => {
       callbackBorrar(indice);
-      consola?.log(
-        `Invitado eliminado: ${invitado.nombre} ${invitado.apellido}`,
-      );
     });
 
     columna.appendChild(tarjeta);
     contenedor.appendChild(columna);
   });
-
-  // Yo registro en la consola cuántos invitados hay actualmente
-  consola?.log(`Listado actualizado: ${invitados.length} invitado(s)`);
 };

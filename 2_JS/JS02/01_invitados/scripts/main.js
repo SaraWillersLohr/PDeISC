@@ -13,7 +13,6 @@ import {
   renderizarLecturaMetodos,
 } from "../modules/formReaders.js";
 import { initTheme } from "../modules/theme.js";
-import { EventConsole } from "../modules/eventConsole.js";
 import { mostrarToast } from "../modules/toast.js";
 import {
   mostrarFeedback,
@@ -27,8 +26,6 @@ const checkTerminos = document.getElementById("termsCheck");
 const contenedorLista = document.getElementById("guestList");
 const panelMetodos = document.getElementById("methodsPanel");
 
-// Yo inicializo la consola de eventos y el tema de la aplicación
-const consola = new EventConsole("eventConsole");
 initTheme();
 
 // Yo mantengo la lista de invitados en memoria
@@ -37,7 +34,7 @@ let listaInvitados = [];
 // Yo creo la función para borrar un invitado del listado
 const borrarInvitado = (indice) => {
   listaInvitados.splice(indice, 1);
-  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
   mostrarToast("toastZone", "Invitado eliminado del listado", "success");
 };
 
@@ -78,17 +75,7 @@ else if (input.name === "acompanantes")
 });
 
 // Yo agrego el evento change al checkbox de términos para validar el formulario
-checkTerminos.addEventListener("change", () => {
-  validarFormulario();
-  consola.log(
-    checkTerminos.checked ? "Términos aceptados" : "Términos desmarcados",
-  );
-});
-
-// Yo agrego el evento click al botón de limpiar consola
-document
-  .getElementById("clearConsole")
-  ?.addEventListener("click", () => consola.limpiar());
+checkTerminos.addEventListener("change", validarFormulario);
 
 // Yo manejo el envío del formulario para agregar un nuevo invitado
 formulario.addEventListener("submit", (e) => {
@@ -96,7 +83,6 @@ formulario.addEventListener("submit", (e) => {
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (!validarFormulario()) {
     mostrarToast("toastZone", "Revisá los campos antes de confirmar", "error");
-    consola.log("Validación fallida: formulario incompleto");
     return;
   }
 
@@ -129,14 +115,8 @@ if (!validarFormulario()) {
 
   // Yo agrego el invitado a la lista y actualizo la interfaz
   listaInvitados.push(nuevoInvitado);
-  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
 
-  consola.log(
-    `Usuario agregado: ${nuevoInvitado.nombre} ${nuevoInvitado.apellido}`,
-  );
-  consola.log(
-    "Lectura con getElementById, querySelector y FormData completada",
-  );
   mostrarToast(
     "toastZone",
     "Invitado confirmado sin recargar la página",
@@ -150,5 +130,4 @@ if (!validarFormulario()) {
 });
 
 // Yo inicio la aplicación y muestro el estado inicial
-consola.log("App iniciada: modo dinámico activo");
-dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);

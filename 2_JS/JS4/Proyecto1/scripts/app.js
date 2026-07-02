@@ -105,7 +105,7 @@ async function cargarUsuarios() {
     "Se ejecutó fetch() contra jsonplaceholder.typicode.com/users",
     "Obteniendo datos de la API pública...",
   ]);
-//
+
   try {
     // fetch es nativo del browser, hay que convertir la respuesta con .json()
     const datosFetch = await obtenerUsuariosConFetch();
@@ -151,7 +151,7 @@ async function cargarUsuarios() {
     renderizarUsuarios([], contenedor, seleccionarUsuario, pedirConfirmacionEliminar);
   }
 }
-
+//acá inicializo la app
 function inicializarApp() {
   inicializarTema();
   initConsola("Explorer listo. Se cargará la API con fetch y axios...");
@@ -163,5 +163,5 @@ function inicializarApp() {
 
   cargarUsuarios();
 }
-
+//acá escucho el evento DOMContentLoaded
 document.addEventListener("DOMContentLoaded", inicializarApp);

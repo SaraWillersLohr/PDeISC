@@ -51,16 +51,45 @@ export const METODOS_ARRAY = {
 export const renderizarEstadoArray = (contenedor, lista, info) => {
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (!contenedor) return;
-  // Yo muestro el método usado, la cantidad de registros y el contenido del array
+
+  const contadorArray = document.getElementById("arrayCount");
+  if (contadorArray) contadorArray.textContent = String(lista.length);
+
+  const nombresHtml = lista.length
+    ? lista
+        .map(
+          (item, indice) =>
+            `<li><span class="sidebar-name-index">${indice + 1}</span><span class="sidebar-name-text">${item.nombre} ${item.apellido}</span></li>`,
+        )
+        .join("")
+    : '<li class="sidebar-names-empty">Sin nombres cargados todavía</li>';
+
   contenedor.innerHTML = `
-    <div class="array-block">
-      <p class="array-label">Método usado</p>
-      <p class="array-method">${info.metodo} — ${info.detalle}</p>
+    <div class="array-stats">
+      <div class="array-stat">
+        <span class="array-stat__label">Método usado</span>
+        <span class="array-method-badge">${info.metodo}</span>
+        <p class="array-stat__detail">${info.detalle}</p>
+      </div>
+      <div class="array-stat array-stat--count">
+        <span class="array-stat__label">Total</span>
+        <span class="array-stat__value">${lista.length}</span>
+      </div>
     </div>
-    <div class="array-block">
-      <p class="array-label">Cantidad de registros</p>
-      <p class="array-count">${lista.length}</p>
+
+    <div class="array-names-zone">
+      <p class="array-zone-title">Nombres en el array</p>
+      <ul class="sidebar-names-list" aria-live="polite">${nombresHtml}</ul>
     </div>
-    <pre class="array-pre" aria-label="Estado del array">${JSON.stringify(lista, null, 2)}</pre>
+
+    <details class="array-json-details">
+      <summary class="array-json-summary">Ver JSON del array</summary>
+      <pre class="array-pre" aria-label="Estado del array">${JSON.stringify(lista, null, 2)}</pre>
+    </details>
   `;
+
+  const listaNombres = contenedor.querySelector(".sidebar-names-list");
+  if (listaNombres && lista.length) {
+    listaNombres.scrollTop = listaNombres.scrollHeight;
+  }
 };

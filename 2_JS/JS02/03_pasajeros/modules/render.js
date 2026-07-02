@@ -1,6 +1,6 @@
 // Yo renderizo la lista de personas sin recargar la página
 // Esto hace que la aplicación sea más rápida y fluida para el usuario
-export const dibujarListaPersonas = (lista, contenedor, onBorrar, consola) => {
+export const dibujarListaPersonas = (lista, contenedor, onBorrar) => {
   // Yo limpio el contenedor antes de volver a dibujar
   contenedor.innerHTML = "";
 
@@ -11,6 +11,9 @@ if (contador) contador.textContent = String(lista.length);
 
   // Yo actualizo la lista lateral de nombres
   const nombresLista = document.getElementById("namesList");
+  const contadorNombres = document.getElementById("namesCount");
+  // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
+if (contadorNombres) contadorNombres.textContent = String(lista.length);
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
 if (nombresLista) {
     nombresLista.innerHTML = "";
@@ -19,18 +22,19 @@ if (!lista.length) {
       nombresLista.innerHTML =
         '<li class="names-empty">Sin nombres guardados todavía</li>';
     } else {
-      lista.forEach((p) => {
+      lista.forEach((p, indice) => {
         const li = document.createElement("li");
-        li.textContent = `${p.nombre} ${p.apellido}`;
+        li.innerHTML = `<span class="sidebar-name-index">${indice + 1}</span><span class="sidebar-name-body"><span class="sidebar-name-text">${p.nombre} ${p.apellido}</span><small class="sidebar-name-meta">${p.nacionalidad} · Doc. ${p.documento}</small></span>`;
         nombresLista.appendChild(li);
       });
+      nombresLista.scrollTop = nombresLista.scrollHeight;
     }
   }
 
   // Si no hay personas, muestro un mensaje de estado vacío
   if (!lista.length) {
     const vacio = document.createElement("div");
-    vacio.className = "col-12 empty-state glass-panel";
+    vacio.className = "col-12 empty-state";
     vacio.innerHTML = "<p>No hay personas en localStorage.</p>";
     contenedor.appendChild(vacio);
     return;
@@ -66,7 +70,4 @@ if (!lista.length) {
     col.appendChild(card);
     contenedor.appendChild(col);
   });
-
-  // Yo registro en la consola cuántas personas hay actualmente
-  consola?.log(`Listado renderizado (${lista.length} persona(s))`);
 };

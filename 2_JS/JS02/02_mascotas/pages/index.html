@@ -27,7 +27,7 @@
         </header>
 
         <div class="layout-main layout-main--p2">
-            <section class="glass-panel">
+            <section class="glass-panel form-panel">
                 <h2 class="section-title">Formulario (9 campos)</h2>
                 <form id="guestForm" novalidate>
                     <div class="row g-3">
@@ -111,24 +111,21 @@
             </section>
 
             <aside class="side-stack">
-                <section class="glass-panel console-panel" id="eventConsole">
-                    <div class="console-head">
-                        <h2 class="section-title mb-0">Consola visual</h2>
-                        <button type="button" id="clearConsole" class="btn btn-sm btn-outline-secondary">Limpiar</button>
-                    </div>
-                    <div class="console-body"></div>
-                </section>
-
                 <section class="glass-panel array-viewer-panel">
-                    <h2 class="section-title">Estado del array</h2>
+                    <div class="side-panel-head">
+                        <h2 class="section-title mb-0">Estado del array</h2>
+                        <span class="side-panel-count" id="arrayCount">0</span>
+                    </div>
                     <div id="arrayViewer"></div>
                 </section>
             </aside>
         </div>
 
-        <section class="mt-5">
+        <section class="records-section mt-5">
             <h2 class="section-title">Datos renderizados del formulario</h2>
-            <div id="guestList" class="row g-3"></div>
+            <div class="records-list-wrap glass-panel">
+                <div id="guestList" class="row g-3"></div>
+            </div>
         </section>
     </main>
 

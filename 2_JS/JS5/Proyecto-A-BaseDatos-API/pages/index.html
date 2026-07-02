@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estanga Education - Gestión de Alumnos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link id="tema-css" rel="stylesheet" href="styles/light.css">
+</head>
+<body>
+
+  <!-- Header institucional -->
+  <header class="header-estanga">
+    <div class="container-fluid px-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="logo-texto">Estanga Education</div>
+          <div class="subtitulo">Gestión de Alumnos</div>
+        </div>
+        <button id="btn-cambiar-tema" class="btn-tema" type="button">Cambiar tema</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor principal con layout de dos columnas -->
+  <main class="contenedor-principal">
+    <div class="container-fluid px-4">
+      <div class="row g-4">
+
+        <!-- Columna izquierda: aplicación funcional -->
+        <div class="col-lg-7">
+
+          <!-- Formulario de registro -->
+          <div class="card card-estanga mb-4">
+            <div class="card-header">Registrar Alumno</div>
+            <div class="card-body">
+              <form id="form-alumno" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="nombre"
+                      name="nombre"
+                      required
+                      minlength="2"
+                      maxlength="100"
+                      pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s'\-]+"
+                    >
+                    <div class="mensaje-campo" id="error-nombre"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="apellido"
+                      name="apellido"
+                      required
+                      minlength="2"
+                      maxlength="100"
+                      pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s'\-]+"
+                    >
+                    <div class="mensaje-campo" id="error-apellido"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="edad" class="form-label">Edad</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="edad"
+                      name="edad"
+                      required
+                      min="1"
+                      max="120"
+                    >
+                    <div class="mensaje-campo" id="error-edad"></div>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <button type="submit" class="btn-estanga">Registrar Alumno</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Tabla de alumnos -->
+          <div class="card card-estanga">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span>Listado de Alumnos</span>
+              <span id="contador-alumnos" class="badge badge-estanga">0 alumnos</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="tabla-alumnos">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nombre</th>
+                      <th>Apellido</th>
+                      <th>Edad</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-alumnos-body">
+                    <tr>
+                      <td colspan="4" class="mensaje-vacio">Cargando alumnos...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Columna derecha: panel educativo -->
+        <div class="col-lg-5">
+          <div class="panel-educativo">
+            <div class="card card-estanga">
+              <div class="card-header">¿Cómo funciona este sistema?</div>
+              <div class="card-body">
+
+                <div class="seccion-explicacion">
+                  <ol class="lista-pasos">
+                    <li>El usuario completa el formulario.</li>
+                    <li>Se ejecutan las validaciones.</li>
+                    <li>Se envía una solicitud POST a la API.</li>
+                    <li>Express recibe la información.</li>
+                    <li>La API guarda el alumno en MySQL.</li>
+                    <li>MySQL devuelve una respuesta.</li>
+                    <li>La tabla se actualiza automáticamente.</li>
+                  </ol>
+                </div>
+
+                <div class="diagrama-flujo mt-4">
+                  <div class="paso-flujo">Formulario</div>
+                  <div class="flecha-flujo">↓</div>
+                  <div class="paso-flujo">POST</div>
+                  <div class="flecha-flujo">↓</div>
+                  <div class="paso-flujo">API REST</div>
+                  <div class="flecha-flujo">↓</div>
+                  <div class="paso-flujo">MySQL</div>
+                  <div class="flecha-flujo">↓</div>
+                  <div class="paso-flujo">JSON</div>
+                  <div class="flecha-flujo">↓</div>
+                  <div class="paso-flujo">Tabla actualizada</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-estanga">
+    <div class="container-fluid px-4">
+      <p>Estanga Education &copy; 2026 — Sistema de Gestión de Alumnos — Puerto 3000</p>
+    </div>
+  </footer>
+
+  <!-- Botón volver arriba -->
+  <button id="btn-volver-arriba" class="btn-volver-arriba" type="button" aria-label="Volver arriba" title="Volver arriba">
+    ↑
+  </button>
+
+  <script type="module" src="scripts/app.js"></script>
+</body>
+</html>

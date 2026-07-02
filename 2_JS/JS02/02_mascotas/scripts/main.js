@@ -14,7 +14,6 @@ import {
 } from "../modules/arrayStorage.js";
 import { dibujarInvitados } from "../modules/render.js";
 import { initTheme } from "../modules/theme.js";
-import { EventConsole } from "../modules/eventConsole.js";
 import { mostrarToast } from "../modules/toast.js";
 import {
   mostrarFeedback,
@@ -29,8 +28,6 @@ const contenedorLista = document.getElementById("guestList");
 const visorArray = document.getElementById("arrayViewer");
 const selectMetodo = document.getElementById("metodoArray");
 
-// Yo inicializo la consola de eventos y el tema de la aplicación
-const consola = new EventConsole("eventConsole");
 initTheme();
 
 // Yo mantengo la lista de invitados en memoria
@@ -39,7 +36,7 @@ let listaInvitados = [];
 // Yo creo la función para borrar un invitado del array
 const borrarInvitado = (indice) => {
   listaInvitados.splice(indice, 1);
-  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
   renderizarEstadoArray(visorArray, listaInvitados, {
     metodo: "splice()",
     detalle: `Se eliminó el índice ${indice}`,
@@ -81,29 +78,19 @@ formulario.addEventListener("input", (e) => {
   const input = e.target;
   const validar = mapaValidadores[input.name];
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
-if (validar) mostrarFeedback(input, validar(input.value));
+  if (validar) mostrarFeedback(input, validar(input.value));
   validarTodo();
 });
 
 // Yo agrego el evento change al checkbox de términos para validar el formulario
 checkTerminos.addEventListener("change", validarTodo);
-// Yo agrego el evento change al select de método para registrar el cambio
-selectMetodo?.addEventListener("change", () => {
-  consola.log(`Método seleccionado: ${selectMetodo.value}`);
-});
-
-// Yo agrego el evento click al botón de limpiar consola
-document
-  .getElementById("clearConsole")
-  ?.addEventListener("click", () => consola.limpiar());
 
 // Yo manejo el envío del formulario para agregar un nuevo invitado al array
 formulario.addEventListener("submit", (e) => {
   e.preventDefault();
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
-if (!validarTodo()) {
+  if (!validarTodo()) {
     mostrarToast("toastZone", "Hay campos inválidos", "error");
-    consola.log("Validación fallida: no se guardó en el array");
     return;
   }
 
@@ -111,7 +98,7 @@ if (!validarTodo()) {
   const metodoKey = selectMetodo.value;
   const estrategia = METODOS_ARRAY[metodoKey];
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
-if (!estrategia) return;
+  if (!estrategia) return;
 
   // Yo creo el objeto con los datos del nuevo invitado
   const invitado = {
@@ -129,7 +116,6 @@ if (!estrategia) return;
   };
 
   // Yo aplico el método seleccionado para agregar al array
-  const antes = listaInvitados.length;
   const resultado = estrategia.aplicar(listaInvitados, invitado);
   listaInvitados = resultado.lista;
 
@@ -138,12 +124,8 @@ if (!estrategia) return;
     metodo: estrategia.etiqueta,
     detalle: resultado.detalle,
   });
-  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
 
-  consola.log(
-    `Array actualizado con ${estrategia.etiqueta} (${antes} → ${listaInvitados.length})`,
-  );
-  consola.log(`Invitado agregado: ${invitado.nombre} ${invitado.apellido}`);
   mostrarToast("toastZone", `Guardado con ${estrategia.etiqueta}`, "success");
 
   // Yo limpio el formulario y el feedback visual
@@ -157,5 +139,4 @@ renderizarEstadoArray(visorArray, listaInvitados, {
   metodo: "Estado inicial",
   detalle: "Array vacío — elegí un método y cargá un invitado",
 });
-consola.log("Proyecto 2 iniciado: arrays en pantalla activos");
-dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
+dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);

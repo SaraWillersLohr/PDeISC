@@ -4,7 +4,7 @@ import { validarDocumento, validarTelefono } from "./validations.js";
 import { mostrarFeedback } from "./feedback.js";
 
 // Yo actualizo el prefijo, límites y hints cuando cambia el país seleccionado
-export const aplicarReglasPais = (formulario, consola) => {
+export const aplicarReglasPais = (formulario) => {
   // Yo obtengo el código del país seleccionado y su configuración
   const codigo = formulario.nacionalidad.value;
   const config = obtenerConfigPais(codigo);
@@ -45,7 +45,6 @@ if (hintTel) hintTel.textContent = config.telefono.mensaje;
   // Yo valido los campos con las nuevas reglas del país
   mostrarFeedback(documento, validarDocumento(documento.value, codigo));
   mostrarFeedback(telefono, validarTelefono(telefono.value, codigo));
-  consola?.log(`Nacionalidad: ${config.nombre} → prefijo ${config.prefijo}`);
 };
 
 // Yo actualizo el contador de dígitos del teléfono en tiempo real

@@ -14,7 +14,6 @@ import {
 } from "../modules/validations.js";
 import { dibujarListaPersonas } from "../modules/render.js";
 import { initTheme } from "../modules/theme.js";
-import { EventConsole } from "../modules/eventConsole.js";
 import { mostrarToast } from "../modules/toast.js";
 import {
   mostrarFeedback,
@@ -36,8 +35,6 @@ const bannerEstado = document.getElementById("saveStatus");
 const selectHijos = document.getElementById("tieneHijos");
 const inputCantHijos = document.getElementById("cantidadHijos");
 
-// Yo inicializo la consola de eventos y el tema de la aplicación
-const consola = new EventConsole("eventConsole");
 initTheme();
 
 // Yo cargo la lista de personas desde localStorage al iniciar
@@ -85,11 +82,9 @@ if (formulario.edad.value !== "")
 
 // Yo creo la función para borrar una persona de la lista
 const borrarPersona = (indice) => {
-  const persona = listaPersonas[indice];
   listaPersonas.splice(indice, 1);
   localStorage.setItem("peopleList", JSON.stringify(listaPersonas));
-  dibujarListaPersonas(listaPersonas, contenedorLista, borrarPersona, consola);
-  consola.log(`Registro eliminado: ${persona.nombre} ${persona.apellido}`);
+  dibujarListaPersonas(listaPersonas, contenedorLista, borrarPersona);
   mostrarToast("toastZone", "Persona eliminada de localStorage", "success");
 };
 
@@ -110,7 +105,7 @@ formulario.nacionalidad.addEventListener("change", () => {
     formulario.nacionalidad,
     validarNacionalidad(formulario.nacionalidad.value),
   );
-  aplicarReglasPais(formulario, consola);
+  aplicarReglasPais(formulario);
   actualizarBoton();
 });
 
@@ -195,11 +190,8 @@ formulario.estadoCivil.addEventListener("change", () => {
   actualizarBoton();
 });
 
-// Yo manejo el cambio de términos y el botón de limpiar consola
+// Yo manejo el cambio de términos
 checkTerminos.addEventListener("change", actualizarBoton);
-document
-  .getElementById("clearConsole")
-  ?.addEventListener("click", () => consola.limpiar());
 
 // Yo manejo el envío del formulario para guardar una nueva persona
 formulario.addEventListener("submit", (e) => {
@@ -212,7 +204,6 @@ if (!validarFormularioCompleto(formulario, checkTerminos)) {
       "Guardado incorrecto: revisá los campos marcados en rojo",
     );
     mostrarToast("toastZone", "No se pudo guardar el registro", "error");
-    consola.log("Validación fallida: guardado cancelado");
     return;
   }
 
@@ -240,27 +231,23 @@ if (!validarFormularioCompleto(formulario, checkTerminos)) {
   localStorage.setItem("peopleList", JSON.stringify(listaPersonas));
 
   // Yo actualizo la interfaz
-  dibujarListaPersonas(listaPersonas, contenedorLista, borrarPersona, consola);
+  dibujarListaPersonas(listaPersonas, contenedorLista, borrarPersona);
   mostrarEstadoGuardado(
     true,
     `Guardado correcto: ${nuevaPersona.nombre} ${nuevaPersona.apellido} en localStorage`,
   );
   mostrarToast("toastZone", "Persona guardada con éxito", "success");
-  consola.log(
-    `Datos guardados en localStorage (${listaPersonas.length} registros)`,
-  );
 
   // Yo limpio el formulario y reseteo el estado
   formulario.reset();
   inputCantHijos.disabled = true;
   inputCantHijos.value = "0";
   limpiarFeedbackFormulario(formulario);
-  aplicarReglasPais(formulario, consola);
+  aplicarReglasPais(formulario);
   actualizarBoton();
 });
 
 // Yo inicio la aplicación cargando datos y aplicando reglas
-consola.log("Datos cargados desde localStorage al iniciar");
-dibujarListaPersonas(listaPersonas, contenedorLista, borrarPersona, consola);
-aplicarReglasPais(formulario, consola);
+dibujarListaPersonas(listaPersonas, contenedorLista, borrarPersona);
+aplicarReglasPais(formulario);
 actualizarBoton();

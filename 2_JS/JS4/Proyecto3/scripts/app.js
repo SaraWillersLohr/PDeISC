@@ -49,23 +49,24 @@ async function enviarUsuario(metodo) {
     ]);
     return;
   }
-
+//acá armo el objeto { name, email }
   const datos = { name: nombre.trim(), email: email.trim() };
+  //acá deshabilito los botones de envío
   const btnFetch = document.getElementById("btn-enviar-fetch");
   const btnAxios = document.getElementById("btn-enviar-axios");
-
   btnFetch.disabled = true;
   btnAxios.disabled = true;
+  //acá muestro el estado de envío
   mostrarEstado(`Enviando con ${metodo}...`, "info");
-
+  //acá verifico si es axios o fetch
   const esAxios = metodo === "axios";
-
+  //acá logueo la acción
   logConsola("POST", [
     esAxios ? "Se ejecutó axios.post()" : "Se ejecutó fetch() POST",
     "Se armó el objeto { name, email } después de validarFormulario()",
     "La API simula la creación y devuelve un ID interno",
   ]);
-
+//acá intento enviar el usuario
   try {
     const resultado = esAxios
       ? await crearUsuarioConAxios(datos)

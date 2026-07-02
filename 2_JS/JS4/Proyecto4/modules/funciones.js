@@ -107,7 +107,7 @@ export function renderizarTablaEmpleados(empleados, contenedor, alSeleccionar, a
     });
   });
 }
-
+//acá muestro el estado de la carga
 export function mostrarEstado(mensaje, tipo = "info") {
   const el = document.getElementById("estado-carga");
   if (!el) return;
@@ -115,7 +115,7 @@ export function mostrarEstado(mensaje, tipo = "info") {
   el.textContent = mensaje;
   el.classList.remove("d-none");
 }
-
+//acá oculto el estado de la carga
 export function ocultarEstado() {
   document.getElementById("estado-carga")?.classList.add("d-none");
 }

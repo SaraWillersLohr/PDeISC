@@ -2,11 +2,11 @@
 const CLAVE_TEMA = "userhub-tema";
 const TEMA_CLARO = "claro";
 const TEMA_OSCURO = "oscuro";
-
+//obtiene el tema guardado o el predeterminado (claro)
 export function obtenerTema() {
   return localStorage.getItem(CLAVE_TEMA) || TEMA_CLARO;
 }
-
+//aplica el tema seleccionado al documento
 export function aplicarTema(tema) {
   const linkEstilos = document.getElementById("estilos-tema");
   if (!linkEstilos) return;
@@ -15,14 +15,14 @@ export function aplicarTema(tema) {
   document.documentElement.setAttribute("data-tema", tema);
   localStorage.setItem(CLAVE_TEMA, tema);
 }
-
+//alterna entre tema claro y oscuro
 export function alternarTema() {
   const temaActual = obtenerTema();
   const nuevoTema = temaActual === TEMA_CLARO ? TEMA_OSCURO : TEMA_CLARO;
   aplicarTema(nuevoTema);
   return nuevoTema;
 }
-
+//inicializa el tema al cargar la aplicación  
 export function inicializarTema() {
   aplicarTema(obtenerTema());
 

@@ -17,7 +17,7 @@ export function ocultarEstado() {
 export function actualizarPanelFlujo(metodo, cantidad) {
   const panel = document.getElementById("panel-flujo");
   if (!panel) return;
-
+//acá actualizo el panel que muestra el flujo API → array → DOM
   panel.classList.remove("d-none");
   document.getElementById("flujo-metodo").textContent = metodo;
   document.getElementById("flujo-cantidad").textContent = cantidad;

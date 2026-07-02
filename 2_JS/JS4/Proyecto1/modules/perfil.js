@@ -7,7 +7,7 @@ export function renderPerfil(datos, contenedor) {
       '<p class="userhub-perfil-placeholder">Aquí aparecerá la información seleccionada</p>';
     return;
   }
-
+//acá armo el array de campos
   const campos = [
     ["Nombre", datos.nombre],
     ["Apodo", datos.apodo],
@@ -18,15 +18,16 @@ export function renderPerfil(datos, contenedor) {
     ["Ciudad", datos.ciudad],
     ["Sitio web", datos.sitioWeb],
   ];
-
+//acá filtro los campos que no son undefined
   const filas = campos
     .filter(([, valor]) => valor !== undefined)
     .map(([label, valor]) => ({ label, value: valor || "—" }));
-
+//acá agrego los extras si existen
   if (datos.extras?.length) {
     datos.extras.forEach((extra) => filas.push({ label: extra.label, value: extra.value }));
   }
 
+  //acá renderizo el perfil
   contenedor.innerHTML = `
     <div class="userhub-profile-detail userhub-fade-in">
       ${filas

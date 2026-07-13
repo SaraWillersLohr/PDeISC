@@ -122,45 +122,60 @@ header {
 }
 
 #cabeza {
-  left: 49.15%;
-  top: 18%;
-  width: 28.71%;
-  height: 19.14%;
+  left: 53.5%;
+  top: 24%;
+  width: 20%;
+  height: 13.4%;
+}
+
+.stickman-part {
+  background-color: #000;
+  border-radius: 10px;
+  position: absolute;
 }
 
 #cuerpo {
-  left: 48.02%;
-  top: 36%;
-  width: 30.96%;
-  height: 22.33%;
+  left: 63.5%;
+  top: 36.5%;
+  width: 1.5%;
+  height: 15%;
+  transform: translateX(-50%);
 }
 
 #brazoIzq {
-  left: 28%;
-  top: 37%;
-  width: 25.10%;
-  height: 16.34%;
+  left: 63.5%;
+  top: 40%;
+  width: 1.2%;
+  height: 12%;
+  transform-origin: top center;
+  transform: translateX(-50%) rotate(40deg);
 }
 
 #brazoDer {
-  left: 74%;
-  top: 37%;
-  width: 25.10%;
-  height: 16.34%;
+  left: 63.5%;
+  top: 40%;
+  width: 1.2%;
+  height: 12%;
+  transform-origin: top center;
+  transform: translateX(-50%) rotate(-40deg);
 }
 
 #piernaIzq {
-  left: 38.7%;
-  top: 56.5%;
-  width: 24.80%;
-  height: 20.25%;
+  left: 63.5%;
+  top: 50.5%;
+  width: 1.5%;
+  height: 15%;
+  transform-origin: top center;
+  transform: translateX(-50%) rotate(25deg);
 }
 
 #piernaDer {
   left: 63.5%;
-  top: 56.5%;
-  width: 24.80%;
-  height: 20.25%;
+  top: 50.5%;
+  width: 1.5%;
+  height: 15%;
+  transform-origin: top center;
+  transform: translateX(-50%) rotate(-25deg);
 }
 
 /* Secciones de Contenido */

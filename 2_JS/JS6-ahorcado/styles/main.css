@@ -363,14 +363,27 @@ button { font-family: var(--font-body); cursor: pointer; }
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: 24px;
-  align-items: start;
+  align-items: stretch;   /* ambas columnas igual altura */
 }
 
 /* ─ Columna izquierda ─ */
 .game-col-left {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+}
+
+/* La card de la horca crece para llenar toda la columna */
+.card-ahorcado {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-ahorcado .card-body-custom {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ─ Columna derecha ─ */
@@ -1134,7 +1147,12 @@ input:focus-visible {
 
   .game-layout {
     grid-template-columns: 1fr;
+    align-items: start;
   }
+
+  /* En mobile la horca no necesita estirarse */
+  .card-ahorcado { flex: none; }
+  .card-ahorcado .card-body-custom { flex: none; }
 
   .ahorcado-wrapper { max-width: 260px; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }

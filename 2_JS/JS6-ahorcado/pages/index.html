@@ -132,7 +132,7 @@
         <!-- ─── ZONA DE JUEGO (2 columnas) ─── -->
         <div class="game-layout">
 
-            <!-- COLUMNA IZQUIERDA: Horca + Personaje + Pista -->
+            <!-- COLUMNA IZQUIERDA: solo Horca -->
             <aside class="game-col-left">
 
                 <!-- Horca -->
@@ -155,20 +155,9 @@
                     </div>
                 </div>
 
-                <!-- Pista -->
-                <div class="card card-pista">
-                    <div class="card-header-custom">
-                        <i data-lucide="lightbulb"></i>
-                        <h3>Pista</h3>
-                    </div>
-                    <div class="card-body-custom">
-                        <p id="pista" class="pista-texto">Seleccioná una especialidad para comenzar</p>
-                    </div>
-                </div>
-
             </aside>
 
-            <!-- COLUMNA DERECHA: Palabra + Letras usadas + Teclado -->
+            <!-- COLUMNA DERECHA: Palabra + Pista + Letras usadas + Teclado -->
             <div class="game-col-right">
 
                 <!-- Palabra a adivinar -->
@@ -184,12 +173,19 @@
                     </div>
                 </div>
 
+                <!-- Pista -->
+                <div class="card card-pista">
+                    <div class="card-header-custom">
+                        <i data-lucide="lightbulb"></i>
+                        <h3>Pista</h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <p id="pista" class="pista-texto">Seleccioná una especialidad para comenzar</p>
+                    </div>
+                </div>
+
                 <!-- Letras usadas -->
                 <div class="card card-letras">
-                    <div class="card-header-custom">
-                        <i data-lucide="x-circle"></i>
-                        <h3>Letras Usadas</h3>
-                    </div>
                     <div class="card-body-custom">
                         <div id="letrasUsadas" aria-live="polite" aria-label="Letras ya utilizadas"></div>
                         <p id="letrasUsadasPlaceholder" class="letras-placeholder">Las letras incorrectas aparecerán aquí</p>

@@ -1,7 +1,7 @@
 import { cargarTema, cambiarTema } from "../context/theme.js";
 import { obtenerPalabra, guardarScore, obtenerRanking } from "./modules/api.js";
 import JuegoAhorcado from "./modules/juego.js";
-import { crearTeclado } from "./modules/teclado.js";
+import { crearTeclado, mostrarTecladoInactivo } from "./modules/teclado.js";
 import { manejarLetra, configurarScrollTop } from "./modules/eventos.js";
 import { renderAhorcado } from "./modules/render.js";
 import { cargarRanking } from "./modules/ranking.js";
@@ -89,6 +89,7 @@ function actualizarIconTema() {
 // ── Inicialización ──
 cargarRanking();
 configurarScrollTop(btnTop);
+mostrarTecladoInactivo(tecladoEl);
 
 // ── Formateo de tiempo ──
 function formatTiempo(segundos) {
@@ -128,7 +129,7 @@ function resetearSesionCompleta() {
   pistaEl.textContent     = "Seleccioná una especialidad para comenzar";
   letrasUsadasEl.innerHTML = "";
   if (letrasPlaceholder) letrasPlaceholder.style.display = "";
-  tecladoEl.innerHTML     = "";
+  mostrarTecladoInactivo(tecladoEl);
   renderAhorcado(0);
 
   document.querySelectorAll(".btn-especialidad").forEach(b => b.classList.remove("activa"));

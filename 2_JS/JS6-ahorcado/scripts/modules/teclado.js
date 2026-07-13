@@ -5,6 +5,7 @@ const abecedario = [
   "R","S","T","U","V","W","X","Y","Z"
 ];
 
+// Crea el teclado activo (durante una partida)
 export function crearTeclado(contenedor, callback) {
   contenedor.innerHTML = "";
 
@@ -16,10 +17,24 @@ export function crearTeclado(contenedor, callback) {
     boton.setAttribute("aria-label", `Letra ${letra}`);
 
     boton.addEventListener("click", () => {
-      if (!boton.disabled) {
-        callback(letra);
-      }
+      if (!boton.disabled) callback(letra);
     });
+
+    contenedor.appendChild(boton);
+  });
+}
+
+// Muestra el teclado deshabilitado (antes de iniciar partida)
+export function mostrarTecladoInactivo(contenedor) {
+  contenedor.innerHTML = "";
+
+  abecedario.forEach((letra) => {
+    const boton = document.createElement("button");
+    boton.textContent = letra;
+    boton.className   = "btn-tecla";
+    boton.setAttribute("data-letra", letra);
+    boton.setAttribute("aria-label", `Letra ${letra}`);
+    boton.disabled    = true;
 
     contenedor.appendChild(boton);
   });

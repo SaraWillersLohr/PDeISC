@@ -6,7 +6,7 @@ import { manejarLetra, configurarScrollTop } from "./modules/eventos.js";
 import { renderAhorcado } from "./modules/render.js";
 import { cargarRanking } from "./modules/ranking.js";
 import { validarNombre } from "./modules/validaciones.js";
-import { descargarPDF } from "./pdf.js";
+import { descargarPDF } from "./modules/pdf.js";
 
 // Instancia de Juego
 const juego = new JuegoAhorcado();
@@ -97,7 +97,7 @@ function resetearSesionCompleta() {
   tiempoSpan.textContent = "00:00";
   puntosSpan.textContent = "0";
   intentosSpan.textContent = "6";
-  palabraRender.textContent = "Seleccioná una especialidad";
+  palabraRender.innerHTML = '<span class="placeholder-chico">Seleccioná una especialidad</span>';
   pista.textContent = "-";
   letrasUsadas.innerHTML = "";
   teclado.innerHTML = "";
@@ -384,6 +384,11 @@ btnPdf?.addEventListener("click", async () => {
   } finally {
     btnPdf.disabled = false;
   }
+});
+
+// Bypasear cartel de orientación vertical en celular
+document.getElementById("btnIgnorePortrait")?.addEventListener("click", () => {
+  document.body.classList.add("ignore-portrait");
 });
 
 // Inicializar Lucide

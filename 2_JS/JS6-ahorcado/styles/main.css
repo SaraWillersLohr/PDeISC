@@ -94,7 +94,8 @@ header {
 .ahorcado-wrapper {
   position: relative;
   width: 100%;
-  max-width: 320px;
+  max-width: 500px; /* Increased from 320px to make it protagonist */
+  margin: 0 auto;
   aspect-ratio: 1024 / 1536; /* Aspect ratio idéntico a las imágenes (1024x1536) */
 }
 
@@ -211,7 +212,7 @@ header {
   color: white !important;
 }
 
-/* Render de Palabra a adivinar (Estilo pizarra/tizas) */
+/* Render de Palabra a adivinar (Estilo Pizarra removido, ahora es como la landing) */
 #palabraRender {
   font-family: var(--font-title);
   font-weight: 800;
@@ -219,18 +220,25 @@ header {
   letter-spacing: 12px;
   text-align: center;
   padding: 15px;
-  background-color: var(--bg-pizarra);
-  color: var(--text-pizarra) !important;
+  background-color: var(--bg-card);
+  color: var(--text-color) !important;
   border-radius: 12px;
   min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
-  border: 1px solid var(--border-color);
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+  border: 2px solid var(--border-color);
   margin-top: 10px;
   word-break: break-all;
+}
+
+.placeholder-chico {
+  font-size: 1.1rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 /* Letras Usadas */
@@ -247,14 +255,14 @@ header {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background-color: var(--bg-badge-usada);
   color: var(--text-badge-usada);
   font-weight: 700;
-  font-size: 0.95rem;
-  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  border: none;
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -267,21 +275,21 @@ header {
 #teclado {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 .btn-tecla {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   background-color: var(--bg-tecla);
   color: var(--text-tecla);
   border: 1px solid var(--border-color);
   font-family: var(--font-title);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -473,4 +481,63 @@ footer {
   .ahorcado-wrapper {
     max-width: 250px;
   }
+}
+
+/* Cartel orientacion celular portrait */
+.portrait-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(22, 26, 20, 0.98);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #e5ebe1;
+}
+
+.portrait-warning-content {
+  max-width: 320px;
+  background-color: var(--bg-card);
+  border: 2px solid var(--primary-green);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.rotate-animation {
+  animation: rotateSlow 2s linear infinite;
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Solo se muestra en portrait y celular (max-width: 576px) */
+@media (max-width: 576px) and (orientation: portrait) {
+  body:not(.ignore-portrait) .portrait-warning-overlay {
+    display: flex;
+  }
+}
+
+/* Ajustes Responsive Teclado */
+@media (max-width: 576px) {
+  .btn-tecla {
+    width: 36px;
+    height: 36px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+  }
+  #teclado {
+    gap: 4px;
+  }
+}
+
+/* Fokus outlines accesibilidad */
+button:focus-visible, 
+input:focus-visible {
+  outline: 3px solid var(--primary-green);
+  outline-offset: 2px;
 }

@@ -32,6 +32,20 @@
 
 <body>
 
+    <!-- Cartel orientacion celular portrait -->
+    <div id="portraitAlert" class="portrait-warning-overlay">
+        <div class="portrait-warning-content text-center p-4">
+            <div class="text-warning mb-3">
+                <i data-lucide="smartphone" class="d-inline-block rotate-animation" style="width: 48px; height: 48px;"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Girá tu dispositivo</h3>
+            <p class="mb-4 text-muted small">Para una mejor experiencia de juego, te recomendamos girar tu teléfono horizontalmente.</p>
+            <button id="btnIgnorePortrait" class="btn btn-warning text-dark fw-bold w-100">
+                Continuar igualmente
+            </button>
+        </div>
+    </div>
+
     <header class="container-fluid py-3 shadow-sm border-bottom-green">
         <div class="container">
 
@@ -128,7 +142,7 @@
                             <h3>Palabra</h3>
 
                             <div id="palabraRender">
-                                Seleccioná una especialidad
+                                <span class="placeholder-chico">Seleccioná una especialidad</span>
                             </div>
 
                         </div>
@@ -151,13 +165,7 @@
 
                         </div>
 
-                        <div class="mb-4">
-
-                            <h3>Teclado</h3>
-
-                            <div id="teclado"></div>
-
-                        </div>
+                        <!-- Teclado removido de aquí para colocarlo abajo a ancho completo -->
 
                         <div class="row">
 
@@ -219,11 +227,21 @@
 
                     </div>
 
+                    <!-- teclado virtual compacto a la derecha -->
+                    <div class="card shadow-sm mt-4 border-success-subtle" id="cardTeclado">
+                        <div class="card-body py-3">
+                            <h3 class="h6 mb-2 text-success text-center fw-bold text-uppercase">Teclado Virtual</h3>
+                            <div id="teclado"></div>
+                        </div>
+                    </div>
+
                 </div>
 
             </section>
 
         </div>
+
+
 
         <!-- tarjetas informativas inferiores (mockup) -->
         <div class="row g-4 mt-2" id="bottomInfoCards">

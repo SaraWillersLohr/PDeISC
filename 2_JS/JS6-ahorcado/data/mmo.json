@@ -1,0 +1,72 @@
+{
+  "especialidad": "Maestro Mayor de Obras",
+  "palabras": [
+    {
+      "palabra": "Cimiento",
+      "pista": "Base sobre la que se construye una obra."
+    },
+    {
+      "palabra": "Fundación",
+      "pista": "Elemento estructural que transmite cargas al suelo."
+    },
+    {
+      "palabra": "Hormigón",
+      "pista": "Material compuesto por cemento, arena y piedra."
+    },
+    {
+      "palabra": "Vigueta",
+      "pista": "Elemento estructural utilizado en losas."
+    },
+    { "palabra": "Columna", "pista": "Elemento vertical que soporta cargas." },
+    { "palabra": "Losa", "pista": "Superficie estructural horizontal." },
+    {
+      "palabra": "Mampostería",
+      "pista": "Sistema constructivo con ladrillos o bloques."
+    },
+    { "palabra": "Revoque", "pista": "Recubrimiento aplicado sobre muros." },
+    {
+      "palabra": "Contrapiso",
+      "pista": "Capa ubicada debajo del piso terminado."
+    },
+    { "palabra": "Excavación", "pista": "Remoción de tierra para construir." },
+    { "palabra": "Mensura", "pista": "Medición técnica de terrenos." },
+    { "palabra": "Nivelación", "pista": "Proceso para igualar alturas." },
+    {
+      "palabra": "Cubierta",
+      "pista": "Parte superior que protege una construcción."
+    },
+    {
+      "palabra": "Carpintería",
+      "pista": "Trabajo relacionado con madera y aberturas."
+    },
+    { "palabra": "Cerámica", "pista": "Material utilizado en revestimientos." },
+    { "palabra": "Azulejo", "pista": "Pieza cerámica para paredes." },
+    { "palabra": "Encofrado", "pista": "Molde temporal para hormigón." },
+    {
+      "palabra": "Andamio",
+      "pista": "Estructura auxiliar para trabajos en altura."
+    },
+    { "palabra": "Mortero", "pista": "Mezcla utilizada para unir mampuestos." },
+    { "palabra": "Hormigonera", "pista": "Máquina para mezclar hormigón." },
+    {
+      "palabra": "Soldadura",
+      "pista": "Proceso para unir materiales metálicos."
+    },
+    {
+      "palabra": "Arquitectura",
+      "pista": "Disciplina dedicada al diseño de edificaciones."
+    },
+    {
+      "palabra": "Topografía",
+      "pista": "Estudio de las características del terreno."
+    },
+    {
+      "palabra": "Urbanismo",
+      "pista": "Planificación y organización de ciudades."
+    },
+    {
+      "palabra": "Estructura",
+      "pista": "Conjunto de elementos resistentes de una obra."
+    }
+  ]
+}

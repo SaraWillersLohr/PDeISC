@@ -1,0 +1,43 @@
+:root {
+  --bg-body: #f8faf6;
+  --bg-card: #ffffff;
+  --bg-canvas: #ffffff;
+  
+  --bg-pizarra: #273620;
+  --text-pizarra: #f0f7ec;
+  
+  --text-color: #2c3327;
+  --text-muted: #6e7a68;
+  --border-color: #dfe7db;
+  
+  --bg-tecla: #eaede8;
+  --text-tecla: #2c3327;
+  --bg-tecla-hover: #cfd8cb;
+  --text-tecla-hover: #1e241a;
+  
+  --bg-badge-usada: #e8ede6;
+  --text-badge-usada: #2c3327;
+}
+
+/* Clases específicas de Bootstrap que dependen de tema en Bootstrap */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: #f5f8f3;
+  color: var(--text-color);
+}
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+  box-shadow: inset 0 0 0 9999px #f4f8f2 !important;
+}
+
+.form-control {
+  background-color: #ffffff;
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.form-control:focus {
+  background-color: #ffffff;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 0.25rem rgba(56, 110, 20, 0.25);
+  color: var(--text-color);
+}

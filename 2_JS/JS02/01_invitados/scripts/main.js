@@ -13,6 +13,7 @@ import {
   renderizarLecturaMetodos,
 } from "../modules/formReaders.js";
 import { initTheme } from "../modules/theme.js";
+import { EventConsole } from "../modules/eventConsole.js";
 import { mostrarToast } from "../modules/toast.js";
 import {
   mostrarFeedback,
@@ -26,6 +27,8 @@ const checkTerminos = document.getElementById("termsCheck");
 const contenedorLista = document.getElementById("guestList");
 const panelMetodos = document.getElementById("methodsPanel");
 
+// Yo inicializo la consola de eventos y el tema de la aplicación
+const consola = new EventConsole("eventConsole");
 initTheme();
 
 // Yo mantengo la lista de invitados en memoria
@@ -34,7 +37,7 @@ let listaInvitados = [];
 // Yo creo la función para borrar un invitado del listado
 const borrarInvitado = (indice) => {
   listaInvitados.splice(indice, 1);
-  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
   mostrarToast("toastZone", "Invitado eliminado del listado", "success");
 };
 
@@ -56,18 +59,18 @@ const validarFormulario = () => {
 formulario.addEventListener("input", (e) => {
   const input = e.target;
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
-if (input.type === "checkbox") return;
+  if (input.type === "checkbox") return;
 
   let resultado = { valido: true, mensaje: "" };
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
-if (input.name === "nombre" || input.name === "apellido")
+  if (input.name === "nombre" || input.name === "apellido")
     resultado = validarNombreReal(input.value);
   // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
-else if (input.name === "edad") resultado = validarEdad(input.value);
+  else if (input.name === "edad") resultado = validarEdad(input.value);
   // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
-else if (input.name === "email") resultado = validarEmail(input.value);
+  else if (input.name === "email") resultado = validarEmail(input.value);
   // Comprueba la siguiente condición y ejecuta este bloque cuando se cumpla.
-else if (input.name === "acompanantes")
+  else if (input.name === "acompanantes")
     resultado = validarAcompanantes(input.value);
 
   mostrarFeedback(input, resultado);
@@ -75,14 +78,25 @@ else if (input.name === "acompanantes")
 });
 
 // Yo agrego el evento change al checkbox de términos para validar el formulario
-checkTerminos.addEventListener("change", validarFormulario);
+checkTerminos.addEventListener("change", () => {
+  validarFormulario();
+  consola.log(
+    checkTerminos.checked ? "Términos aceptados" : "Términos desmarcados",
+  );
+});
+
+// Yo agrego el evento click al botón de limpiar consola
+document
+  .getElementById("clearConsole")
+  ?.addEventListener("click", () => consola.limpiar());
 
 // Yo manejo el envío del formulario para agregar un nuevo invitado
 formulario.addEventListener("submit", (e) => {
   e.preventDefault();
   // Comprueba si la condición es verdadera y, si lo es, ejecuta este bloque.
-if (!validarFormulario()) {
+  if (!validarFormulario()) {
     mostrarToast("toastZone", "Revisá los campos antes de confirmar", "error");
+    consola.log("Validación fallida: formulario incompleto");
     return;
   }
 
@@ -101,7 +115,7 @@ if (!validarFormulario()) {
       valores: lecturaFormData.valores,
     },
   ]);
-
+  //FORMDATA ES
   // Yo creo el objeto con los datos del nuevo invitado
   const nuevoInvitado = {
     nombre: lecturaId.valor,
@@ -115,8 +129,14 @@ if (!validarFormulario()) {
 
   // Yo agrego el invitado a la lista y actualizo la interfaz
   listaInvitados.push(nuevoInvitado);
-  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
+  dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);
 
+  consola.log(
+    `Usuario agregado: ${nuevoInvitado.nombre} ${nuevoInvitado.apellido}`,
+  );
+  consola.log(
+    "Lectura con getElementById, querySelector y FormData completada",
+  );
   mostrarToast(
     "toastZone",
     "Invitado confirmado sin recargar la página",
@@ -130,4 +150,5 @@ if (!validarFormulario()) {
 });
 
 // Yo inicio la aplicación y muestro el estado inicial
-dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado);
+consola.log("App iniciada: modo dinámico activo");
+dibujarInvitados(listaInvitados, contenedorLista, borrarInvitado, consola);

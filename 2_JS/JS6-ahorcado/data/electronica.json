@@ -1,0 +1,75 @@
+{
+  "especialidad": "Electrónica",
+  "palabras": [
+    {
+      "palabra": "Resistencia",
+      "pista": "Componente que limita el paso de corriente."
+    },
+    {
+      "palabra": "Capacitor",
+      "pista": "Componente que almacena energía eléctrica."
+    },
+    { "palabra": "Inductor", "pista": "Componente basado en una bobina." },
+    {
+      "palabra": "Diodo",
+      "pista": "Permite el paso de corriente en un solo sentido."
+    },
+    {
+      "palabra": "Transistor",
+      "pista": "Componente utilizado para amplificar o conmutar señales."
+    },
+    {
+      "palabra": "Microchip",
+      "pista": "Circuito integrado de pequeño tamaño."
+    },
+    { "palabra": "Sensor", "pista": "Detecta cambios físicos del entorno." },
+    {
+      "palabra": "Actuador",
+      "pista": "Ejecuta una acción a partir de una señal."
+    },
+    {
+      "palabra": "Osciloscopio",
+      "pista": "Instrumento para visualizar señales eléctricas."
+    },
+    {
+      "palabra": "Multímetro",
+      "pista": "Instrumento para medir magnitudes eléctricas."
+    },
+    {
+      "palabra": "Protoboard",
+      "pista": "Placa utilizada para prototipos electrónicos."
+    },
+    {
+      "palabra": "Soldador",
+      "pista": "Herramienta para unir componentes electrónicos."
+    },
+    { "palabra": "Voltaje", "pista": "Diferencia de potencial eléctrico." },
+    { "palabra": "Corriente", "pista": "Flujo de cargas eléctricas." },
+    {
+      "palabra": "Potencia",
+      "pista": "Cantidad de energía consumida o entregada."
+    },
+    { "palabra": "Frecuencia", "pista": "Número de ciclos por segundo." },
+    {
+      "palabra": "Impedancia",
+      "pista": "Oposición al paso de corriente alterna."
+    },
+    { "palabra": "Relé", "pista": "Interruptor controlado eléctricamente." },
+    { "palabra": "Bobina", "pista": "Conductor enrollado en espiras." },
+    { "palabra": "Circuito", "pista": "Conjunto de componentes conectados." },
+    { "palabra": "Amplificador", "pista": "Aumenta la amplitud de una señal." },
+    {
+      "palabra": "Microcontrolador",
+      "pista": "Circuito programable usado en automatización."
+    },
+    {
+      "palabra": "Microprocesador",
+      "pista": "Unidad central de procesamiento."
+    },
+    { "palabra": "Automatización", "pista": "Control automático de procesos." },
+    {
+      "palabra": "Electrónica",
+      "pista": "Rama técnica que estudia circuitos y dispositivos."
+    }
+  ]
+}

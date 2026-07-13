@@ -1,14 +1,14 @@
 {
   "name": "proyecto-a-base-datos-api",
   "version": "1.0.0",
-  "description": "Estanga Education - Gestión de Alumnos con MySQL y API REST",
+  "description": "Bases de datos y API - Gestión de Alumnos con MySQL y API REST",
   "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["express", "mysql", "api", "estanga"],
-  "author": "Estanga Education",
+  "keywords": ["express", "mysql", "api", "bases-datos-api"],
+  "author": "Bases de datos y API",
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",

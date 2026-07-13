@@ -1,0 +1,78 @@
+{
+  "especialidad": "Informática",
+  "palabras": [
+    {
+      "palabra": "Algoritmo",
+      "pista": "Conjunto de pasos para resolver un problema."
+    },
+    {
+      "palabra": "Programación",
+      "pista": "Proceso de crear software mediante código."
+    },
+    { "palabra": "Hardware", "pista": "Parte física de una computadora." },
+    { "palabra": "Software", "pista": "Conjunto de programas de un sistema." },
+    {
+      "palabra": "Firmware",
+      "pista": "Software integrado en un dispositivo electrónico."
+    },
+    {
+      "palabra": "Servidor",
+      "pista": "Equipo que brinda servicios a otros equipos."
+    },
+    {
+      "palabra": "Cliente",
+      "pista": "Equipo o aplicación que solicita servicios."
+    },
+    {
+      "palabra": "Router",
+      "pista": "Dispositivo que conecta diferentes redes."
+    },
+    {
+      "palabra": "Switch",
+      "pista": "Dispositivo que interconecta equipos en una red."
+    },
+    {
+      "palabra": "Firewall",
+      "pista": "Sistema de protección contra accesos no autorizados."
+    },
+    { "palabra": "Linux", "pista": "Sistema operativo de código abierto." },
+    {
+      "palabra": "Windows",
+      "pista": "Sistema operativo desarrollado por Microsoft."
+    },
+    {
+      "palabra": "Android",
+      "pista": "Sistema operativo utilizado en dispositivos móviles."
+    },
+    { "palabra": "Python", "pista": "Lenguaje de programación muy utilizado." },
+    { "palabra": "Java", "pista": "Lenguaje orientado a objetos muy popular." },
+    {
+      "palabra": "JavaScript",
+      "pista": "Lenguaje utilizado principalmente en páginas web."
+    },
+    { "palabra": "Compilador", "pista": "Programa que traduce código fuente." },
+    {
+      "palabra": "Depuración",
+      "pista": "Proceso de encontrar y corregir errores."
+    },
+    {
+      "palabra": "Virtualización",
+      "pista": "Creación de entornos simulados o virtuales."
+    },
+    {
+      "palabra": "Ciberseguridad",
+      "pista": "Protección de sistemas y datos digitales."
+    },
+    {
+      "palabra": "Criptografía",
+      "pista": "Técnica para proteger información mediante cifrado."
+    },
+    { "palabra": "Backup", "pista": "Copia de seguridad de datos." },
+    { "palabra": "Internet", "pista": "Red mundial de computadoras." },
+    {
+      "palabra": "Intranet",
+      "pista": "Red privada dentro de una organización."
+    },
+    { "palabra": "Ethernet", "pista": "Tecnología de redes cableadas." }
+  ]
+}

@@ -1,14 +1,14 @@
 {
   "name": "proyecto-b-consumo-api",
   "version": "1.0.0",
-  "description": "Estanga Education - Portal Académico con Fetch y Axios",
+  "description": "Bases de datos y API - Portal Académico con Fetch y Axios",
   "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["express", "fetch", "axios", "estanga"],
-  "author": "Estanga Education",
+  "keywords": ["express", "fetch", "axios", "bases-datos-api"],
+  "author": "Bases de datos y API",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.9",

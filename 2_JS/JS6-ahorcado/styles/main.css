@@ -1,0 +1,476 @@
+/* --------------------------------------------------
+   DISEÑO INSTITUCIONAL AHORCADO TÉCNICO - MAIN SYSTEM
+   -------------------------------------------------- */
+
+/* Root & Fonts */
+:root {
+  --primary-green: #386e14;
+  --primary-red: #d81e1e;
+  --primary-green-hover: #2d580f;
+  --font-title: 'Outfit', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+  
+  /* Animaciones */
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-body);
+  color: var(--text-color);
+  min-height: 100vh;
+  transition: var(--transition-smooth);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Header */
+header {
+  background-color: var(--bg-card);
+  border-bottom: 2px solid var(--primary-green);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: var(--transition-smooth);
+}
+
+.logo-header {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-header-title {
+  font-size: 1.6rem;
+  color: var(--primary-green);
+  transition: var(--transition-smooth);
+}
+
+.logo-header-title:hover {
+  transform: scale(1.02);
+}
+
+.btn-outline-theme {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-body);
+  color: var(--text-color);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  transition: var(--transition-smooth);
+}
+
+.btn-outline-theme:hover {
+  background-color: var(--primary-green);
+  color: white;
+  border-color: var(--primary-green);
+  transform: rotate(15deg);
+}
+
+/* Contenedor del Ahorcado Responsivo */
+#contenedorAhorcado {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-canvas);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  transition: var(--transition-smooth);
+}
+
+.ahorcado-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1024 / 1536; /* Aspect ratio idéntico a las imágenes (1024x1536) */
+}
+
+.horca-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Partes del cuerpo absolutas basadas en porcentajes exactos */
+.parte-cuerpo {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.parte-cuerpo.visible {
+  opacity: 1;
+}
+
+.parte-cuerpo.oculto {
+  opacity: 0;
+}
+
+#cabeza {
+  left: 37.89%;
+  top: 42.32%;
+  width: 28.71%;
+  height: 19.14%;
+}
+
+#cuerpo {
+  left: 37.70%;
+  top: 39.32%;
+  width: 30.96%;
+  height: 22.33%;
+}
+
+#brazoIzq {
+  left: 44.14%;
+  top: 39.06%;
+  width: 25.10%;
+  height: 16.34%;
+}
+
+#brazoDer {
+  left: 51.76%;
+  top: 39.06%;
+  width: 25.10%;
+  height: 16.34%;
+}
+
+#piernaIzq {
+  left: 46.19%;
+  top: 40.04%;
+  width: 24.80%;
+  height: 20.25%;
+}
+
+#piernaDer {
+  left: 35.35%;
+  top: 40.69%;
+  width: 24.80%;
+  height: 20.25%;
+}
+
+/* Secciones de Contenido */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  transition: var(--transition-smooth);
+  color: var(--text-color);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.card h2, .card h3 {
+  color: var(--primary-green);
+  font-family: var(--font-title);
+  margin-bottom: 1rem;
+}
+
+/* Botones de Especialidad */
+.especialidad {
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 700;
+  transition: var(--transition-smooth);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.especialidad.activa {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(56, 110, 20, 0.2);
+}
+
+.especialidad[data-especialidad="informatica"].activa {
+  background-color: #198754 !important;
+  color: white !important;
+}
+
+.especialidad[data-especialidad="mmo"].activa {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.especialidad[data-especialidad="electronica"].activa {
+  background-color: #0d6efd !important;
+  color: white !important;
+}
+
+/* Render de Palabra a adivinar (Estilo pizarra/tizas) */
+#palabraRender {
+  font-family: var(--font-title);
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: 12px;
+  text-align: center;
+  padding: 15px;
+  background-color: var(--bg-pizarra);
+  color: var(--text-pizarra) !important;
+  border-radius: 12px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  border: 1px solid var(--border-color);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 10px;
+  word-break: break-all;
+}
+
+/* Letras Usadas */
+#letrasUsadas {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 45px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 0;
+}
+
+.badge-letra-usada {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--bg-badge-usada);
+  color: var(--text-badge-usada);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-color);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Teclado Virtual Moderno */
+#teclado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.btn-tecla {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: var(--bg-tecla);
+  color: var(--text-tecla);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-tecla:hover:not(:disabled) {
+  background-color: var(--bg-tecla-hover);
+  color: var(--text-tecla-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-tecla:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Coloreado de teclas usadas según acierto */
+.tecla-correcta {
+  background-color: var(--primary-green) !important;
+  color: white !important;
+  border-color: var(--primary-green) !important;
+  opacity: 1 !important;
+}
+
+.tecla-incorrecta {
+  background-color: var(--primary-red) !important;
+  color: white !important;
+  border-color: var(--primary-red) !important;
+  opacity: 1 !important;
+}
+
+/* Paneles de Control (Tiempo, Puntos, Intentos) */
+.col-md-4 .card {
+  margin-bottom: 0;
+  border-radius: 12px;
+}
+
+.col-md-4 .card h5 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.col-md-4 .card span {
+  font-family: var(--font-title);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--primary-green);
+}
+
+/* Tabla del Ranking */
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: var(--primary-green) !important;
+  color: white !important;
+  font-family: var(--font-title);
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.table td {
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+/* Botón flotante Volver Arriba */
+#btnTop {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--primary-green);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(56, 110, 20, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#btnTop.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#btnTop:hover {
+  background-color: var(--primary-green-hover);
+  transform: scale(1.1);
+}
+
+/* Modales Bootstrap */
+.modal-content {
+  border-radius: 20px;
+  border-width: 2px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  background-color: var(--bg-card);
+  color: var(--text-color);
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 20px 24px;
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 16px 24px 24px;
+}
+
+/* Tarjeta informativa en la parte inferior */
+.info-bar-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.info-bar-card {
+  flex: 1;
+  min-width: 250px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.01);
+}
+
+.info-bar-card i {
+  color: var(--primary-green);
+  flex-shrink: 0;
+}
+
+/* Footer Institucional */
+footer {
+  background-color: var(--primary-green);
+  color: white;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+}
+
+/* Resaltado para Selección de Especialidad */
+@keyframes pulseHighlight {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.4); }
+  70% { transform: scale(1.03); box-shadow: 0 0 0 15px rgba(241, 196, 15, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); }
+}
+
+.highlight-pulse {
+  animation: pulseHighlight 1.5s infinite;
+  border-radius: 12px;
+  padding: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  #contenedorAhorcado {
+    padding: 15px;
+  }
+  .ahorcado-wrapper {
+    max-width: 250px;
+  }
+}

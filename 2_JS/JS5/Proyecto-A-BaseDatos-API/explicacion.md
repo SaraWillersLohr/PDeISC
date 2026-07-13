@@ -1,4 +1,4 @@
-# JS5 - Proyecto A: Estanga Education - Gestión de Alumnos
+# JS5 - Proyecto A: Bases de datos y API - Gestión de Alumnos
 
 ## Documentación para defensa del Trabajo Práctico
 
@@ -39,7 +39,7 @@ Frontend (HTML + CSS + JS)
 | `pages/index.html` | Interfaz visual con formulario, tabla y panel educativo. |
 | `scripts/app.js` | Lógica del frontend: validaciones, fetch, renderizado. |
 | `context/tema.js` | Gestión del modo claro/oscuro con localStorage. |
-| `styles/light.css` / `dark.css` | Estilos visuales del ecosistema Estanga Education. |
+| `styles/light.css` / `dark.css` | Estilos visuales del ecosistema Bases de datos y API. |
 
 ---
 

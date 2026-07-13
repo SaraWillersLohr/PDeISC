@@ -1,4 +1,4 @@
-# JS5 - Proyecto B: Estanga Education - Portal Académico
+# JS5 - Proyecto B: Bases de datos y API - Portal Académico
 
 ## Documentación para defensa del Trabajo Práctico
 
@@ -144,7 +144,7 @@ El buscador filtra alumnos **en tiempo real** mientras el usuario escribe:
 - **¿Cómo funciona?:** explica el flujo de consumo de API.
 
 ### Tema claro/oscuro
-- Misma identidad visual que el Proyecto A (Estanga Education).
+- Misma identidad visual que el Proyecto A (Bases de datos y API).
 - Preferencia en localStorage.
 - Bootstrap responsive: desktop lado a lado, móvil apilado.
 

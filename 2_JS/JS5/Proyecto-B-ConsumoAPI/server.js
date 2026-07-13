@@ -18,5 +18,5 @@ app.get('/', (req, res) => {
 
 // Acá inicio el servidor en el puerto 3001
 app.listen(PUERTO, () => {
-  console.log(`Estanga Education - Portal Académico corriendo en http://localhost:${PUERTO}`);
+  console.log(`Bases de datos y API - Portal Académico corriendo en http://localhost:${PUERTO}`);
 });

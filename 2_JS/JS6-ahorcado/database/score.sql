@@ -1,0 +1,10 @@
+USE Estanga;
+
+CREATE TABLE IF NOT EXISTS score (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    tiempo INT NOT NULL,
+    puntos INT NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    especialidad VARCHAR(50) NOT NULL
+);

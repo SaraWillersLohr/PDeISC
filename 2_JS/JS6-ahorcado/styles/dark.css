@@ -1,57 +1,60 @@
+/* ============================================================
+   TEMA OSCURO — AHORCADO TÉCNICO
+   Paleta propia, sin inversión automática de colores
+   ============================================================ */
 :root {
-  --bg-body: #111410;
-  --bg-card: #1c201a;
-  --bg-canvas: #161a14;
-  
-  --bg-pizarra: #12190f;
-  --text-pizarra: #52b825;
-  
-  --text-color: #e5ebe1;
-  --text-muted: #8a9685;
-  --border-color: #2b3326;
-  
-  --bg-tecla: #242b20;
-  --text-tecla: #e5ebe1;
-  --bg-tecla-hover: #3b4635;
-  --text-tecla-hover: #ffffff;
-  
-  --bg-badge-usada: #232920;
-  --text-badge-usada: #b0c0ab;
+  --bg-body:        #111810;
+  --bg-card:        #1a2218;
+  --bg-canvas:      #141c12;
+  --bg-header-card: #162014;
+
+  --text-color:     #ddecd5;
+  --text-muted:     #7a9a6e;
+  --border-color:   #253321;
+
+  --bg-tecla:       #1e2a1b;
+  --text-tecla:     #ddecd5;
+  --bg-tecla-hover: #2e3d29;
+  --text-tecla-hover:#ffffff;
+
+  --bg-badge-usada: #2d1515;
+  --text-badge-usada:#e87070;
+
+  --bg-row-hover:   #1e2a1b;
+
+  --gold-bg:   #2a2610;
+  --silver-bg: #1e201e;
+  --bronze-bg: #2a1e14;
 }
 
-/* Clases específicas de Bootstrap que dependen de tema en Bootstrap */
-.table {
-  --bs-table-bg: transparent;
-  --bs-table-striped-bg: #1f251d;
+/* Overrides específicos para inputs y tabla en modo oscuro */
+.input-nombre {
+  background-color: var(--bg-canvas);
   color: var(--text-color);
-}
-.table-striped>tbody>tr:nth-of-type(odd)>* {
-  box-shadow: inset 0 0 0 9999px #1f251d !important;
-}
-
-.form-control {
-  background-color: #161a14;
   border-color: var(--border-color);
-  color: var(--text-color);
 }
 
-.form-control:focus {
-  background-color: #1c201a;
-  border-color: var(--primary-green);
-  box-shadow: 0 0 0 0.25rem rgba(56, 110, 20, 0.4);
-  color: var(--text-color);
-}
-
-.modal-content {
+.input-nombre:focus {
   background-color: var(--bg-card);
+  border-color: #386e14;
+  box-shadow: 0 0 0 3px rgba(56, 110, 20, 0.25);
   color: var(--text-color);
-  border-color: var(--border-color);
 }
 
-.bg-light {
-  background-color: #161a14 !important;
+.modal-stats {
+  background-color: var(--bg-canvas);
 }
 
-.border-bottom-green {
-  border-bottom: 2px solid var(--primary-green) !important;
+.modal-stat-value {
+  color: var(--text-color);
+}
+
+/* Tabla ranking modo oscuro */
+.tabla-ranking tbody tr:nth-child(even) {
+  background-color: rgba(255,255,255,0.03);
+}
+
+/* Stickman color blanco en modo oscuro */
+.stickman-part {
+  background-color: #ddecd5;
 }

@@ -1,6 +1,8 @@
+// Abecedario español completo con Ñ en su lugar correcto
 const abecedario = [
-  "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-  "N", "Ñ", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+  "A","B","C","D","E","F","G","H","I",
+  "J","K","L","M","N","Ñ","O","P","Q",
+  "R","S","T","U","V","W","X","Y","Z"
 ];
 
 export function crearTeclado(contenedor, callback) {
@@ -9,8 +11,9 @@ export function crearTeclado(contenedor, callback) {
   abecedario.forEach((letra) => {
     const boton = document.createElement("button");
     boton.textContent = letra;
-    boton.className = "btn btn-tecla";
+    boton.className   = "btn-tecla";
     boton.setAttribute("data-letra", letra);
+    boton.setAttribute("aria-label", `Letra ${letra}`);
 
     boton.addEventListener("click", () => {
       if (!boton.disabled) {

@@ -1,40 +1,42 @@
-// renderiza la palabra oculta
+const normalizar = (c) => c.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+// Renderiza la palabra oculta
 export function renderPalabra(juego, contenedor) {
   contenedor.textContent = juego.palabraOculta();
 }
 
-// renderiza letras usadas como pequeños badges circulares para coincidir con la landing
+// Renderiza letras incorrectas como burbujas rojas
 export function renderLetras(juego, contenedor) {
   contenedor.innerHTML = "";
+
+  const palabraNorm = normalizar(juego.palabra);
+
   juego.letrasUsadas.forEach((letra) => {
-    const span = document.createElement("span");
-    span.textContent = letra;
-    span.className = "badge-letra-usada";
-    contenedor.appendChild(span);
+    // Solo mostrar las incorrectas en las burbujas
+    if (!palabraNorm.includes(normalizar(letra))) {
+      const span = document.createElement("span");
+      span.textContent = letra;
+      span.className = "badge-letra-usada";
+      span.setAttribute("aria-label", `Letra incorrecta: ${letra}`);
+      contenedor.appendChild(span);
+    }
   });
 }
 
-// muestra partes del cuerpo en secuencia obligatoria acumulativa
+// Muestra partes del cuerpo de forma acumulativa y progresiva
 export function renderAhorcado(errores) {
-  const partes = [
-    "cabeza",
-    "cuerpo",
-    "brazoIzq",
-    "brazoDer",
-    "piernaIzq",
-    "piernaDer"
-  ];
+  const partes = ["cabeza", "cuerpo", "brazoIzq", "brazoDer", "piernaIzq", "piernaDer"];
 
   partes.forEach((parte, indice) => {
-    const elemento = document.getElementById(parte);
-    if (elemento) {
-      if (indice < errores) {
-        elemento.classList.remove("oculto");
-        elemento.classList.add("visible");
-      } else {
-        elemento.classList.remove("visible");
-        elemento.classList.add("oculto");
-      }
+    const el = document.getElementById(parte);
+    if (!el) return;
+
+    if (indice < errores) {
+      el.classList.remove("oculto");
+      el.classList.add("visible");
+    } else {
+      el.classList.remove("visible");
+      el.classList.add("oculto");
     }
   });
 }

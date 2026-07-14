@@ -1,3 +1,4 @@
+// conexión con la base de datos para usar mysql en el proyecto.
 import mysql from "mysql2/promise";
 
 const pool = mysql.createPool({

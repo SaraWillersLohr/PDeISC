@@ -1,3 +1,4 @@
+// maneja el tema claro y oscuro de la interfaz.
 const hojaTema = document.getElementById("themeStylesheet");
 
 export function cargarTema() {
@@ -7,8 +8,8 @@ export function cargarTema() {
 
 export function cambiarTema() {
   const temaActual = localStorage.getItem("tema") || "light";
-  const nuevoTema  = temaActual === "light" ? "dark" : "light";
-  hojaTema.href    = `/styles/${nuevoTema}.css`;
+  const nuevoTema = temaActual === "light" ? "dark" : "light";
+  hojaTema.href = `/styles/${nuevoTema}.css`;
   localStorage.setItem("tema", nuevoTema);
   return nuevoTema;
 }

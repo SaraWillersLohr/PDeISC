@@ -1,6 +1,10 @@
-// obtener palabra según especialidad, excluyendo las ya jugadas
+// obtiene una palabra según la especialidad, excluyendo las que ya se usaron.
+// las palabras vienen desde la api y se piden al servidor.
 export async function obtenerPalabra(especialidad, excluidas = []) {
-  const query = excluidas.length > 0 ? `?excluidas=${encodeURIComponent(excluidas.join(","))}` : "";
+  const query =
+    excluidas.length > 0
+      ? `?excluidas=${encodeURIComponent(excluidas.join(","))}`
+      : "";
   const respuesta = await fetch(`/api/palabra/${especialidad}${query}`);
 
   if (!respuesta.ok) {
@@ -10,7 +14,7 @@ export async function obtenerPalabra(especialidad, excluidas = []) {
   return await respuesta.json();
 }
 
-// obtener ranking
+// obtiene el ranking desde la api.
 export async function obtenerRanking() {
   const respuesta = await fetch("/api/scores");
   if (!respuesta.ok) {
@@ -19,7 +23,7 @@ export async function obtenerRanking() {
   return await respuesta.json();
 }
 
-// guardar score (usando PUT)
+// guarda un score usando el método put.
 export async function guardarScore(datos) {
   const respuesta = await fetch("/api/score", {
     method: "PUT",

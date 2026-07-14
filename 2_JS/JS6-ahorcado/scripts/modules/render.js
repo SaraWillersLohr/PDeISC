@@ -1,16 +1,19 @@
+// muestra la palabra oculta, las letras equivocadas y el ahorcado en la interfaz.
+// la función renderPalabra actualiza el contenido del contenedor con la palabra del juego.
 const normalizar = (c) => c.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-// Renderiza la palabra oculta
+// muestra la palabra oculta en la interfaz.
 export function renderPalabra(juego, contenedor) {
   contenedor.textContent = juego.palabraOculta();
 }
 
-// Renderiza letras incorrectas como burbujas rojas
+// muestra las letras incorrectas como burbujas rojas.
+
 export function renderLetras(juego, contenedor) {
   contenedor.innerHTML = "";
 
   const palabraNorm = normalizar(juego.palabra);
-
+  // Recorrer las letras usadas y mostrar solo las incorrectas
   juego.letrasUsadas.forEach((letra) => {
     // Solo mostrar las incorrectas en las burbujas
     if (!palabraNorm.includes(normalizar(letra))) {
@@ -23,9 +26,16 @@ export function renderLetras(juego, contenedor) {
   });
 }
 
-// Muestra partes del cuerpo de forma acumulativa y progresiva
+// muestra las partes del cuerpo de forma progresiva según los errores.
 export function renderAhorcado(errores) {
-  const partes = ["cabeza", "cuerpo", "brazoIzq", "brazoDer", "piernaIzq", "piernaDer"];
+  const partes = [
+    "cabeza",
+    "cuerpo",
+    "brazoIzq",
+    "brazoDer",
+    "piernaIzq",
+    "piernaDer",
+  ];
 
   partes.forEach((parte, indice) => {
     const el = document.getElementById(parte);

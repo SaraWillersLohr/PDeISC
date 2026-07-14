@@ -1,3 +1,4 @@
+// servidor principal de la aplicación. sirve el frontend y expone la api para obtener palabras y scores.
 import express from "express";
 import cors from "cors";
 import fs from "fs/promises";
@@ -12,7 +13,7 @@ const PORT = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// middleware
+// middlewares del servidor.
 app.use(cors());
 app.use(express.json());
 
@@ -20,17 +21,17 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "pages", "index.html"));
 });
 
-// servir frontend
+// sirve el frontend desde la carpeta del proyecto.
 app.use(express.static(__dirname));
 
-// ---------- API PALABRAS ----------
+// ---------- api de palabras ----------
 
 app.get("/api/palabra/:especialidad", async (req, res) => {
   try {
     const { especialidad } = req.params;
     const excluidasQuery = req.query.excluidas || "";
     const excluidas = excluidasQuery
-      ? excluidasQuery.split(",").map(w => w.toUpperCase().trim())
+      ? excluidasQuery.split(",").map((w) => w.toUpperCase().trim())
       : [];
 
     const archivos = {
@@ -53,7 +54,7 @@ app.get("/api/palabra/:especialidad", async (req, res) => {
 
     // Filtrar palabras excluidas
     const palabrasRestantes = datos.palabras.filter(
-      (p) => !excluidas.includes(p.palabra.toUpperCase().trim())
+      (p) => !excluidas.includes(p.palabra.toUpperCase().trim()),
     );
 
     if (palabrasRestantes.length === 0) {
@@ -70,7 +71,7 @@ app.get("/api/palabra/:especialidad", async (req, res) => {
   }
 });
 
-// ---------- API SCORES ----------
+// ---------- api de scores ----------
 
 app.get("/api/scores", async (req, res) => {
   try {
@@ -90,15 +91,20 @@ app.get("/api/scores", async (req, res) => {
   }
 });
 
-// ---------- GUARDAR SCORE ----------
-// usamos PUT porque me comentaste que no quieren POST
+// ---------- guardar score ----------
+// usa put porque la app lo maneja así.
 
 app.put("/api/score", async (req, res) => {
   try {
     const { nombre, tiempo, puntos, especialidad } = req.body;
 
     // validaciones backend robustas
-    if (!especialidad || !["informatica", "mmo", "electronica"].includes(especialidad.toLowerCase())) {
+    if (
+      !especialidad ||
+      !["informatica", "mmo", "electronica"].includes(
+        especialidad.toLowerCase(),
+      )
+    ) {
       return res.status(400).json({
         error: "Especialidad inválida",
       });
@@ -107,7 +113,8 @@ app.put("/api/score", async (req, res) => {
     const regexNombre = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ]{3,20}$/;
     if (!nombre || !regexNombre.test(nombre.trim())) {
       return res.status(400).json({
-        error: "Nombre inválido (debe tener entre 3 y 20 caracteres alfanuméricos y espacios)",
+        error:
+          "Nombre inválido (debe tener entre 3 y 20 caracteres alfanuméricos y espacios)",
       });
     }
 

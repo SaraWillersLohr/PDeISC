@@ -1,5 +1,6 @@
+// carga el ranking de jugadores desde la api y lo muestra en la tabla.
 import { obtenerRanking } from "./api.js";
-
+// obtiene los datos del ranking y los muestra en la interfaz.
 export async function cargarRanking() {
   const tabla = document.getElementById("tablaRanking");
   if (!tabla) return;
@@ -7,7 +8,7 @@ export async function cargarRanking() {
   try {
     const ranking = await obtenerRanking();
     tabla.innerHTML = "";
-
+    // Si no hay jugadores, mostrar mensaje
     if (ranking.length === 0) {
       tabla.innerHTML = `
         <tr>
@@ -18,14 +19,15 @@ export async function cargarRanking() {
       `;
       return;
     }
-
+    // Recorrer el ranking y agregar filas a la tabla
     ranking.forEach((jugador, idx) => {
       const mins = Math.floor(jugador.tiempo / 60);
       const secs = jugador.tiempo % 60;
-      const tiempoFormateado = `${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+      const tiempoFormateado = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 
       const esp = jugador.especialidad.toLowerCase();
-      const espText = esp === "mmo" ? "MMO" : (esp.charAt(0).toUpperCase() + esp.slice(1));
+      const espText =
+        esp === "mmo" ? "MMO" : esp.charAt(0).toUpperCase() + esp.slice(1);
 
       const pos = idx + 1;
       let rowClass = "";
@@ -46,7 +48,7 @@ export async function cargarRanking() {
         </tr>
       `;
     });
-
+    // Si hay menos de 10 jugadores, completar con filas vacías
   } catch (error) {
     console.error("Error al cargar ranking:", error);
     tabla.innerHTML = `

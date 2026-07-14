@@ -1,3 +1,5 @@
+// valida el nombre del jugador antes de guardarlo en el ranking.
+// devuelve true si el nombre es válido y false si no lo es.
 export function validarNombre(nombre) {
   if (!nombre) return false;
   const nombreTrim = nombre.trim();

@@ -4,49 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Ahorcado Técnico - Juego Académico Institucional</title>
-    <meta name="description" content="Desafío del Ahorcado Técnico. Poné a prueba tus conocimientos en Informática, MMO y Electrónica. ¡Adiviná las palabras y salvá al estudiante técnico!">
-    
-    <!-- favicon -->
+    <meta name="description" content="Desafío del Ahorcado Técnico. Poné a prueba tus conocimientos en Informática, MMO y Electrónica.">
     <link rel="icon" type="image/png" href="/assets/logo.png">
-
-    <!-- google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- jsPDF CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <!-- estilos -->
     <link rel="stylesheet" href="/styles/main.css">
     <link id="themeStylesheet" rel="stylesheet" href="/styles/light.css">
 </head>
 
 <body>
 
-    <!-- Cartel orientación celular portrait -->
+    <!-- Portrait warning -->
     <div id="portraitAlert" class="portrait-warning-overlay">
         <div class="portrait-warning-content">
-            <div class="portrait-icon">
-                <i data-lucide="smartphone" class="rotate-animation"></i>
-            </div>
+            <div class="portrait-icon"><i data-lucide="smartphone" class="rotate-animation"></i></div>
             <h3>Girá tu dispositivo</h3>
             <p>Para una mejor experiencia de juego, te recomendamos girar tu teléfono horizontalmente.</p>
-            <button id="btnIgnorePortrait" class="btn-portrait-continue">
-                Continuar igualmente
-            </button>
+            <button id="btnIgnorePortrait" class="btn-portrait-continue">Continuar igualmente</button>
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ -->
+    <!-- ══════════════ HEADER ══════════════ -->
     <header id="mainHeader">
         <div class="header-inner">
-
             <div class="header-brand">
                 <img src="/assets/logo.png" alt="Logo Escuela Técnica" class="header-logo" id="headerLogo">
                 <div class="header-titles">
@@ -54,159 +38,119 @@
                     <p class="header-subtitle">Adivina la palabra y salva al estudiante técnico</p>
                 </div>
             </div>
-
-            <button id="btnTema" class="btn-tema" aria-label="Cambiar tema de color">
-                <i data-lucide="moon" id="iconTema"></i>
-            </button>
-
+            <div class="header-actions">
+                <button id="btnInstrucciones" class="btn-instrucciones" aria-label="Ver instrucciones">
+                    <i data-lucide="help-circle"></i>
+                    <span>Instrucciones</span>
+                </button>
+                <button id="btnTema" class="btn-tema" aria-label="Cambiar tema de color">
+                    <i data-lucide="moon" id="iconTema"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- ═══════════════════════════════════════ MAIN ═══════════════════════════════════════ -->
+    <!-- ══════════════ MAIN ══════════════ -->
     <main id="mainContent">
 
-        <!-- ─── ESPECIALIDADES ─── -->
+        <!-- ── ESPECIALIDADES ── -->
         <section class="section-especialidades" id="seccionEspecialidades">
-            <h2 class="section-title">Elegí tu Especialidad</h2>
+            <span class="section-label">Especialidad</span>
             <div class="especialidades-grid" id="especialidades">
-
                 <button class="btn-especialidad" data-especialidad="informatica">
-                    <span class="esp-icon">
-                        <i data-lucide="monitor"></i>
-                    </span>
+                    <span class="esp-icon"><i data-lucide="monitor"></i></span>
                     <span class="esp-nombre">Informática</span>
-                    <span class="esp-desc">Sistemas y programación</span>
                 </button>
-
                 <button class="btn-especialidad" data-especialidad="electronica">
-                    <span class="esp-icon">
-                        <i data-lucide="cpu"></i>
-                    </span>
+                    <span class="esp-icon"><i data-lucide="cpu"></i></span>
                     <span class="esp-nombre">Electrónica</span>
-                    <span class="esp-desc">Circuitos y componentes</span>
                 </button>
-
                 <button class="btn-especialidad" data-especialidad="mmo">
-                    <span class="esp-icon">
-                        <i data-lucide="hard-hat"></i>
-                    </span>
+                    <span class="esp-icon"><i data-lucide="hard-hat"></i></span>
                     <span class="esp-nombre">Maestro Mayor de Obras</span>
-                    <span class="esp-desc">Construcción y arquitectura</span>
                 </button>
-
             </div>
         </section>
 
-        <!-- ─── PANEL DE STATS ─── -->
-        <section class="stats-bar" id="statsBar">
-            <div class="stat-card">
+        <!-- ── STATS BAR ── -->
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-chip">
                 <i data-lucide="clock"></i>
-                <div class="stat-info">
-                    <span class="stat-label">Tiempo</span>
-                    <span class="stat-value" id="tiempo">00:00</span>
-                </div>
+                <span class="stat-chip-label">Tiempo</span>
+                <span class="stat-chip-value" id="tiempo">00:00</span>
             </div>
-            <div class="stat-card">
+            <div class="stat-chip">
                 <i data-lucide="star"></i>
-                <div class="stat-info">
-                    <span class="stat-label">Puntos</span>
-                    <span class="stat-value" id="puntos">0</span>
-                </div>
+                <span class="stat-chip-label">Puntos</span>
+                <span class="stat-chip-value" id="puntos">0</span>
             </div>
-            <div class="stat-card stat-card-danger">
+            <div class="stat-chip stat-chip-danger">
                 <i data-lucide="alert-triangle"></i>
-                <div class="stat-info">
-                    <span class="stat-label">Errores</span>
-                    <span class="stat-value" id="intentos">6</span>
-                </div>
+                <span class="stat-chip-label">Errores</span>
+                <span class="stat-chip-value" id="intentos">6</span>
             </div>
-            <div class="stat-card">
+            <div class="stat-chip stat-chip-esp">
                 <i data-lucide="layers"></i>
-                <div class="stat-info">
-                    <span class="stat-label">Especialidad</span>
-                    <span class="stat-value stat-value-sm" id="statEspecialidad">–</span>
-                </div>
+                <span class="stat-chip-label">Especialidad</span>
+                <span class="stat-chip-value stat-chip-value-sm" id="statEspecialidad">–</span>
             </div>
-        </section>
+        </div>
 
-        <!-- ─── ZONA DE JUEGO (2 columnas) ─── -->
+        <!-- ── ZONA DE JUEGO ── -->
         <div class="game-layout">
 
-            <!-- COLUMNA IZQUIERDA: solo Horca -->
+            <!-- COLUMNA IZQUIERDA: Horca (indicador secundario) -->
             <aside class="game-col-left">
-
-                <!-- Horca -->
-                <div class="card card-ahorcado">
-                    <div class="card-header-custom">
-                        <h2>Estado del Personaje</h2>
-                    </div>
-                    <div class="card-body-custom">
-                        <div id="contenedorAhorcado">
-                            <div class="ahorcado-wrapper">
-                                <img src="/assets/horca.png" alt="Soporte de la Horca" id="orca" class="horca-img">
-                                <img src="/assets/cabeza.png" id="cabeza" class="parte-cuerpo oculto" alt="Cabeza del personaje">
-                                <div id="cuerpo" class="parte-cuerpo oculto stickman-part"></div>
-                                <div id="brazoIzq" class="parte-cuerpo oculto stickman-part"></div>
-                                <div id="brazoDer" class="parte-cuerpo oculto stickman-part"></div>
-                                <div id="piernaIzq" class="parte-cuerpo oculto stickman-part"></div>
-                                <div id="piernaDer" class="parte-cuerpo oculto stickman-part"></div>
-                            </div>
+                <div class="card-ahorcado">
+                    <p class="horca-label">Estado</p>
+                    <div id="contenedorAhorcado">
+                        <div class="ahorcado-wrapper">
+                            <img src="/assets/horca.png" alt="Horca" id="orca" class="horca-img">
+                            <img src="/assets/cabeza.png" id="cabeza" class="parte-cuerpo oculto" alt="Cabeza">
+                            <div id="cuerpo"    class="parte-cuerpo oculto stickman-part"></div>
+                            <div id="brazoIzq"  class="parte-cuerpo oculto stickman-part"></div>
+                            <div id="brazoDer"  class="parte-cuerpo oculto stickman-part"></div>
+                            <div id="piernaIzq" class="parte-cuerpo oculto stickman-part"></div>
+                            <div id="piernaDer" class="parte-cuerpo oculto stickman-part"></div>
                         </div>
                     </div>
                 </div>
-
             </aside>
 
-            <!-- COLUMNA DERECHA: Palabra + Pista + Letras usadas + Teclado -->
+            <!-- COLUMNA DERECHA: Juego principal -->
             <div class="game-col-right">
 
-                <!-- Palabra a adivinar -->
-                <div class="card card-palabra">
-                    <div class="card-header-custom">
-                        <i data-lucide="type"></i>
-                        <h2>Palabra a Adivinar</h2>
+                <!-- PALABRA (foco principal) -->
+                <div class="zona-palabra">
+                    <div id="palabraRender" aria-live="polite" aria-label="Palabra a adivinar">
+                        <span class="placeholder-chico">Seleccioná una especialidad</span>
                     </div>
-                    <div class="card-body-custom">
-                        <div id="palabraRender" aria-live="polite" aria-label="Palabra a adivinar">
-                            <span class="placeholder-chico">Seleccioná una especialidad</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pista -->
-                <div class="card card-pista">
-                    <div class="card-header-custom">
+                    <!-- Pista integrada debajo de la palabra -->
+                    <div class="pista-inline" id="pistaInline">
                         <i data-lucide="lightbulb"></i>
-                        <h3>Pista</h3>
-                    </div>
-                    <div class="card-body-custom">
-                        <p id="pista" class="pista-texto">Seleccioná una especialidad para comenzar</p>
+                        <p id="pista">Seleccioná una especialidad para comenzar</p>
                     </div>
                 </div>
 
-                <!-- Letras usadas -->
-                <div class="card card-letras">
-                    <div class="card-body-custom">
-                        <div id="letrasUsadas" aria-live="polite" aria-label="Letras ya utilizadas"></div>
-                        <p id="letrasUsadasPlaceholder" class="letras-placeholder">Las letras incorrectas aparecerán aquí</p>
-                    </div>
+                <!-- LETRAS USADAS: línea compacta -->
+                <div class="letras-usadas-bar">
+                    <span class="letras-bar-label">
+                        <i data-lucide="x-circle"></i>
+                        Incorrectas:
+                    </span>
+                    <div id="letrasUsadas" aria-live="polite" aria-label="Letras incorrectas usadas"></div>
+                    <span id="letrasUsadasPlaceholder" class="letras-placeholder">–</span>
                 </div>
 
-                <!-- Teclado -->
-                <div class="card card-teclado">
-                    <div class="card-header-custom">
-                        <i data-lucide="keyboard"></i>
-                        <h3>Teclado Virtual</h3>
-                    </div>
-                    <div class="card-body-custom">
-                        <div id="teclado" role="group" aria-label="Teclado virtual"></div>
-                    </div>
+                <!-- TECLADO (elemento principal de interacción) -->
+                <div class="zona-teclado">
+                    <div id="teclado" role="group" aria-label="Teclado virtual"></div>
                 </div>
 
             </div>
         </div>
 
-        <!-- ─── GUARDAR SCORE ─── -->
+        <!-- ── GUARDAR SCORE ── -->
         <section class="card card-guardar" id="seccionGuardar">
             <div class="card-header-custom">
                 <i data-lucide="save"></i>
@@ -226,7 +170,7 @@
             </div>
         </section>
 
-        <!-- ─── RANKING ─── -->
+        <!-- ── RANKING ── -->
         <section class="card card-ranking" id="seccionRanking">
             <div class="card-header-custom">
                 <i data-lucide="trophy"></i>
@@ -241,12 +185,8 @@
                     <table class="tabla-ranking" id="tablaRankingWrapper">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Jugador</th>
-                                <th>Especialidad</th>
-                                <th>Puntos</th>
-                                <th>Tiempo</th>
-                                <th>Fecha</th>
+                                <th>#</th><th>Jugador</th><th>Especialidad</th>
+                                <th>Puntos</th><th>Tiempo</th><th>Fecha</th>
                             </tr>
                         </thead>
                         <tbody id="tablaRanking"></tbody>
@@ -257,7 +197,7 @@
 
     </main>
 
-    <!-- ═══════════════════════════════════════ FOOTER ═══════════════════════════════════════ -->
+    <!-- ══════════════ FOOTER ══════════════ -->
     <footer id="mainFooter">
         <div class="footer-inner">
             <img src="/assets/logo.png" alt="Logo" class="footer-logo">
@@ -266,19 +206,66 @@
         </div>
     </footer>
 
-    <!-- Botón subir -->
-    <button id="btnTop" aria-label="Volver arriba">
-        <i data-lucide="arrow-up"></i>
-    </button>
+    <button id="btnTop" aria-label="Volver arriba"><i data-lucide="arrow-up"></i></button>
 
-    <!-- ═══════════════════════════════════════ MODALES ═══════════════════════════════════════ -->
+    <!-- ══════════════ MODALES ══════════════ -->
+
+    <!-- Modal Instrucciones -->
+    <div class="modal-overlay" id="modalInstrucciones" role="dialog" aria-modal="true" aria-labelledby="modalInstruccionesTitle" hidden>
+        <div class="modal-box modal-box-instrucciones">
+
+            <h2 id="modalInstruccionesTitle">¿Cómo se juega?</h2>
+
+            <div class="instrucciones-reglas">
+
+                <div class="regla-row">
+                    <span class="regla-icono regla-icono-verde"><i data-lucide="keyboard"></i></span>
+                    <p>Elegí letras para descubrir la palabra técnica oculta.</p>
+                </div>
+
+                <div class="regla-row">
+                    <span class="regla-icono regla-icono-verde"><i data-lucide="check-circle"></i></span>
+                    <p>Completás todas las letras → <strong>ganás</strong>.</p>
+                </div>
+
+                <div class="regla-row">
+                    <span class="regla-icono regla-icono-rojo"><i data-lucide="x-circle"></i></span>
+                    <p>Cometés 6 errores → <strong>perdés</strong>.</p>
+                </div>
+
+                <div class="regla-row">
+                    <span class="regla-icono regla-icono-amarillo"><i data-lucide="star"></i></span>
+                    <p><strong>+10</strong> por letra correcta · <strong>+100</strong> al completar la palabra.</p>
+                </div>
+
+                <div class="regla-row">
+                    <span class="regla-icono regla-icono-verde"><i data-lucide="layers"></i></span>
+                    <p>Elegí tu especialidad: <strong>Informática</strong>, <strong>Electrónica</strong> o <strong>M.M.O.</strong></p>
+                </div>
+
+            </div>
+
+            <div class="instrucciones-no-mostrar">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="checkNoMostrar">
+                    <span>No volver a mostrar</span>
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-primary" id="btnInstruccionesComenzar">
+                    <i data-lucide="play"></i>
+                    Comenzar
+                </button>
+            </div>
+
+        </div>
+    </div>
 
     <!-- Modal Victoria -->
     <div class="modal-overlay" id="modalVictoria" role="dialog" aria-modal="true" aria-labelledby="modalVictoriaTitle" hidden>
         <div class="modal-box modal-box-success">
-            <div class="modal-icon modal-icon-success">
-                <i data-lucide="trophy"></i>
-            </div>
+            <div class="modal-icon modal-icon-success"><i data-lucide="trophy"></i></div>
             <h2 id="modalVictoriaTitle">¡Ganaste!</h2>
             <p class="modal-subtitle">Salvaste al estudiante técnico</p>
             <div class="modal-stats">
@@ -293,14 +280,8 @@
             </div>
             <p class="modal-message">¿Querés seguir acumulando puntos con una nueva palabra?</p>
             <div class="modal-actions">
-                <button class="btn-modal btn-modal-primary" id="btnSeguir">
-                    <i data-lucide="play"></i>
-                    Seguir Jugando
-                </button>
-                <button class="btn-modal btn-modal-outline" id="btnGuardar">
-                    <i data-lucide="save"></i>
-                    Guardar Score
-                </button>
+                <button class="btn-modal btn-modal-primary" id="btnSeguir"><i data-lucide="play"></i>Seguir Jugando</button>
+                <button class="btn-modal btn-modal-outline" id="btnGuardar"><i data-lucide="save"></i>Guardar Score</button>
             </div>
         </div>
     </div>
@@ -308,9 +289,7 @@
     <!-- Modal Derrota -->
     <div class="modal-overlay" id="modalDerrota" role="dialog" aria-modal="true" aria-labelledby="modalDerrotaTitle" hidden>
         <div class="modal-box modal-box-danger">
-            <div class="modal-icon modal-icon-danger">
-                <i data-lucide="frown"></i>
-            </div>
+            <div class="modal-icon modal-icon-danger"><i data-lucide="frown"></i></div>
             <h2 id="modalDerrotaTitle">Perdiste</h2>
             <p class="modal-subtitle">El estudiante no pudo ser salvado</p>
             <div class="modal-stats">
@@ -328,14 +307,8 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn-modal btn-modal-danger" id="btnDerrotaReiniciar">
-                    <i data-lucide="refresh-cw"></i>
-                    Volver a Empezar
-                </button>
-                <button class="btn-modal btn-modal-outline-danger" id="btnDerrotaGuardar">
-                    <i data-lucide="save"></i>
-                    Guardar Score
-                </button>
+                <button class="btn-modal btn-modal-danger" id="btnDerrotaReiniciar"><i data-lucide="refresh-cw"></i>Volver a Empezar</button>
+                <button class="btn-modal btn-modal-outline-danger" id="btnDerrotaGuardar"><i data-lucide="save"></i>Guardar Score</button>
             </div>
         </div>
     </div>
@@ -343,31 +316,21 @@
     <!-- Modal Fin de Palabras -->
     <div class="modal-overlay" id="modalFinPalabras" role="dialog" aria-modal="true" aria-labelledby="modalFinPalabrasTitle" hidden>
         <div class="modal-box modal-box-warning">
-            <div class="modal-icon modal-icon-warning">
-                <i data-lucide="award"></i>
-            </div>
+            <div class="modal-icon modal-icon-warning"><i data-lucide="award"></i></div>
             <h2 id="modalFinPalabrasTitle">¡Especialidad Completada!</h2>
-            <p class="modal-subtitle">Completaste todas las palabras disponibles en esta especialidad</p>
-            <p class="modal-message">Podés registrar tu score actual en el ranking o elegir otra especialidad para seguir sumando.</p>
+            <p class="modal-subtitle">Completaste todas las palabras de esta especialidad</p>
+            <p class="modal-message">Podés registrar tu score o elegir otra especialidad.</p>
             <div class="modal-actions">
-                <button class="btn-modal btn-modal-warning" id="btnFinEspecialidad">
-                    <i data-lucide="layers"></i>
-                    Elegir Especialidad
-                </button>
-                <button class="btn-modal btn-modal-outline" id="btnFinGuardar">
-                    <i data-lucide="save"></i>
-                    Guardar Score
-                </button>
+                <button class="btn-modal btn-modal-warning" id="btnFinEspecialidad"><i data-lucide="layers"></i>Elegir Especialidad</button>
+                <button class="btn-modal btn-modal-outline" id="btnFinGuardar"><i data-lucide="save"></i>Guardar Score</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Guardar Score -->
+    <!-- Modal Score Guardado -->
     <div class="modal-overlay" id="modalGuardarScore" role="dialog" aria-modal="true" aria-labelledby="modalGuardarTitle" hidden>
         <div class="modal-box modal-box-success">
-            <div class="modal-icon modal-icon-success">
-                <i data-lucide="check-circle"></i>
-            </div>
+            <div class="modal-icon modal-icon-success"><i data-lucide="check-circle"></i></div>
             <h2 id="modalGuardarTitle">¡Score Guardado!</h2>
             <p class="modal-subtitle">Tu partida quedó registrada en el ranking</p>
             <div class="modal-stats">
@@ -381,10 +344,7 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn-modal btn-modal-primary" id="btnModalGuardarCerrar">
-                    <i data-lucide="check"></i>
-                    Aceptar
-                </button>
+                <button class="btn-modal btn-modal-primary" id="btnModalGuardarCerrar"><i data-lucide="check"></i>Aceptar</button>
             </div>
         </div>
     </div>
@@ -392,5 +352,4 @@
     <script type="module" src="/scripts/main.js"></script>
 
 </body>
-
 </html>

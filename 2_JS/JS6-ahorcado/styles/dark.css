@@ -1,6 +1,5 @@
 /* ============================================================
    TEMA OSCURO — AHORCADO TÉCNICO
-   Paleta propia, sin inversión automática de colores
    ============================================================ */
 :root {
   --bg-body:        #111810;
@@ -27,7 +26,28 @@
   --bronze-bg: #2a1e14;
 }
 
-/* Overrides específicos para inputs y tabla en modo oscuro */
+/* Íconos de especialidades inactivas */
+.btn-especialidad .esp-icon {
+  background-color: #1e2a1b;
+  border-color: #2e3d29;
+}
+
+.btn-especialidad .esp-icon i { color: #7ecf5a; }
+.btn-especialidad:hover .esp-icon { border-color: #386e14; }
+
+/* Horca: fondo claro fijo sin importar el tema */
+.card-ahorcado {
+  background-color: #f4f8f1 !important;
+  border-color: #dce8d4 !important;
+}
+
+.horca-label { color: #386e14 !important; }
+
+#contenedorAhorcado { background-color: #f4f8f1 !important; }
+
+.stickman-part { background-color: #1e2b18; }
+
+/* Inputs */
 .input-nombre {
   background-color: var(--bg-canvas);
   color: var(--text-color);
@@ -37,24 +57,29 @@
 .input-nombre:focus {
   background-color: var(--bg-card);
   border-color: #386e14;
-  box-shadow: 0 0 0 3px rgba(56, 110, 20, 0.25);
+  box-shadow: 0 0 0 3px rgba(56,110,20,0.25);
   color: var(--text-color);
 }
 
-.modal-stats {
-  background-color: var(--bg-canvas);
-}
+/* Modales */
+.modal-stats { background-color: var(--bg-canvas); }
+.modal-stat-value { color: var(--text-color); }
 
-.modal-stat-value {
-  color: var(--text-color);
-}
+/* Instrucciones */
+.instruccion-item { background-color: var(--bg-canvas); border-color: var(--border-color); }
 
-/* Tabla ranking modo oscuro */
-.tabla-ranking tbody tr:nth-child(even) {
-  background-color: rgba(255,255,255,0.03);
-}
+/* Tabla ranking */
+.tabla-ranking tbody tr:nth-child(even) { background-color: rgba(255,255,255,0.02); }
 
-/* Stickman color blanco en modo oscuro */
-.stickman-part {
-  background-color: #ddecd5;
-}
+/* Letras usadas barra */
+.letras-usadas-bar { background-color: var(--bg-card); }
+
+/* Zona teclado */
+.zona-teclado { background-color: var(--bg-card); }
+
+/* Zona palabra */
+.zona-palabra { border-color: #386e14; }
+
+#palabraRender { background-color: var(--bg-canvas); }
+
+.pista-inline { background-color: var(--bg-card); border-color: var(--border-color); }

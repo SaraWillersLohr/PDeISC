@@ -36,6 +36,7 @@ const statEsp        = document.getElementById("statEspecialidad");
 const btnTop         = document.getElementById("btnTop");
 const btnPdf         = document.getElementById("btnPdf");
 const errorNombreDOM = document.getElementById("errorNombreDOM");
+const btnInstrucciones = document.getElementById("btnInstrucciones");
 
 // ── Helpers de Modal ──
 function abrirModal(id) {
@@ -79,17 +80,39 @@ btnTema.addEventListener("click", () => {
 
 function actualizarIconTema() {
   const tema = localStorage.getItem("tema") || "light";
-  // Cambiar ícono
   if (iconTema) {
     iconTema.setAttribute("data-lucide", tema === "dark" ? "sun" : "moon");
     lucide.createIcons();
   }
 }
 
+// ── Modal Instrucciones ──
+function mostrarInstruccionesAuto() {
+  const noMostrar = localStorage.getItem("instruccionesOmitidas") === "true";
+  if (!noMostrar) abrirModal("modalInstrucciones");
+}
+
+btnInstrucciones?.addEventListener("click", () => {
+  abrirModal("modalInstrucciones");
+});
+
+document.getElementById("btnInstruccionesComenzar")?.addEventListener("click", () => {
+  const check = document.getElementById("checkNoMostrar");
+  if (check?.checked) localStorage.setItem("instruccionesOmitidas", "true");
+  cerrarModal("modalInstrucciones");
+});
+
+document.getElementById("btnInstruccionesOmitir")?.addEventListener("click", () => {
+  const check = document.getElementById("checkNoMostrar");
+  if (check?.checked) localStorage.setItem("instruccionesOmitidas", "true");
+  cerrarModal("modalInstrucciones");
+});
+
 // ── Inicialización ──
 cargarRanking();
 configurarScrollTop(btnTop);
 mostrarTecladoInactivo(tecladoEl);
+mostrarInstruccionesAuto();
 
 // ── Formateo de tiempo ──
 function formatTiempo(segundos) {

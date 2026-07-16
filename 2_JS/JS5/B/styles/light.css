@@ -26,11 +26,9 @@
   --color-fondo-card: var(--blanco-calido);
   --color-fondo-header: var(--taupe);
   --color-fondo-footer: var(--taupe);
-  --color-fondo-consola: #2c3e50;
   --color-texto: var(--taupe);
   --color-texto-claro: var(--alice-blue);
   --color-texto-secundario: var(--taupe-grey);
-  --color-texto-consola: #a8e6cf;
   --color-borde: var(--periwinkle-light);
   --color-primario: var(--taupe-grey);
   --color-primario-hover: var(--taupe);
@@ -244,8 +242,8 @@ body {
 }
 
 .btn-estanga-secundario {
-  background: linear-gradient(135deg, var(--sky-blue-light) 0%, var(--sky-blue-deep) 100%);
-  color: var(--taupe);
+  background: linear-gradient(135deg, #3d6ba8 0%, var(--yale-blue) 100%);
+  color: var(--alice-blue);
 }
 
 .btn-estanga-secundario:hover {
@@ -308,28 +306,6 @@ body {
 .panel-educativo {
   position: sticky;
   top: 1rem;
-}
-
-/* Consola visual */
-.consola-educativa {
-  background: var(--color-fondo-consola);
-  border-radius: 12px;
-  padding: 1rem;
-  max-height: 220px;
-  overflow-y: auto;
-  font-family: 'Courier New', monospace;
-  font-size: 0.82rem;
-  border: 1px solid var(--periwinkle);
-}
-
-.consola-educativa .linea-consola {
-  color: var(--color-texto-consola);
-  margin-bottom: 0.4rem;
-  line-height: 1.5;
-}
-
-.consola-educativa .hora-consola {
-  color: var(--periwinkle);
 }
 
 /* Sección ¿Cómo funciona? */
@@ -437,38 +413,6 @@ body {
   color: var(--sky-blue-deep);
 }
 
-/* Comparador Fetch vs Axios */
-.comparador-card {
-  background: rgba(240, 244, 239, 0.58);
-  border-radius: 12px;
-  padding: 1rem;
-  margin-top: 0.75rem;
-  border: 1px solid var(--color-borde);
-}
-
-.comparador-card h6 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--taupe);
-}
-
-.comparador-card pre {
-  background: var(--color-fondo-consola);
-  color: var(--color-texto-consola);
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  overflow-x: auto;
-  margin-bottom: 0.5rem;
-}
-
-.comparador-card ul {
-  font-size: 0.82rem;
-  padding-left: 1.2rem;
-  color: var(--color-texto-secundario);
-}
-
 /* Buscador */
 .buscador-alumnos {
   margin-bottom: 1rem;
@@ -515,6 +459,18 @@ body {
   margin: 0;
   opacity: 0.9;
   color: var(--alice-blue);
+}
+
+.text-muted {
+  color: var(--color-texto-secundario) !important;
+}
+
+code {
+  background: rgba(230, 170, 206, 0.35);
+  color: var(--taupe);
+  padding: 0.15em 0.45em;
+  border-radius: 6px;
+  font-size: 0.85em;
 }
 
 /* Mensaje vacío */

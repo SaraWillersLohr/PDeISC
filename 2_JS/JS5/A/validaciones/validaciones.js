@@ -68,7 +68,7 @@ export const validarNombre = (texto) => validarTextoReal(texto, 'nombre');
 export const validarApellido = (texto) => validarTextoReal(texto, 'apellido');
 
 // Acá valido que la edad sea un número entero dentro del rango permitido
-export const validarEdad = (edad, min = 1, max = 120) => {
+export const validarEdad = (edad, min = 11, max = 120) => {
   const numero = Number(edad);
 
   if (edad === '' || edad === null || edad === undefined || Number.isNaN(numero)) {

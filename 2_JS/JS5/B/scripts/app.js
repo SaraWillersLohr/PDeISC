@@ -62,12 +62,11 @@ function filtrarAlumnos(termino) {
 // Acá cargo los alumnos usando Fetch (API nativa del navegador)
 async function cargarConFetch() {
   mostrarMetodoActivo('Fetch');
-  actualizarExplicacion('Fetch es la API nativa del navegador. Enviando POST a la API del Proyecto A...');
+  actualizarExplicacion('Fetch es la API nativa del navegador. Enviando GET a la API del Proyecto A...');
 
   try {
     const respuesta = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      method: 'GET'
     });
 
     if (!respuesta.ok) {
@@ -93,10 +92,10 @@ async function cargarConFetch() {
 // Acá cargo los alumnos usando Axios (biblioteca externa)
 async function cargarConAxios() {
   mostrarMetodoActivo('Axios');
-  actualizarExplicacion('Axios es una librería que simplifica las peticiones HTTP. Enviando POST a la API del Proyecto A...');
+  actualizarExplicacion('Axios es una librería que simplifica las peticiones HTTP. Enviando GET a la API del Proyecto A...');
 
   try {
-    const respuesta = await axios.post(API_URL);
+    const respuesta = await axios.get(API_URL);
 
     alumnosCompletos = respuesta.data;
 

@@ -83,12 +83,11 @@ function renderizarTabla(alumnos) {
   `).join('');
 }
 
-// Acá pido la lista de alumnos a la API con POST y actualizo la tabla
+// Acá pido la lista de alumnos a la API con GET y actualizo la tabla
 async function cargarAlumnos() {
   try {
     const respuesta = await fetch(`${API_BASE}/listar-alumnos`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      method: 'GET'
     });
 
     if (!respuesta.ok) {

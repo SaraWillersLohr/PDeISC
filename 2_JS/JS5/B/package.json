@@ -7,7 +7,12 @@
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["express", "fetch", "axios", "bases-datos-api"],
+  "keywords": [
+    "express",
+    "fetch",
+    "axios",
+    "bases-datos-api"
+  ],
   "author": "Bases de datos y API",
   "license": "ISC",
   "dependencies": {

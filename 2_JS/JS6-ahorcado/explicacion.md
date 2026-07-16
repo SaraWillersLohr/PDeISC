@@ -120,3 +120,30 @@ también me costó entender bien cómo funcionan los módulos es en el navegador
 ## conclusión
 
 creo que el proyecto cumple con todo lo que pedía la consigna. aprendí a separar responsabilidades usando módulos, a conectar el frontend con una base de datos a través de una api rest, y a manejar el estado de una aplicación de forma más ordenada usando clases. me quedé contento con el diseño final y con que el juego funcione de punta a punta: desde elegir la especialidad hasta guardar el score y verlo en el ranking.
+
+---
+
+## solución rápida para errores de carga de recursos / iconos
+
+Si ves que los íconos no aparecen o la página queda sin poder interactuar, probá estos pasos en el orden indicado:
+
+- **Abrir DevTools (Console / Network)**: buscá errores tipo `ReferenceError`, `404` o `ERR_BLOCKED_BY_CLIENT`. Estos diagnósticos te dirán si falta un archivo, hay un error JS, o un bloqueador está cortando peticiones.
+- **Arrancar el servidor local** (desde la raíz del proyecto) si abriste el HTML con `file://`. En la terminal:
+
+```bash
+cd "C:\Users\Sara Willers\Desktop\PDeISC\2_JS\JS6-ahorcado"
+node server.js
+```
+
+- **Comprobar rutas de imports y assets**: el proyecto usa rutas desde la raíz (`/scripts/main.js`, `/styles/...`, `/assets/...`). Si abrís el archivo sin servidor, esas rutas fallan. Alternativa: convertirlas a relativas o servir con `node server.js`.
+- **Ver si un adblock u otra extensión bloquea peticiones externas** (por ejemplo a `unpkg.com` o `api-js.mixpanel`). Si ves `ERR_BLOCKED_BY_CLIENT` en Network, deshabilitá el bloqueador para `localhost` o usá versiones locales de las librerías.
+- **Verificar inicializaciones en la consola**: por ejemplo `lucide.createIcons()` y funciones del contexto (p. ej. `cargarTema`) deben existir. Si aparece `ReferenceError: cargarTema is not defined`, revisá que `scripts/main.js` importe `../context/theme.js` correctamente y que la etiqueta `<link id="themeStylesheet">` exista en el `head`.
+- **Si los SVG de Lucide se ven sin estilo**: inspeccioná el DOM — Lucide reemplaza `<i data-lucide="..."></i>` por `<svg>`. Asegurate que tus reglas CSS afecten a `svg` además de a `i`, p. ej.:
+
+```css
+.esp-icon i, .esp-icon svg { width: 18px; height: 18px; color: var(--text-muted); }
+```
+
+- **Solución alternativa (evitar CDNs bloqueados)**: descargá la versión de Lucide y colocala en `assets/libs/lucide.min.js` y referenciala desde `pages/index.html` con una ruta local (`/assets/libs/lucide.min.js`). De este modo no dependés de la conexión ni de bloqueadores.
+
+Si querés, puedo añadir al repositorio una copia local de Lucide y actualizar `pages/index.html` automáticamente — confirmame si lo hago.

@@ -2,6 +2,7 @@
 // organiza la interfaz, la sesión del jugador, las rondas, la conexión con la api
 // y la integración con los módulos de teclado, ranking, validaciones y pdf.
 import { obtenerPalabra, guardarScore, obtenerRanking } from "./modules/api.js";
+import { cargarTema, cambiarTema } from "../context/theme.js";
 import JuegoAhorcado from "./modules/juego.js";
 import Jugador from "./modules/jugador.js";
 import Score from "./modules/score.js";

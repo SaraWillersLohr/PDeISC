@@ -3,8 +3,8 @@
 function normalizarCaracter(char) {
   return char.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
+//logica basica del juego
 // representa el juego del ahorcado.
-//
 export default class JuegoAhorcado {
   constructor() {
     this.palabra = "";
@@ -13,6 +13,7 @@ export default class JuegoAhorcado {
     this.errores = 0;
     this.maxErrores = 6;
   }
+
   // inicia el juego con una palabra y una pista.
   iniciar(palabra, pista) {
     this.palabra = palabra.toUpperCase();

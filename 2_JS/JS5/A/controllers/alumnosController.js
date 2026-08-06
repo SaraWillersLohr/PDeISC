@@ -1,11 +1,17 @@
+//controlador de alumnos, contiene las funciones para crear y listar alumnos en la base de datos MySQL
 import pool from "../database/conexion.js";
 import { validarAlumno } from "../validaciones/validaciones.js";
+//pool es un objeto que representa la conexión a la base de datos MySQL y permite ejecutar consultas SQL de manera eficiente.
+//Se importa desde el archivo de configuración de la base de datos (conexion.js) y se utiliza para realizar operaciones como insertar y obtener registros en la tabla alumnos.
 
 // Acá inserto un alumno nuevo en la tabla alumnos de MySQL
+//async funtion es una función asíncrona que permite usar await para esperar la resolución de promesas, en este caso, la ejecución de la consulta SQL para insertar un nuevo alumno en la base de datos.
 export async function crearAlumno(req, res) {
   try {
     const { nombre, apellido, edad } = req.body;
+    //req.body contiene los datos enviados por el cliente en el cuerpo de la solicitud HTTP, en este caso, los datos del nuevo alumno (nombre, apellido y edad) que se van a insertar en la base de datos.
 
+    //errores de validación, se usa la función validarAlumno para comprobar que los datos del alumno cumplen con los requisitos establecidos (por ejemplo, que el nombre y apellido no estén vacíos y que la edad sea un número válido).
     const errores = validarAlumno({ nombre, apellido, edad });
 
     if (Object.keys(errores).length > 0) {

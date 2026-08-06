@@ -1,3 +1,4 @@
+//tema.js
 // Acá guardo y leo la preferencia de tema (claro u oscuro) en localStorage
 const CLAVE_TEMA = "estanga-tema";
 

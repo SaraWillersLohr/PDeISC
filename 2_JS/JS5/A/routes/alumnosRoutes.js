@@ -1,3 +1,4 @@
+//alumnosRoutes.js, define las rutas para crear y listar alumnos en la aplicación Express
 import { Router } from "express";
 import {
   crearAlumno,

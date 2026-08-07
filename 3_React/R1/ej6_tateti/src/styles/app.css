@@ -1,0 +1,389 @@
+/* importa las variables de color de cada tema */
+@import './light.css';
+@import './dark.css';
+
+/* reset y base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==================== HEADER ==================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.header-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* botón del tema */
+.theme-toggle {
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--bg-card);
+  border-color: var(--accent-primary);
+  transform: rotate(20deg);
+}
+
+/* ==================== MAIN CONTENT ==================== */
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ==================== GAME LAYOUT ==================== */
+
+/* layout de dos columnas como el tutorial, pero más grande */
+.game {
+  display: flex;
+  flex-direction: row;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+/* columna izquierda: el tablero */
+.game-board {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* columna derecha: panel de info */
+.game-info {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ==================== TABLERO ==================== */
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.board-row {
+  display: flex;
+}
+
+/* casilla del tablero */
+.square {
+  width: clamp(90px, 15vw, 160px);
+  height: clamp(90px, 15vw, 160px);
+  background-color: var(--square-bg);
+  border: 2px solid var(--square-border);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.square:hover {
+  background-color: var(--square-hover);
+  border-color: var(--border-hover);
+}
+
+/* animación al colocar una ficha */
+.square--x,
+.square--o {
+  animation: pop-in 0.2s ease-out;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.6); opacity: 0.5; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.square--x {
+  color: var(--color-x);
+}
+
+.square--o {
+  color: var(--color-o);
+}
+
+/* casilla ganadora resaltada */
+.square--winning {
+  background-color: var(--square-winning);
+  border-color: var(--square-winning-border);
+  animation: winning-pulse 0.5s ease-out;
+}
+
+@keyframes winning-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* bordes redondeados solo en las esquinas del tablero */
+.board-row:first-child .square:first-child { border-radius: 12px 0 0 0; }
+.board-row:first-child .square:last-child  { border-radius: 0 12px 0 0; }
+.board-row:last-child  .square:first-child { border-radius: 0 0 0 12px; }
+.board-row:last-child  .square:last-child  { border-radius: 0 0 12px 0; }
+
+/* ==================== PANEL DE ESTADO ==================== */
+
+.status-panel {
+  background-color: var(--status-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.status-panel--winner {
+  background-color: var(--status-winner-bg);
+  border-color: var(--status-winner-border);
+  animation: slide-in 0.3s ease-out;
+}
+
+.status-panel--draw {
+  background-color: var(--status-draw-bg);
+  border-color: var(--status-draw-border);
+}
+
+@keyframes slide-in {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.status-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.status-moves {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ==================== BOTÓN REINICIAR ==================== */
+
+.reset-button {
+  background-color: var(--reset-bg);
+  color: var(--reset-text);
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.reset-button:hover {
+  background-color: var(--reset-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.reset-button:active {
+  transform: translateY(0) rotate(-10deg);
+}
+
+/* ==================== HISTORIAL ==================== */
+
+.history-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.history-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.moves-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.move-item {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* el movimiento actual se muestra diferente */
+.move-item--current .move-current-label {
+  display: block;
+  padding: 0.5rem 0.85rem;
+  background-color: var(--move-current-bg);
+  color: var(--move-current-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.move-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.85rem;
+  background-color: var(--move-button-bg);
+  color: var(--move-button-text);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.move-button:hover {
+  background-color: var(--move-button-hover);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+/* scrollbar del historial */
+.history-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.history-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.history-panel::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+}
+
+/* ==================== FOOTER ==================== */
+
+.footer {
+  text-align: center;
+  padding: 1.5rem 2rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+.footer a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+/* en pantallas más chicas el panel pasa abajo */
+@media (max-width: 768px) {
+  .game {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .game-info {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .header {
+    padding: 1rem 1.25rem;
+  }
+
+  .main-content {
+    padding: 1.25rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 1.4rem;
+  }
+
+  .history-panel {
+    max-height: 260px;
+  }
+}

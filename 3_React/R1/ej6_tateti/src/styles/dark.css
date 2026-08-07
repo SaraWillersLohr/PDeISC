@@ -1,0 +1,47 @@
+/* variables del modo oscuro */
+[data-theme='dark'] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-hover: #334155;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+
+  --border-color: #334155;
+  --border-hover: #475569;
+
+  --accent-primary: #818cf8;
+  --accent-secondary: #a78bfa;
+  --accent-hover: #6366f1;
+
+  --color-x: #818cf8;
+  --color-o: #f472b6;
+
+  --square-bg: #1e293b;
+  --square-border: #334155;
+  --square-hover: #334155;
+  --square-winning: #422006;
+  --square-winning-border: #d97706;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  --reset-bg: #818cf8;
+  --reset-hover: #6366f1;
+  --reset-text: #0f172a;
+
+  --status-bg: #1e293b;
+  --status-winner-bg: #422006;
+  --status-winner-border: #d97706;
+  --status-draw-bg: #052e16;
+  --status-draw-border: #16a34a;
+
+  --move-current-bg: #312e81;
+  --move-current-text: #a5b4fc;
+  --move-button-bg: #1e293b;
+  --move-button-hover: #334155;
+  --move-button-text: #cbd5e1;
+}

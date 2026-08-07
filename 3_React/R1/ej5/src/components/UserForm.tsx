@@ -25,6 +25,19 @@ function validarNombre(valor: string): string {
   if (!soloLetras.test(valor)) {
     return "Solo se permiten letras, espacios y apóstrofes.";
   }
+
+  // detecta repetición excesiva: una misma letra más de 3 veces seguidas
+  const repeticion = /([a-zA-ZáéíóúÁÉÍÓÚñÑüÜ])\1{3,}/;
+  if (repeticion.test(valor)) {
+    return "El nombre tiene demasiadas letras repetidas seguidas.";
+  }
+
+  // verifica que el nombre tenga al menos una vocal
+  const tieneVocal = /[aeiouáéíóúüAEIOUÁÉÍÓÚÜ]/;
+  if (!tieneVocal.test(valor)) {
+    return "El nombre debe contener al menos una vocal.";
+  }
+
   return "";
 }
 

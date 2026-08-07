@@ -1,0 +1,44 @@
+/* Importa todas las variables de color del proyecto */
+@import './styles/variables.css';
+
+/* Reset básico */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-sans);
+  font-size: 18px;
+  line-height: 1.55;
+  letter-spacing: 0.18px;
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  transition: background-color var(--transicion), color var(--transicion);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* El contenedor raíz ocupa toda la pantalla en columna */
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  color: var(--color-titulo);
+  font-weight: 600;
+  transition: color var(--transicion);
+}
+
+p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+}

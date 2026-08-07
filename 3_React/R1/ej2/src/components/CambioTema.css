@@ -1,0 +1,51 @@
+/* Botón contenedor, sin estilos propios de botón */
+.tema-btn {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Pista del toggle */
+.tema-btn__track {
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-primario-suave);
+  border: 1.5px solid var(--color-primario-borde);
+  padding: 3px;
+  transition: background var(--transicion), border-color var(--transicion);
+}
+
+/* Círculo deslizante con el ícono */
+.tema-btn__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primario);
+  color: #fff;
+  transform: translateX(0);
+  transition: transform var(--transicion), background var(--transicion);
+}
+
+/* Desplaza el thumb al modo oscuro */
+[data-theme="dark"] .tema-btn__thumb {
+  transform: translateX(22px);
+}
+
+.tema-btn:hover .tema-btn__track {
+  border-color: var(--color-primario);
+}
+
+.tema-btn:focus-visible .tema-btn__track {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 3px;
+}

@@ -1,0 +1,104 @@
+/* animación de entrada al cargar */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* wrapper del efecto de borde brillante */
+.tarjeta-glow {
+  width: min(280px, 88vw);
+  animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.3s ease;
+}
+
+/* elevación suave al pasar el mouse */
+.tarjeta-glow:hover {
+  transform: translateY(-6px);
+}
+
+/* contenedor principal de la tarjeta */
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  background-color: var(--color-card);
+  transition: background-color var(--transicion);
+}
+
+/* imagen grande en la parte superior */
+.tarjeta__imagen-wrapper {
+  width: 100%;
+  /* altura proporcional: ~68% del total de la tarjeta */
+  aspect-ratio: 3 / 3.6;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* la foto cubre todo el espacio sin deformarse */
+.tarjeta__imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* zona de texto centrada en la parte inferior */
+.tarjeta__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  background-color: var(--color-card);
+  transition: background-color var(--transicion);
+  text-align: center;
+}
+
+/* nombre y apellido juntos, grande y en negrita */
+.tarjeta__nombre-completo {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.1rem, 4vw, 1.25rem);
+  font-weight: 700;
+  color: var(--color-titulo);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  margin: 0;
+  transition: color var(--transicion);
+}
+
+/* profesión en color primario, más pequeña */
+.tarjeta__profesion {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.78rem, 2.5vw, 0.88rem);
+  font-weight: 400;
+  color: var(--color-primario);
+  margin: 0;
+  transition: color var(--transicion);
+}
+
+/* línea decorativa corta debajo de la profesión */
+.tarjeta__linea {
+  display: block;
+  width: 36px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primario), var(--color-primario-borde));
+  margin-top: 0.5rem;
+}
+
+/* responsive: en celular la tarjeta se achica un poco más */
+@media (max-width: 480px) {
+  .tarjeta-glow {
+    width: min(260px, 82vw);
+  }
+}

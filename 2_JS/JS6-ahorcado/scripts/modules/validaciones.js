@@ -10,3 +10,5 @@ export function validarNombre(nombre) {
   const regex = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ]+$/;
   return regex.test(nombreTrim);
 }
+//regex es una expresión regular que permite letras (mayúsculas y minúsculas), números, espacios y caracteres acentuados.
+//se usa para validar el nombre del jugador antes de guardarlo en el ranking.

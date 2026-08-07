@@ -1,0 +1,15 @@
+/* estilos del modo oscuro */
+
+.tema-oscuro {
+  --color-fondo: #1e2326;
+  --color-secundario: #2d353a;
+  --color-principal: #588b8b;
+  --color-boton: #f28f3b;
+  --color-boton-limpiar: #c8553d;
+  --color-texto: #ffffff;
+  --color-tarjeta: #2d353a;
+  --color-borde: #3d4a52;
+  --color-sombra: rgba(0, 0, 0, 0.3);
+  --color-placeholder: #7a8a92;
+  --color-input-fondo: #252d32;
+}

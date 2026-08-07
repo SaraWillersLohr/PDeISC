@@ -1,0 +1,33 @@
+/* Variables de color para el modo claro */
+:root {
+  --color-fondo: #f0eef5;
+  --color-card: #ffffff;
+  --color-texto: #6b6375;
+  --color-titulo: #08060d;
+  --color-primario: #aa3bff;
+  --color-primario-suave: rgba(170, 59, 255, 0.10);
+  --color-primario-borde: rgba(170, 59, 255, 0.40);
+  --color-borde: #e5e4e7;
+  --sombra-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --sombra-md: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --sombra-lg: 0 20px 48px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.06);
+  --radio-card: 24px;
+  --transicion: 0.35s ease;
+  --fuente-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --fuente-mono: ui-monospace, Consolas, monospace;
+}
+
+/* Variables de color para el modo oscuro */
+[data-theme="dark"] {
+  --color-fondo: #15151d;
+  --color-card: #222230;
+  --color-texto: #9ca3af;
+  --color-titulo: #f3f4f6;
+  --color-primario: #c084fc;
+  --color-primario-suave: rgba(192, 132, 252, 0.12);
+  --color-primario-borde: rgba(192, 132, 252, 0.40);
+  --color-borde: #2e303a;
+  --sombra-sm: 0 2px 8px rgba(0, 0, 0, 0.30);
+  --sombra-md: 0 8px 24px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.20);
+  --sombra-lg: 0 20px 48px rgba(0, 0, 0, 0.55), 0 6px 16px rgba(0, 0, 0, 0.30);
+}

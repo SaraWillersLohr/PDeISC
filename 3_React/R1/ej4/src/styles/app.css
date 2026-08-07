@@ -1,0 +1,352 @@
+/* estilos principales de la app */
+
+/* importa los temas */
+@import './light.css';
+@import './dark.css';
+
+/* reset y base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* contenedor principal que aprovecha el ancho */
+.contenedor {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 40px 24px;
+}
+
+/* ========== HEADER ========== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background-color: var(--color-tarjeta);
+  box-shadow: 0 2px 8px var(--color-sombra);
+  margin-bottom: 32px;
+  transition: background-color 0.3s ease;
+}
+
+.header-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-texto);
+}
+
+.header-titulo h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-texto);
+}
+
+/* botón para cambiar el tema */
+.btn-tema {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--color-texto);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-tema:hover {
+  background-color: var(--color-borde);
+}
+
+/* ========== FORMULARIO ========== */
+.task-form {
+  margin-bottom: 24px;
+}
+
+.form-fila {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.form-input {
+  flex: 1;
+  padding: 14px 18px;
+  border: 2px solid var(--color-borde);
+  border-radius: 12px;
+  font-size: 16px;
+  background-color: var(--color-tarjeta);
+  color: var(--color-texto);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-btn-principal);
+  box-shadow: 0 0 0 3px rgba(33, 78, 52, 0.2);
+}
+
+.form-input::placeholder {
+  color: var(--color-texto-secundario);
+}
+
+/* botón agregar */
+.btn-agregar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background-color: var(--color-btn-principal);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.btn-agregar:hover:not(:disabled) {
+  background-color: var(--color-btn-principal-hover);
+  transform: translateY(-1px);
+}
+
+.btn-agregar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* mensaje de error */
+.form-error {
+  margin-top: 8px;
+  color: var(--color-error);
+  font-size: 14px;
+  padding-left: 4px;
+}
+
+/* ========== PESTAÑAS ========== */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--color-tab-bg);
+  color: var(--color-tab-texto);
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  opacity: 0.85;
+}
+
+/* pestaña seleccionada */
+.tab-activa {
+  background-color: var(--color-tab-activa-bg);
+  color: var(--color-tab-activa-texto);
+}
+
+/* ========== LISTA DE TAREAS ========== */
+.task-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* cada tarea */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background-color: var(--color-tarjeta);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--color-sombra);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.3s ease;
+}
+
+.task-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px var(--color-sombra-hover);
+}
+
+/* tarea completada */
+.task-item.completada {
+  background-color: var(--color-completada-bg);
+}
+
+/* checkbox */
+.task-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-checkbox);
+  flex-shrink: 0;
+}
+
+/* información de la tarea */
+.task-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* texto de la tarea */
+.task-texto {
+  font-size: 16px;
+  color: var(--color-texto);
+  transition: color 0.2s ease;
+}
+
+/* texto tachado cuando está completada */
+.task-item.completada .task-texto {
+  text-decoration: line-through;
+  color: var(--color-completada-texto);
+}
+
+/* fecha de creación */
+.task-fecha {
+  font-size: 12px;
+  color: var(--color-texto-secundario);
+}
+
+/* botón eliminar */
+.btn-eliminar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-eliminar);
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.btn-eliminar:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+  transform: scale(1.1);
+}
+
+/* ========== LISTA VACÍA ========== */
+.lista-vacia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 0;
+  color: var(--color-texto-secundario);
+  text-align: center;
+}
+
+.lista-vacia p {
+  font-size: 17px;
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 20px 24px;
+  background-color: var(--color-footer-bg);
+  box-shadow: 0 -2px 8px var(--color-sombra);
+  margin-top: 40px;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+  flex-wrap: wrap;
+}
+
+.contador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--color-texto-secundario);
+}
+
+.contador strong {
+  color: var(--color-texto);
+  font-weight: 700;
+}
+
+/* ========== BOTÓN VOLVER ARRIBA ========== */
+.btn-volver-arriba {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background-color: var(--color-scroll-btn);
+  color: var(--color-scroll-btn-texto);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--color-sombra-hover);
+  transition: transform 0.2s ease, opacity 0.3s ease;
+  opacity: 1;
+  z-index: 100;
+}
+
+.btn-volver-arriba:hover {
+  transform: translateY(-3px);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .form-fila {
+    flex-direction: column;
+  }
+
+  .btn-agregar {
+    justify-content: center;
+  }
+
+  .tabs {
+    justify-content: center;
+  }
+
+  .footer {
+    gap: 16px;
+  }
+
+  .btn-volver-arriba {
+    bottom: 20px;
+    right: 20px;
+  }
+}

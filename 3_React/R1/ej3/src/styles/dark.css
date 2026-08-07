@@ -1,0 +1,87 @@
+/* modo oscuro */
+
+.dark {
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+/* borde del encabezado */
+
+.dark .header {
+    border-bottom-color: #334155;
+}
+
+/* tarjeta */
+
+.dark .counter-card {
+    background: #1e293b;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
+    border-color: rgba(51, 65, 85, 0.6);
+}
+
+/* círculo del número */
+
+.dark .contador {
+    border-color: rgba(129, 140, 248, 0.55);
+    color: #f8fafc;
+}
+
+/* botón restar - circular */
+
+.dark .btn-restar {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .btn-restar:hover:not(:disabled) {
+    background: #2d1f1f;
+    border-color: #f87171;
+    color: #f87171;
+    box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
+}
+
+/* botón sumar - circular */
+
+.dark .btn-sumar {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .btn-sumar:hover {
+    background: #162419;
+    border-color: #10b981;
+    color: #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+/* etiquetas de los botones */
+
+.dark .boton-label {
+    color: #cbd5e1;
+}
+
+/* botón tema */
+
+.dark .theme-button {
+    background: #334155;
+    color: #f8fafc;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    border: 1px solid #475569;
+}
+
+.dark .theme-button:hover {
+    background: #3d4f66;
+}
+
+/* tarjeta del mensaje */
+
+.dark .mensaje-card {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.25);
+}
+

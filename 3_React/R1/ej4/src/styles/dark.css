@@ -1,0 +1,26 @@
+/* estilos para el modo oscuro */
+
+body.modo-oscuro {
+  --color-fondo: #011638;
+  --color-tarjeta: #364156;
+  --color-btn-principal: #214E34;
+  --color-btn-principal-hover: #1a3e29;
+  --color-texto: #FFFFFF;
+  --color-texto-secundario: #CDCDCD;
+  --color-borde: #4a5568;
+  --color-error: #ff6b6b;
+  --color-completada-bg: #2a3245;
+  --color-completada-texto: #777777;
+  --color-tab-activa-bg: #214E34;
+  --color-tab-activa-texto: #ffffff;
+  --color-tab-bg: #2c3a50;
+  --color-tab-texto: #cdcdcd;
+  --color-eliminar: #e74c3c;
+  --color-eliminar-hover: #c0392b;
+  --color-checkbox: #4CAF7D;
+  --color-sombra: rgba(0, 0, 0, 0.3);
+  --color-sombra-hover: rgba(0, 0, 0, 0.5);
+  --color-scroll-btn: #214E34;
+  --color-scroll-btn-texto: #ffffff;
+  --color-footer-bg: #364156;
+}

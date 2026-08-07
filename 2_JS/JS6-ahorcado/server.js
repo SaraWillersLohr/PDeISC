@@ -4,7 +4,7 @@ import cors from "cors";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-
+  
 import pool from "./database/conexion.js";
 
 const app = express();
@@ -71,7 +71,7 @@ app.get("/api/palabra/:especialidad", async (req, res) => {
   }
 });
 
-// ---------- api de scores ----------
+// Api de scors
 
 app.get("/api/scores", async (req, res) => {
   try {

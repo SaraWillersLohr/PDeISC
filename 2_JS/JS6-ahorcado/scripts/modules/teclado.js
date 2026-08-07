@@ -32,6 +32,7 @@ const abecedario = [
 
 // crea el teclado activo durante una partida.
 // cada botón llama a la función callback con la letra correspondiente.
+//callback es la función que maneja la letra seleccionada por el jugador.
 export function crearTeclado(contenedor, callback) {
   contenedor.innerHTML = "";
 
@@ -66,3 +67,4 @@ export function mostrarTecladoInactivo(contenedor) {
     contenedor.appendChild(boton);
   });
 }
+//si se ingresa ua lera por teclado fisico, se deshabilita el boton correspondiente en el teclado virtual.

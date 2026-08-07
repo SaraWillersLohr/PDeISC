@@ -123,7 +123,7 @@ document
     cerrarModal("modalInstrucciones");
   });
 
-// ── inicio ──
+// inicio 
 // carga el ranking, activa el botón de subir, muestra el teclado inactivo
 // y abre las instrucciones si corresponde.
 cargarRanking();
@@ -139,7 +139,7 @@ function formatTiempo(segundos) {
   return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 }
 
-// ── cronómetro ──
+//  cronómetro 
 // inicia el contador de la partida y actualiza el tiempo cada segundo.
 function iniciarCronometro() {
   detenerCronometro();
@@ -311,7 +311,8 @@ document.querySelectorAll(".btn-especialidad").forEach((boton) => {
   });
 });
 
-// ── teclado físico ──
+// teclado físico
+// escucha las teclas presionadas y llama a la función de procesar letra.
 window.addEventListener("keydown", (e) => {
   if (!juegoActivo) return;
   if (document.querySelector(".modal-overlay:not([hidden])")) return;

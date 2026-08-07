@@ -1,0 +1,15 @@
+/* estilos del modo claro */
+
+.tema-claro {
+  --color-fondo: #ffffff;
+  --color-secundario: #ffd5c2;
+  --color-principal: #588b8b;
+  --color-boton: #f28f3b;
+  --color-boton-limpiar: #c8553d;
+  --color-texto: #2f2f2f;
+  --color-tarjeta: #f9f9f9;
+  --color-borde: #e0e0e0;
+  --color-sombra: rgba(0, 0, 0, 0.08);
+  --color-placeholder: #9a9a9a;
+  --color-input-fondo: #ffffff;
+}

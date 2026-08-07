@@ -1,0 +1,303 @@
+/*
+  holaMundo.css
+  uso variables css de index.css y clases con prefijo "hm-" para no pisar estilos globales.
+*/
+
+/* tarjeta contenedora */
+.hm-tarjeta {
+  position: relative;
+  width: min(100%, 520px);
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--sombra-tarjeta, var(--card-shadow));
+  background: var(--surface);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    background 0.45s ease,
+    border-color 0.45s ease;
+}
+
+.hm-tarjeta:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* escena de fondo — cielo nocturno por defecto (modo oscuro) */
+.hm-escena {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: radial-gradient(ellipse at 50% 0%, #1a2a4a 0%, #07101f 70%);
+  overflow: hidden;
+  transition: background 0.45s ease;
+}
+
+/* modo claro: cielo diurno */
+body.light .hm-escena {
+  background: radial-gradient(ellipse at 50% 0%, #bfe9ff 0%, #7cc4f5 40%, #4fa0de 100%);
+}
+
+/* estrellas — ocultas por defecto, visibles en modo oscuro */
+.hm-estrella {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  animation: hm-parpadeo 3s infinite ease-in-out;
+  transition: opacity 0.45s ease;
+}
+
+body.dark .hm-estrella,
+body:not(.light) .hm-estrella {
+  opacity: 1;
+}
+
+/* posición y tamaño individual de cada estrella */
+.hm-estrella--1 { width: 2px; height: 2px; top: 14%; left: 12%; animation-delay: 0s;    }
+.hm-estrella--2 { width: 3px; height: 3px; top: 22%; left: 30%; animation-delay: 0.6s;  }
+.hm-estrella--3 { width: 2px; height: 2px; top: 10%; left: 55%; animation-delay: 1.2s;  }
+.hm-estrella--4 { width: 2px; height: 2px; top: 30%; left: 72%; animation-delay: 0.3s;  }
+.hm-estrella--5 { width: 3px; height: 3px; top: 18%; left: 85%; animation-delay: 0.9s;  }
+.hm-estrella--6 { width: 2px; height: 2px; top: 38%; left: 20%; animation-delay: 1.5s;  }
+.hm-estrella--7 { width: 2px; height: 2px; top:  8%; left: 45%; animation-delay: 0.45s; }
+.hm-estrella--8 { width: 3px; height: 3px; top: 35%; left: 60%; animation-delay: 1.8s;  }
+
+@keyframes hm-parpadeo {
+  0%,  100% { opacity: 0.9; transform: scale(1);   }
+  50%        { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* sol — oculto por defecto, visible en modo claro */
+.hm-sol {
+  position: absolute;
+  top: -32px;
+  right: 18%;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ffe97a 0%, #ffc832 55%, #ff9f00 100%);
+  box-shadow:
+    0 0 30px 10px rgba(255, 200, 50, 0.45),
+    0 0 80px 30px rgba(255, 160, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  animation: hm-brillo-sol 4s infinite ease-in-out;
+}
+
+body.light .hm-sol {
+  opacity: 1;
+}
+
+@keyframes hm-brillo-sol {
+  0%,  100% { box-shadow: 0 0 30px 10px rgba(255, 200, 50, 0.45), 0 0 80px  30px rgba(255, 160, 0, 0.20); }
+  50%        { box-shadow: 0 0 40px 18px rgba(255, 200, 50, 0.55), 0 0 100px 40px rgba(255, 160, 0, 0.28); }
+}
+
+/* planeta tierra */
+.hm-tierra {
+  position: absolute;
+  bottom: -55px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  /* modo oscuro: tierra nocturna */
+  background: radial-gradient(circle at 38% 35%, #1e3a5f 0%, #0d2137 55%, #060e1c 100%);
+  box-shadow:
+    inset -12px -10px 22px rgba(0, 0, 0, 0.6),
+    0 0 28px rgba(100, 160, 255, 0.18);
+
+  animation: hm-flotar 6s ease-in-out infinite;
+  transition: background 0.45s ease, box-shadow 0.45s ease;
+}
+
+/* modo claro: tierra iluminada */
+body.light .hm-tierra {
+  background: radial-gradient(circle at 38% 35%, #5bb8f7 0%, #2980d6 40%, #1460a8 100%);
+  box-shadow:
+    inset -12px -10px 22px rgba(0, 50, 100, 0.3),
+    0 0 28px rgba(60, 140, 240, 0.3);
+}
+
+@keyframes hm-flotar {
+  0%,  100% { transform: translateX(-50%) translateY(0);    }
+  50%        { transform: translateX(-50%) translateY(-6px); }
+}
+
+/* continentes — masas terrestres simuladas con border-radius asimétrico */
+.hm-tierra__continente {
+  position: absolute;
+  border-radius: 40% 60% 50% 55% / 50% 45% 60% 40%;
+
+  /* modo oscuro: verde apagado */
+  background: rgba(20, 60, 40, 0.7);
+  transition: background 0.45s ease;
+}
+
+body.light .hm-tierra__continente {
+  background: rgba(40, 140, 60, 0.75);
+}
+
+.hm-tierra__continente--1 {
+  width: 52px;
+  height: 38px;
+  top: 28%;
+  left: 22%;
+  transform: rotate(-15deg);
+}
+
+.hm-tierra__continente--2 {
+  width: 36px;
+  height: 50px;
+  top: 20%;
+  left: 52%;
+  transform: rotate(20deg);
+  border-radius: 50% 40% 60% 45% / 45% 60% 40% 55%;
+}
+
+.hm-tierra__continente--3 {
+  width: 44px;
+  height: 28px;
+  top: 55%;
+  left: 30%;
+  transform: rotate(10deg);
+}
+
+/* reflejo especular sobre la tierra */
+.hm-tierra__reflejo {
+  position: absolute;
+  top: 10%;
+  left: 18%;
+  width: 30px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(-30deg);
+  filter: blur(4px);
+}
+
+/* contenido: badge, título y descripción */
+.hm-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.8rem 2.4rem 2.6rem;
+  gap: 0;
+}
+
+/* badge del stack tecnológico */
+.hm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+  border: 1px solid var(--border);
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease;
+}
+
+/* punto animado antes del texto del badge */
+.hm-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: hm-latido 2s ease-in-out infinite;
+}
+
+@keyframes hm-latido {
+  0%,  100% { transform: scale(1);   opacity: 1;   }
+  50%        { transform: scale(1.5); opacity: 0.6; }
+}
+
+/* título principal con gradiente */
+.hm-titulo {
+  margin: 0;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  background: var(--title-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: background 0.45s ease;
+}
+
+/* descripción secundaria */
+.hm-descripcion {
+  margin-top: 1.2rem;
+  color: var(--text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.7;
+  max-width: 36ch;
+  transition: color 0.35s ease;
+}
+
+/* línea divisora entre la escena y el contenido */
+.hm-tarjeta::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 200px; /* misma altura que .hm-escena */
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  pointer-events: none;
+}
+
+/* responsive — móviles */
+@media (max-width: 480px) {
+  .hm-escena {
+    height: 160px;
+  }
+
+  .hm-tierra {
+    width: 120px;
+    height: 120px;
+    bottom: -40px;
+  }
+
+  .hm-contenido {
+    padding: 2.2rem 1.6rem 2rem;
+  }
+
+  .hm-badge {
+    font-size: 0.72rem;
+    padding: 0.4rem 0.85rem;
+  }
+
+  .hm-titulo {
+    font-size: clamp(2.2rem, 8vw, 3rem);
+  }
+
+  .hm-descripcion {
+    font-size: 0.9rem;
+  }
+
+  /* ajusto el divisor al nuevo alto de la escena */
+  .hm-tarjeta::after {
+    top: 160px;
+  }
+}

@@ -1,0 +1,79 @@
+/* contenedor raíz de la aplicación */
+.app {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background-color: var(--color-fondo);
+  transition: background-color var(--transicion);
+}
+
+/* barra superior: título a la izquierda, toggle a la derecha */
+.app__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid var(--color-borde);
+  transition: border-color var(--transicion);
+}
+
+/* grupo izquierdo: ícono + textos */
+.app__header-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* cuadrado con ícono de perfil */
+.app__header-icono {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: var(--color-primario);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* título principal del header */
+.app__header-nombre {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-weight: 700;
+  color: var(--color-titulo);
+  margin: 0;
+  line-height: 1.2;
+  transition: color var(--transicion);
+}
+
+/* subtítulo del header */
+.app__header-subtitulo {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.72rem, 1.5vw, 0.8rem);
+  font-weight: 400;
+  color: var(--color-texto);
+  margin: 0;
+  line-height: 1.2;
+  transition: color var(--transicion);
+}
+
+/* zona central donde se muestra la tarjeta */
+.app__main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
+  overflow: visible;
+}
+
+/* responsive: en celular el header se ajusta */
+@media (max-width: 480px) {
+  .app__header-nombre {
+    font-size: 0.85rem;
+  }
+  .app__header-subtitulo {
+    font-size: 0.7rem;
+  }
+}

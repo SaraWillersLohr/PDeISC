@@ -1,0 +1,405 @@
+/* importa las fuentes: Playfair Display para títulos, Inter para el cuerpo */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap");
+
+/* reset general */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* cuerpo de la aplicación */
+
+body {
+    font-family: "Inter", sans-serif;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* contenedor principal */
+
+.app {
+    min-height: 100vh;
+    padding: 32px 40px;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* encabezado */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid transparent;
+}
+
+/* título del encabezado */
+
+.header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: "Playfair Display", serif;
+    letter-spacing: -0.3px;
+}
+
+/* subtítulo del encabezado */
+
+.header p {
+    margin-top: 4px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+/* botón del tema */
+
+.theme-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    flex-shrink: 0;
+}
+
+.theme-button:hover {
+    transform: scale(1.08);
+}
+
+/* contenido principal */
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* tarjeta del contador */
+
+.counter-card {
+    width: min(100%, 1000px);
+    padding: 56px 48px;
+    border-radius: 32px;
+    border: 1px solid transparent;
+    text-align: center;
+    transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* detalle decorativo superior izquierdo */
+
+.counter-card::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* detalle decorativo inferior derecho */
+
+.counter-card::after {
+    content: "";
+    position: absolute;
+    bottom: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* título de la tarjeta */
+
+.counter-card h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: "Playfair Display", serif;
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
+}
+
+/* descripción de la tarjeta */
+
+.counter-card > p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    opacity: 0.65;
+}
+
+/* círculo del número */
+
+.contador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    border: 2px solid #6366f1;
+    margin: 40px auto;
+    font-size: 4.5rem;
+    font-weight: 700;
+    transition: border-color 0.3s;
+    position: relative;
+    z-index: 1;
+}
+
+/* grupo de botones */
+
+.botones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+/* grupo de cada botón (icono + etiqueta) */
+
+.boton-grupo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* etiqueta debajo de cada botón */
+
+.boton-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+/* botón circular pequeño (restar y sumar) */
+
+.btn-circular {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    font-size: 1.2rem;
+}
+
+.btn-circular:hover {
+    transform: scale(1.08);
+}
+
+.btn-circular:active {
+    transform: scale(0.95);
+}
+
+.btn-circular:focus {
+    outline: none;
+}
+
+.btn-circular:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* botón central destacado (reiniciar) */
+
+.btn-reiniciar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    font-family: "Inter", sans-serif;
+}
+
+.btn-reiniciar:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+}
+
+.btn-reiniciar:active {
+    transform: translateY(0);
+}
+
+.btn-reiniciar:focus {
+    outline: none;
+}
+
+/* tarjeta del mensaje de mínimo */
+
+.mensaje-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 32px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================
+   RESPONSIVE MÓVIL
+   ===================== */
+
+@media (max-width: 768px) {
+
+    /* padding reducido, el contenido se expande a toda la pantalla */
+
+    .app {
+        padding: 24px 20px;
+        min-height: 100vh;
+    }
+
+    /* header en fila horizontal, sin apilar */
+
+    .header {
+        flex-direction: row;
+        margin-bottom: 36px;
+        padding-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.3rem;
+    }
+
+    .header p {
+        font-size: 0.8rem;
+    }
+
+    /* la tarjeta mantiene bordes redondeados y margen lateral en móvil */
+
+    .counter-card {
+        width: 100%;
+        padding: 36px 24px 40px;
+        border-radius: 32px;
+        box-shadow: none;
+    }
+
+    /* título más prominente */
+
+    .counter-card h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .counter-card > p {
+        font-size: 1rem;
+    }
+
+    /* círculo grande que aprovecha el ancho de pantalla */
+
+    .contador {
+        width: min(75vw, 260px);
+        height: min(75vw, 260px);
+        font-size: min(18vw, 5rem);
+        margin: 48px auto;
+        border-width: 3px;
+    }
+
+    /* botones siempre en fila, sin hacer wrap */
+
+    .botones {
+        gap: 32px;
+        flex-wrap: nowrap;
+        margin-top: 8px;
+    }
+
+    .btn-circular {
+        width: 64px;
+        height: 64px;
+    }
+
+    /* botón reiniciar se vuelve circular en móvil, solo ícono */
+
+    .btn-reiniciar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        padding: 0;
+        font-size: 0;
+        gap: 0;
+    }
+
+    .boton-label {
+        font-size: 0.82rem;
+    }
+
+    /* mensaje con más espacio vertical */
+
+    .mensaje-card {
+        margin-top: 40px;
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-size: 0.95rem;
+    }
+
+}
+
+/* pantallas muy pequeñas */
+
+@media (max-width: 400px) {
+
+    .app {
+        padding: 20px 16px;
+    }
+
+    .header h1 {
+        font-size: 1.1rem;
+    }
+
+    .contador {
+        width: 72vw;
+        height: 72vw;
+        font-size: 17vw;
+        margin: 40px auto;
+    }
+
+    .botones {
+        gap: 24px;
+    }
+
+    .btn-circular {
+        width: 56px;
+        height: 56px;
+    }
+
+    .btn-reiniciar {
+        width: 56px;
+        height: 56px;
+    }
+
+}

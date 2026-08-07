@@ -11,10 +11,20 @@ function App() {
   }, [darkMode]);
 
   return (
-    <main className="app-shell">
-      <CambioTema darkMode={darkMode} setDarkMode={setDarkMode} />
-      <HolaMundo />
-    </main>
+    <div className="app-shell">
+      {/* encabezado con el nombre del ejercicio y el botón de tema */}
+      <header className="header">
+        <div>
+          <h1>Hola Mundo</h1>
+          <p>Ejercicio 1 — React + TypeScript</p>
+        </div>
+        <CambioTema darkMode={darkMode} setDarkMode={setDarkMode} />
+      </header>
+
+      <main className="main-content">
+        <HolaMundo />
+      </main>
+    </div>
   );
 }
 

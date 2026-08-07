@@ -1,21 +1,13 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-
-// define qué información va a tener el contexto
-interface ThemeContextType {
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-}
-
-// crea el contexto con un valor por defecto vacío
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+import { ThemeContext } from './themeContextObject';
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
 // provee el tema a toda la aplicación
-export function ThemeProvider({ children }: ThemeProviderProps) {
+export default function ThemeProvider({ children }: ThemeProviderProps) {
   // lee el tema guardado en localStorage, o usa 'light' por defecto
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('tateti-theme');
@@ -38,13 +30,4 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       {children}
     </ThemeContext.Provider>
   );
-}
-
-// hook para usar el contexto en cualquier componente
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme debe usarse dentro de ThemeProvider');
-  }
-  return context;
 }

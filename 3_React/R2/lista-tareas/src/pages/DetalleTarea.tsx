@@ -36,49 +36,50 @@ export const DetalleTarea = ({ tareas, eliminarTarea, cambiarEstadoTarea }: Deta
   };
 
   return (
-    <div className="container pb-5">
+    <div className="container-fluid pt-4 pt-md-5 mt-md-4 pb-5">
       <div className="row justify-content-center">
-        <div className="col-12 col-md-8 col-lg-6">
-          <div className="card border-0 shadow-lg detail-card p-4">
-            <div className="d-flex justify-content-end mb-3">
+        <div className="col-12 col-md-10 col-lg-8 col-xl-7">
+          <div className="card border-0 shadow-lg detail-card p-4 p-md-5">
+            {/* Botón de cierre X */}
+            <div className="d-flex justify-content-end mb-2">
               <Link to="/" className="text-decoration-none close-btn" title="Volver al inicio">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
-                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16">
+                  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
                 </svg>
               </Link>
             </div>
             
-            <h1 className="fw-bold mb-3">{tarea.titulo}</h1>
-            <p className="lead text-muted mb-4">{tarea.descripcion}</p>
+            <h1 className="fw-bold mb-2 fs-2">{tarea.titulo}</h1>
+            <p className="lead text-muted mb-4 fs-6">{tarea.descripcion}</p>
             
             <hr className="text-muted opacity-25 mb-4" />
             
-            <p className="mb-3">
-              <span className="text-muted">Fecha de Creación: </span> 
-              <span className="fw-medium">{tarea.fechaCreacion}</span>
-            </p>
+            <div className="mb-4">
+              <span className="text-muted small">Fecha de Creación: </span> 
+              <span className="fw-medium small ms-1">{tarea.fechaCreacion}</span>
+            </div>
             
             <div className="d-flex align-items-center mb-5">
-              <span className="me-3 fw-medium">Estado:</span>
+              <span className="text-muted small me-3">Estado:</span>
               {tarea.completa ? (
-                <span className="badge bg-success px-3 py-2 fw-normal fs-6">Completa</span>
+                <span className="badge bg-success px-3 py-2 fw-normal">Completa</span>
               ) : (
-                <span className="badge app-badge-purple px-3 py-2 fw-normal fs-6">Incompleta</span>
+                <span className="badge app-badge-purple px-3 py-2 fw-normal text-dark">Incompleta</span>
               )}
             </div>
 
             {/* botones de acción principal */}
             {!mostrandoConfirmacion && (
-              <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center mt-4">
+              <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
                 <button 
                   onClick={() => cambiarEstadoTarea(tarea.id)} 
-                  className="btn btn-primary px-4 py-2 rounded-pill flex-grow-1"
+                  className="btn btn-primary px-4 py-2 rounded-pill flex-grow-1 fw-semibold"
                 >
                   {tarea.completa ? 'Marcar como incompleta' : 'Marcar como completa'}
                 </button>
                 <button 
                   onClick={() => setMostrandoConfirmacion(true)} 
-                  className="btn btn-outline-danger px-4 py-2 rounded-pill flex-grow-1"
+                  className="btn btn-outline-danger px-4 py-2 rounded-pill flex-grow-1 fw-semibold"
                 >
                   Eliminar tarea
                 </button>
@@ -88,8 +89,8 @@ export const DetalleTarea = ({ tareas, eliminarTarea, cambiarEstadoTarea }: Deta
             {/* confirmación visual de eliminación */}
             {mostrandoConfirmacion && (
               <div className="alert alert-danger mt-4 text-center border-0 rounded-4 shadow-sm" role="alert">
-                <h5 className="alert-heading mb-3 text-danger">¿Querés eliminar esta tarea?</h5>
-                <p className="small mb-4 text-danger opacity-75">Esta acción no se puede deshacer.</p>
+                <h5 className="alert-heading mb-2 text-danger fw-bold">¿Querés eliminar esta tarea?</h5>
+                <p className="small mb-3 text-danger opacity-75">Esta acción no se puede deshacer.</p>
                 <div className="d-flex justify-content-center gap-3">
                   <button 
                     onClick={() => setMostrandoConfirmacion(false)} 

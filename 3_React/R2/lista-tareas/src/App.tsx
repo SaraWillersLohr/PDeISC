@@ -45,7 +45,7 @@ function App() {
       <BrowserRouter>
         <div className="app-container min-vh-100">
           <Navbar />
-          <main className="app-content">
+          <main id="main-content" className="app-content">
             <Routes>
             {/* inicio */}
               <Route path="/" element={<Inicio tareas={tareas} cambiarEstadoTarea={cambiarEstadoTarea} />} />

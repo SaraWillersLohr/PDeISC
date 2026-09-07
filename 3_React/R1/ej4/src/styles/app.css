@@ -1,8 +1,8 @@
 /* estilos principales de la app */
 
 /* importa los temas */
-@import './light.css';
-@import './dark.css';
+@import "./light.css";
+@import "./dark.css";
 
 /* reset y base */
 * {
@@ -12,10 +12,12 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--color-fondo);
   color: var(--color-texto);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
   min-height: 100vh;
 }
 
@@ -27,7 +29,7 @@ body {
   padding: 0 24px 40px 24px;
 }
 
-/* ========== HEADER ========== */
+/*header*/
 .header {
   display: flex;
   justify-content: space-between;
@@ -72,7 +74,7 @@ body {
   background-color: var(--color-borde);
 }
 
-/* ========== FORMULARIO ========== */
+/* formulario */
 .task-form {
   margin-bottom: 24px;
 }
@@ -91,7 +93,9 @@ body {
   font-size: 16px;
   background-color: var(--color-tarjeta);
   color: var(--color-texto);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   outline: none;
 }
 
@@ -117,7 +121,9 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
   white-space: nowrap;
 }
 
@@ -139,7 +145,7 @@ body {
   padding-left: 4px;
 }
 
-/* ========== PESTAÑAS ========== */
+/* pestañas */
 .tabs {
   display: flex;
   gap: 8px;
@@ -168,7 +174,7 @@ body {
   color: var(--color-tab-activa-texto);
 }
 
-/* ========== LISTA DE TAREAS ========== */
+/* lista de tareas */
 .task-list {
   list-style: none;
   display: flex;
@@ -185,7 +191,10 @@ body {
   background-color: var(--color-tarjeta);
   border-radius: 12px;
   box-shadow: 0 2px 8px var(--color-sombra);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.3s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.3s ease;
 }
 
 .task-item:hover {
@@ -245,7 +254,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
   flex-shrink: 0;
 }
 
@@ -254,7 +265,7 @@ body {
   transform: scale(1.1);
 }
 
-/* ========== LISTA VACÍA ========== */
+/* lista vacía */
 .lista-vacia {
   display: flex;
   flex-direction: column;
@@ -269,7 +280,7 @@ body {
   font-size: 17px;
 }
 
-/* ========== FOOTER ========== */
+/* footer */
 .footer {
   display: flex;
   justify-content: center;
@@ -296,7 +307,7 @@ body {
   font-weight: 700;
 }
 
-/* ========== BOTÓN VOLVER ARRIBA ========== */
+/* boton suur arriba */
 .btn-volver-arriba {
   position: fixed;
   bottom: 32px;
@@ -312,7 +323,9 @@ body {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 12px var(--color-sombra-hover);
-  transition: transform 0.2s ease, opacity 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.3s ease;
   opacity: 1;
   z-index: 100;
 }
@@ -321,7 +334,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* ========== RESPONSIVE ========== */
+/* media qury responsivo*/
 @media (max-width: 600px) {
   .header {
     flex-direction: column;

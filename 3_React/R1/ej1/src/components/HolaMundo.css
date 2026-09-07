@@ -23,7 +23,7 @@
   box-shadow: var(--card-shadow-hover);
 }
 
-/* escena de fondo — cielo nocturno en modo oscuro */
+/* fondo — noche en modo oscuro */
 .hm-escena {
   position: relative;
   width: 100%;
@@ -33,12 +33,12 @@
   transition: background 0.4s ease;
 }
 
-/* modo claro: cielo diurno */
+/* modo claro: dia */
 body.light .hm-escena {
   background: linear-gradient(180deg, #7cc4f5 0%, #bfe9ff 100%);
 }
 
-/* estrellas — tres puntos blancos simples, ocultos en modo claro */
+/* estrellas — tres puntos blancos */
 .hm-estrella {
   position: absolute;
   width: 3px;
@@ -53,11 +53,20 @@ body.light .hm-estrella {
   opacity: 0;
 }
 
-.hm-estrella--1 { top: 20%; left: 15%; }
-.hm-estrella--2 { top: 35%; left: 55%; }
-.hm-estrella--3 { top: 15%; left: 78%; }
+.hm-estrella--1 {
+  top: 20%;
+  left: 15%;
+}
+.hm-estrella--2 {
+  top: 35%;
+  left: 55%;
+}
+.hm-estrella--3 {
+  top: 15%;
+  left: 78%;
+}
 
-/* sol — círculo naranja, oculto en modo oscuro */
+/* sol — círculo naranja*/
 .hm-sol {
   position: absolute;
   top: 20px;
@@ -70,12 +79,12 @@ body.light .hm-estrella {
   opacity: 0;
   transition: opacity 0.4s ease;
 }
-
+/*hm es un prefijo para evitar conflictos con otros estilos globales.*/
 body.light .hm-sol {
   opacity: 1;
 }
 
-/* planeta tierra — círculo azul centrado en la parte inferior */
+/* planeta  */
 .hm-tierra {
   position: absolute;
   bottom: -50px;
@@ -95,10 +104,15 @@ body.light .hm-tierra {
   box-shadow: inset -8px -8px 16px rgba(0, 50, 100, 0.25);
 }
 
-/* animación simple de flotación */
+/* flotación */
 @keyframes hm-flotar {
-  0%,  100% { transform: translateX(-50%) translateY(0);    }
-  50%        { transform: translateX(-50%) translateY(-6px); }
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-6px);
+  }
 }
 
 /* continentes — dos manchas verdes sobre el planeta */
@@ -127,7 +141,6 @@ body.light .hm-tierra__continente {
   left: 55%;
 }
 
-/* línea divisora entre la escena y el contenido */
 .hm-divisor {
   width: 100%;
   height: 1px;
@@ -171,7 +184,7 @@ body.light .hm-tierra__continente {
   transition: color 0.4s ease;
 }
 
-/* responsive — pantallas pequeñas */
+/* responsive */
 @media (max-width: 480px) {
   .hm-escena {
     height: 160px;

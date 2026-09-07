@@ -1,44 +1,83 @@
-/* Importa todas las variables de color del proyecto */
-@import './styles/variables.css';
+/* variable globales: modo claro (default) */
+:root {
+  --background: #f0eef5;
+  --card-background: #ffffff;
+  --text-color: #6b6375;
+  --text-heading: #08060d;
+  --primary-color: #aa3bff;
+  --primary-soft: rgba(170, 59, 255, 0.1);
+  --primary-border: rgba(170, 59, 255, 0.4);
+  --border-color: #e5e4e7;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.06);
+  --radius-card: 24px;
+  --transition: 0.35s ease;
 
-/* Reset básico */
-*, *::before, *::after {
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.55;
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text-color);
+  background-color: var(--background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+}
+
+/* mdo oscuro */
+:root[data-theme="dark"] {
+  --background: #0f1017;
+  --card-background: #1a1b24;
+  --text-color: #9ca3af;
+  --text-heading: #f3f4f6;
+  --primary-color: #c084fc;
+  --primary-soft: rgba(192, 132, 252, 0.12);
+  --primary-border: rgba(192, 132, 252, 0.4);
+  --border-color: #2e303a;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55), 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* reset */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: var(--fuente-sans);
-  font-size: 18px;
-  line-height: 1.55;
-  letter-spacing: 0.18px;
-  color: var(--color-texto);
-  background-color: var(--color-fondo);
-  transition: background-color var(--transicion), color var(--transicion);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  background-color: var(--background);
+  transition:
+    background-color var(--transition),
+    color var(--transition);
 }
 
-/* El contenedor raíz ocupa toda la pantalla en columna */
-#root {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-}
-
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin: 0;
-  color: var(--color-titulo);
+  color: var(--text-heading);
   font-weight: 600;
-  transition: color var(--transicion);
 }
 
 p {
   margin: 0;
 }
 
-@media (max-width: 768px) {
-  body {
-    font-size: 16px;
-  }
+/* root */
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
 }

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import HolaMundo from "./components/HolaMundo";
 import CambioTema from "./components/CambioTema";
-
+//useEffect es un hook que permite ejecutar una función cuando el componente se monta o se actualiza.
+// useState es un hook que permite crear un estado local en el componente.
+//un hook es una función que permite usar el estado y otras características de React en componentes funcionales.
 function App() {
   const [darkMode, setDarkMode] = useState(true);
 

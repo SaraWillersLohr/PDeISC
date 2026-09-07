@@ -1,10 +1,11 @@
 /* contenedor raíz de la aplicación */
 .app {
-  min-height: 100svh;
+  height: 100svh;
   display: grid;
   grid-template-rows: auto 1fr;
-  background-color: var(--color-fondo);
-  transition: background-color var(--transicion);
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 20%, var(--color-primario-suave), transparent 38%), var(--color-fondo);
+  transition: background var(--transicion);
 }
 
 /* barra superior: título a la izquierda, toggle a la derecha */
@@ -12,8 +13,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem);
   border-bottom: 1px solid var(--color-borde);
+  background: color-mix(in srgb, var(--color-fondo) 88%, transparent);
   transition: border-color var(--transicion);
 }
 
@@ -39,7 +42,7 @@
 
 /* título principal del header */
 .app__header-nombre {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--fuente-sans);
   font-size: clamp(0.9rem, 2vw, 1rem);
   font-weight: 700;
   color: var(--color-titulo);
@@ -50,7 +53,7 @@
 
 /* subtítulo del header */
 .app__header-subtitulo {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--fuente-sans);
   font-size: clamp(0.72rem, 1.5vw, 0.8rem);
   font-weight: 400;
   color: var(--color-texto);
@@ -64,15 +67,31 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
-  overflow: visible;
+  min-height: 0;
+  padding: clamp(0.75rem, 2.5vh, 1.5rem) clamp(1rem, 4vw, 2rem);
+  overflow: hidden;
 }
 
 /* responsive: en celular el header se ajusta */
 @media (max-width: 480px) {
+  .app__header {
+    align-items: flex-start;
+  }
+
+  .app__header-titulo {
+    min-width: 0;
+    gap: 0.55rem;
+  }
+
+  .app__header-icono {
+    width: 36px;
+    height: 36px;
+  }
+
   .app__header-nombre {
     font-size: 0.85rem;
   }
+
   .app__header-subtitulo {
     font-size: 0.7rem;
   }

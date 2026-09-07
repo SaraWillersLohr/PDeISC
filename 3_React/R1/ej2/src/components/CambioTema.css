@@ -1,51 +1,47 @@
-/* Botón contenedor, sin estilos propios de botón */
+/* Botón simple: muestra el icono del tema activo. */
 .tema-btn {
   appearance: none;
-  border: none;
-  background: none;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   cursor: pointer;
-  display: inline-flex;
+  display: grid;
+  place-items: center;
   align-items: center;
-}
-
-/* Pista del toggle */
-.tema-btn__track {
-  display: flex;
-  align-items: center;
-  width: 52px;
-  height: 28px;
   border-radius: 999px;
+  border: 1px solid var(--color-primario-borde);
   background: var(--color-primario-suave);
-  border: 1.5px solid var(--color-primario-borde);
-  padding: 3px;
-  transition: background var(--transicion), border-color var(--transicion);
+  color: #7e22ce;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition:
+    background var(--transicion),
+    border-color var(--transicion),
+    color var(--transicion),
+    transform var(--transicion),
+    box-shadow var(--transicion);
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Círculo deslizante con el ícono */
-.tema-btn__thumb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+[data-theme="dark"] .tema-btn {
+  color: #e9d5ff;
+}
+
+.tema-btn:hover {
+  border-color: var(--color-primario);
   background: var(--color-primario);
   color: #fff;
-  transform: translateX(0);
-  transition: transform var(--transicion), background var(--transicion);
+  box-shadow: 0 5px 14px var(--color-primario-suave);
+  transform: translateY(-1px);
 }
 
-/* Desplaza el thumb al modo oscuro */
-[data-theme="dark"] .tema-btn__thumb {
-  transform: translateX(22px);
-}
-
-.tema-btn:hover .tema-btn__track {
-  border-color: var(--color-primario);
-}
-
-.tema-btn:focus-visible .tema-btn__track {
+.tema-btn:focus-visible {
   outline: 2px solid var(--color-primario);
   outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tema-btn {
+    transition: none;
+  }
 }

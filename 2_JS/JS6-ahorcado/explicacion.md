@@ -84,9 +84,9 @@ usé mysql para guardar los scores de los jugadores. la base de datos se llama `
 
 | campo | tipo | descripción |
 |-------|------|-------------|
-| id | int auto_increment | identificador único |
-| nombre | varchar(100) | nombre del jugador |
-| tiempo | int | tiempo en segundos |
+| id    | int auto_increment | identificador único |
+| nombre| varchar(100) | nombre del jugador |
+| tiempo| int | tiempo en segundos |
 | puntos | int | puntos obtenidos |
 | fecha | datetime | fecha y hora del registro |
 | especialidad | varchar(50) | especialidad jugada |

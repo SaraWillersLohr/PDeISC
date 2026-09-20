@@ -1,0 +1,12 @@
+.page {
+  padding: 2rem;
+}
+
+.page h1 {
+  font-size: 1.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.page p {
+  color: var(--color-text-muted);
+}

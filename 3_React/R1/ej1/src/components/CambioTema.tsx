@@ -1,6 +1,7 @@
 //componente de cambio de tema
 import { FaMoon, FaSun } from "react-icons/fa";
 import type { Dispatch, SetStateAction } from "react";
+
 //props es un objeto que contiene dos propiedades: darkMode y setDarkMode. darkMode es un booleano que indica si el modo oscuro está activado o no, y setDarkMode es una función que permite cambiar el estado de darkMode.
 type CambioTemaProps = {
   darkMode: boolean;

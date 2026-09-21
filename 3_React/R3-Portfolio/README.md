@@ -19,6 +19,12 @@ portfolio de una sola página, orientado a desarrollo web y fotografía. la land
 
 la contraseña inicial del panel es `cambiar-esta-clave-2026`. el usuario creado por la migración debe cambiarla al primer acceso. no se almacena en texto plano: la migración inserta su hash bcrypt. antes de desplegar, reemplazar `jwt_secret` y `admin_secret` por valores largos y únicos.
 
+## despliegue
+
+este proyecto necesita dos despliegues: el frontend puede ir a vercel con `frontend` como root directory, y el backend debe estar disponible públicamente en un servicio node.js con acceso a mariadb. en vercel configurar solo `VITE_API_URL=https://url-del-backend` (sin barra final). no colocar claves de base de datos ni secretos con prefijo `VITE_`.
+
+en el backend configurar `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `ADMIN_SECRET`, `JWT_SECRET` y `CLIENT_URL=https://tu-proyecto.vercel.app`. los uploads locales no son persistentes en plataformas serverless; para producción se recomienda un servicio de storage de imágenes.
+
 ## estructura
 
 ```text

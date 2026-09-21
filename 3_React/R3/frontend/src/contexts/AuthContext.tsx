@@ -25,8 +25,9 @@ interface AuthContextValue {
   /** modo useState: controla si mostramos login sin cambiar url */
   showStateLogin: boolean;
   setShowStateLogin: (show: boolean) => void;
-  login: (data: LoginFormData, mode: LoginMode) => Promise<void>;
+  login: (data: LoginFormData, mode: LoginMode) => Promise<Usuario>;
   logout: () => void;
+  updateUsuario: (usuario: Usuario) => void;
   isLoading: boolean;
 }
 
@@ -89,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUsuario(userData);
         setLoginMode(mode);
         persistSession(session);
+        return userData;
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       } finally {
@@ -103,6 +105,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setShowStateLogin(false);
   }, [clearSession]);
 
+  /** actualizo los datos del usuario en memoria y almacenamiento persistente */
+  const updateUsuario = useCallback(
+    (nuevoUsuario: Usuario) => {
+      setUsuario(nuevoUsuario);
+      const stored = getSessionStorage<AuthSession>(STORAGE_KEYS.SESSION);
+      if (stored) {
+        persistSession({
+          ...stored.data,
+          usuario: nuevoUsuario,
+        });
+      }
+    },
+    [persistSession],
+  );
+
   const value = useMemo(
     () => ({
       usuario,
@@ -112,9 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setShowStateLogin,
       login,
       logout,
+      updateUsuario,
       isLoading,
     }),
-    [usuario, loginMode, showStateLogin, login, logout, isLoading],
+    [usuario, loginMode, showStateLogin, login, logout, updateUsuario, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

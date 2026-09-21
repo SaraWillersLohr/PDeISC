@@ -37,3 +37,16 @@ export async function getMeApi(): Promise<Usuario> {
 
   return data.data;
 }
+
+/** actualiza la contraseña inicial del usuario para remover la contraseña predeterminada */
+export async function cambiarPasswordInicialApi(password: string): Promise<Usuario> {
+  const { data } = await axiosInstance.post<ApiResponse<Usuario>>('/auth/cambiar-password-inicial', {
+    password,
+  });
+
+  if (!data.success) {
+    throw new Error(data.message);
+  }
+
+  return data.data;
+}

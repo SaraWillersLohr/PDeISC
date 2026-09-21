@@ -5,12 +5,15 @@ import { LoginForm } from './LoginForm';
 import { AuthLayout } from '@/components/layouts/AuthLayout';
 import styles from './LoginPages.module.css';
 
+import type { Usuario } from '@/types';
+
 /** login opción B — ruta formal /login con react router */
 export function LoginRouterPage() {
   const navigate = useNavigate();
 
-  const handleSuccess = () => {
-    navigate('/dashboard', { replace: true });
+  const handleSuccess = (user?: Usuario) => {
+    const dest = user?.rol === 'peon' ? '/peon' : user?.rol === 'veterinario' ? '/veterinario' : '/dashboard';
+    navigate(dest, { replace: true });
   };
 
   return (

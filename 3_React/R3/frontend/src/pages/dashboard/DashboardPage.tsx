@@ -11,6 +11,7 @@ import { MetricCard } from '@/components/molecules/MetricCard';
 import { FieldSummaryChart } from '@/components/molecules/FieldSummaryChart';
 import { QuickActionCard } from '@/components/molecules/QuickActionCard';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle';
+import { NotificationModal } from '@/components/molecules/NotificationModal';
 import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
@@ -19,6 +20,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   // cargo métricas al montar con useEffect
   useEffect(() => {
@@ -43,7 +45,12 @@ export function DashboardPage() {
           <span className={styles.badge}>login: {loginMode === 'router' ? 'React Router' : 'useState'}</span>
         </div>
         <div className={styles.headerActions}>
-          <button type="button" className={styles.bell} aria-label="notificaciones">
+          <button
+            type="button"
+            className={styles.bell}
+            onClick={() => setNotifOpen(true)}
+            aria-label="notificaciones"
+          >
             <Bell size={20} />
             {data.alertasActivas > 0 && <span>{data.alertasActivas}</span>}
           </button>
@@ -85,8 +92,11 @@ export function DashboardPage() {
         <QuickActionCard title="Gestión de Corrales" description="Crear, editar y eliminar lotes/corrales" icon={<Fence size={20} />} onClick={() => navigate('/dashboard/corrales')} />
         <QuickActionCard title="Mis animales" description="Ver y gestionar todos los animales" icon={<PawPrint size={20} />} onClick={() => navigate('/dashboard/animales')} />
         <QuickActionCard title="Mi Equipo" description="Peones, Veterinarios o Copropietarios" icon={<Users size={20} />} onClick={() => navigate('/dashboard/equipo')} />
-        <QuickActionCard title="Agregar animal" description="Nuevo animal, especie o raza" icon={<Plus size={20} />} onClick={() => showToast('info', 'disponible en fase 5')} />
+        <QuickActionCard title="Agregar animal" description="Nuevo animal, especie o raza" icon={<Plus size={20} />} onClick={() => navigate('/dashboard/animales?nuevo=true')} />
       </section>
+
+      {/* panel desplegable de notificaciones y alertas sanitarias */}
+      <NotificationModal isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
     </div>
   );
 }

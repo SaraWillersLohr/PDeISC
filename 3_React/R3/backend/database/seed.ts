@@ -27,6 +27,28 @@ const USUARIOS_DEMO: SeedUser[] = [
 
 async function seed(): Promise<void> {
   console.log('[seed] iniciando...');
+
+  // aseguro la existencia de la columna debe_cambiar_password
+  try {
+    await pool.query(`ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS debe_cambiar_password TINYINT(1) DEFAULT 1`);
+  } catch {
+    // compatibilidad si el motor no admite if not exists
+  }
+
+  // aseguro la existencia de la tabla notificaciones
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS notificaciones (
+      id_notificacion INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      id_animal INT UNSIGNED NULL,
+      titulo VARCHAR(150) NOT NULL,
+      mensaje TEXT NOT NULL,
+      tipo VARCHAR(50) DEFAULT 'alerta_sanitaria',
+      leida TINYINT(1) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_notificacion_animal FOREIGN KEY (id_animal) REFERENCES animales(id_animal) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
   const passwordHash = await hashPassword(DEMO_PASSWORD);
 
   for (const u of USUARIOS_DEMO) {
@@ -42,12 +64,13 @@ async function seed(): Promise<void> {
     }
 
     await pool.query(
-      `INSERT INTO usuarios (id_rol, nombre, apellido, email, password_hash)
-       VALUES (?, ?, ?, ?, ?)
+      `INSERT INTO usuarios (id_rol, nombre, apellido, email, password_hash, debe_cambiar_password)
+       VALUES (?, ?, ?, ?, ?, 1)
        ON DUPLICATE KEY UPDATE
          nombre = VALUES(nombre),
          apellido = VALUES(apellido),
          password_hash = VALUES(password_hash),
+         debe_cambiar_password = 1,
          activo = 1`,
       [idRol, u.nombre, u.apellido, u.email, passwordHash],
     );
@@ -55,44 +78,13 @@ async function seed(): Promise<void> {
     console.log(`[seed] ✓ ${u.email} (${u.rol})`);
   }
 
-  // animales demo para métricas del dashboard (fase 4)
-  const [[countRow]] = await pool.query<{ n: number }[]>(
-    'SELECT COUNT(*) AS n FROM animales',
-  );
-  if (Number((countRow as { n: number }).n) === 0) {
-    const [corrales] = await pool.query<{ id_corral: number }[]>(
-      'SELECT id_corral FROM corrales WHERE es_enfermeria = 0 LIMIT 5',
-    );
-    const [razas] = await pool.query<{ id_raza: number; especie: string }[]>(
-      `SELECT r.id_raza, e.nombre AS especie FROM razas r JOIN especies e ON e.id_especie = r.id_especie`,
-    );
-    const listaRazas = razas as { id_raza: number; especie: string }[];
-    const listaCorrales = corrales as { id_corral: number }[];
-    let n = 0;
-    for (const esp of ['Bovino', 'Ovino', 'Equino'] as const) {
-      const raza = listaRazas.find((r) => r.especie === esp);
-      if (!raza) continue;
-      const cant = esp === 'Bovino' ? 80 : esp === 'Ovino' ? 30 : 14;
-      for (let i = 0; i < cant; i++) {
-        n++;
-        const mesAtras = Math.floor(Math.random() * 11);
-        await pool.query(
-          `INSERT INTO animales (id_corral, id_raza, identificador, estado_salud, created_at)
-           VALUES (?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? MONTH))`,
-          [
-            listaCorrales[i % listaCorrales.length].id_corral,
-            raza.id_raza,
-            `AN-${String(n).padStart(4, '0')}`,
-            i < 3 ? 'enfermo' : 'sano',
-            mesAtras,
-          ],
-        );
-      }
-    }
-    console.log(`[seed] ✓ ${n} animales demo insertados`);
-  }
+  // limpieza para iniciar desde cero sin animales ficticios ni tratamientos simulados
+  await pool.query('DELETE FROM tratamientos');
+  await pool.query('DELETE FROM notificaciones');
+  await pool.query('DELETE FROM animales');
 
-  console.log(`[seed] listo — contraseña demo: ${DEMO_PASSWORD}`);
+  console.log('[seed] ✓ base de datos reiniciada desde cero (0 animales, 0 alertas)');
+  console.log(`[seed] listo — contraseña demo inicial: ${DEMO_PASSWORD}`);
   await pool.end();
 }
 

@@ -16,6 +16,7 @@ export interface UsuarioDB {
   email: string;
   password_hash: string;
   activo: number;
+  debe_cambiar_password?: number;
   rol_nombre?: RolNombre;
 }
 
@@ -27,6 +28,7 @@ export interface UsuarioPublico {
   rol: RolNombre;
   rolLabel: string;
   activo: boolean;
+  debe_cambiar_password?: boolean;
 }
 
 export interface ApiResponse<T = unknown> {

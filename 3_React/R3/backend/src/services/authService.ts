@@ -1,6 +1,6 @@
 /** logica de login y perfil */
 import pool from '../config/database';
-import { comparePassword } from '../utils/password';
+import { comparePassword, hashPassword } from '../utils/password';
 import { signToken } from '../utils/jwt';
 import { getRolLabel } from '../utils/roles';
 import type { LoginRequest, UsuarioDB, UsuarioPublico } from '../types';
@@ -44,6 +44,7 @@ function toPublico(row: UsuarioRow): UsuarioPublico {
     rol,
     rolLabel: getRolLabel(rol),
     activo: row.activo === 1,
+    debe_cambiar_password: Number(row.debe_cambiar_password) === 1,
   };
 }
 
@@ -77,4 +78,19 @@ export async function getProfile(idUsuario: number): Promise<UsuarioPublico> {
     throw new Error('usuario no encontrado');
   }
   return toPublico(usuario);
+}
+
+/** actualizo contraseña obligatoria en primer ingreso */
+export async function cambiarPasswordInicial(idUsuario: number, nuevaPassword: string): Promise<UsuarioPublico> {
+  if (!nuevaPassword || nuevaPassword.trim().length < 6) {
+    throw new Error('la contraseña debe tener al menos 6 caracteres');
+  }
+
+  const passwordHash = await hashPassword(nuevaPassword.trim());
+  await pool.query(
+    `UPDATE usuarios SET password_hash = ?, debe_cambiar_password = 0 WHERE id_usuario = ?`,
+    [passwordHash, idUsuario],
+  );
+
+  return getProfile(idUsuario);
 }

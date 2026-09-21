@@ -2,14 +2,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import type { LoginFormData, LoginMode } from '@/types';
+import type { LoginFormData, LoginMode, Usuario } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import styles from './LoginForm.module.css';
 
 interface LoginFormProps {
   mode: LoginMode;
-  onSuccess?: () => void;
+  onSuccess?: (user?: Usuario) => void;
 }
 
 /** formulario reutilizable para ambos sistemas de login */
@@ -32,9 +32,9 @@ export function LoginForm({ mode, onSuccess }: LoginFormProps) {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data, mode);
+      const user = await login(data, mode);
       showToast('success', `sesión iniciada (${mode === 'router' ? 'react router' : 'useState'})`);
-      onSuccess?.();
+      onSuccess?.(user);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'credenciales inválidas';
       showToast('error', msg);

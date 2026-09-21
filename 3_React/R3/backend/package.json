@@ -9,9 +9,15 @@
     "start": "node dist/server.js",
     "seed": "tsx database/seed.ts"
   },
-  "keywords": ["estancia", "ganado", "express", "mariadb"],
+  "keywords": [
+    "estancia",
+    "ganado",
+    "express",
+    "mariadb"
+  ],
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

@@ -39,3 +39,29 @@ export async function me(req: Request, res: Response): Promise<void> {
     res.status(404).json({ success: false, message });
   }
 }
+
+/** POST /api/auth/cambiar-password-inicial — cambia la contraseña predeterminada */
+export async function cambiarPasswordInicial(req: Request, res: Response): Promise<void> {
+  try {
+    if (!req.usuario) {
+      res.status(401).json({ success: false, message: 'no autenticado' });
+      return;
+    }
+
+    const { password } = req.body as { password?: string };
+    if (!password || typeof password !== 'string') {
+      res.status(400).json({ success: false, message: 'la contraseña es requerida' });
+      return;
+    }
+
+    const usuarioActualizado = await authService.cambiarPasswordInicial(req.usuario.id_usuario, password);
+    res.json({
+      success: true,
+      message: 'contraseña actualizada correctamente',
+      data: usuarioActualizado,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'error al actualizar la contraseña';
+    res.status(400).json({ success: false, message });
+  }
+}

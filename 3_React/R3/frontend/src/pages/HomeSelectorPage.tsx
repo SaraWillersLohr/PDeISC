@@ -10,15 +10,16 @@ import styles from './HomeSelectorPage.module.css';
 /** pantalla inicial: el usuario elige el sistema de login */
 export function HomeSelectorPage() {
   const navigate = useNavigate();
-  const { setShowStateLogin, isAuthenticated } = useAuth();
+  const { setShowStateLogin, isAuthenticated, usuario } = useAuth();
   const { isDark } = useTheme();
 
-  // si ya hay sesión activa, redirijo al dashboard
+  // si ya hay sesión activa, redirijo a la vista del rol correspondiente
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      const dest = usuario?.rol === 'peon' ? '/peon' : usuario?.rol === 'veterinario' ? '/veterinario' : '/dashboard';
+      navigate(dest, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, usuario, navigate]);
 
   if (isAuthenticated) {
     return null;

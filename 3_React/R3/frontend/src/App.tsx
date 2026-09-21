@@ -6,6 +6,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { AppRouter } from '@/routes/AppRouter';
 import { ScrollToTopButton } from '@/components/atoms/ScrollToTopButton';
 import { ToastContainer } from '@/components/molecules/ToastContainer';
+import { ChangePasswordModal } from '@/components/molecules/ChangePasswordModal';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <ToastProvider>
           <AuthProvider>
             <AppRouter />
+            <ChangePasswordModal />
             <ToastContainer />
             <ScrollToTopButton />
           </AuthProvider>

@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   apellido     VARCHAR(100) NOT NULL,
   email        VARCHAR(150) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
+  debe_cambiar_password TINYINT(1) DEFAULT 1,
   activo       TINYINT(1) DEFAULT 1,
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -104,6 +105,20 @@ CREATE TABLE IF NOT EXISTS tratamientos (
   created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_tratamiento_animal FOREIGN KEY (id_animal) REFERENCES animales(id_animal),
   CONSTRAINT fk_tratamiento_vet FOREIGN KEY (id_veterinario) REFERENCES usuarios(id_usuario)
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 8. notificaciones (alertas sanitarias y eventos del sistema)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS notificaciones (
+  id_notificacion INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id_animal       INT UNSIGNED NULL,
+  titulo          VARCHAR(150) NOT NULL,
+  mensaje         TEXT NOT NULL,
+  tipo            VARCHAR(50) DEFAULT 'alerta_sanitaria',
+  leida           TINYINT(1) DEFAULT 0,
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_notificacion_animal FOREIGN KEY (id_animal) REFERENCES animales(id_animal) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ============================================================

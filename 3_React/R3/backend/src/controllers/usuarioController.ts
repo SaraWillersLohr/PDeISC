@@ -18,8 +18,9 @@ export async function create(req: Request, res: Response): Promise<void> {
   try {
     const body = req.body as CreateUsuarioRequest;
 
-    if (!body.nombre || !body.apellido || !body.email || !body.password || !body.rol) {
-      res.status(400).json({ success: false, message: 'todos los campos son obligatorios' });
+    const apellido = (body.apellido ?? '').trim();
+    if (!body.nombre || !body.email || !body.password || !body.rol) {
+      res.status(400).json({ success: false, message: 'nombre, email, contraseña y rol son obligatorios' });
       return;
     }
 
@@ -28,7 +29,7 @@ export async function create(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const usuario = await usuarioService.createUsuario(body, req.usuario!.rol);
+    const usuario = await usuarioService.createUsuario({ ...body, apellido }, req.usuario!.rol);
     res.status(201).json({ success: true, message: 'usuario creado', data: usuario });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'error al crear usuario';

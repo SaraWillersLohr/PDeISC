@@ -32,9 +32,10 @@ export function StateLoginOverlay() {
     setShowStateLogin(false);
   };
 
-  const handleSuccess = () => {
+  const handleSuccess = (user?: import('@/types').Usuario) => {
     setShowStateLogin(false);
-    navigate('/dashboard', { replace: true });
+    const dest = user?.rol === 'peon' ? '/peon' : user?.rol === 'veterinario' ? '/veterinario' : '/dashboard';
+    navigate(dest, { replace: true });
   };
 
   return (

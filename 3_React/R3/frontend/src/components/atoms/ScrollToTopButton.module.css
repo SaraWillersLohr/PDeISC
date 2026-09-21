@@ -1,3 +1,4 @@
+/* estilos del boton para volver arriba */
 .btn {
   position: fixed;
   bottom: 1.5rem;
@@ -13,11 +14,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s, opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
   animation: fadeIn 0.3s ease;
 }
 
-[data-theme='dark'] .btn {
+[data-theme="dark"] .btn {
   background: var(--color-primary-light);
   color: #0f1410;
 }

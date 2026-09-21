@@ -1,3 +1,4 @@
+/** pantalla temporal para modulos aun no implementados */
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle';

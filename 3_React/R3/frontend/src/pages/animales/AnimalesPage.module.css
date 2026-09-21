@@ -1,3 +1,4 @@
+/* estilos de la pantalla de animales */
 .page {
   padding: 2rem;
   max-width: 1200px;
@@ -36,10 +37,12 @@
   border-radius: var(--radius-pill);
   font-weight: 600;
   font-size: 0.9rem;
-  transition: opacity 0.2s, transform 0.15s;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
 }
 
-[data-theme='dark'] .primaryBtn {
+[data-theme="dark"] .primaryBtn {
   background: var(--color-primary-light);
   color: #0f1410;
 }
@@ -166,7 +169,7 @@
   color: #166534;
 }
 
-[data-theme='dark'] .statusSano {
+[data-theme="dark"] .statusSano {
   background: #14532d;
   color: #86efac;
 }
@@ -176,7 +179,7 @@
   color: #991b1b;
 }
 
-[data-theme='dark'] .statusEnfermo {
+[data-theme="dark"] .statusEnfermo {
   background: #7f1d1d;
   color: #fca5a5;
 }
@@ -186,7 +189,7 @@
   color: #92400e;
 }
 
-[data-theme='dark'] .statusHerido {
+[data-theme="dark"] .statusHerido {
   background: #78350f;
   color: #fde68a;
 }
@@ -196,7 +199,7 @@
   color: #5b21b6;
 }
 
-[data-theme='dark'] .statusTratamiento {
+[data-theme="dark"] .statusTratamiento {
   background: #4c1d95;
   color: #c4b5fd;
 }
@@ -236,7 +239,7 @@
   border-color: #fca5a5;
 }
 
-[data-theme='dark'] .iconBtnDanger:hover {
+[data-theme="dark"] .iconBtnDanger:hover {
   background: #450a0a;
   color: #f87171;
   border-color: #7f1d1d;
@@ -355,7 +358,7 @@
   font-weight: 600;
 }
 
-[data-theme='dark'] .saveBtn {
+[data-theme="dark"] .saveBtn {
   background: var(--color-primary-light);
   color: #0f1410;
 }

@@ -1,3 +1,4 @@
+/* estilos del formulario de login */
 .form {
   width: 100%;
   max-width: 380px;
@@ -114,10 +115,12 @@
   border-radius: var(--radius-pill);
   font-size: 1rem;
   font-weight: 600;
-  transition: opacity 0.2s, transform 0.15s;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
 }
 
-[data-theme='dark'] .submitBtn {
+[data-theme="dark"] .submitBtn {
   background: var(--color-primary-light);
   color: #0f1410;
 }

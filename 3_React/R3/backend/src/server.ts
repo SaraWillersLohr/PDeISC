@@ -1,6 +1,7 @@
 /** arranque del servidor express */
-import dotenv from 'dotenv';
-import app from './app';
+import dotenv from "dotenv";
+/** inicia el servidor http de la api */
+import app from "./app";
 
 dotenv.config();
 

@@ -1,3 +1,4 @@
+/* estilos del modal de notificaciones */
 .overlay {
   position: fixed;
   inset: 0;
@@ -134,7 +135,7 @@
   color: #991b1b;
 }
 
-[data-theme='dark'] .tagEnfermo {
+[data-theme="dark"] .tagEnfermo {
   background: #7f1d1d;
   color: #fca5a5;
 }
@@ -144,7 +145,7 @@
   color: #5b21b6;
 }
 
-[data-theme='dark'] .tagTratamiento {
+[data-theme="dark"] .tagTratamiento {
   background: #4c1d95;
   color: #c4b5fd;
 }

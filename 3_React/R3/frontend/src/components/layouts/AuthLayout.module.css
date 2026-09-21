@@ -1,3 +1,4 @@
+/* estilos del layout de autenticacion */
 .wrapper {
   min-height: 100vh;
   display: flex;
@@ -5,13 +6,17 @@
   justify-content: center;
   padding: 1.5rem;
   background:
-    linear-gradient(135deg, rgba(168, 213, 162, 0.85) 0%, rgba(74, 124, 63, 0.9) 100%),
+    linear-gradient(
+      135deg,
+      rgba(168, 213, 162, 0.85) 0%,
+      rgba(74, 124, 63, 0.9) 100%
+    ),
     var(--login-bg-image) center / cover no-repeat;
   background-attachment: fixed;
 }
 
 .wrapper::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   background: rgba(26, 48, 32, 0.25);
@@ -50,7 +55,7 @@
   background: #f0f4f1;
 }
 
-[data-theme='dark'] .imageCol {
+[data-theme="dark"] .imageCol {
   background: #141a16;
 }
 

@@ -1,3 +1,4 @@
+/** configura middlewares y rutas de la api */
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { testConnection } from './config/database';

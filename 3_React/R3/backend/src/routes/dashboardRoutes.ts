@@ -1,15 +1,15 @@
-/** rutas del dashboard — solo roles administrativos */
-import { Router } from 'express';
-import { authenticate } from '../middleware/authMiddleware';
-import { authorize } from '../middleware/roleMiddleware';
-import * as dashboardController from '../controllers/dashboardController';
+// rutas del dashboard — solo roles administrativos
+import { Router } from "express";
+import { authenticate } from "../middleware/authMiddleware";
+import { authorize } from "../middleware/roleMiddleware";
+import * as dashboardController from "../controllers/dashboardController";
 
 const router = Router();
 
 router.get(
-  '/summary',
+  "/summary",
   authenticate,
-  authorize('dueno', 'copropietario'),
+  authorize("dueno", "copropietario"),
   dashboardController.summary,
 );
 

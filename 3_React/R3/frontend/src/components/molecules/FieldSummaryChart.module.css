@@ -1,3 +1,4 @@
+/* estilos del resumen grafico */
 .wrap {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
@@ -60,6 +61,12 @@
   margin-top: 0.35rem;
 }
 
-.bovino { background: #1a3020; }
-.ovino { background: #4ade80; }
-.equino { background: #facc15; }
+.bovino {
+  background: #1a3020;
+}
+.ovino {
+  background: #4ade80;
+}
+.equino {
+  background: #facc15;
+}

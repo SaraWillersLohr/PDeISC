@@ -1,10 +1,11 @@
+/* estilos del selector inicial */
 .page {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--color-bg) 0%, #e8f5e9 100%);
   padding: 1.5rem;
 }
 
-[data-theme='dark'] .page {
+[data-theme="dark"] .page {
   background: linear-gradient(135deg, var(--color-bg) 0%, #0d1a12 100%);
 }
 
@@ -76,7 +77,10 @@
   border-radius: var(--radius-lg);
   padding: 2rem;
   text-align: left;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
   box-shadow: var(--shadow-card);
 }
 

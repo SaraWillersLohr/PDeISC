@@ -1,3 +1,4 @@
+/* estilos de la pantalla de corrales */
 .page {
   padding: 2rem;
   max-width: 1200px;
@@ -36,10 +37,12 @@
   border-radius: var(--radius-pill);
   font-weight: 600;
   font-size: 0.9rem;
-  transition: opacity 0.2s, transform 0.15s;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
 }
 
-[data-theme='dark'] .primaryBtn {
+[data-theme="dark"] .primaryBtn {
   background: var(--color-primary-light);
   color: #0f1410;
 }
@@ -132,7 +135,7 @@
   color: #0369a1;
 }
 
-[data-theme='dark'] .badgeGeneral {
+[data-theme="dark"] .badgeGeneral {
   background: #082f49;
   color: #7dd3fc;
 }
@@ -142,7 +145,7 @@
   color: #b91c1c;
 }
 
-[data-theme='dark'] .badgeEnfermeria {
+[data-theme="dark"] .badgeEnfermeria {
   background: #450a0a;
   color: #fca5a5;
 }
@@ -220,7 +223,7 @@
   border-color: #fca5a5;
 }
 
-[data-theme='dark'] .iconBtnDanger:hover {
+[data-theme="dark"] .iconBtnDanger:hover {
   background: #450a0a;
   color: #f87171;
   border-color: #7f1d1d;
@@ -337,7 +340,7 @@
   font-weight: 600;
 }
 
-[data-theme='dark'] .saveBtn {
+[data-theme="dark"] .saveBtn {
   background: var(--color-primary-light);
   color: #0f1410;
 }

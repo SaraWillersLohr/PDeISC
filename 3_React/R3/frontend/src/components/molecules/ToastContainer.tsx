@@ -1,4 +1,4 @@
-/** contenedor visual de toasts */
+// contenedor visual de toasts
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import type { ToastMessage } from '@/types';
@@ -11,6 +11,7 @@ const iconMap = {
   warning: AlertTriangle,
 };
 
+// ejecuto toastitem
 function ToastItem({ toast, onClose }: { toast: ToastMessage; onClose: () => void }) {
   const Icon = iconMap[toast.type];
 
@@ -25,7 +26,7 @@ function ToastItem({ toast, onClose }: { toast: ToastMessage; onClose: () => voi
   );
 }
 
-/** contenedor de toasts — reemplaza alert() */
+/** contenedor de toasts  reemplaza alert() */
 export function ToastContainer() {
   const { toasts, removeToast } = useToast();
 
@@ -39,3 +40,4 @@ export function ToastContainer() {
     </div>
   );
 }
+

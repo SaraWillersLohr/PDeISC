@@ -1,4 +1,4 @@
-/** llamadas api de corrales */
+// llamadas api de corrales
 import axiosInstance, { getApiErrorMessage } from './axiosInstance';
 import type { Corral } from '@/types';
 
@@ -21,6 +21,7 @@ export interface UpdateCorralPayload {
   activo?: boolean;
 }
 
+// ejecuto listcorralesapi
 export async function listCorralesApi(): Promise<Corral[]> {
   try {
     const { data } = await axiosInstance.get<ApiResponse<Corral[]>>('/corrales');
@@ -30,6 +31,7 @@ export async function listCorralesApi(): Promise<Corral[]> {
   }
 }
 
+// ejecuto createcorralapi
 export async function createCorralApi(payload: CreateCorralPayload): Promise<Corral> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Corral>>('/corrales', payload);
@@ -39,6 +41,7 @@ export async function createCorralApi(payload: CreateCorralPayload): Promise<Cor
   }
 }
 
+// ejecuto updatecorralapi
 export async function updateCorralApi(id: number, payload: UpdateCorralPayload): Promise<Corral> {
   try {
     const { data } = await axiosInstance.patch<ApiResponse<Corral>>(`/corrales/${id}`, payload);
@@ -48,6 +51,7 @@ export async function updateCorralApi(id: number, payload: UpdateCorralPayload):
   }
 }
 
+// ejecuto deletecorralapi
 export async function deleteCorralApi(id: number): Promise<void> {
   try {
     await axiosInstance.delete(`/corrales/${id}`);
@@ -55,3 +59,4 @@ export async function deleteCorralApi(id: number): Promise<void> {
     throw new Error(getApiErrorMessage(error));
   }
 }
+

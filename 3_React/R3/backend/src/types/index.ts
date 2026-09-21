@@ -1,4 +1,4 @@
-/** tipos compartidos del backend */
+// tipos compartidos del backend
 
 export type RolNombre = 'dueno' | 'copropietario' | 'peon' | 'veterinario';
 
@@ -58,3 +58,4 @@ export interface UpdateUsuarioRequest {
   rol?: RolNombre;
   activo?: boolean;
 }
+

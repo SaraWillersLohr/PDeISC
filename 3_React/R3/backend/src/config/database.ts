@@ -1,4 +1,4 @@
-/** pool de conexion mariadb */
+// pool de conexion mariadb
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
@@ -16,7 +16,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-/** verifica que la base responda — útil para health check */
+// verifica que la base responda � �til para health check
 export async function testConnection(): Promise<boolean> {
   try {
     const connection = await pool.getConnection();
@@ -30,3 +30,4 @@ export async function testConnection(): Promise<boolean> {
 }
 
 export default pool;
+

@@ -1,4 +1,4 @@
-/** selector login useState vs router */
+// selector login usestate vs router
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Route, ToggleLeft } from 'lucide-react';
@@ -7,13 +7,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle';
 import styles from './HomeSelectorPage.module.css';
 
-/** pantalla inicial: el usuario elige el sistema de login */
+// pantalla inicial: el usuario elige el sistema de login
 export function HomeSelectorPage() {
   const navigate = useNavigate();
   const { setShowStateLogin, isAuthenticated, usuario } = useAuth();
   const { isDark } = useTheme();
 
-  // si ya hay sesión activa, redirijo a la vista del rol correspondiente
+  // si ya hay sesi�n activa, redirijo a la vista del rol correspondiente
   useEffect(() => {
     if (isAuthenticated) {
       const dest = usuario?.rol === 'peon' ? '/peon' : usuario?.rol === 'veterinario' ? '/veterinario' : '/dashboard';
@@ -25,10 +25,12 @@ export function HomeSelectorPage() {
     return null;
   }
 
+  // ejecuto handlerouterlogin
   const handleRouterLogin = () => {
     navigate('/login');
   };
 
+  // ejecuto handlestatelogin
   const handleStateLogin = () => {
     setShowStateLogin(true);
   };
@@ -53,7 +55,7 @@ export function HomeSelectorPage() {
         </div>
 
         <div className={styles.cards}>
-          {/* opción A: login con useState (sin cambiar url) */}
+          {/* opcion a: login con usestate (sin cambiar url) */}
           <button
             type="button"
             className={styles.card}
@@ -70,7 +72,7 @@ export function HomeSelectorPage() {
             <span className={styles.cardCta}>iniciar con useState →</span>
           </button>
 
-          {/* opción B: login con react router */}
+          {/* opcion b: login con react router */}
           <button
             type="button"
             className={`${styles.card} ${styles.cardPrimary}`}
@@ -91,3 +93,4 @@ export function HomeSelectorPage() {
     </div>
   );
 }
+

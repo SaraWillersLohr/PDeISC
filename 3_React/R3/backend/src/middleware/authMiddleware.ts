@@ -1,11 +1,11 @@
-/** valida el token y carga el usuario autenticado */
+// valida el token y carga el usuario autenticado
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils/jwt";
 
-// middleware que exige token jwt válido en header authorization
-//middleware es una función que se ejecuta antes de que la solicitud llegue
-//al controlador, y se utiliza para verificar si el usuario está autenticado antes
-//de permitirle acceder a ciertas rutas protegidas.
+// middleware que exige token jwt v�lido en header authorization
+// middleware es una funci�n que se ejecuta antes de que la solicitud llegue
+// al controlador, y se utiliza para verificar si el usuario est� autenticado antes
+// de permitirle acceder a ciertas rutas protegidas.
 export function authenticate(
   req: Request,
   res: Response,
@@ -33,3 +33,4 @@ export function authenticate(
     });
   }
 }
+

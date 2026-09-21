@@ -13,3 +13,4 @@ router.delete("/:id", notificacionController.remove);
 router.delete("/", notificacionController.clear);
 
 export default router;
+

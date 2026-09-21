@@ -1,8 +1,8 @@
 // rutas de animales, esta carpeta contiene los endpoints relacionados con
-//la gestión de animales, incluyendo la creación, actualización, eliminación y
+// la gesti�n de animales, incluyendo la creaci�n, actualizaci�n, eliminaci�n y
 // reporte de enfermedades.
-//cuando el usuario selecciona useState en el frontend, se hace una solicitud a estos
-// endpoints para obtener o modificar la información de los animales.
+// cuando el usuario selecciona usestate en el frontend, se hace una solicitud a estos
+// endpoints para obtener o modificar la informaci�n de los animales.
 import { Router } from "express";
 import * as animalController from "../controllers/animalController";
 import { authenticate } from "../middleware/authMiddleware";
@@ -42,3 +42,4 @@ router.post(
 );
 
 export default router;
+

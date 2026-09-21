@@ -6,7 +6,7 @@ import { authorize } from "../middleware/roleMiddleware";
 
 const router = Router();
 
-// todas las rutas de usuarios requieren autenticación + rol admin
+// todas las rutas de usuarios requieren autenticaci�n + rol admin
 router.use(authenticate);
 router.use(authorize("dueno", "copropietario"));
 
@@ -16,3 +16,4 @@ router.patch("/:id", usuarioController.update);
 router.delete("/:id", usuarioController.remove);
 
 export default router;
+

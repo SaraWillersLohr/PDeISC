@@ -1,9 +1,9 @@
-/** cliente http con token jwt */
+// cliente http con token jwt
 import axios from 'axios';
 import { getSessionStorage, STORAGE_KEYS } from '@/utils/storage';
 import type { AuthSession } from '@/types';
 
-/** instancia axios centralizada — adjunta token jwt si existe sesión */
+// instancia axios centralizada � adjunta token jwt si existe sesi�n
 const axiosInstance = axios.create({
   baseURL: '/api',
   timeout: 10000,
@@ -20,7 +20,7 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-/** extraigo mensaje de error legible desde respuesta axios */
+// extraigo mensaje de error legible desde respuesta axios
 export function getApiErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     return error.response?.data?.message ?? error.message ?? 'error de conexión';
@@ -30,3 +30,4 @@ export function getApiErrorMessage(error: unknown): string {
 }
 
 export default axiosInstance;
+

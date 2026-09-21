@@ -1,13 +1,15 @@
-/** boton flotante volver arriba */
+// boton flotante volver arriba
 import { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import styles from './ScrollToTopButton.module.css';
 
-/** botón sticky que aparece al hacer scroll y sube suavemente */
+// bot�n sticky que aparece al hacer scroll y sube suavemente
 export function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
 
+  // ejecuto el callback del hook
   useEffect(() => {
+    // ejecuto handlescroll
     const handleScroll = () => {
       setVisible(window.scrollY > 400);
     };
@@ -16,6 +18,7 @@ export function ScrollToTopButton() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // ejecuto scrolltotop
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -33,3 +36,4 @@ export function ScrollToTopButton() {
     </button>
   );
 }
+

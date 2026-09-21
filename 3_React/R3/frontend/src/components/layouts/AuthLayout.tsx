@@ -1,4 +1,4 @@
-/** layout visual del login */
+// layout visual del login
 import type { ReactNode } from 'react';
 import imgLogin from '@/assets/img_login.png';
 import styles from './AuthLayout.module.css';
@@ -8,7 +8,7 @@ interface AuthLayoutProps {
   compact?: boolean;
 }
 
-/** layout de login — vaca a la izquierda, formulario a la derecha (referencia visual) */
+/** layout de login  vaca a la izquierda, formulario a la derecha (referencia visual) */
 export function AuthLayout({ children, compact = false }: AuthLayoutProps) {
   return (
     <div
@@ -19,7 +19,7 @@ export function AuthLayout({ children, compact = false }: AuthLayoutProps) {
         <div className={styles.imageCol}>
           <img
             src={imgLogin}
-            alt="vaca en el campo — estanciaapp"
+            alt="vaca en el campo  estanciaapp"
             className={styles.cowImage}
           />
         </div>
@@ -28,3 +28,4 @@ export function AuthLayout({ children, compact = false }: AuthLayoutProps) {
     </div>
   );
 }
+

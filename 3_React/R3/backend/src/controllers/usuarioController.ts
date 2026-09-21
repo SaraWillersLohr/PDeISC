@@ -1,9 +1,9 @@
-//controlador de usuarios
+// controlador de usuarios
 import { Request, Response } from "express";
 import * as usuarioService from "../services/usuarioService";
 import type { CreateUsuarioRequest, UpdateUsuarioRequest } from "../types";
 
-// GET /api/usuarios — lista empleados (solo admins)
+// GET /api/usuarios  lista empleados (solo admins)
 export async function list(req: Request, res: Response): Promise<void> {
   try {
     const usuarios = await usuarioService.listUsuarios();
@@ -15,7 +15,7 @@ export async function list(req: Request, res: Response): Promise<void> {
   }
 }
 
-// POST /api/usuarios — alta de empleado o copropietario
+// POST /api/usuarios  alta de empleado o copropietario
 export async function create(req: Request, res: Response): Promise<void> {
   try {
     const body = req.body as CreateUsuarioRequest;
@@ -56,7 +56,7 @@ export async function create(req: Request, res: Response): Promise<void> {
   }
 }
 
-// PATCH /api/usuarios/:id — actualiza datos de un usuario
+// PATCH /api/usuarios/:id  actualiza datos de un usuario
 export async function update(req: Request, res: Response): Promise<void> {
   try {
     const id = Number(req.params.id);
@@ -78,12 +78,12 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
 }
 
-// DELETE /api/usuarios/:id — desactiva usuario (soft delete)
+// DELETE /api/usuarios/:id  desactiva usuario (soft delete)
 export async function remove(req: Request, res: Response): Promise<void> {
   try {
     const id = Number(req.params.id);
 
-    // evito que el dueño se elimine a sí mismo
+    // evito que el due�o se elimine a s� mismo
     if (req.usuario?.id_usuario === id) {
       res
         .status(400)
@@ -102,3 +102,4 @@ export async function remove(req: Request, res: Response): Promise<void> {
     res.status(400).json({ success: false, message });
   }
 }
+

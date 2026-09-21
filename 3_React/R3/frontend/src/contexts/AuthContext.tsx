@@ -1,4 +1,4 @@
-/** contexto de sesion y login */
+// contexto de sesion y login
 import {
   createContext,
   useCallback,
@@ -22,7 +22,7 @@ interface AuthContextValue {
   usuario: Usuario | null;
   isAuthenticated: boolean;
   loginMode: LoginMode | null;
-  /** modo useState: controla si mostramos login sin cambiar url */
+  // modo usestate: controla si mostramos login sin cambiar url
   showStateLogin: boolean;
   setShowStateLogin: (show: boolean) => void;
   login: (data: LoginFormData, mode: LoginMode) => Promise<Usuario>;
@@ -33,6 +33,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// ejecuto authprovider
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [loginMode, setLoginMode] = useState<LoginMode | null>(null);
@@ -45,8 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeStorageItem(STORAGE_KEYS.SESSION);
   }, []);
 
-  // restauro y valido sesión al montar — protección de datos
+  // restauro y valido sesi�n al montar � protecci�n de datos
   useEffect(() => {
+    // ejecuto restoresession
     const restoreSession = async () => {
       const stored = getSessionStorage<AuthSession>(STORAGE_KEYS.SESSION);
 
@@ -60,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUsuario(perfil);
         setLoginMode(stored.data.loginMode);
       } catch {
-        // token inválido o expirado — limpio storage
+        // token inv�lido o expirado � limpio storage
         clearSession();
       } finally {
         setIsLoading(false);
@@ -105,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setShowStateLogin(false);
   }, [clearSession]);
 
-  /** actualizo los datos del usuario en memoria y almacenamiento persistente */
+  // actualizo los datos del usuario en memoria y almacenamiento persistente
   const updateUsuario = useCallback(
     (nuevoUsuario: Usuario) => {
       setUsuario(nuevoUsuario);
@@ -138,8 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// ejecuto useauth
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth debe usarse dentro de AuthProvider');
   return ctx;
 }
+

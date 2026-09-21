@@ -1,4 +1,4 @@
-/** página principal del dashboard dueño/copropietario — fase 4 */
+// p�gina principal del dashboard due�o/copropietario � fase 4
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, CloudSun, Fence, PawPrint, Plus, TriangleAlert, Users } from 'lucide-react';
@@ -14,6 +14,7 @@ import { ThemeToggle } from '@/components/atoms/ThemeToggle';
 import { NotificationModal } from '@/components/molecules/NotificationModal';
 import styles from './DashboardPage.module.css';
 
+// ejecuto dashboardpage
 export function DashboardPage() {
   const { usuario, loginMode } = useAuth();
   const { showToast } = useToast();
@@ -22,7 +23,7 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  // cargo métricas al montar con useEffect
+  // cargo m�tricas al montar con useeffect
   useEffect(() => {
     getDashboardSummaryApi()
       .then(setData)
@@ -100,3 +101,4 @@ export function DashboardPage() {
     </div>
   );
 }
+

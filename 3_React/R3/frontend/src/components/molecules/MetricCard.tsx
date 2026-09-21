@@ -1,4 +1,4 @@
-/** tarjeta de métrica — usada en la fila superior del dashboard */
+// tarjeta de m�trica � usada en la fila superior del dashboard
 import type { ReactNode } from 'react';
 import styles from './MetricCard.module.css';
 
@@ -10,6 +10,7 @@ interface MetricCardProps {
   variant?: 'default' | 'alert' | 'info';
 }
 
+// ejecuto metriccard
 export function MetricCard({ title, value, subtitle, icon, variant = 'default' }: MetricCardProps) {
   return (
     <article className={`${styles.card} ${styles[variant]}`}>
@@ -22,3 +23,4 @@ export function MetricCard({ title, value, subtitle, icon, variant = 'default' }
     </article>
   );
 }
+

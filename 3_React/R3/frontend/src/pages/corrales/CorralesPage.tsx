@@ -1,4 +1,4 @@
-/** gestión de corrales — fase 5 */
+// gesti�n de corrales � fase 5
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Fence, Plus, Edit2, Trash2, X, HeartPulse } from 'lucide-react';
@@ -14,6 +14,7 @@ import type { Corral } from '@/types';
 import { ConfirmModal } from '@/components/molecules/ConfirmModal';
 import styles from './CorralesPage.module.css';
 
+// ejecuto corralespage
 export function CorralesPage() {
   const { showToast } = useToast();
   const [corrales, setCorrales] = useState<Corral[]>([]);
@@ -35,6 +36,7 @@ export function CorralesPage() {
     },
   });
 
+  // ejecuto loadcorrales
   const loadCorrales = async () => {
     try {
       setLoading(true);
@@ -47,16 +49,19 @@ export function CorralesPage() {
     }
   };
 
+  // ejecuto el callback del hook
   useEffect(() => {
     loadCorrales();
   }, []);
 
+  // ejecuto opencreatemodal
   const openCreateModal = () => {
     setEditingCorral(null);
     reset({ nombre: '', capacidad: 30, es_enfermeria: false });
     setModalOpen(true);
   };
 
+  // ejecuto openeditmodal
   const openEditModal = (corral: Corral) => {
     setEditingCorral(corral);
     reset({
@@ -67,12 +72,14 @@ export function CorralesPage() {
     setModalOpen(true);
   };
 
+  // ejecuto closemodal
   const closeModal = () => {
     setModalOpen(false);
     setEditingCorral(null);
     reset();
   };
 
+  // ejecuto onsubmit
   const onSubmit = async (data: CreateCorralPayload) => {
     try {
       if (editingCorral) {
@@ -97,6 +104,7 @@ export function CorralesPage() {
     }
   };
 
+  // ejecuto handledelete
   const handleDelete = (corral: Corral) => {
     if (corral.ocupados > 0) {
       showToast('warning', 'no podés eliminar un corral con animales adentro');
@@ -105,6 +113,7 @@ export function CorralesPage() {
     setCorralToDelete(corral);
   };
 
+  // ejecuto confirmdeletecorral
   const confirmDeleteCorral = async () => {
     if (!corralToDelete) return;
     try {
@@ -286,3 +295,4 @@ export function CorralesPage() {
     </div>
   );
 }
+

@@ -1,9 +1,9 @@
-/** boton toggle de tema */
+// boton toggle de tema
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import styles from './ThemeToggle.module.css';
 
-/** botón para alternar modo claro / oscuro */
+// bot�n para alternar modo claro / oscuro
 export function ThemeToggle() {
   const { isDark, toggleTheme } = useTheme();
 
@@ -18,3 +18,4 @@ export function ThemeToggle() {
     </button>
   );
 }
+

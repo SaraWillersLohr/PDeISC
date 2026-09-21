@@ -1,4 +1,4 @@
-/** overlay login con useState */
+// overlay login con usestate
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
@@ -7,7 +7,7 @@ import { LoginForm } from './LoginForm';
 import { AuthLayout } from '@/components/layouts/AuthLayout';
 import styles from './LoginPages.module.css';
 
-/** login opción A — overlay controlado por useState, url sin cambios */
+// login opci�n a � overlay controlado por usestate, url sin cambios
 export function StateLoginOverlay() {
   const navigate = useNavigate();
   const { setShowStateLogin } = useAuth();
@@ -17,6 +17,7 @@ export function StateLoginOverlay() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    // ejecuto onkeydown
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setShowStateLogin(false);
     };
@@ -28,6 +29,7 @@ export function StateLoginOverlay() {
     };
   }, [setShowStateLogin]);
 
+  // ejecuto handleclose
   const handleClose = () => {
     setShowStateLogin(false);
   };
@@ -57,3 +59,4 @@ export function StateLoginOverlay() {
     </div>
   );
 }
+

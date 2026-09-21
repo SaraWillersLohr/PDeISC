@@ -1,4 +1,4 @@
-/** tarjeta de acceso rápido — módulos del dashboard */
+// tarjeta de acceso r�pido � m�dulos del dashboard
 import type { ReactNode } from 'react';
 import styles from './QuickActionCard.module.css';
 
@@ -9,6 +9,7 @@ interface Props {
   onClick?: () => void;
 }
 
+// ejecuto quickactioncard
 export function QuickActionCard({ title, description, icon, onClick }: Props) {
   return (
     <button type="button" className={styles.card} onClick={onClick}>
@@ -18,3 +19,4 @@ export function QuickActionCard({ title, description, icon, onClick }: Props) {
     </button>
   );
 }
+

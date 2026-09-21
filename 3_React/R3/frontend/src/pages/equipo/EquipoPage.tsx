@@ -1,4 +1,4 @@
-/** gestión de equipo de trabajo — fase 5 */
+// gesti�n de equipo de trabajo � fase 5
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Users, UserPlus, Trash2, X } from 'lucide-react';
@@ -14,6 +14,7 @@ import type { Usuario, RolNombre } from '@/types';
 import { ConfirmModal } from '@/components/molecules/ConfirmModal';
 import styles from './EquipoPage.module.css';
 
+// ejecuto equipopage
 export function EquipoPage() {
   const { usuario: currentUser } = useAuth();
   const { showToast } = useToast();
@@ -38,6 +39,7 @@ export function EquipoPage() {
     },
   });
 
+  // ejecuto loadusuarios
   const loadUsuarios = async () => {
     try {
       setLoading(true);
@@ -50,10 +52,12 @@ export function EquipoPage() {
     }
   };
 
+  // ejecuto el callback del hook
   useEffect(() => {
     loadUsuarios();
   }, []);
 
+  // ejecuto opencreatemodal
   const openCreateModal = () => {
     reset({
       nombre: '',
@@ -65,11 +69,13 @@ export function EquipoPage() {
     setModalOpen(true);
   };
 
+  // ejecuto closemodal
   const closeModal = () => {
     setModalOpen(false);
     reset();
   };
 
+  // ejecuto onsubmit
   const onSubmit = async (data: CreateUsuarioPayload) => {
     try {
       await createUsuarioApi(data);
@@ -81,6 +87,7 @@ export function EquipoPage() {
     }
   };
 
+  // ejecuto handledelete
   const handleDelete = (usuario: Usuario) => {
     if (usuario.id_usuario === currentUser?.id_usuario) {
       showToast('warning', 'no podés eliminar tu propia cuenta');
@@ -89,6 +96,7 @@ export function EquipoPage() {
     setUserToDelete(usuario);
   };
 
+  // ejecuto confirmdeleteusuario
   const confirmDeleteUsuario = async () => {
     if (!userToDelete) return;
     try {
@@ -101,8 +109,10 @@ export function EquipoPage() {
     }
   };
 
+  // ejecuto countrol
   const countRol = (rol: RolNombre) => usuarios.filter((u) => u.rol === rol).length;
 
+  // ejecuto getrolebadgeclass
   const getRoleBadgeClass = (rol: RolNombre) => {
     switch (rol) {
       case 'dueno':
@@ -326,3 +336,4 @@ export function EquipoPage() {
     </div>
   );
 }
+

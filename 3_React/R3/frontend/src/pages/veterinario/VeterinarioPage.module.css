@@ -36,7 +36,7 @@
   margin-top: 0.25rem;
 }
 
-[data-theme='dark'] .roleTag {
+[data-theme="dark"] .roleTag {
   background: #4c1d95;
   color: #c4b5fd;
 }
@@ -104,7 +104,7 @@
   gap: 1rem;
 }
 
-[data-theme='dark'] .banner {
+[data-theme="dark"] .banner {
   background: #450a0a;
   border-color: #991b1b;
 }
@@ -115,7 +115,7 @@
   color: #991b1b;
 }
 
-[data-theme='dark'] .bannerText h2 {
+[data-theme="dark"] .bannerText h2 {
   color: #fca5a5;
 }
 
@@ -125,7 +125,7 @@
   margin-top: 0.2rem;
 }
 
-[data-theme='dark'] .bannerText p {
+[data-theme="dark"] .bannerText p {
   color: #fecaca;
 }
 
@@ -177,7 +177,7 @@
   color: #991b1b;
 }
 
-[data-theme='dark'] .statusEnfermo {
+[data-theme="dark"] .statusEnfermo {
   background: #7f1d1d;
   color: #fca5a5;
 }
@@ -187,7 +187,7 @@
   color: #5b21b6;
 }
 
-[data-theme='dark'] .statusTratamiento {
+[data-theme="dark"] .statusTratamiento {
   background: #4c1d95;
   color: #c4b5fd;
 }
@@ -250,7 +250,7 @@
   cursor: pointer;
 }
 
-[data-theme='dark'] .btnDischarge {
+[data-theme="dark"] .btnDischarge {
   background: #14532d;
   border-color: #22c55e;
   color: #86efac;

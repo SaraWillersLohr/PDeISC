@@ -1,4 +1,4 @@
-/** llamadas api para tratamientos médicos veterinarios */
+// llamadas api para tratamientos m�dicos veterinarios
 import axiosInstance, { getApiErrorMessage } from './axiosInstance';
 import type { Tratamiento } from '@/types';
 
@@ -17,7 +17,7 @@ export interface CreateTratamientoPayload {
   observaciones?: string | null;
 }
 
-/** obtiene el historial clínico de un animal */
+// obtiene el historial cl�nico de un animal
 export async function listTratamientosApi(idAnimal: number): Promise<Tratamiento[]> {
   try {
     const { data } = await axiosInstance.get<ApiResponse<Tratamiento[]>>(`/tratamientos?id_animal=${idAnimal}`);
@@ -27,7 +27,7 @@ export async function listTratamientosApi(idAnimal: number): Promise<Tratamiento
   }
 }
 
-/** registra una nueva nota clínica o tratamiento */
+// registra una nueva nota cl�nica o tratamiento
 export async function createTratamientoApi(payload: CreateTratamientoPayload): Promise<Tratamiento> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Tratamiento>>('/tratamientos', payload);
@@ -36,3 +36,4 @@ export async function createTratamientoApi(payload: CreateTratamientoPayload): P
     throw new Error(getApiErrorMessage(error));
   }
 }
+

@@ -1,13 +1,13 @@
-//en este archivo se encuentran los controladores de autenticación,
-//que manejan las solicitudes relacionadas con el inicio de sesión,
-//la obtención del perfil del usuario y el cambio de contraseña inicial.
+// en este archivo se encuentran los controladores de autenticaci�n,
+// que manejan las solicitudes relacionadas con el inicio de sesi�n,
+// la obtenci�n del perfil del usuario y el cambio de contrase�a inicial.
 import { Request, Response } from "express";
 import * as authService from "../services/authService";
 import type { LoginRequest } from "../types";
 
-// POST /api/auth/login — valida credenciales y devuelve jwt
-//esta funcion maneja la solicitud de inicio de sesión,
-//valida las credenciales del usuario y devuelve un token JWT si son correctas.
+// POST /api/auth/login  valida credenciales y devuelve jwt
+// esta funcion maneja la solicitud de inicio de sesi�n,
+// valida las credenciales del usuario y devuelve un token jwt si son correctas.
 export async function login(req: Request, res: Response): Promise<void> {
   try {
     const { email, password } = req.body as LoginRequest;
@@ -35,7 +35,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
-// GET /api/auth/me — devuelve perfil del usuario autenticado
+// GET /api/auth/me  devuelve perfil del usuario autenticado
 export async function me(req: Request, res: Response): Promise<void> {
   try {
     if (!req.usuario) {
@@ -52,7 +52,7 @@ export async function me(req: Request, res: Response): Promise<void> {
   }
 }
 
-//POST /api/auth/cambiar-password-inicial — cambia la contraseña predeterminada
+// post /api/auth/cambiar-password-inicial � cambia la contrase�a predeterminada
 export async function cambiarPasswordInicial(
   req: Request,
   res: Response,
@@ -88,3 +88,4 @@ export async function cambiarPasswordInicial(
     res.status(400).json({ success: false, message });
   }
 }
+

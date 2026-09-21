@@ -1,4 +1,4 @@
-/** helpers para localStorage / sessionStorage con manejo seguro de json */
+// helpers para localstorage / sessionstorage con manejo seguro de json
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -19,13 +19,14 @@ export function setStorageItem<T>(key: string, value: T, persistent = true): voi
   storage.setItem(key, JSON.stringify(value));
 }
 
+// ejecuto removestorageitem
 export function removeStorageItem(key: string): void {
   if (!isBrowser) return;
   localStorage.removeItem(key);
   sessionStorage.removeItem(key);
 }
 
-/** busco sesión en localStorage (recordarme) o sessionStorage (sesión temporal) */
+// busco sesi�n en localstorage (recordarme) o sessionstorage (sesi�n temporal)
 export function getSessionStorage<T>(key: string): { data: T; persistent: boolean } | null {
   const fromLocal = getStorageItem<T>(key, true);
   if (fromLocal) return { data: fromLocal, persistent: true };
@@ -36,9 +37,10 @@ export function getSessionStorage<T>(key: string): { data: T; persistent: boolea
   return null;
 }
 
-/** claves centralizadas para evitar typos */
+// claves centralizadas para evitar typos
 export const STORAGE_KEYS = {
   THEME: 'estancia_theme',
   SESSION: 'estancia_session',
   LOGIN_MODE: 'estancia_login_mode',
 } as const;
+

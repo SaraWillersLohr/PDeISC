@@ -1,4 +1,4 @@
-/** logica de login y perfil */
+// logica de login y perfil
 import pool from '../config/database';
 import { comparePassword, hashPassword } from '../utils/password';
 import { signToken } from '../utils/jwt';
@@ -8,7 +8,7 @@ import type { RowDataPacket } from 'mysql2';
 
 interface UsuarioRow extends RowDataPacket, UsuarioDB {}
 
-/** busco usuario por email incluyendo nombre del rol */
+// busco usuario por email incluyendo nombre del rol
 async function findByEmail(email: string): Promise<UsuarioRow | null> {
   const [rows] = await pool.query<UsuarioRow[]>(
     `SELECT u.*, r.nombre AS rol_nombre
@@ -21,7 +21,7 @@ async function findByEmail(email: string): Promise<UsuarioRow | null> {
   return rows[0] ?? null;
 }
 
-/** busco usuario por id para validar sesión */
+// busco usuario por id para validar sesi�n
 async function findById(id: number): Promise<UsuarioRow | null> {
   const [rows] = await pool.query<UsuarioRow[]>(
     `SELECT u.*, r.nombre AS rol_nombre
@@ -34,6 +34,7 @@ async function findById(id: number): Promise<UsuarioRow | null> {
   return rows[0] ?? null;
 }
 
+// ejecuto topublico
 function toPublico(row: UsuarioRow): UsuarioPublico {
   const rol = row.rol_nombre!;
   return {
@@ -48,7 +49,7 @@ function toPublico(row: UsuarioRow): UsuarioPublico {
   };
 }
 
-/** valido credenciales y devuelvo token + usuario sin datos sensibles */
+// valido credenciales y devuelvo token + usuario sin datos sensibles
 export async function login(data: LoginRequest): Promise<{ token: string; usuario: UsuarioPublico }> {
   const usuario = await findByEmail(data.email);
 
@@ -71,7 +72,7 @@ export async function login(data: LoginRequest): Promise<{ token: string; usuari
   return { token, usuario: toPublico(usuario) };
 }
 
-/** obtengo perfil del usuario autenticado por id del token */
+// obtengo perfil del usuario autenticado por id del token
 export async function getProfile(idUsuario: number): Promise<UsuarioPublico> {
   const usuario = await findById(idUsuario);
   if (!usuario) {
@@ -80,7 +81,7 @@ export async function getProfile(idUsuario: number): Promise<UsuarioPublico> {
   return toPublico(usuario);
 }
 
-/** actualizo contraseña obligatoria en primer ingreso */
+// actualizo contrase�a obligatoria en primer ingreso
 export async function cambiarPasswordInicial(idUsuario: number, nuevaPassword: string): Promise<UsuarioPublico> {
   if (!nuevaPassword || nuevaPassword.trim().length < 6) {
     throw new Error('la contraseña debe tener al menos 6 caracteres');
@@ -94,3 +95,4 @@ export async function cambiarPasswordInicial(idUsuario: number, nuevaPassword: s
 
   return getProfile(idUsuario);
 }
+

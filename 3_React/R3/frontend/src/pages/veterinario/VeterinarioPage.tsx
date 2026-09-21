@@ -1,4 +1,4 @@
-/** vista sanitaria de veterinario — enfocada exclusivamente en el corral de enfermería */
+// vista sanitaria de veterinario � enfocada exclusivamente en el corral de enfermer�a
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -36,6 +36,7 @@ interface NotaTratamientoFormData {
   observaciones: string;
 }
 
+// ejecuto veterinariopage
 export function VeterinarioPage() {
   const { usuario, logout } = useAuth();
   const { showToast } = useToast();
@@ -46,7 +47,7 @@ export function VeterinarioPage() {
   const [alertCount, setAlertCount] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  // modal de historial clínico y nueva nota
+  // modal de historial cl�nico y nueva nota
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [historial, setHistorial] = useState<Tratamiento[]>([]);
   const [loadingHistorial, setLoadingHistorial] = useState(false);
@@ -69,6 +70,7 @@ export function VeterinarioPage() {
     },
   });
 
+  // ejecuto loaddata
   const loadData = async () => {
     try {
       setLoading(true);
@@ -85,21 +87,23 @@ export function VeterinarioPage() {
     }
   };
 
+  // ejecuto el callback del hook
   useEffect(() => {
     loadData();
   }, []);
 
+  // ejecuto handlelogout
   const handleLogout = () => {
     logout();
     navigate('/', { replace: true });
   };
 
-  // filtro estricto: el veterinario solo se ocupa del corral de enfermería
+  // filtro estricto: el veterinario solo se ocupa del corral de enfermer�a
   const animalesEnfermeria = useMemo(() => {
     return animales.filter((a) => a.corral_es_enfermeria);
   }, [animales]);
 
-  // apertura de ficha e historial médico
+  // apertura de ficha e historial m�dico
   const openHistoryModal = async (animal: Animal) => {
     setSelectedAnimal(animal);
     reset();
@@ -114,6 +118,7 @@ export function VeterinarioPage() {
     }
   };
 
+  // ejecuto closehistorymodal
   const closeHistoryModal = () => {
     setSelectedAnimal(null);
     setHistorial([]);
@@ -159,12 +164,13 @@ export function VeterinarioPage() {
     }
   };
 
-  // alta médica
+  // alta m�dica
   const openDischargeModal = (animal: Animal) => {
     setDischargeAnimal(animal);
     setNotasAlta('');
   };
 
+  // ejecuto handleconfirmdischarge
   const handleConfirmDischarge = async () => {
     if (!dischargeAnimal) return;
     setSubmittingDischarge(true);
@@ -250,7 +256,7 @@ export function VeterinarioPage() {
                   </span>
                 </div>
 
-                {/* ficha técnica en modo lectura */}
+                {/* ficha tecnica en modo lectura */}
                 <div className={styles.techSheet}>
                   <div className={styles.sheetRow}>
                     <span className={styles.sheetLabel}>Nombre / Alias:</span>
@@ -262,11 +268,11 @@ export function VeterinarioPage() {
                   </div>
                   <div className={styles.sheetRow}>
                     <span className={styles.sheetLabel}>Peso registrado:</span>
-                    <span>{animal.peso_kg ? `${animal.peso_kg} kg` : '—'}</span>
+                    <span>{animal.peso_kg ? `${animal.peso_kg} kg` : ''}</span>
                   </div>
                   <div className={styles.sheetRow}>
                     <span className={styles.sheetLabel}>Fecha nacimiento:</span>
-                    <span>{animal.fecha_nacimiento || '—'}</span>
+                    <span>{animal.fecha_nacimiento || ''}</span>
                   </div>
                   <div className={styles.sheetRow}>
                     <span className={styles.sheetLabel}>Corral de origen:</span>
@@ -310,7 +316,7 @@ export function VeterinarioPage() {
         </section>
       )}
 
-      {/* modal de historial clínico y registro de nota médica */}
+      {/* modal de historial clinico y registro de nota medica */}
       {selectedAnimal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -347,12 +353,12 @@ export function VeterinarioPage() {
                     </p>
                     {t.medicamento && (
                       <p style={{ fontSize: '0.8rem', color: 'var(--color-primary-light)' }}>
-                        💊 Medicamento: {t.medicamento}
+                        Medicamento: {t.medicamento}
                       </p>
                     )}
                     {t.observaciones && (
                       <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                        📝 {t.observaciones}
+                        Observaciones: {t.observaciones}
                       </p>
                     )}
                     <div className={styles.timelineMeta}>
@@ -364,7 +370,7 @@ export function VeterinarioPage() {
               )}
             </div>
 
-            {/* formulario para registrar nueva nota médica */}
+            {/* formulario para registrar nueva nota medica */}
             <form onSubmit={handleSubmit(onSubmitNote)} className={styles.formSection}>
               <h3>
                 <Stethoscope size={16} style={{ display: 'inline', marginRight: '0.35rem' }} />
@@ -418,7 +424,7 @@ export function VeterinarioPage() {
         </div>
       )}
 
-      {/* modal de confirmación de alta médica */}
+      {/* modal de confirmacion de alta medica */}
       {dischargeAnimal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -476,3 +482,4 @@ export function VeterinarioPage() {
     </div>
   );
 }
+

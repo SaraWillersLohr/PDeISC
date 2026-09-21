@@ -1,4 +1,4 @@
-/** contexto de tema claro/oscuro */
+// contexto de tema claro/oscuro
 import {
   createContext,
   useCallback,
@@ -21,6 +21,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+// ejecuto themeprovider
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     return getStorageItem<Theme>(STORAGE_KEYS.THEME) ?? 'light';
@@ -53,8 +54,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
+// ejecuto usetheme
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error('useTheme debe usarse dentro de ThemeProvider');
   return ctx;
 }
+

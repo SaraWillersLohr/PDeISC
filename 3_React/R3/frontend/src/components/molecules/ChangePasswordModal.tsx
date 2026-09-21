@@ -1,4 +1,4 @@
-/** modal obligatorio de cambio de contraseña en el primer inicio de sesión */
+// modal obligatorio de cambio de contrase�a en el primer inicio de sesi�n
 import React, { useState } from 'react';
 import { ShieldCheck, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,7 +6,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { cambiarPasswordInicialApi } from '@/api/authApi';
 import styles from './ChangePasswordModal.module.css';
 
-/** modal que bloquea la navegación hasta que el usuario reemplace la clave temporal */
+// modal que bloquea la navegaci�n hasta que el usuario reemplace la clave temporal
 export const ChangePasswordModal: React.FC = () => {
   const { usuario, updateUsuario } = useAuth();
   const { showToast } = useToast();
@@ -21,6 +21,7 @@ export const ChangePasswordModal: React.FC = () => {
     return null;
   }
 
+  // ejecuto handlesubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -115,3 +116,4 @@ export const ChangePasswordModal: React.FC = () => {
     </div>
   );
 };
+

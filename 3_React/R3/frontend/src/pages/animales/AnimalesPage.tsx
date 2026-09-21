@@ -1,4 +1,4 @@
-/** gestión completa de animales — fase 5 */
+// gesti�n completa de animales � fase 5
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -28,6 +28,7 @@ interface AnimalFormData {
   estado_salud: EstadoSalud;
 }
 
+// ejecuto animalespage
 export function AnimalesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showToast } = useToast();
@@ -70,12 +71,13 @@ export function AnimalesPage() {
 
   const selectedEspecieId = watch('id_especie');
 
-  // razas disponibles según la especie seleccionada
+  // razas disponibles seg�n la especie seleccionada
   const availableRazas = useMemo(() => {
     const esp = especies.find((e) => Number(e.id_especie) === Number(selectedEspecieId));
     return esp?.razas || [];
   }, [especies, selectedEspecieId]);
 
+  // ejecuto loaddata
   const loadData = async () => {
     try {
       setLoading(true);
@@ -94,11 +96,12 @@ export function AnimalesPage() {
     }
   };
 
+  // ejecuto el callback del hook
   useEffect(() => {
     loadData();
   }, []);
 
-  // si llega ?nuevo=true en url (ej. desde acción rápida del dashboard), abrir modal
+  // si llega ?nuevo=true en url (ej. desde acci�n r�pida del dashboard), abrir modal
   useEffect(() => {
     if (searchParams.get('nuevo') === 'true' && especies.length > 0 && corrales.length > 0) {
       openCreateModal();
@@ -107,6 +110,7 @@ export function AnimalesPage() {
     }
   }, [searchParams, especies, corrales]);
 
+  // ejecuto opencreatemodal
   const openCreateModal = () => {
     setEditingAnimal(null);
     const defaultEsp = especies[0];
@@ -126,6 +130,7 @@ export function AnimalesPage() {
     setModalOpen(true);
   };
 
+  // ejecuto openeditmodal
   const openEditModal = (animal: Animal) => {
     setEditingAnimal(animal);
     reset({
@@ -141,12 +146,14 @@ export function AnimalesPage() {
     setModalOpen(true);
   };
 
+  // ejecuto closemodal
   const closeModal = () => {
     setModalOpen(false);
     setEditingAnimal(null);
     reset();
   };
 
+  // ejecuto onsubmit
   const onSubmit = async (data: AnimalFormData) => {
     try {
       const payload: CreateAnimalPayload = {
@@ -173,10 +180,12 @@ export function AnimalesPage() {
     }
   };
 
+  // ejecuto handledelete
   const handleDelete = (animal: Animal) => {
     setAnimalToDelete(animal);
   };
 
+  // ejecuto confirmdeleteanimal
   const confirmDeleteAnimal = async () => {
     if (!animalToDelete) return;
     try {
@@ -207,6 +216,7 @@ export function AnimalesPage() {
 
   const hasActiveFilters = search || filtroCorral !== '' || filtroEspecie !== '' || filtroEstado !== '';
 
+  // ejecuto clearfilters
   const clearFilters = () => {
     setSearch('');
     setFiltroCorral('');
@@ -214,6 +224,7 @@ export function AnimalesPage() {
     setFiltroEstado('');
   };
 
+  // ejecuto getstatusbadgeclass
   const getStatusBadgeClass = (status: EstadoSalud) => {
     switch (status) {
       case 'sano':
@@ -229,6 +240,7 @@ export function AnimalesPage() {
     }
   };
 
+  // ejecuto formatstatus
   const formatStatus = (status: EstadoSalud) => {
     switch (status) {
       case 'sano':
@@ -342,7 +354,7 @@ export function AnimalesPage() {
                     <span className={styles.idBadge}>{animal.identificador}</span>
                   </td>
                   <td>
-                    <strong>{animal.nombre || '—'}</strong>
+                    <strong>{animal.nombre || ''}</strong>
                   </td>
                   <td>
                     {animal.especie_nombre} · <small>{animal.raza_nombre}</small>
@@ -357,7 +369,7 @@ export function AnimalesPage() {
                       {animal.corral_nombre}
                     </span>
                   </td>
-                  <td>{animal.peso_kg ? `${animal.peso_kg} kg` : '—'}</td>
+                  <td>{animal.peso_kg ? `${animal.peso_kg} kg` : ''}</td>
                   <td>
                     <span className={`${styles.statusBadge} ${getStatusBadgeClass(animal.estado_salud)}`}>
                       {formatStatus(animal.estado_salud)}
@@ -485,9 +497,8 @@ export function AnimalesPage() {
                             value={corral.id_corral}
                             disabled={isFull}
                           >
-                            {corral.nombre} ({corral.ocupados}/{corral.capacidad})
-                            {corral.es_enfermeria ? ' — ENFERMERÍA' : ''}
-                            {isFull ? ' [COMPLETO]' : ''}
+                                {corral.nombre} ({corral.ocupados}/{corral.capacidad})
+                                {isFull ? ' [COMPLETO]' : ''}
                           </option>
                         );
                       })}
@@ -557,3 +568,4 @@ export function AnimalesPage() {
     </div>
   );
 }
+

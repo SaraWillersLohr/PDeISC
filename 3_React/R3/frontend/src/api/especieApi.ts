@@ -1,4 +1,4 @@
-/** llamadas api de especies y razas */
+// llamadas api de especies y razas
 import axiosInstance, { getApiErrorMessage } from './axiosInstance';
 import type { Especie, Raza } from '@/types';
 
@@ -8,6 +8,7 @@ interface ApiResponse<T> {
   data: T;
 }
 
+// ejecuto listespeciesapi
 export async function listEspeciesApi(): Promise<Especie[]> {
   try {
     const { data } = await axiosInstance.get<ApiResponse<Especie[]>>('/especies');
@@ -17,6 +18,7 @@ export async function listEspeciesApi(): Promise<Especie[]> {
   }
 }
 
+// ejecuto createespecieapi
 export async function createEspecieApi(nombre: string): Promise<Especie> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Especie>>('/especies', { nombre });
@@ -26,6 +28,7 @@ export async function createEspecieApi(nombre: string): Promise<Especie> {
   }
 }
 
+// ejecuto createrazaapi
 export async function createRazaApi(idEspecie: number, nombre: string): Promise<Raza> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Raza>>(`/especies/${idEspecie}/razas`, { nombre });
@@ -34,3 +37,4 @@ export async function createRazaApi(idEspecie: number, nombre: string): Promise<
     throw new Error(getApiErrorMessage(error));
   }
 }
+

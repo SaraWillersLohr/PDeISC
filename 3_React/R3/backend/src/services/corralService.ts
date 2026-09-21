@@ -1,4 +1,4 @@
-/** servicio de gestión de corrales */
+// servicio de gesti�n de corrales
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
@@ -33,6 +33,7 @@ export interface UpdateCorralRequest {
   activo?: boolean;
 }
 
+// ejecuto tocorral
 function toCorral(row: CorralRow): CorralItem {
   return {
     id_corral: row.id_corral,
@@ -44,6 +45,7 @@ function toCorral(row: CorralRow): CorralItem {
   };
 }
 
+// ejecuto listcorrales
 export async function listCorrales(): Promise<CorralItem[]> {
   const [rows] = await pool.query<CorralRow[]>(
     `SELECT c.id_corral, c.nombre, c.capacidad, c.es_enfermeria, c.activo,
@@ -57,6 +59,7 @@ export async function listCorrales(): Promise<CorralItem[]> {
   return rows.map(toCorral);
 }
 
+// ejecuto createcorral
 export async function createCorral(data: CreateCorralRequest): Promise<CorralItem> {
   const nombre = data.nombre.trim();
   const capacidad = Number(data.capacidad);
@@ -87,6 +90,7 @@ export async function createCorral(data: CreateCorralRequest): Promise<CorralIte
   }
 }
 
+// ejecuto updatecorral
 export async function updateCorral(id: number, data: UpdateCorralRequest): Promise<CorralItem> {
   const fields: string[] = [];
   const values: unknown[] = [];
@@ -143,6 +147,7 @@ export async function updateCorral(id: number, data: UpdateCorralRequest): Promi
   }
 }
 
+// ejecuto deletecorral
 export async function deleteCorral(id: number): Promise<void> {
   const [[countRow]] = await pool.query<RowDataPacket[]>(
     'SELECT COUNT(*) AS ocupados FROM animales WHERE id_corral = ? AND activo = 1',
@@ -160,3 +165,4 @@ export async function deleteCorral(id: number): Promise<void> {
 
   if (result.affectedRows === 0) throw new Error('corral no encontrado');
 }
+

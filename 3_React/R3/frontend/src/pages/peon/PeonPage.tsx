@@ -1,4 +1,4 @@
-/** vista operativa de campo para peón — interfaz móvil y responsiva */
+// vista operativa de campo para pe�n � interfaz m�vil y responsiva
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -36,6 +36,7 @@ interface NacimientoFormData {
   peso_kg: string;
 }
 
+// ejecuto peonpage
 export function PeonPage() {
   const { usuario, logout } = useAuth();
   const { showToast } = useToast();
@@ -84,11 +85,12 @@ export function PeonPage() {
     return esp?.razas || [];
   }, [especies, selectedEspecieId]);
 
-  // solo corrales generales activos (no enfermería)
+  // solo corrales generales activos (no enfermer�a)
   const corralesGenerales = useMemo(() => {
     return corrales.filter((c) => !c.es_enfermeria && c.activo);
   }, [corrales]);
 
+  // ejecuto loaddata
   const loadData = async () => {
     try {
       setLoading(true);
@@ -107,16 +109,18 @@ export function PeonPage() {
     }
   };
 
+  // ejecuto el callback del hook
   useEffect(() => {
     loadData();
   }, []);
 
+  // ejecuto handlelogout
   const handleLogout = () => {
     logout();
     navigate('/', { replace: true });
   };
 
-  // filtro de animales en corrales comunes (no en enfermería)
+          <p>No se encontraron animales activos en corrales comunes.</p>
   const animalesCampo = useMemo(() => {
     return animales.filter((a) => {
       if (a.corral_es_enfermeria) return false;
@@ -147,6 +151,7 @@ export function PeonPage() {
     setBirthModalOpen(true);
   };
 
+  // ejecuto onsubmitbirth
   const onSubmitBirth = async (data: NacimientoFormData) => {
     try {
       const payload: CreateAnimalPayload = {
@@ -177,6 +182,7 @@ export function PeonPage() {
     setDestCorralId(available ? available.id_corral : 0);
   };
 
+  // ejecuto handleconfirmtransfer
   const handleConfirmTransfer = async () => {
     if (!transferAnimal || !destCorralId) return;
     try {
@@ -189,12 +195,13 @@ export function PeonPage() {
     }
   };
 
-  // reporte de enfermedad hacia enfermería
+  // modal de reporte de enfermedad
   const openSickModal = (animal: Animal) => {
     setSickAnimal(animal);
     setSintomas('');
   };
 
+  // ejecuto handleconfirmsick
   const handleConfirmSick = async () => {
     if (!sickAnimal) return;
     setSubmittingSick(true);
@@ -504,7 +511,7 @@ export function PeonPage() {
         </div>
       )}
 
-      {/* modal para reportar enfermedad hacia enfermería */}
+      {/* modal para reportar enfermedad hacia enfermeria */}
       {sickAnimal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -558,3 +565,4 @@ export function PeonPage() {
     </div>
   );
 }
+

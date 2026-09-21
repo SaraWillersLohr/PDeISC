@@ -38,7 +38,7 @@
   margin-top: 0.25rem;
 }
 
-[data-theme='dark'] .roleTag {
+[data-theme="dark"] .roleTag {
   background: #14532d;
   color: #86efac;
 }
@@ -77,7 +77,7 @@
   box-shadow: 0 4px 12px rgba(26, 48, 32, 0.25);
 }
 
-[data-theme='dark'] .actionBanner {
+[data-theme="dark"] .actionBanner {
   background: var(--color-primary-light);
   color: #0f1410;
 }
@@ -107,7 +107,7 @@
   white-space: nowrap;
 }
 
-[data-theme='dark'] .birthBtn {
+[data-theme="dark"] .birthBtn {
   background: #0f1410;
   color: #fff;
 }
@@ -229,7 +229,7 @@
   gap: 0.35rem;
 }
 
-[data-theme='dark'] .btnSick {
+[data-theme="dark"] .btnSick {
   background: #450a0a;
   border-color: #991b1b;
   color: #fca5a5;

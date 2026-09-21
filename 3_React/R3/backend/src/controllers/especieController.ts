@@ -1,8 +1,8 @@
-//controlador de especies y razas
+// controlador de especies y razas
 import { Request, Response, NextFunction } from "express";
 import * as especieService from "../services/especieService";
 
-//esta funcion lista las especies disponibles, crea una nueva especie y crea una nueva raza asociada a una especie existente.
+// esta funcion lista las especies disponibles, crea una nueva especie y crea una nueva raza asociada a una especie existente.
 export async function list(_req: Request, res: Response, next: NextFunction) {
   try {
     const especies = await especieService.listEspecies();
@@ -11,7 +11,7 @@ export async function list(_req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
-//crear especie
+// crear especie
 export async function createEspecie(
   req: Request,
   res: Response,
@@ -27,7 +27,7 @@ export async function createEspecie(
     next(error);
   }
 }
-//crear raza asociada a una especie existente
+// crear raza asociada a una especie existente
 export async function createRaza(
   req: Request,
   res: Response,
@@ -42,3 +42,4 @@ export async function createRaza(
     next(error);
   }
 }
+

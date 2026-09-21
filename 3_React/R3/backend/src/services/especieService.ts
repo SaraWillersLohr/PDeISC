@@ -1,4 +1,4 @@
-/** servicio de especies y razas */
+// servicio de especies y razas
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
@@ -25,6 +25,7 @@ interface RazaRow extends RowDataPacket {
   nombre: string;
 }
 
+// ejecuto listespecies
 export async function listEspecies(): Promise<EspecieItem[]> {
   const [especies] = await pool.query<EspecieRow[]>(
     'SELECT id_especie, nombre FROM especies ORDER BY nombre ASC',
@@ -40,6 +41,7 @@ export async function listEspecies(): Promise<EspecieItem[]> {
   }));
 }
 
+// ejecuto createespecie
 export async function createEspecie(nombre: string): Promise<EspecieItem> {
   const cleanNombre = nombre.trim();
   if (!cleanNombre) throw new Error('el nombre de la especie es requerido');
@@ -62,6 +64,7 @@ export async function createEspecie(nombre: string): Promise<EspecieItem> {
   }
 }
 
+// ejecuto createraza
 export async function createRaza(idEspecie: number, nombre: string): Promise<RazaItem> {
   const cleanNombre = nombre.trim();
   if (!cleanNombre) throw new Error('el nombre de la raza es requerido');
@@ -83,3 +86,4 @@ export async function createRaza(idEspecie: number, nombre: string): Promise<Raz
     throw err;
   }
 }
+

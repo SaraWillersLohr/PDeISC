@@ -1,4 +1,4 @@
-/** componente de confirmación accesible para erradicar alerts y confirms del navegador */
+// componente de confirmaci�n accesible para erradicar alerts y confirms del navegador
 import React, { useEffect } from 'react';
 import { AlertTriangle, Info } from 'lucide-react';
 import styles from './ConfirmModal.module.css';
@@ -14,7 +14,7 @@ interface ConfirmModalProps {
   onCancel: () => void;
 }
 
-/** modal reutilizable de confirmación dentro de la interfaz */
+// modal reutilizable de confirmaci�n dentro de la interfaz
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
   title,
@@ -29,6 +29,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
 
+    // ejecuto handlekeydown
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onCancel();
@@ -72,3 +73,4 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     </div>
   );
 };
+

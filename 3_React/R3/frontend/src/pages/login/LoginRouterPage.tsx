@@ -1,4 +1,4 @@
-/** pagina login con react router */
+// pagina login con react router
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { LoginForm } from './LoginForm';
@@ -7,10 +7,11 @@ import styles from './LoginPages.module.css';
 
 import type { Usuario } from '@/types';
 
-/** login opción B — ruta formal /login con react router */
+// login opci�n b � ruta formal /login con react router
 export function LoginRouterPage() {
   const navigate = useNavigate();
 
+  // ejecuto handlesuccess
   const handleSuccess = (user?: Usuario) => {
     const dest = user?.rol === 'peon' ? '/peon' : user?.rol === 'veterinario' ? '/veterinario' : '/dashboard';
     navigate(dest, { replace: true });
@@ -31,3 +32,4 @@ export function LoginRouterPage() {
     </AuthLayout>
   );
 }
+

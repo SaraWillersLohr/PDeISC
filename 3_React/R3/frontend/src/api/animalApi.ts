@@ -1,4 +1,4 @@
-/** llamadas api de animales */
+// llamadas api de animales
 import axiosInstance, { getApiErrorMessage } from './axiosInstance';
 import type { Animal, EstadoSalud } from '@/types';
 
@@ -36,6 +36,7 @@ export interface UpdateAnimalPayload {
   activo?: boolean;
 }
 
+// ejecuto listanimalesapi
 export async function listAnimalesApi(filters: AnimalFilterParams = {}): Promise<Animal[]> {
   try {
     const params = new URLSearchParams();
@@ -52,6 +53,7 @@ export async function listAnimalesApi(filters: AnimalFilterParams = {}): Promise
   }
 }
 
+// ejecuto createanimalapi
 export async function createAnimalApi(payload: CreateAnimalPayload): Promise<Animal> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Animal>>('/animales', payload);
@@ -61,6 +63,7 @@ export async function createAnimalApi(payload: CreateAnimalPayload): Promise<Ani
   }
 }
 
+// ejecuto updateanimalapi
 export async function updateAnimalApi(id: number, payload: UpdateAnimalPayload): Promise<Animal> {
   try {
     const { data } = await axiosInstance.patch<ApiResponse<Animal>>(`/animales/${id}`, payload);
@@ -70,6 +73,7 @@ export async function updateAnimalApi(id: number, payload: UpdateAnimalPayload):
   }
 }
 
+// ejecuto deleteanimalapi
 export async function deleteAnimalApi(id: number): Promise<void> {
   try {
     await axiosInstance.delete(`/animales/${id}`);
@@ -78,7 +82,7 @@ export async function deleteAnimalApi(id: number): Promise<void> {
   }
 }
 
-/** reporta un animal como enfermo y lo traslada automáticamente a enfermería */
+// reporta un animal como enfermo y lo traslada autom�ticamente a enfermer�a
 export async function reportarEnfermedadApi(id: number, comentarios: string): Promise<Animal> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Animal>>(`/animales/${id}/reportar-enfermedad`, {
@@ -90,7 +94,7 @@ export async function reportarEnfermedadApi(id: number, comentarios: string): Pr
   }
 }
 
-/** da el alta sanitaria a un animal internado en enfermería y lo reintegra */
+// da el alta sanitaria a un animal internado en enfermer�a y lo reintegra
 export async function darDeAltaApi(id: number, notas_alta?: string): Promise<Animal> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Animal>>(`/animales/${id}/alta`, {
@@ -101,3 +105,4 @@ export async function darDeAltaApi(id: number, notas_alta?: string): Promise<Ani
     throw new Error(getApiErrorMessage(error));
   }
 }
+

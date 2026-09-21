@@ -1,4 +1,4 @@
-/** formulario de login reutilizable */
+// formulario de login reutilizable
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
@@ -12,7 +12,7 @@ interface LoginFormProps {
   onSuccess?: (user?: Usuario) => void;
 }
 
-/** formulario reutilizable para ambos sistemas de login */
+// formulario reutilizable para ambos sistemas de login
 export function LoginForm({ mode, onSuccess }: LoginFormProps) {
   const { login, isLoading } = useAuth();
   const { showToast } = useToast();
@@ -30,6 +30,7 @@ export function LoginForm({ mode, onSuccess }: LoginFormProps) {
     },
   });
 
+  // ejecuto onsubmit
   const onSubmit = async (data: LoginFormData) => {
     try {
       const user = await login(data, mode);
@@ -116,3 +117,4 @@ export function LoginForm({ mode, onSuccess }: LoginFormProps) {
     </form>
   );
 }
+

@@ -1,4 +1,4 @@
-/** placeholder de módulos — se implementan en fase 5 */
+// placeholder de m�dulos � se implementan en fase 5
 import styles from './ModulePlaceholderPage.module.css';
 
 interface Props {
@@ -6,6 +6,7 @@ interface Props {
   fase?: number;
 }
 
+// ejecuto moduleplaceholderpage
 export function ModulePlaceholderPage({ title, fase = 5 }: Props) {
   return (
     <div className={styles.page}>
@@ -14,3 +15,4 @@ export function ModulePlaceholderPage({ title, fase = 5 }: Props) {
     </div>
   );
 }
+

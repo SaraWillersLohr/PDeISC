@@ -1,11 +1,11 @@
-//controlador del dashboard — expone métricas al frontend
+// controlador del dashboard � expone m�tricas al frontend
 import { Request, Response } from "express";
 import * as dashboardService from "../services/dashboardService";
 
-// GET /api/dashboard/summary — métricas del panel dueño/copropietario
-//esta función maneja la solicitud para obtener las métricas del panel de control,
-//esas metricas incluyen el número total de animales, el número de animales por estado de salud,
-//el número de corrales y el número de especies.
+// get /api/dashboard/summary � m�tricas del panel due�o/copropietario
+// esta funci�n maneja la solicitud para obtener las m�tricas del panel de control,
+// esas metricas incluyen el n�mero total de animales, el n�mero de animales por estado de salud,
+// el n�mero de corrales y el n�mero de especies.
 export async function summary(_req: Request, res: Response): Promise<void> {
   try {
     const data = await dashboardService.getDashboardSummary();
@@ -16,3 +16,4 @@ export async function summary(_req: Request, res: Response): Promise<void> {
     res.status(500).json({ success: false, message });
   }
 }
+

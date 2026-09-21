@@ -1,4 +1,4 @@
-// rutas del dashboard — solo roles administrativos
+// rutas del dashboard  solo roles administrativos
 import { Router } from "express";
 import { authenticate } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/roleMiddleware";
@@ -14,3 +14,4 @@ router.get(
 );
 
 export default router;
+

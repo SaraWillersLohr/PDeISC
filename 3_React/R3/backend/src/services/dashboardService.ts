@@ -1,4 +1,4 @@
-/** servicio de métricas del dashboard — consultas agregadas a mariaDB */
+// servicio de m�tricas del dashboard � consultas agregadas a mariadb
 import pool from '../config/database';
 import type { RowDataPacket } from 'mysql2';
 
@@ -35,7 +35,7 @@ interface ChartRow extends RowDataPacket {
   cantidad: number;
 }
 
-/** obtengo todas las métricas del panel admin en una sola llamada */
+// obtengo todas las m�tricas del panel admin en una sola llamada
 export async function getDashboardSummary(): Promise<DashboardSummary> {
   const [[animalesRow]] = await pool.query<CountRow[]>(
     'SELECT COUNT(*) AS total FROM animales WHERE activo = 1',
@@ -89,6 +89,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     const filas = (chartRows as { mes: number; especie: string; cantidad: number }[]).filter(
       (f) => f.mes === i + 1,
     );
+    // ejecuto get
     const get = (esp: string) =>
       Number(filas.find((f) => f.especie === esp)?.cantidad ?? 0);
     return { mes, bovinos: get('Bovino'), ovinos: get('Ovino'), equinos: get('Equino') };
@@ -107,3 +108,4 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     resumenMensual,
   };
 }
+

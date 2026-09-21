@@ -1,11 +1,11 @@
-// servicio de gestión de animales
+// servicio de gesti�n de animales
 import pool from "../config/database";
 import type { RowDataPacket, ResultSetHeader } from "mysql2";
 import { createNotificacion } from "./notificacionService";
 
 export type EstadoSalud = "sano" | "enfermo" | "herido" | "en_tratamiento";
-//intefaxz de animal
-//muestra informacion
+// intefaxz de animal
+// muestra informacion
 export interface AnimalItem {
   id_animal: number;
   identificador: string;
@@ -25,7 +25,7 @@ export interface AnimalItem {
   created_at: string;
 }
 // interfaz de fila de animal para mapear resultados de la base de datos
-//los resultadso se mapean a la interfaz AnimalItem para su uso en el servicio y controlador
+// los resultadso se mapean a la interfaz animalitem para su uso en el servicio y controlador
 interface AnimalRow extends RowDataPacket {
   id_animal: number;
   identificador: string;
@@ -44,8 +44,8 @@ interface AnimalRow extends RowDataPacket {
   activo: number;
   created_at: string;
 }
-// función para mapear una fila de animal a un objeto AnimalItem
-// esta función convierte los datos de la base de datos a un formato más amigable para la aplicación
+// funci�n para mapear una fila de animal a un objeto animalitem
+// esta funci�n convierte los datos de la base de datos a un formato m�s amigable para la aplicaci�n
 function toAnimal(row: AnimalRow): AnimalItem {
   return {
     id_animal: row.id_animal,
@@ -68,14 +68,14 @@ function toAnimal(row: AnimalRow): AnimalItem {
     created_at: row.created_at,
   };
 }
-// interfaz para los filtros de búsqueda de animales
+// interfaz para los filtros de b�squeda de animales
 export interface AnimalFilters {
   id_corral?: number;
   estado_salud?: EstadoSalud;
   id_especie?: number;
   search?: string;
 }
-// esta función lista los animales aplicando filtros opcionales como id_corral, estado_salud, id_especie y búsqueda por nombre o descripción.
+// esta funci�n lista los animales aplicando filtros opcionales como id_corral, estado_salud, id_especie y b�squeda por nombre o descripci�n.
 export async function listAnimales(
   filters: AnimalFilters = {},
 ): Promise<AnimalItem[]> {
@@ -129,6 +129,7 @@ export interface CreateAnimalRequest {
   estado_salud?: EstadoSalud;
 }
 
+// ejecuto createanimal
 export async function createAnimal(
   data: CreateAnimalRequest,
 ): Promise<AnimalItem> {
@@ -205,6 +206,7 @@ export interface UpdateAnimalRequest {
   activo?: boolean;
 }
 
+// ejecuto updateanimal
 export async function updateAnimal(
   id: number,
   data: UpdateAnimalRequest,
@@ -271,7 +273,7 @@ export async function updateAnimal(
     fields.push("id_corral = ?");
     values.push(data.id_corral);
 
-    // si se traslada a enfermería, guardo el corral de origen
+    // si se traslada a enfermer�a, guardo el corral de origen
     if (destInfo.es_enfermeria === 1) {
       fields.push("id_corral_origen = ?");
       values.push(actual.id_corral);
@@ -288,7 +290,7 @@ export async function updateAnimal(
       values,
     );
 
-    // si cambió el estado de salud se registra la notificación correspondiente
+    // si cambi� el estado de salud se registra la notificaci�n correspondiente
     if (data.estado_salud && data.estado_salud !== actual.estado_salud) {
       if (
         data.estado_salud === "enfermo" ||
@@ -335,7 +337,7 @@ export async function updateAnimal(
   }
 }
 
-/** reporta un animal enfermo, lo traslada automáticamente a enfermería y registra síntomas */
+// reporta un animal enfermo, lo traslada autom�ticamente a enfermer�a y registra s�ntomas
 export async function reportarEnfermedad(
   idAnimal: number,
   comentarios: string,
@@ -347,19 +349,19 @@ export async function reportarEnfermedad(
   );
   if (!animal) throw new Error("animal no encontrado");
 
-  // busco el corral designado como enfermería
+  // busco el corral designado como enfermer�a
   const [[enfermeria]] = await pool.query<RowDataPacket[]>(
     "SELECT id_corral, capacidad FROM corrales WHERE es_enfermeria = 1 AND activo = 1 LIMIT 1",
   );
   if (!enfermeria)
     throw new Error("no se encontró un corral de enfermería configurado");
 
-  // si ya está en enfermería no se vuelve a trasladar
+  // si ya est� en enfermer�a no se vuelve a trasladar
   if (animal.id_corral === enfermeria.id_corral) {
     throw new Error("el animal ya se encuentra en el corral de enfermería");
   }
 
-  // actualizo animal: guardo corral previo, mudo a enfermería y marco como enfermo
+  // actualizo animal: guardo corral previo, mudo a enfermer�a y marco como enfermo
   await pool.query(
     `UPDATE animales
      SET id_corral_origen = ?, id_corral = ?, estado_salud = 'enfermo'
@@ -392,7 +394,7 @@ export async function reportarEnfermedad(
   return actualizado;
 }
 
-/** da de alta a un animal en enfermería y lo devuelve a su corral original */
+// da de alta a un animal en enfermer�a y lo devuelve a su corral original
 export async function darDeAlta(
   idAnimal: number,
   idVeterinario: number,
@@ -444,10 +446,10 @@ export async function darDeAlta(
     [destCorralId, idAnimal],
   );
 
-  // registro nota de alta médica
+  // registro nota de alta m�dica
   const detalleAlta = notasAlta?.trim()
     ? `alta médica: ${notasAlta.trim()}`
-    : "alta médica emitida por veterinario — animal recuperado";
+    : "alta médica emitida por veterinario � animal recuperado";
 
   await pool.query(
     `INSERT INTO tratamientos (id_animal, id_veterinario, descripcion, fecha_inicio, fecha_fin)
@@ -455,7 +457,7 @@ export async function darDeAlta(
     [idAnimal, idVeterinario, detalleAlta],
   );
 
-  // registro notificación de alta médica persistente
+  // registro notificaci�n de alta m�dica persistente
   await createNotificacion(
     "Alta médica emitida",
     `Animal ${animal.identificador} declarado sano y reintegrado a corral`,
@@ -469,6 +471,7 @@ export async function darDeAlta(
   return actualizado;
 }
 
+// ejecuto deleteanimal
 export async function deleteAnimal(id: number): Promise<void> {
   const [result] = await pool.query<ResultSetHeader>(
     "UPDATE animales SET activo = 0 WHERE id_animal = ?",
@@ -476,3 +479,4 @@ export async function deleteAnimal(id: number): Promise<void> {
   );
   if (result.affectedRows === 0) throw new Error("animal no encontrado");
 }
+

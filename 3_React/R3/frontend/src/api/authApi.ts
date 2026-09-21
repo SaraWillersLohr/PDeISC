@@ -1,4 +1,4 @@
-/** llamadas api de autenticacion */
+// llamadas api de autenticacion
 import axiosInstance from './axiosInstance';
 import type { LoginFormData, Usuario } from '@/types';
 
@@ -13,7 +13,7 @@ interface LoginResponse {
   usuario: Usuario;
 }
 
-/** inicio sesión contra la api — devuelve token jwt y datos del usuario */
+// inicio sesi�n contra la api � devuelve token jwt y datos del usuario
 export async function loginApi(credentials: LoginFormData): Promise<LoginResponse> {
   const { data } = await axiosInstance.post<ApiResponse<LoginResponse>>('/auth/login', {
     email: credentials.email,
@@ -27,7 +27,7 @@ export async function loginApi(credentials: LoginFormData): Promise<LoginRespons
   return data.data;
 }
 
-/** valido token existente y obtengo perfil actualizado */
+// valido token existente y obtengo perfil actualizado
 export async function getMeApi(): Promise<Usuario> {
   const { data } = await axiosInstance.get<ApiResponse<Usuario>>('/auth/me');
 
@@ -38,7 +38,7 @@ export async function getMeApi(): Promise<Usuario> {
   return data.data;
 }
 
-/** actualiza la contraseña inicial del usuario para remover la contraseña predeterminada */
+// actualiza la contrase�a inicial del usuario para remover la contrase�a predeterminada
 export async function cambiarPasswordInicialApi(password: string): Promise<Usuario> {
   const { data } = await axiosInstance.post<ApiResponse<Usuario>>('/auth/cambiar-password-inicial', {
     password,
@@ -50,3 +50,4 @@ export async function cambiarPasswordInicialApi(password: string): Promise<Usuar
 
   return data.data;
 }
+

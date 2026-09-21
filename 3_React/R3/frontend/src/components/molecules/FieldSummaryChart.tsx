@@ -1,4 +1,4 @@
-/** gráfico de barras apiladas — resumen del campo por especie */
+// gr�fico de barras apiladas � resumen del campo por especie
 import type { DashboardSummary } from '@/types';
 import styles from './FieldSummaryChart.module.css';
 
@@ -6,6 +6,7 @@ interface Props {
   data: DashboardSummary['resumenMensual'];
 }
 
+// ejecuto fieldsummarychart
 export function FieldSummaryChart({ data }: Props) {
   const max = Math.max(
     ...data.map((d) => d.bovinos + d.ovinos + d.equinos),
@@ -38,3 +39,4 @@ export function FieldSummaryChart({ data }: Props) {
     </div>
   );
 }
+

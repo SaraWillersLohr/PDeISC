@@ -1,4 +1,4 @@
-/** enrutador principal — rutas públicas, login dual y dashboard protegido */
+// enrutador principal � rutas p�blicas, login dual y dashboard protegido
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { HomeSelectorPage } from '@/pages/HomeSelectorPage';
 import { LoginRouterPage } from '@/pages/login/LoginRouterPage';
@@ -13,7 +13,7 @@ import { VeterinarioPage } from '@/pages/veterinario/VeterinarioPage';
 import { useAuth } from '@/contexts/AuthContext';
 import type { RolNombre } from '@/types';
 
-/** redirige a / si no hay sesión activa */
+// redirige a / si no hay sesi�n activa
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <div className="loading-screen">cargando...</div>;
@@ -21,7 +21,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/** redirige a la vista correspondiente al rol si ya hay sesión */
+// redirige a la vista correspondiente al rol si ya hay sesi�n
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, usuario } = useAuth();
   if (isLoading) return <div className="loading-screen">cargando...</div>;
@@ -32,7 +32,7 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/** solo dueño y copropietario — panel general */
+// solo due�o y copropietario � panel general
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { usuario, isLoading } = useAuth();
   const admin: RolNombre[] = ['dueno', 'copropietario'];
@@ -41,7 +41,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/** solo peón (o admin para supervisión) */
+// solo pe�n (o admin para supervisi�n)
 function PeonRoute({ children }: { children: React.ReactNode }) {
   const { usuario, isLoading } = useAuth();
   const permitidos: RolNombre[] = ['peon', 'dueno', 'copropietario'];
@@ -50,7 +50,7 @@ function PeonRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/** solo veterinario (o admin para supervisión) */
+// solo veterinario (o admin para supervisi�n)
 function VeterinarioRoute({ children }: { children: React.ReactNode }) {
   const { usuario, isLoading } = useAuth();
   const permitidos: RolNombre[] = ['veterinario', 'dueno', 'copropietario'];
@@ -59,6 +59,7 @@ function VeterinarioRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// ejecuto approuter
 export function AppRouter() {
   const { showStateLogin, isAuthenticated } = useAuth();
 
@@ -68,7 +69,7 @@ export function AppRouter() {
         <Route path="/" element={<HomeSelectorPage />} />
         <Route path="/login" element={<GuestRoute><LoginRouterPage /></GuestRoute>} />
         
-        {/* rutas exclusivas de administración (dueño y copropietario) */}
+        {/* rutas exclusivas de administracion (dueno y copropietario) */}
         <Route
           path="/dashboard"
           element={
@@ -85,7 +86,7 @@ export function AppRouter() {
           <Route path="equipo" element={<EquipoPage />} />
         </Route>
 
-        {/* ruta operativa de campo (peón) */}
+        {/* ruta operativa de campo (peon) */}
         <Route
           path="/peon"
           element={
@@ -97,7 +98,7 @@ export function AppRouter() {
           }
         />
 
-        {/* ruta sanitaria y enfermería (veterinario) */}
+        {/* ruta sanitaria y enfermeria (veterinario) */}
         <Route
           path="/veterinario"
           element={
@@ -115,3 +116,4 @@ export function AppRouter() {
     </>
   );
 }
+

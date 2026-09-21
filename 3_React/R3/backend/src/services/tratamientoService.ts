@@ -1,4 +1,4 @@
-/** servicio de gestión de tratamientos médicos e historial clínico */
+// servicio de gesti�n de tratamientos m�dicos e historial cl�nico
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
@@ -38,7 +38,7 @@ export interface CreateTratamientoRequest {
   observaciones?: string | null;
 }
 
-/** listo el historial de tratamientos para un animal específico */
+// listo el historial de tratamientos para un animal espec�fico
 export async function listTratamientosByAnimal(idAnimal: number): Promise<TratamientoItem[]> {
   const [rows] = await pool.query<TratamientoRow[]>(
     `SELECT t.id_tratamiento, t.id_animal, t.id_veterinario,
@@ -66,7 +66,7 @@ export async function listTratamientosByAnimal(idAnimal: number): Promise<Tratam
   }));
 }
 
-/** registro una nueva nota clínica o tratamiento */
+// registro una nueva nota cl�nica o tratamiento
 export async function createTratamiento(data: CreateTratamientoRequest): Promise<TratamientoItem> {
   const descripcion = data.descripcion?.trim();
   if (!descripcion) throw new Error('la descripción del tratamiento es obligatoria');
@@ -89,3 +89,4 @@ export async function createTratamiento(data: CreateTratamientoRequest): Promise
   if (!creado) throw new Error('error al recuperar el tratamiento creado');
   return creado;
 }
+

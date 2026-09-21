@@ -1,4 +1,4 @@
-/** llamadas api de usuarios */
+// llamadas api de usuarios
 import axiosInstance, { getApiErrorMessage } from './axiosInstance';
 import type { RolNombre, Usuario } from '@/types';
 
@@ -16,13 +16,13 @@ export interface CreateUsuarioPayload {
   rol: RolNombre;
 }
 
-/** listo empleados — solo admins (dueño/copropietario) */
+// listo empleados � solo admins (due�o/copropietario)
 export async function listUsuariosApi(): Promise<Usuario[]> {
   const { data } = await axiosInstance.get<ApiResponse<Usuario[]>>('/usuarios');
   return data.data;
 }
 
-/** doy de alta un empleado o copropietario */
+// doy de alta un empleado o copropietario
 export async function createUsuarioApi(payload: CreateUsuarioPayload): Promise<Usuario> {
   try {
     const { data } = await axiosInstance.post<ApiResponse<Usuario>>('/usuarios', payload);
@@ -41,7 +41,7 @@ export interface UpdateUsuarioPayload {
   activo?: boolean;
 }
 
-/** actualizo datos de un empleado */
+// actualizo datos de un empleado
 export async function updateUsuarioApi(id: number, payload: UpdateUsuarioPayload): Promise<Usuario> {
   try {
     const { data } = await axiosInstance.patch<ApiResponse<Usuario>>(`/usuarios/${id}`, payload);
@@ -51,7 +51,7 @@ export async function updateUsuarioApi(id: number, payload: UpdateUsuarioPayload
   }
 }
 
-/** desactivo un empleado (soft delete) */
+// desactivo un empleado (soft delete)
 export async function deleteUsuarioApi(id: number): Promise<void> {
   try {
     await axiosInstance.delete(`/usuarios/${id}`);
@@ -59,3 +59,4 @@ export async function deleteUsuarioApi(id: number): Promise<void> {
     throw new Error(getApiErrorMessage(error));
   }
 }
+

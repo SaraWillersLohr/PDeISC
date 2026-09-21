@@ -1,4 +1,4 @@
-/** tipos globales del frontend */
+// tipos globales del frontend
 
 export type RolNombre = 'dueno' | 'copropietario' | 'peon' | 'veterinario';
 
@@ -33,7 +33,7 @@ export interface LoginFormData {
   rememberMe: boolean;
 }
 
-/** métricas del dashboard dueño/copropietario (fase 4) */
+// m�tricas del dashboard due�o/copropietario (fase 4)
 export interface DashboardSummary {
   totalAnimales: number;
   variacionMes: number;
@@ -47,7 +47,7 @@ export interface DashboardSummary {
   resumenMensual: { mes: string; bovinos: number; ovinos: number; equinos: number }[];
 }
 
-/** tipos de gestión de corrales, animales y especies (fase 5) */
+// tipos de gesti�n de corrales, animales y especies (fase 5)
 export interface Corral {
   id_corral: number;
   nombre: string;
@@ -90,7 +90,7 @@ export interface Animal {
   created_at: string;
 }
 
-/** notas médicas y tratamientos veterinarios */
+// notas m�dicas y tratamientos veterinarios
 export interface Tratamiento {
   id_tratamiento: number;
   id_animal: number;
@@ -104,7 +104,7 @@ export interface Tratamiento {
   created_at: string;
 }
 
-/** alertas del sistema para campanita y avisos */
+// alertas del sistema para campanita y avisos
 export interface NotificacionAlerta {
   id: string;
   id_notificacion?: number;
@@ -119,5 +119,6 @@ export interface NotificacionAlerta {
   fecha: string;
   tipo: 'alerta_sanitaria' | 'en_tratamiento' | 'alta' | 'info';
 }
+
 
 

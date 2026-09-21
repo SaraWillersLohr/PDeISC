@@ -1,8 +1,8 @@
-//controlador de notificaciones y alertas
+// controlador de notificaciones y alertas
 import { Request, Response, NextFunction } from "express";
 import * as notificacionService from "../services/notificacionService";
 
-//lista notificaciones sanitarias activas
+// lista notificaciones sanitarias activas
 export async function list(_req: Request, res: Response, next: NextFunction) {
   try {
     const data = await notificacionService.getNotificacionesSanitarias();
@@ -12,7 +12,7 @@ export async function list(_req: Request, res: Response, next: NextFunction) {
   }
 }
 
-// elimina una notificación individual
+// elimina una notificaci�n individual
 export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
@@ -41,3 +41,4 @@ export async function clear(_req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
+

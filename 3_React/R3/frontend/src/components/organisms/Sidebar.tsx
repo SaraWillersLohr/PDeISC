@@ -1,4 +1,4 @@
-/** barra lateral verde — navegación del panel admin */
+// barra lateral verde � navegaci�n del panel admin
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Fence, PawPrint, Users, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,10 +11,12 @@ const NAV = [
   { to: '/dashboard/equipo', label: 'Mi Equipo', icon: Users },
 ];
 
+// ejecuto sidebar
 export function Sidebar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  // ejecuto handlelogout
   const handleLogout = () => {
     logout();
     navigate('/', { replace: true });
@@ -51,3 +53,4 @@ export function Sidebar() {
     </aside>
   );
 }
+

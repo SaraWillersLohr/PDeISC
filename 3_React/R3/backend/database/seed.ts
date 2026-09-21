@@ -1,8 +1,6 @@
-/**
- * script de seed — inserta usuarios demo con contraseñas hasheadas
- * ejecutar: npm run seed
- * contraseña de todos los usuarios demo: Estancia2025!
- */
+// ejecuto el seed para crear usuarios demo con contraseñas hasheadas
+// ejecuto este archivo con npm run seed
+// uso estancia2025! como contraseña inicial de los usuarios demo
 import dotenv from 'dotenv';
 import pool from '../src/config/database';
 import { hashPassword } from '../src/utils/password';
@@ -25,6 +23,7 @@ const USUARIOS_DEMO: SeedUser[] = [
   { rol: 'veterinario', nombre: 'Laura', apellido: 'Fernández', email: 'vet@estancia.app' },
 ];
 
+// cargo datos demo y limpio los registros operativos anteriores
 async function seed(): Promise<void> {
   console.log('[seed] iniciando...');
 

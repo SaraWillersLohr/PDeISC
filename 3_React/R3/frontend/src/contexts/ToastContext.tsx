@@ -1,4 +1,4 @@
-/** contexto de notificaciones toast */
+// contexto de notificaciones toast
 import {
   createContext,
   useCallback,
@@ -19,6 +19,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 let toastCounter = 0;
 
+// ejecuto toastprovider
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -31,7 +32,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       const id = `toast-${++toastCounter}-${Date.now()}`;
       setToasts((prev) => [...prev, { id, type, message }]);
 
-      // auto-cierro después de 4 segundos
+      // auto-cierro despu�s de 4 segundos
       setTimeout(() => removeToast(id), 4000);
     },
     [removeToast],
@@ -45,8 +46,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
 }
 
+// ejecuto usetoast
 export function useToast(): ToastContextValue {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error('useToast debe usarse dentro de ToastProvider');
   return ctx;
 }
+

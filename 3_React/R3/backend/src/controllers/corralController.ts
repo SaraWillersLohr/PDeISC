@@ -1,9 +1,9 @@
-//controlador de corrales
+// controlador de corrales
 
 import { Request, Response, NextFunction } from "express";
 import * as corralService from "../services/corralService";
-//esta función maneja la solicitud para listar corrales,
-//crea un nuevo corral, actualiza un corral existente y elimina un corral.
+// esta funci�n maneja la solicitud para listar corrales,
+// crea un nuevo corral, actualiza un corral existente y elimina un corral.
 export async function list(_req: Request, res: Response, next: NextFunction) {
   try {
     const corrales = await corralService.listCorrales();
@@ -12,7 +12,7 @@ export async function list(_req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
-//crear un corral
+// crear un corral
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const corral = await corralService.createCorral(req.body);
@@ -23,7 +23,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
-//actualizar un corral
+// actualizar un corral
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
@@ -33,7 +33,7 @@ export async function update(req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
-//eliminar un corral
+// eliminar un corral
 export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
@@ -43,3 +43,4 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
+

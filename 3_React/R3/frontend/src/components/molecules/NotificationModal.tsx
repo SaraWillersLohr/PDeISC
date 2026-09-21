@@ -1,4 +1,4 @@
-/** componente para visualizar y gestionar las alertas sanitarias y avisos */
+// componente para visualizar y gestionar las alertas sanitarias y avisos
 import { useEffect, useState } from 'react';
 import { Bell, X, Trash2 } from 'lucide-react';
 import { listNotificacionesApi, deleteNotificacionApi, clearNotificacionesApi } from '@/api/notificacionApi';
@@ -10,11 +10,12 @@ interface Props {
   onClose: () => void;
 }
 
-/** panel lateral desplegable de notificaciones y alertas */
+// panel lateral desplegable de notificaciones y alertas
 export function NotificationModal({ isOpen, onClose }: Props) {
   const [alertas, setAlertas] = useState<NotificacionAlerta[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // ejecuto loadalertas
   const loadAlertas = async () => {
     try {
       setLoading(true);
@@ -27,11 +28,13 @@ export function NotificationModal({ isOpen, onClose }: Props) {
     }
   };
 
+  // ejecuto el callback del hook
   useEffect(() => {
     if (!isOpen) return;
     loadAlertas();
   }, [isOpen]);
 
+  // ejecuto handledeleteone
   const handleDeleteOne = async (id: string) => {
     try {
       await deleteNotificacionApi(id);
@@ -41,6 +44,7 @@ export function NotificationModal({ isOpen, onClose }: Props) {
     }
   };
 
+  // ejecuto handleclearall
   const handleClearAll = async () => {
     try {
       await clearNotificacionesApi();
@@ -115,7 +119,7 @@ export function NotificationModal({ isOpen, onClose }: Props) {
                 </div>
 
                 <div className={styles.itemFooter}>
-                  <span>📍 {a.corral_nombre}</span>
+                  <span>⚠️ {a.corral_nombre}</span>
                   {a.fecha && (
                     <span className={styles.itemTimestamp}>
                       {new Date(a.fecha).toLocaleDateString()} {new Date(a.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -130,3 +134,4 @@ export function NotificationModal({ isOpen, onClose }: Props) {
     </div>
   );
 }
+

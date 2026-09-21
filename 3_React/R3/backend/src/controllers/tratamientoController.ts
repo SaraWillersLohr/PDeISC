@@ -1,6 +1,6 @@
-//controlador de tratamientos médicos
-//esto es para el veterinario, para registrar tratamientos y
-//notas médicas de los animales, y para listar los tratamientos de un animal específico.
+// controlador de tratamientos m�dicos
+// esto es para el veterinario, para registrar tratamientos y
+// notas m�dicas de los animales, y para listar los tratamientos de un animal espec�fico.
 import { Request, Response, NextFunction } from "express";
 import * as tratamientoService from "../services/tratamientoService";
 
@@ -28,7 +28,7 @@ export async function listByAnimal(
   }
 }
 
-// crea un tratamiento o nota médica
+// crea un tratamiento o nota m�dica
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const idVeterinario = req.usuario?.id_usuario;
@@ -54,3 +54,4 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
+

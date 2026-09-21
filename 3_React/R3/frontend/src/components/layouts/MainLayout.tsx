@@ -1,8 +1,9 @@
-/** layout principal del dashboard — sidebar + contenido */
+/** layout principal del dashboard  sidebar + contenido */
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '@/components/organisms/Sidebar';
 import styles from './MainLayout.module.css';
 
+// ejecuto mainlayout
 export function MainLayout() {
   return (
     <div className={styles.shell}>
@@ -13,3 +14,4 @@ export function MainLayout() {
     </div>
   );
 }
+

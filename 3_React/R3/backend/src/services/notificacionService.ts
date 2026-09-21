@@ -1,4 +1,4 @@
-/** servicio de notificaciones y alertas sanitarias en tiempo real */
+// servicio de notificaciones y alertas sanitarias en tiempo real
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
@@ -32,7 +32,7 @@ interface NotificacionRow extends RowDataPacket {
   corral_origen_nombre: string | null;
 }
 
-/** crea una nueva notificación persistente en la base de datos */
+// crea una nueva notificaci�n persistente en la base de datos
 export async function createNotificacion(
   titulo: string,
   mensaje: string,
@@ -46,7 +46,7 @@ export async function createNotificacion(
   return result.insertId;
 }
 
-/** obtengo todas las notificaciones persistentes ordenadas por fecha reciente */
+// obtengo todas las notificaciones persistentes ordenadas por fecha reciente
 export async function getNotificacionesSanitarias(): Promise<NotificacionAlerta[]> {
   const [rows] = await pool.query<NotificacionRow[]>(
     `SELECT n.id_notificacion,
@@ -84,7 +84,7 @@ export async function getNotificacionesSanitarias(): Promise<NotificacionAlerta[
   }));
 }
 
-/** elimina una notificación individual por su identificador */
+// elimina una notificaci�n individual por su identificador
 export async function deleteNotificacion(idNotificacion: number): Promise<void> {
   const [res] = await pool.query<ResultSetHeader>(
     `DELETE FROM notificaciones WHERE id_notificacion = ?`,
@@ -95,7 +95,8 @@ export async function deleteNotificacion(idNotificacion: number): Promise<void> 
   }
 }
 
-/** elimina todas las notificaciones de la estancia */
+// elimina todas las notificaciones de la estancia
 export async function clearNotificaciones(): Promise<void> {
   await pool.query(`DELETE FROM notificaciones`);
 }
+

@@ -1,4 +1,4 @@
-/** logica crud de empleados */
+// logica crud de empleados
 import pool from '../config/database';
 import { hashPassword } from '../utils/password';
 import { getRolLabel, ROL_DUENO } from '../utils/roles';
@@ -20,6 +20,7 @@ interface UsuarioRow extends RowDataPacket {
   rol_nombre: RolNombre;
 }
 
+// ejecuto topublico
 function toPublico(row: UsuarioRow): UsuarioPublico {
   return {
     id_usuario: row.id_usuario,
@@ -32,6 +33,7 @@ function toPublico(row: UsuarioRow): UsuarioPublico {
   };
 }
 
+// ejecuto getrolid
 async function getRolId(nombre: RolNombre): Promise<number> {
   const [rows] = await pool.query<RowDataPacket[]>(
     'SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1',
@@ -41,7 +43,7 @@ async function getRolId(nombre: RolNombre): Promise<number> {
   return rows[0].id_rol as number;
 }
 
-/** listo todos los usuarios activos — solo admins */
+/** listo todos los usuarios activos  solo admins */
 export async function listUsuarios(): Promise<UsuarioPublico[]> {
   const [rows] = await pool.query<UsuarioRow[]>(
     `SELECT u.id_usuario, u.id_rol, u.nombre, u.apellido, u.email, u.activo, r.nombre AS rol_nombre
@@ -53,12 +55,12 @@ export async function listUsuarios(): Promise<UsuarioPublico[]> {
   return rows.map(toPublico);
 }
 
-/** creo un usuario nuevo — valido permisos según rol del creador */
+// creo un usuario nuevo � valido permisos seg�n rol del creador
 export async function createUsuario(
   data: CreateUsuarioRequest,
   creadorRol: RolNombre,
 ): Promise<UsuarioPublico> {
-  // solo el dueño puede crear copropietarios
+  // solo el due�o puede crear copropietarios
   if (data.rol === 'copropietario' && creadorRol !== ROL_DUENO) {
     throw new Error('solo el dueño puede dar de alta copropietarios');
   }
@@ -96,7 +98,7 @@ export async function createUsuario(
   }
 }
 
-/** actualizo datos de un usuario existente */
+// actualizo datos de un usuario existente
 export async function updateUsuario(
   id: number,
   data: UpdateUsuarioRequest,
@@ -144,7 +146,7 @@ export async function updateUsuario(
   return toPublico(rows[0]);
 }
 
-/** desactivo usuario (soft delete) — no elimino físicamente */
+// desactivo usuario (soft delete) � no elimino f�sicamente
 export async function deactivateUsuario(id: number): Promise<void> {
   const [result] = await pool.query<ResultSetHeader>(
     'UPDATE usuarios SET activo = 0 WHERE id_usuario = ?',
@@ -154,3 +156,4 @@ export async function deactivateUsuario(id: number): Promise<void> {
     throw new Error('usuario no encontrado');
   }
 }
+

@@ -1,4 +1,4 @@
-// rutas de tratamientos médicos
+// rutas de tratamientos m�dicos
 import { Router } from "express";
 import * as tratamientoController from "../controllers/tratamientoController";
 import { authenticate } from "../middleware/authMiddleware";
@@ -8,10 +8,10 @@ const router = Router();
 
 router.use(authenticate);
 
-// cualquier usuario autenticado puede leer historial médico
+// cualquier usuario autenticado puede leer historial m�dico
 router.get("/", tratamientoController.listByAnimal);
 
-// solo veterinarios, dueño y copropietario pueden registrar tratamientos
+// solo veterinarios, due�o y copropietario pueden registrar tratamientos
 router.post(
   "/",
   authorize("veterinario", "dueno", "copropietario"),
@@ -19,3 +19,4 @@ router.post(
 );
 
 export default router;
+

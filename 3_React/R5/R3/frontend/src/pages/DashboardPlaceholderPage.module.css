@@ -1,0 +1,75 @@
+/* estilos de la pantalla temporal */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 2rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--color-text);
+}
+
+.header p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.modeBadge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(45, 90, 39, 0.1);
+  color: var(--color-primary-light);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoutBtn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
+
+.main {
+  padding: 2rem;
+}
+
+.placeholder {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border: 2px dashed var(--color-border);
+}
+
+.placeholder h2 {
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.placeholder p {
+  color: var(--color-text-muted);
+  max-width: 480px;
+  margin: 0 auto;
+}

@@ -1,0 +1,21 @@
+/* shell del dashboard — sidebar fija + área scrollable */
+.shell {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.content {
+  margin-left: 232px;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .shell {
+    min-height: 100vh;
+  }
+
+  .content {
+    margin-left: 0;
+  }
+}

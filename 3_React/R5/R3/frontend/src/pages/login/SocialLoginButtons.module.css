@@ -1,0 +1,7 @@
+.section { margin-top: 1.25rem; text-align: center; }
+.section > p { color: var(--color-text-muted); font-size: .8rem; margin-bottom: .75rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+.providerButton { align-items: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-text); cursor: pointer; display: flex; font-size: .8rem; font-weight: 600; gap: .4rem; justify-content: center; min-height: 2.5rem; padding: .5rem; transition: transform .15s, border-color .15s; }
+.providerButton:hover { border-color: var(--color-primary-light); transform: translateY(-1px); }
+.google { color: #b3261e; }.facebook { color: #1877f2; }.github { color: var(--color-text); }.discord { color: #5865f2; }.twitch { color: #9146ff; }.twitter { color: var(--color-text); }
+@media (max-width: 360px) { .grid { grid-template-columns: 1fr; } }

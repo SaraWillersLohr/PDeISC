@@ -6,6 +6,11 @@ import { NotificationModal } from "@/components/molecules/NotificationModal";
 import { listNotificacionesApi } from "@/api/notificacionApi";
 import styles from "./MainLayout.module.css";
 
+export interface MainLayoutOutletContext {
+  notificationCount: number;
+  onOpenNotifications: () => void;
+}
+
 // ejecuto mainlayout
 export function MainLayout() {
   const [notifOpen, setNotifOpen] = useState(false);
@@ -19,12 +24,14 @@ export function MainLayout() {
 
   return (
     <div className={styles.shell}>
-      <Sidebar
-        notificationCount={notificationCount}
-        onOpenNotifications={() => setNotifOpen(true)}
-      />
+      <Sidebar />
       <div className={styles.content}>
-        <Outlet />
+        <Outlet
+          context={{
+            notificationCount,
+            onOpenNotifications: () => setNotifOpen(true),
+          }}
+        />
       </div>
       <NotificationModal
         isOpen={notifOpen}

@@ -1,7 +1,8 @@
 // p�gina principal del dashboard due�o/copropietario � fase 4
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import {
+  Bell,
   CloudSun,
   Fence,
   PawPrint,
@@ -18,12 +19,15 @@ import { MetricCard } from "@/components/molecules/MetricCard";
 import { FieldSummaryChart } from "@/components/molecules/FieldSummaryChart";
 import { QuickActionCard } from "@/components/molecules/QuickActionCard";
 import styles from "./DashboardPage.module.css";
+import type { MainLayoutOutletContext } from "@/components/layouts/MainLayout";
 
 // ejecuto dashboardpage
 export function DashboardPage() {
   const { usuario, loginMode } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { notificationCount, onOpenNotifications } =
+    useOutletContext<MainLayoutOutletContext>();
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,6 +58,16 @@ export function DashboardPage() {
             login: {loginMode === "router" ? "React Router" : "useState"}
           </span>
         </div>
+        <button
+          type="button"
+          className={styles.bell}
+          onClick={onOpenNotifications}
+          title="notificaciones"
+          aria-label="notificaciones"
+        >
+          <Bell size={18} />
+          {notificationCount > 0 && <span>{notificationCount}</span>}
+        </button>
       </header>
 
       <section className={styles.metrics}>

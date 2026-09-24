@@ -1,17 +1,43 @@
 /* estilos del interruptor de tema */
 .toggle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: max-content;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 0.2rem;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
+  gap: 0.15rem;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .toggle:hover {
   background: var(--color-input-bg);
+}
+
+.mode,
+.activeMode {
+  min-height: 30px;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.mode {
+  color: var(--color-text-muted);
+}
+
+.activeMode {
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-weight: 700;
 }

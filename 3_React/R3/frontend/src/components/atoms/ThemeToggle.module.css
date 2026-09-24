@@ -1,17 +1,56 @@
 /* estilos del interruptor de tema */
 .toggle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: min(100%, 18.5rem);
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.3rem;
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
+  gap: 0.25rem;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.option,
+.optionActive {
+  min-width: 0;
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  gap: 0.4rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.optionActive {
+  background: var(--color-primary);
+  color: var(--color-sidebar-text);
+  font-weight: 700;
 }
 
 .toggle:hover {
-  background: var(--color-input-bg);
+  border-color: var(--color-primary);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+@media (max-width: 380px) {
+  .option,
+  .optionActive {
+    gap: 0.25rem;
+    padding-inline: 0.35rem;
+    font-size: 0.72rem;
+  }
 }

@@ -9,7 +9,6 @@ import {
   LogOut,
   Menu,
   X,
-  Bell,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle";
@@ -22,16 +21,8 @@ const NAV = [
   { to: "/dashboard/equipo", label: "Mi Equipo", icon: Users },
 ];
 
-interface SidebarProps {
-  notificationCount: number;
-  onOpenNotifications: () => void;
-}
-
 // ejecuto sidebar
-export function Sidebar({
-  notificationCount,
-  onOpenNotifications,
-}: SidebarProps) {
+export function Sidebar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,21 +46,6 @@ export function Sidebar({
       </div>
 
       <div className={styles.toolbar}>
-        <button
-          type="button"
-          className={styles.notificationButton}
-          onClick={onOpenNotifications}
-          aria-label="notificaciones"
-          title="notificaciones"
-        >
-          <Bell size={18} />
-          {notificationCount > 0 && (
-            <span className={styles.notificationBadge}>
-              {notificationCount}
-            </span>
-          )}
-        </button>
-        <ThemeToggle />
         <button
           type="button"
           className={styles.menuToggle}
@@ -107,6 +83,11 @@ export function Sidebar({
           <LogOut size={18} />
           Cerrar sesión
         </button>
+
+        {/* El selector queda al final para que también sea accesible en el menú móvil. */}
+        <div className={styles.themeControl}>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

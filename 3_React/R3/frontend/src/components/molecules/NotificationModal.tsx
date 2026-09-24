@@ -1,17 +1,22 @@
 // componente para visualizar y gestionar las alertas sanitarias y avisos
-import { useEffect, useState } from 'react';
-import { Bell, X, Trash2 } from 'lucide-react';
-import { listNotificacionesApi, deleteNotificacionApi, clearNotificacionesApi } from '@/api/notificacionApi';
-import type { NotificacionAlerta } from '@/types';
-import styles from './NotificationModal.module.css';
+import { useEffect, useState } from "react";
+import { Bell, X, Trash2 } from "lucide-react";
+import {
+  listNotificacionesApi,
+  deleteNotificacionApi,
+  clearNotificacionesApi,
+} from "@/api/notificacionApi";
+import type { NotificacionAlerta } from "@/types";
+import styles from "./NotificationModal.module.css";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onAlertClick?: () => void;
 }
 
 // panel lateral desplegable de notificaciones y alertas
-export function NotificationModal({ isOpen, onClose }: Props) {
+export function NotificationModal({ isOpen, onClose, onAlertClick }: Props) {
   const [alertas, setAlertas] = useState<NotificacionAlerta[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -75,7 +80,12 @@ export function NotificationModal({ isOpen, onClose }: Props) {
                 Limpiar todas
               </button>
             )}
-            <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="cerrar panel">
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="cerrar panel"
+            >
               <X size={20} />
             </button>
           </div>
@@ -85,26 +95,44 @@ export function NotificationModal({ isOpen, onClose }: Props) {
           {loading ? (
             <div className={styles.empty}>cargando alertas...</div>
           ) : alertas.length === 0 ? (
-            <div className={styles.empty}>no hay alertas sanitarias activas</div>
+            <div className={styles.empty}>
+              no hay alertas sanitarias activas
+            </div>
           ) : (
             alertas.map((a) => (
-              <div key={a.id} className={styles.item}>
+              <div
+                key={a.id}
+                className={styles.item}
+                onClick={onAlertClick}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ")
+                    onAlertClick?.();
+                }}
+                role={onAlertClick ? "button" : undefined}
+                tabIndex={onAlertClick ? 0 : undefined}
+              >
                 <div className={styles.itemHeader}>
                   <span className={styles.idBadge}>{a.identificador}</span>
                   <div className={styles.itemHeaderRight}>
                     <span
                       className={`${styles.stateTag} ${
-                        a.estado_salud === 'enfermo' || a.tipo === 'alerta_sanitaria'
+                        a.estado_salud === "enfermo" ||
+                        a.tipo === "alerta_sanitaria"
                           ? styles.tagEnfermo
                           : styles.tagTratamiento
                       }`}
                     >
-                      {a.estado_salud === 'en_tratamiento' ? 'en tratamiento' : a.estado_salud}
+                      {a.estado_salud === "en_tratamiento"
+                        ? "en tratamiento"
+                        : a.estado_salud}
                     </span>
                     <button
                       type="button"
                       className={styles.deleteItemBtn}
-                      onClick={() => handleDeleteOne(a.id)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteOne(a.id);
+                      }}
                       title="Eliminar notificación"
                     >
                       <Trash2 size={14} />
@@ -122,7 +150,11 @@ export function NotificationModal({ isOpen, onClose }: Props) {
                   <span>⚠️ {a.corral_nombre}</span>
                   {a.fecha && (
                     <span className={styles.itemTimestamp}>
-                      {new Date(a.fecha).toLocaleDateString()} {new Date(a.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(a.fecha).toLocaleDateString()}{" "}
+                      {new Date(a.fecha).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   )}
                 </div>
@@ -134,4 +166,3 @@ export function NotificationModal({ isOpen, onClose }: Props) {
     </div>
   );
 }
-

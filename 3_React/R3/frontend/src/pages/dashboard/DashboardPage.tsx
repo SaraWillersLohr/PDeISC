@@ -8,11 +8,14 @@ import {
   Plus,
   TriangleAlert,
   Users,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { getDashboardSummaryApi } from "@/api/dashboardApi";
+import { listNotificacionesApi } from "@/api/notificacionApi";
 import { getApiErrorMessage } from "@/api/axiosInstance";
+import { NotificationModal } from "@/components/molecules/NotificationModal";
 import type { DashboardSummary } from "@/types";
 import { MetricCard } from "@/components/molecules/MetricCard";
 import { FieldSummaryChart } from "@/components/molecules/FieldSummaryChart";
@@ -26,6 +29,8 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   // cargo m�tricas al montar con useeffect
   useEffect(() => {
@@ -34,6 +39,12 @@ export function DashboardPage() {
       .catch((e) => showToast("error", getApiErrorMessage(e)))
       .finally(() => setLoading(false));
   }, [showToast]);
+
+  useEffect(() => {
+    listNotificacionesApi()
+      .then((notifications) => setNotificationCount(notifications.length))
+      .catch(() => setNotificationCount(0));
+  }, []);
 
   if (loading)
     return <div className={styles.loading}>cargando métricas...</div>;
@@ -54,6 +65,16 @@ export function DashboardPage() {
             login: {loginMode === "router" ? "React Router" : "useState"}
           </span>
         </div>
+        <button
+          type="button"
+          className={styles.bell}
+          onClick={() => setNotificationsOpen(true)}
+          aria-label="abrir alertas sanitarias"
+          title="alertas sanitarias"
+        >
+          <Bell size={20} />
+          {notificationCount > 0 && <span>{notificationCount}</span>}
+        </button>
       </header>
 
       <section className={styles.metrics}>
@@ -117,6 +138,11 @@ export function DashboardPage() {
           onClick={() => navigate("/dashboard/animales?nuevo=true")}
         />
       </section>
+      <NotificationModal
+        isOpen={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+        onAlertClick={() => navigate("/dashboard/animales")}
+      />
     </div>
   );
 }

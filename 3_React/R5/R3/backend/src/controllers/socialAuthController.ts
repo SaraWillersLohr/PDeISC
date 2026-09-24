@@ -27,7 +27,7 @@ export function startSocialLogin(req: Request, res: Response, next: (error?: unk
 
   req.session.rememberMe = req.query.remember === '1';
   const scopes: Record<SocialProvider, string[] | undefined> = {
-    google: ['profile', 'email'], facebook: ['email'], github: ['user:email'],
+    google: ['profile', 'email'], facebook: ['public_profile', 'email'], github: ['user:email'],
     discord: ['identify', 'email'], twitch: ['user:read:email'], twitter: undefined,
   };
   (passport.authenticate as any)(provider, { session: false, state: true, scope: scopes[provider] })(req, res, next);

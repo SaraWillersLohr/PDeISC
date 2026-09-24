@@ -18,6 +18,7 @@ function HolaMundo() {
         <span className="hm-tierra">
           <span className="hm-tierra__continente hm-tierra__continente--1" />
           <span className="hm-tierra__continente hm-tierra__continente--2" />
+          <span className="hm-tierra__continente hm-tierra__continente--3" />
         </span>
       </div>
 

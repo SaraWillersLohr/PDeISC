@@ -128,19 +128,31 @@ body.light .hm-tierra__continente {
 }
 
 .hm-tierra__continente--1 {
-  width: 45px;
-  height: 32px;
-  top: 28%;
-  left: 22%;
+  width: 36px;
+  height: 60px;
+  top: 18%;
+  left: 12%;
+  border-radius: 52% 48% 44% 56% / 36% 38% 62% 64%;
+  transform: rotate(-12deg);
 }
 
 .hm-tierra__continente--2 {
-  width: 30px;
+  width: 66px;
   height: 40px;
-  top: 22%;
-  left: 55%;
+  top: 26%;
+  left: 42%;
+  border-radius: 50% 50% 46% 54% / 58% 42% 58% 42%;
+  transform: rotate(-6deg);
 }
 
+.hm-tierra__continente--3 {
+  width: 34px;
+  height: 30px;
+  top: 52%;
+  left: 66%;
+  border-radius: 52% 48% 54% 46% / 38% 56% 44% 62%;
+  transform: rotate(14deg);
+}
 .hm-divisor {
   width: 100%;
   height: 1px;

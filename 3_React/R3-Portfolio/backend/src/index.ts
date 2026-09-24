@@ -196,12 +196,10 @@ app.post("/api/admin/:collection", requireAdmin, async (req, res) => {
     `INSERT INTO ${name} (${keys.map((k) => `\`${k}\``).join(",")}) VALUES (${keys.map(() => "?").join(",")})`,
     keys.map((k) => data.data[k]),
   );
-  res
-    .status(201)
-    .json({
-      id: (result as { insertId: number }).insertId,
-      message: "Elemento creado.",
-    });
+  res.status(201).json({
+    id: (result as { insertId: number }).insertId,
+    message: "Elemento creado.",
+  });
 });
 app.put("/api/admin/:collection/:id", requireAdmin, async (req, res) => {
   const name = collection(req.params.collection);

@@ -44,6 +44,15 @@ function App() {
       }),
     );
   };
+
+  // actualizo una tarea existente
+  const editarTarea = (tareaEditada: Tarea) => {
+    setTareas((tareasActuales) =>
+      tareasActuales.map((tarea) =>
+        tarea.id === tareaEditada.id ? tareaEditada : tarea,
+      ),
+    );
+  };
   //react router para manejar las rutas de la aplicación,
   // y el ThemeProvider para manejar el tema de la aplicación. Dentro del BrowserRouter, se renderiza el componente Navbar y un main que contiene las rutas de la aplicación. Cada ruta renderiza un componente diferente según la URL.
   return (
@@ -76,10 +85,28 @@ function App() {
                 }
               />
 
+              {/* editar */}
+              <Route
+                path="/editar/:id"
+                element={
+                  <CrearTarea
+                    agregarTarea={agregarTarea}
+                    editarTarea={editarTarea}
+                    tareas={tareas}
+                  />
+                }
+              />
+
               {/* crear */}
               <Route
                 path="/crear"
-                element={<CrearTarea agregarTarea={agregarTarea} />}
+                element={
+                  <CrearTarea
+                    agregarTarea={agregarTarea}
+                    editarTarea={editarTarea}
+                    tareas={tareas}
+                  />
+                }
               />
             </Routes>
           </main>

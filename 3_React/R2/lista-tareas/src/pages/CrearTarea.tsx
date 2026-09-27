@@ -1,47 +1,65 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import type { Tarea } from '../types/Tarea';
+import { useEffect, useState } from "react";
+import { useNavigate, Link, useParams } from "react-router-dom";
+import type { Tarea } from "../types/Tarea";
 
 interface CrearTareaProps {
   agregarTarea: (tarea: Tarea) => void;
+  editarTarea: (tarea: Tarea) => void;
+  tareas?: Tarea[];
 }
 
-export const CrearTarea = ({ agregarTarea }: CrearTareaProps) => {
+export const CrearTarea = ({
+  agregarTarea,
+  editarTarea,
+  tareas = [],
+}: CrearTareaProps) => {
   const navigate = useNavigate();
-  
+  const { id } = useParams();
+  const modoEdicion = Boolean(id);
+
+  const tareaExistente = tareas.find((tarea) => tarea.id === Number(id));
+
   // acá guardo los valores del formulario
-  const [titulo, setTitulo] = useState('');
-  const [descripcion, setDescripcion] = useState('');
+  const [titulo, setTitulo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
   const [completa, setCompleta] = useState(false);
-  
+
   // acá guardo los errores
-  const [errorTitulo, setErrorTitulo] = useState('');
-  const [errorDescripcion, setErrorDescripcion] = useState('');
+  const [errorTitulo, setErrorTitulo] = useState("");
+  const [errorDescripcion, setErrorDescripcion] = useState("");
+
+  useEffect(() => {
+    if (tareaExistente) {
+      setTitulo(tareaExistente.titulo);
+      setDescripcion(tareaExistente.descripcion);
+      setCompleta(tareaExistente.completa);
+    }
+  }, [tareaExistente]);
 
   // manejo el evento onSubmit del formulario
   const manejarEnvio = (e: React.FormEvent) => {
     // evito que la página se recargue (comportamiento por defecto)
     e.preventDefault();
-    
+
     let hasError = false;
-    
+
     // valido el título
-    if (titulo.trim() === '') {
-      setErrorTitulo('El título es obligatorio.');
+    if (titulo.trim() === "") {
+      setErrorTitulo("El título es obligatorio.");
       hasError = true;
     } else if (titulo.length < 3) {
-      setErrorTitulo('El título es muy corto.');
+      setErrorTitulo("El título es muy corto.");
       hasError = true;
     } else {
-      setErrorTitulo('');
+      setErrorTitulo("");
     }
 
     // valido la descripción
-    if (descripcion.trim() === '') {
-      setErrorDescripcion('La descripción es obligatoria.');
+    if (descripcion.trim() === "") {
+      setErrorDescripcion("La descripción es obligatoria.");
       hasError = true;
     } else {
-      setErrorDescripcion('');
+      setErrorDescripcion("");
     }
 
     // si hay errores, no sigo
@@ -49,25 +67,38 @@ export const CrearTarea = ({ agregarTarea }: CrearTareaProps) => {
 
     // genero la fecha actual
     const fecha = new Date();
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
     const año = fecha.getFullYear();
     const fechaFormateada = `${dia}/${mes}/${año}`;
 
+    if (modoEdicion && tareaExistente) {
+      const tareaActualizada: Tarea = {
+        ...tareaExistente,
+        titulo: titulo.trim(),
+        descripcion: descripcion.trim(),
+        completa,
+      };
+
+      editarTarea(tareaActualizada);
+      navigate(`/tarea/${tareaExistente.id}`);
+      return;
+    }
+
     // acá creo la nueva tarea con los datos del formulario
     const nuevaTarea: Tarea = {
-      id: Date.now(), 
+      id: Date.now(),
       titulo: titulo.trim(),
       descripcion: descripcion.trim(),
       fechaCreacion: fechaFormateada,
-      completa
+      completa,
     };
 
     // la agrego al estado
     agregarTarea(nuevaTarea);
-    
+
     // vuelvo al inicio
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -76,65 +107,93 @@ export const CrearTarea = ({ agregarTarea }: CrearTareaProps) => {
         {/* Hacemos el ancho amplio pero el alto compacto */}
         <div className="col-12 col-md-10 col-lg-8 col-xl-7">
           <div className="mb-3">
-            <h2 className="fw-bold mb-1 fs-3">Crear nueva tarea</h2>
-            <p className="text-muted small mb-0">Completá los datos para sumarla a tu lista.</p>
+            <h2 className="fw-bold mb-1 fs-3">
+              {modoEdicion ? "Editar tarea" : "Crear nueva tarea"}
+            </h2>
+            <p className="text-muted small mb-0">
+              {modoEdicion
+                ? "Modificá los datos de esta tarea."
+                : "Completá los datos para sumarla a tu lista."}
+            </p>
           </div>
-            
+
           <form onSubmit={manejarEnvio} noValidate>
             <div className="mb-3">
-              <label htmlFor="titulo" className="form-label fw-semibold small mb-1">Título</label>
-              <input 
-                type="text" 
-                className={`form-control custom-input py-2 ${errorTitulo ? 'is-invalid' : ''}`} 
-                id="titulo" 
+              <label
+                htmlFor="titulo"
+                className="form-label fw-semibold small mb-1"
+              >
+                Título
+              </label>
+              <input
+                type="text"
+                className={`form-control custom-input py-2 ${errorTitulo ? "is-invalid" : ""}`}
+                id="titulo"
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
                 placeholder="Ej: Leer material de clase"
                 required
               />
-              {errorTitulo && <div className="invalid-feedback">{errorTitulo}</div>}
+              {errorTitulo && (
+                <div className="invalid-feedback">{errorTitulo}</div>
+              )}
             </div>
 
             <div className="mb-3">
-              <label htmlFor="descripcion" className="form-label fw-semibold small mb-1">Descripción</label>
-              <textarea 
-                className={`form-control custom-input py-2 ${errorDescripcion ? 'is-invalid' : ''}`} 
-                id="descripcion" 
+              <label
+                htmlFor="descripcion"
+                className="form-label fw-semibold small mb-1"
+              >
+                Descripción
+              </label>
+              <textarea
+                className={`form-control custom-input py-2 ${errorDescripcion ? "is-invalid" : ""}`}
+                id="descripcion"
                 rows={2}
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
                 placeholder="Escribí los detalles de tu tarea acá..."
                 required
               ></textarea>
-              {errorDescripcion && <div className="invalid-feedback">{errorDescripcion}</div>}
+              {errorDescripcion && (
+                <div className="invalid-feedback">{errorDescripcion}</div>
+              )}
             </div>
 
             <div className="mb-3">
-              <span className="form-label fw-semibold small mb-2 d-block">Estado</span>
+              <span className="form-label fw-semibold small mb-2 d-block">
+                Estado
+              </span>
               <div className="d-flex gap-4">
                 <div className="form-check custom-radio">
-                  <input 
-                    className="form-check-input" 
-                    type="radio" 
-                    name="estado" 
-                    id="incompleta" 
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="estado"
+                    id="incompleta"
                     checked={!completa}
                     onChange={() => setCompleta(false)}
                   />
-                  <label className="form-check-label ms-1 small" htmlFor="incompleta">
+                  <label
+                    className="form-check-label ms-1 small"
+                    htmlFor="incompleta"
+                  >
                     Incompleta
                   </label>
                 </div>
                 <div className="form-check custom-radio">
-                  <input 
-                    className="form-check-input" 
-                    type="radio" 
-                    name="estado" 
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="estado"
                     id="completa"
                     checked={completa}
                     onChange={() => setCompleta(true)}
                   />
-                  <label className="form-check-label ms-1 small" htmlFor="completa">
+                  <label
+                    className="form-check-label ms-1 small"
+                    htmlFor="completa"
+                  >
                     Completa
                   </label>
                 </div>
@@ -142,10 +201,16 @@ export const CrearTarea = ({ agregarTarea }: CrearTareaProps) => {
             </div>
 
             <div className="mt-4 d-flex flex-column gap-2">
-              <button type="submit" className="btn btn-primary w-100 rounded-pill py-2 fw-semibold">
-                Crear tarea
+              <button
+                type="submit"
+                className="btn btn-primary w-100 rounded-pill py-2 fw-semibold"
+              >
+                {modoEdicion ? "Guardar cambios" : "Crear tarea"}
               </button>
-              <Link to="/" className="btn btn-light w-100 rounded-pill py-2 fw-semibold text-center text-decoration-none">
+              <Link
+                to={modoEdicion ? `/tarea/${id}` : "/"}
+                className="btn btn-light w-100 rounded-pill py-2 fw-semibold text-center text-decoration-none"
+              >
                 Cancelar
               </Link>
             </div>

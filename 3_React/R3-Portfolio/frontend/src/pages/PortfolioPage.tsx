@@ -4,7 +4,7 @@ import { PhotoCarousel } from "../components/PhotoCarousel";
 import { Reveal, SectionTitle } from "../components/ui";
 import { usePortfolio, useTheme } from "../hooks";
 import type { Item } from "../types";
-
+//secciones de la página
 const nav = [
   ["inicio", "inicio"],
   ["sobre-mi", "sobre mí"],
@@ -17,6 +17,7 @@ const nav = [
   ["contacto", "contacto"],
 ];
 const text = (item: Item, key: string) => String(item[key] || "");
+// Componente principal de la página de portfolio
 export function PortfolioPage() {
   const { data, error } = usePortfolio();
   const { theme, toggle } = useTheme();

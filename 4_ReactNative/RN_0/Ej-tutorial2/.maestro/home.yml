@@ -1,4 +1,0 @@
-appId: com.sarawillers.ejtutorial2
----
-- launchApp
-- assertVisible: 'Welcome'

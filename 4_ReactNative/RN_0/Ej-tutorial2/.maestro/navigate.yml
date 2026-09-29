@@ -1,0 +1,5 @@
+appId: com.sarawillers.ejtutorial2
+---
+- launchApp
+- tapOn: 'Settings'
+- assertVisible: 'Settings'

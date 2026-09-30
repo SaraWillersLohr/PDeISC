@@ -2,18 +2,22 @@ import { StyleSheet, View } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { BackgroundName } from '../constants/appearance';
 
+// propiedades opcionales para controlar el fondo desde afuera
 interface BackgroundDecorationProps {
   enabled?: boolean;
   type?: BackgroundName;
 }
 
+// componente para dibujar las formas decorativas de fondo (olas o bruma)
 export function BackgroundDecoration({ enabled, type }: BackgroundDecorationProps) {
   const { palette, appearance } = useTheme();
   const currentBg = type ?? appearance.background;
   const isEnabled = enabled !== undefined ? enabled : currentBg !== 'Claro';
 
+  // si el estilo elegido es claro no mostramos ninguna decoracion
   if (!isEnabled || currentBg === 'Claro') return null;
 
+  // si el usuario eligio bruma mostramos resplandores suaves
   if (currentBg === 'Bruma') {
     return (
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
@@ -23,6 +27,7 @@ export function BackgroundDecoration({ enabled, type }: BackgroundDecorationProp
     );
   }
 
+  // si el usuario eligio olas mostramos curvas organicas en las esquinas
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <View style={[styles.wave, styles.topWave, { backgroundColor: palette.soft }]} />
@@ -33,6 +38,7 @@ export function BackgroundDecoration({ enabled, type }: BackgroundDecorationProp
   );
 }
 
+// estilos para el posicionamiento y redondeo de las formas de fondo
 const styles = StyleSheet.create({
   wave: {
     position: 'absolute',

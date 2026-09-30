@@ -2,10 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 
+// boton interactivo para alternar entre modo claro y modo oscuro
 export function ThemeButton() {
+  // recuperamos el estado del tema y la funcion para alternarlo
   const { isDark, palette, toggleTheme } = useTheme();
 
   return (
+    // boton presionable con animacion de escala y opacidad
     <Pressable
       onPress={toggleTheme}
       accessibilityRole="button"
@@ -21,6 +24,7 @@ export function ThemeButton() {
         },
       ]}
     >
+      {/* icono que cambia a sol en oscuro y luna en claro */}
       <Ionicons
         name={isDark ? 'sunny' : 'moon'}
         size={20}
@@ -30,6 +34,7 @@ export function ThemeButton() {
   );
 }
 
+// estilos para darle forma circular y sombra sutil al boton
 const styles = StyleSheet.create({
   button: {
     width: 42,

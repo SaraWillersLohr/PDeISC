@@ -1,10 +1,12 @@
 import { Platform, TextStyle } from 'react-native';
 
+// tipos permitidos para colores, fuentes, tamanos y fondos
 export type ColorName = 'Bosque' | 'Cielo' | 'Laguna' | 'Salvia' | 'Arena' | 'Terracota';
 export type FontName = 'Moderna' | 'Elegante' | 'Cursiva' | 'Monospace';
 export type TextSize = 'Pequeño' | 'Normal' | 'Grande';
 export type BackgroundName = 'Claro' | 'Bruma' | 'Olas';
 
+// estructura principal con todas las configuraciones de apariencia
 export type AppearanceSettings = {
   color: ColorName;
   font: FontName;
@@ -12,6 +14,7 @@ export type AppearanceSettings = {
   background: BackgroundName;
 };
 
+// valores iniciales que usa la aplicacion por defecto
 export const defaultAppearance: AppearanceSettings = {
   color: 'Bosque',
   font: 'Moderna',
@@ -19,6 +22,7 @@ export const defaultAppearance: AppearanceSettings = {
   background: 'Claro',
 };
 
+// lista de colores disponibles con sus codigos hexadecimales
 export const colorOptions: { name: ColorName; color: string }[] = [
   { name: 'Bosque', color: '#287C68' },
   { name: 'Cielo', color: '#55AFC2' },
@@ -28,6 +32,7 @@ export const colorOptions: { name: ColorName; color: string }[] = [
   { name: 'Terracota', color: '#B87550' },
 ];
 
+// opciones de tipografia con nombre legible y descripcion breve
 export const fontOptions: {
   label: string;
   value: FontName;
@@ -39,6 +44,7 @@ export const fontOptions: {
   { label: 'Máquina', value: 'Monospace', description: 'Monoespaciada retro typewriter' },
 ];
 
+// funcion para obtener la fuente correcta segun el sistema operativo
 export const getFontFamily = (font: FontName): string | undefined => {
   switch (font) {
     case 'Moderna':
@@ -74,6 +80,7 @@ export const getFontFamily = (font: FontName): string | undefined => {
   }
 };
 
+// funcion para aplicar cursiva, peso y espaciado segun la tipografia
 export const getFontStyle = (font: FontName): TextStyle => {
   switch (font) {
     case 'Cursiva':
@@ -104,18 +111,21 @@ export const getFontStyle = (font: FontName): TextStyle => {
   }
 };
 
+// opciones de tamano de texto con su valor numerico en pixeles
 export const textSizes: { label: TextSize; value: number }[] = [
   { label: 'Pequeño', value: 30 },
   { label: 'Normal', value: 40 },
   { label: 'Grande', value: 50 },
 ];
 
+// colores de fondo para modo claro y oscuro segun el estilo elegido
 export const backgrounds: Record<BackgroundName, { light: string; dark: string }> = {
   Claro: { light: '#F4F8F4', dark: '#14211F' },
   Bruma: { light: '#E8F1ED', dark: '#1B302B' },
   Olas: { light: '#E4F1F2', dark: '#183037' },
 };
 
+// paletas de acento claro, oscuro y tonos suaves para cada color
 export const colorAccents: Record<ColorName, { light: string; dark: string; softLight: string; softDark: string }> = {
   Bosque: { light: '#287C68', dark: '#83CDB5', softLight: '#E3F1EC', softDark: '#28463E' },
   Cielo: { light: '#267A8B', dark: '#91D4E2', softLight: '#DFF1F4', softDark: '#1E3B49' },

@@ -1,4 +1,6 @@
+// colores base de la aplicacion para modo claro y modo oscuro
 export const colors = {
+  // paleta para cuando la app esta en modo claro
   light: {
     background: '#F5F8F6',
     surface: '#FFFFFF',
@@ -8,6 +10,7 @@ export const colors = {
     border: '#E0EAE5',
     soft: '#E4F0EC',
   },
+  // paleta para cuando la app esta en modo oscuro
   dark: {
     background: '#111C1A',
     surface: '#182724',
@@ -18,3 +21,4 @@ export const colors = {
     soft: '#213832',
   },
 };
+

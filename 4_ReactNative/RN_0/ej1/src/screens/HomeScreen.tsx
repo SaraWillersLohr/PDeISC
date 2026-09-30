@@ -4,15 +4,23 @@ import { BackgroundDecoration } from '../components/BackgroundDecoration';
 import { getFontFamily, getFontStyle } from '../constants/appearance';
 import { useTheme } from '../context/ThemeContext';
 
+// pantalla principal limpia con el saludo hola mundo
 export function HomeScreen() {
+  // obtenemos la paleta y apariencia actual del contexto
   const { palette, appearance } = useTheme();
+  // calculamos el tamano numerico segun la opcion elegida
   const fontSize = appearance.textSize === 'Pequeño' ? 32 : appearance.textSize === 'Grande' ? 52 : 42;
+  // calculamos estilos adicionales como cursiva o espaciado
   const fontStyle = getFontStyle(appearance.font);
 
   return (
+    // vista contenedora con el color de fondo elegido
     <View style={[styles.screen, { backgroundColor: palette.background }]}>
+      {/* decoraciones visuales de fondo como olas o bruma */}
       <BackgroundDecoration />
+      {/* scrollview para que no se corte en pantallas chicas */}
       <ScrollView contentContainerStyle={styles.content}>
+        {/* tarjeta central limpia que destaca el saludo */}
         <View
           style={[
             styles.card,
@@ -22,7 +30,7 @@ export function HomeScreen() {
             },
           ]}
         >
-          {/* Badge de bienvenida superior */}
+          {/* badge superior de bienvenida */}
           <View style={[styles.badge, { backgroundColor: palette.soft }]}>
             <Ionicons name="sparkles" size={14} color={palette.accent} />
             <Text style={[styles.badgeText, { color: palette.accent }]}>
@@ -30,7 +38,7 @@ export function HomeScreen() {
             </Text>
           </View>
 
-          {/* Texto principal Hola Mundo */}
+          {/* texto principal hola mundo con tipografia dinamica */}
           <Text
             accessibilityRole="header"
             style={[
@@ -46,25 +54,28 @@ export function HomeScreen() {
             Hola Mundo
           </Text>
 
-          {/* Subtítulo limpio y sutil */}
+          {/* subtitulo limpio explicativo */}
           <Text style={[styles.subtitle, { color: palette.secondary }]}>
             Tu primer pantalla interactiva y estilizada
           </Text>
 
-          {/* Píldoras con resumen de estilos activos */}
+          {/* etiquetas con el resumen de estilos activos */}
           <View style={styles.tagsContainer}>
+            {/* etiqueta con el color seleccionado */}
             <View style={[styles.tag, { borderColor: palette.border }]}>
               <View style={[styles.colorDot, { backgroundColor: palette.accent }]} />
               <Text style={[styles.tagText, { color: palette.secondary }]}>
                 {appearance.color}
               </Text>
             </View>
+            {/* etiqueta con la fuente seleccionada */}
             <View style={[styles.tag, { borderColor: palette.border }]}>
               <Ionicons name="text-outline" size={12} color={palette.secondary} />
               <Text style={[styles.tagText, { color: palette.secondary }]}>
                 {appearance.font}
               </Text>
             </View>
+            {/* etiqueta con el tamano de texto */}
             <View style={[styles.tag, { borderColor: palette.border }]}>
               <Ionicons name="resize-outline" size={12} color={palette.secondary} />
               <Text style={[styles.tagText, { color: palette.secondary }]}>
@@ -78,6 +89,7 @@ export function HomeScreen() {
   );
 }
 
+// estilos para centrado, tarjeta, textos y etiquetas
 const styles = StyleSheet.create({
   screen: {
     flex: 1,

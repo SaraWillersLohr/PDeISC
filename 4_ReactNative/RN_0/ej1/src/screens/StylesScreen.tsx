@@ -16,12 +16,16 @@ import {
 } from '../constants/appearance';
 import { useTheme } from '../context/ThemeContext';
 
+// pantalla para personalizar los estilos visuales en tiempo real
 export function StylesScreen() {
+  // recuperamos la paleta activa y funcion para aplicar cambios
   const { palette, appearance, applyAppearance, storageError } = useTheme();
+  // estado para mostrar el boton flotante de volver arriba
   const [showTop, setShowTop] = useState(false);
   const scroll = useRef<ScrollView>(null);
   const insets = useSafeAreaInsets();
 
+  // funcion para actualizar cualquier propiedad y guardarla al instante
   const updateSetting = <K extends keyof AppearanceSettings>(
     key: K,
     value: AppearanceSettings[K]
@@ -30,8 +34,11 @@ export function StylesScreen() {
   };
 
   return (
+    // vista contenedora con el fondo activo
     <View style={[styles.screen, { backgroundColor: palette.background }]}>
+      {/* decoraciones visuales de fondo */}
       <BackgroundDecoration />
+      {/* scrollview principal para navegar por todos los ajustes */}
       <ScrollView
         ref={scroll}
         contentContainerStyle={[
@@ -42,6 +49,7 @@ export function StylesScreen() {
             paddingTop: Math.max(24, insets.top),
           },
         ]}
+        // evento de scroll para detectar cuando mostrar el boton flotante
         onScroll={({ nativeEvent }) =>
           setShowTop(
             nativeEvent.contentSize.height > nativeEvent.layoutMeasurement.height + 1 &&
@@ -50,7 +58,7 @@ export function StylesScreen() {
         }
         scrollEventThrottle={16}
       >
-        {/* Encabezado principal */}
+        {/* encabezado principal con titulo y boton de tema */}
         <View style={styles.heading}>
           <View style={{ flex: 1 }}>
             <Text accessibilityRole="header" style={[styles.title, { color: palette.text }]}>
@@ -63,7 +71,7 @@ export function StylesScreen() {
           <ThemeButton />
         </View>
 
-        {/* Tarjeta de Vista Previa en Vivo */}
+        {/* tarjeta de vista previa en tiempo real */}
         <View
           style={[
             styles.previewCard,
@@ -73,6 +81,7 @@ export function StylesScreen() {
             },
           ]}
         >
+          {/* cabecera de la vista previa */}
           <View style={styles.previewHeader}>
             <View style={[styles.previewBadge, { backgroundColor: palette.soft }]}>
               <Ionicons name="sparkles" size={13} color={palette.accent} />
@@ -85,6 +94,7 @@ export function StylesScreen() {
             </Text>
           </View>
 
+          {/* cuerpo de la vista previa donde se muestra el texto dinamico */}
           <View style={styles.previewBody}>
             <Text
               accessibilityRole="header"
@@ -103,7 +113,7 @@ export function StylesScreen() {
           </View>
         </View>
 
-        {/* Sección: Tema de Colores */}
+        {/* seccion para elegir el color principal de la interfaz */}
         <View
           style={[
             styles.card,
@@ -124,10 +134,12 @@ export function StylesScreen() {
             </View>
           </View>
 
+          {/* ciclo para renderizar cada circulo de color de la paleta */}
           <View style={styles.colorsGrid}>
             {colorOptions.map(({ name, color }) => {
               const selected = appearance.color === name;
               return (
+                // boton con animacion al tocarlo para elegir este color
                 <Pressable
                   key={name}
                   accessibilityRole="button"
@@ -171,7 +183,7 @@ export function StylesScreen() {
           </View>
         </View>
 
-        {/* Sección: Tipografía */}
+        {/* seccion para seleccionar la tipografia del texto */}
         <View
           style={[
             styles.card,
@@ -190,6 +202,7 @@ export function StylesScreen() {
             </View>
           </View>
 
+          {/* ciclo para listar las opciones de fuente con su ejemplo visual */}
           <View style={styles.fontsList}>
             {fontOptions.map((font) => {
               const selected = appearance.font === font.value;
@@ -197,6 +210,7 @@ export function StylesScreen() {
               const optionFontStyle = getFontStyle(font.value);
 
               return (
+                // tarjeta presionable para seleccionar la fuente de forma directa
                 <Pressable
                   key={font.value}
                   accessibilityRole="button"
@@ -212,6 +226,7 @@ export function StylesScreen() {
                   ]}
                 >
                   <View style={styles.fontCardLeft}>
+                    {/* muestra visual dibujada con la tipografia real */}
                     <Text
                       style={[
                         styles.fontSample,
@@ -259,7 +274,7 @@ export function StylesScreen() {
           </View>
         </View>
 
-        {/* Sección: Tamaño de Texto */}
+        {/* seccion para cambiar el tamano del texto */}
         <View
           style={[
             styles.card,
@@ -280,6 +295,7 @@ export function StylesScreen() {
             </View>
           </View>
 
+          {/* ciclo para generar los botones segmentados de tamano */}
           <View
             style={[
               styles.segmentContainer,
@@ -289,6 +305,7 @@ export function StylesScreen() {
             {textSizes.map(({ label, value }) => {
               const selected = appearance.textSize === label;
               return (
+                // boton de opcion de tamano individual
                 <Pressable
                   key={label}
                   accessibilityRole="button"
@@ -325,7 +342,7 @@ export function StylesScreen() {
           </View>
         </View>
 
-        {/* Sección: Fondo Visual */}
+        {/* seccion para cambiar el estilo de fondo de las pantallas */}
         <View
           style={[
             styles.card,
@@ -346,10 +363,12 @@ export function StylesScreen() {
             </View>
           </View>
 
+          {/* ciclo para mostrar las tarjetas en miniatura de cada fondo */}
           <View style={styles.bgGrid}>
             {(['Claro', 'Bruma', 'Olas'] as const).map((name) => {
               const selected = appearance.background === name;
               return (
+                // tarjeta miniatura de cada fondo con su ilustracion
                 <Pressable
                   key={name}
                   accessibilityRole="button"
@@ -425,6 +444,7 @@ export function StylesScreen() {
           </View>
         </View>
 
+        {/* banner informativo en caso de ocurrir algun error de guardado */}
         {storageError && (
           <View style={[styles.errorBanner, { backgroundColor: palette.soft }]}>
             <Ionicons name="alert-circle" size={18} color={palette.accent} />
@@ -435,7 +455,7 @@ export function StylesScreen() {
         )}
       </ScrollView>
 
-      {/* Botón flotante para subir */}
+      {/* boton flotante para subir rapidamente cuando se desliza la pantalla */}
       {showTop && (
         <Pressable
           accessibilityRole="button"
@@ -457,10 +477,12 @@ export function StylesScreen() {
   );
 }
 
+// funcion auxiliar para obtener el valor numerico en pixeles de cada tamano
 function sizeValue(size: TextSize) {
   return textSizes.find((option) => option.label === size)?.value ?? 42;
 }
 
+// definicion de todos los estilos visuales de la pantalla
 const styles = StyleSheet.create({
   screen: {
     flex: 1,

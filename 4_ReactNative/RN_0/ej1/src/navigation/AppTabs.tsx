@@ -7,14 +7,17 @@ import { useTheme } from '../context/ThemeContext';
 import { HomeScreen } from '../screens/HomeScreen';
 import { StylesScreen } from '../screens/StylesScreen';
 
+// definicion de las rutas disponibles en las pestanas
 type TabRoutes = { Inicio: undefined; Estilos: undefined };
 const Tabs = createBottomTabNavigator<TabRoutes>();
 
+// componente principal de navegacion con barra de pestanas inferior
 export function AppTabs() {
   const { palette, isDark } = useTheme();
   const base = isDark ? DarkTheme : DefaultTheme;
 
   return (
+    // contenedor de navegacion con los colores sincronizados con el tema
     <NavigationContainer
       theme={{
         ...base,
@@ -28,9 +31,12 @@ export function AppTabs() {
         },
       }}
     >
+      {/* navegador de tabs con opciones de diseno personalizadas */}
       <Tabs.Navigator
         screenOptions={({ route }) => ({
+          // boton de sol y luna en la esquina derecha del encabezado
           headerRight: () => <ThemeButton />,
+          // estilos de la barra superior
           headerStyle: {
             backgroundColor: palette.background,
             borderBottomColor: palette.border,
@@ -51,6 +57,7 @@ export function AppTabs() {
             fontWeight: '700',
             marginBottom: Platform.OS === 'ios' ? 0 : 4,
           },
+          // estilos de la barra de pestanas inferior
           tabBarStyle: {
             backgroundColor: palette.surface,
             borderTopColor: palette.border,
@@ -64,6 +71,7 @@ export function AppTabs() {
             shadowRadius: 10,
             elevation: 8,
           },
+          // funcion para mostrar el icono correspondiente segun la pestana
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
               name={
@@ -77,6 +85,7 @@ export function AppTabs() {
           ),
         })}
       >
+        {/* primer tab: pantalla limpia con el saludo hola mundo */}
         <Tabs.Screen
           name="Inicio"
           component={HomeScreen}
@@ -84,6 +93,7 @@ export function AppTabs() {
             headerTitle: 'Mi Proyecto',
           }}
         />
+        {/* segundo tab: pantalla para personalizar los estilos */}
         <Tabs.Screen
           name="Estilos"
           component={StylesScreen}

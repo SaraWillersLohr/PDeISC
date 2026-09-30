@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Componentes RN",
+    "slug": "componentes-react-native",
+    "version": "1.0.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["ios", "android", "web"]
+  }
+}

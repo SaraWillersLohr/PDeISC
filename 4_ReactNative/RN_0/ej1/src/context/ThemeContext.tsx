@@ -4,6 +4,7 @@ import { useColorScheme } from 'react-native';
 import { colors } from '../constants/colors';
 import { AppearanceSettings, colorAccents, defaultAppearance, backgrounds } from '../constants/appearance';
 
+// tipos y contexto para compartir el tema en toda la app
 type Mode = 'light' | 'dark';
 type ThemeValue = {
   palette: typeof colors.light;
@@ -17,15 +18,20 @@ const ThemeContext = createContext<ThemeValue | undefined>(undefined);
 const STORAGE_KEY = '@ej1/theme';
 const APPEARANCE_KEY = '@ej1/appearance';
 
+// componente proveedor que envuelve la app y maneja el tema
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const systemTheme = useColorScheme();
+  // estado para saber si estamos en modo claro u oscuro
   const [mode, setMode] = useState<Mode>(systemTheme === 'dark' ? 'dark' : 'light');
+  // estado con la configuracion visual activa (color, fuente, tamano, fondo)
   const [appearance, setAppearance] = useState(defaultAppearance);
+  // estado para esperar a leer el almacenamiento antes de mostrar la pantalla
   const [ready, setReady] = useState(false);
+  // estado para capturar cualquier error al guardar en asyncstorage
   const [storageError, setStorageError] = useState<string | null>(null);
   const writes = useRef(Promise.resolve());
 
-  // recupero el tema elegido antes de mostrar la aplicación
+  // efecto para recuperar el tema y estilos guardados previamente en el celular
   useEffect(() => {
     let active = true;
     Promise.all([AsyncStorage.getItem(STORAGE_KEY), AsyncStorage.getItem(APPEARANCE_KEY)]).then(([savedMode, savedAppearance]) => {
@@ -35,6 +41,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         try {
           const parsed = JSON.parse(savedAppearance) as Partial<AppearanceSettings>;
           let validFont = defaultAppearance.font;
+          // verificacion para validar que la fuente guardada siga existiendo
           if (parsed.font === 'Moderna' || parsed.font === 'Elegante' || parsed.font === 'Cursiva' || parsed.font === 'Monospace') {
             validFont = parsed.font;
           } else if (parsed.font === ('Georgia' as any)) {
@@ -53,6 +60,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => { active = false; };
   }, []);
 
+  // funcion para aplicar estilos inmediatamente y guardarlos en el telefono
   const applyAppearance = (settings: AppearanceSettings) => {
     setAppearance(settings);
     AsyncStorage.setItem(APPEARANCE_KEY, JSON.stringify(settings)).catch(() =>
@@ -60,6 +68,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  // combinamos el modo claro u oscuro con el acento de color elegido
   const paletteColors = colorAccents[appearance.color];
   const palette = {
     ...colors[mode],
@@ -68,7 +77,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     soft: mode === 'dark' ? paletteColors.softDark : paletteColors.softLight,
   };
 
-  // guardo el tema elegido; respeto el orden aunque se cambie varias veces
+  // efecto para guardar el modo claro u oscuro cada vez que se presiona el boton
   useEffect(() => {
     if (!ready) return;
     writes.current = writes.current.then(() => AsyncStorage.setItem(STORAGE_KEY, mode))
@@ -76,15 +85,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       .catch(() => setStorageError('El tema cambió, pero no se pudo guardar.'));
   }, [mode, ready]);
 
+  // si todavia no cargamos las preferencias no renderizamos para evitar parpadeos
   if (!ready) return null;
+
+  // retornamos el proveedor con todas las funciones y valores del tema
   return (
-    <ThemeContext.Provider value={{ palette, isDark: mode === 'dark', appearance, applyAppearance,
-      toggleTheme: () => setMode((previous) => previous === 'light' ? 'dark' : 'light'), storageError }}>
+    <ThemeContext.Provider value={{
+      palette,
+      isDark: mode === 'dark',
+      appearance,
+      applyAppearance,
+      toggleTheme: () => setMode((previous) => previous === 'light' ? 'dark' : 'light'),
+      storageError,
+    }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
+// hook para usar el tema y los estilos en cualquier componente de forma simple
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (!context) throw new Error('useTheme debe usarse dentro de ThemeProvider');

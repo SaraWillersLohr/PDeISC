@@ -37,6 +37,7 @@ export const DetalleTarea = ({
 
   // elimino la tarea y vuelvo al inicio
   const confirmarEliminacion = () => {
+    if (!tarea.completa) return;
     eliminarTarea(tarea.id);
     navigate("/");
   };
@@ -108,12 +109,14 @@ export const DetalleTarea = ({
                 >
                   Editar tarea
                 </Link>
-                <button
-                  onClick={() => setMostrandoConfirmacion(true)}
-                  className="btn btn-outline-danger px-4 py-2 rounded-pill flex-grow-1 fw-semibold"
-                >
-                  Eliminar tarea
-                </button>
+                {tarea.completa && (
+                  <button
+                    onClick={() => setMostrandoConfirmacion(true)}
+                    className="btn btn-outline-danger px-4 py-2 rounded-pill flex-grow-1 fw-semibold"
+                  >
+                    Eliminar tarea
+                  </button>
+                )}
               </div>
             )}
 

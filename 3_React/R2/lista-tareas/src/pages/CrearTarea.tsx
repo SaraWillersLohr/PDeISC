@@ -22,7 +22,6 @@ export const CrearTarea = ({
   // acá guardo los valores del formulario
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [completa, setCompleta] = useState(false);
 
   // acá guardo los errores
   const [errorTitulo, setErrorTitulo] = useState("");
@@ -32,7 +31,6 @@ export const CrearTarea = ({
     if (tareaExistente) {
       setTitulo(tareaExistente.titulo);
       setDescripcion(tareaExistente.descripcion);
-      setCompleta(tareaExistente.completa);
     }
   }, [tareaExistente]);
 
@@ -77,7 +75,6 @@ export const CrearTarea = ({
         ...tareaExistente,
         titulo: titulo.trim(),
         descripcion: descripcion.trim(),
-        completa,
       };
 
       editarTarea(tareaActualizada);
@@ -91,7 +88,7 @@ export const CrearTarea = ({
       titulo: titulo.trim(),
       descripcion: descripcion.trim(),
       fechaCreacion: fechaFormateada,
-      completa,
+      completa: false,
     };
 
     // la agrego al estado
@@ -158,46 +155,6 @@ export const CrearTarea = ({
               {errorDescripcion && (
                 <div className="invalid-feedback">{errorDescripcion}</div>
               )}
-            </div>
-
-            <div className="mb-3">
-              <span className="form-label fw-semibold small mb-2 d-block">
-                Estado
-              </span>
-              <div className="d-flex gap-4">
-                <div className="form-check custom-radio">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="estado"
-                    id="incompleta"
-                    checked={!completa}
-                    onChange={() => setCompleta(false)}
-                  />
-                  <label
-                    className="form-check-label ms-1 small"
-                    htmlFor="incompleta"
-                  >
-                    Incompleta
-                  </label>
-                </div>
-                <div className="form-check custom-radio">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="estado"
-                    id="completa"
-                    checked={completa}
-                    onChange={() => setCompleta(true)}
-                  />
-                  <label
-                    className="form-check-label ms-1 small"
-                    htmlFor="completa"
-                  >
-                    Completa
-                  </label>
-                </div>
-              </div>
             </div>
 
             <div className="mt-4 d-flex flex-column gap-2">

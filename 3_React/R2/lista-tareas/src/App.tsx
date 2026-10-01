@@ -28,9 +28,11 @@ function App() {
 
   // elimino la tarea por su id
   const eliminarTarea = (id: number) => {
-    setTareas((tareasActuales) =>
-      tareasActuales.filter((tarea) => tarea.id !== id),
-    );
+    setTareas((tareasActuales) => {
+      const tareaAEliminar = tareasActuales.find((tarea) => tarea.id === id);
+      if (!tareaAEliminar?.completa) return tareasActuales;
+      return tareasActuales.filter((tarea) => tarea.id !== id);
+    });
   };
 
   // cambio el estado de completa a incompleta y viceversa

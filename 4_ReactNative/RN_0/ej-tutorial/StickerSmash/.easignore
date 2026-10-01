@@ -1,0 +1,23 @@
+# Mantiene el archivo de EAS centrado en StickerSmash.
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.git/
+.workspace/
+*.tsbuildinfo
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.pem
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.DS_Store
+example/
+ios/
+android/

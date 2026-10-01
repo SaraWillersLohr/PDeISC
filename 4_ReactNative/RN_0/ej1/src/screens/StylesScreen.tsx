@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackgroundDecoration } from '../components/BackgroundDecoration';
-import { ThemeButton } from '../components/ThemeButton';
+import { Ionicons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BackgroundDecoration } from "../components/BackgroundDecoration";
+import { ThemeButton } from "../components/ThemeButton";
 import {
   AppearanceSettings,
   backgrounds,
@@ -13,8 +13,8 @@ import {
   getFontStyle,
   TextSize,
   textSizes,
-} from '../constants/appearance';
-import { useTheme } from '../context/ThemeContext';
+} from "../constants/appearance";
+import { useTheme } from "../context/ThemeContext";
 
 // pantalla para personalizar los estilos visuales en tiempo real
 export function StylesScreen() {
@@ -22,13 +22,15 @@ export function StylesScreen() {
   const { palette, appearance, applyAppearance, storageError } = useTheme();
   // estado para mostrar el boton flotante de volver arriba
   const [showTop, setShowTop] = useState(false);
+  // Guarda la referencia para poder desplazar la pantalla desde el botón flotante.
   const scroll = useRef<ScrollView>(null);
+  // Lee el espacio seguro de la pantalla para evitar tapar contenido.
   const insets = useSafeAreaInsets();
 
   // funcion para actualizar cualquier propiedad y guardarla al instante
   const updateSetting = <K extends keyof AppearanceSettings>(
     key: K,
-    value: AppearanceSettings[K]
+    value: AppearanceSettings[K],
   ) => {
     applyAppearance({ ...appearance, [key]: value });
   };
@@ -50,18 +52,25 @@ export function StylesScreen() {
           },
         ]}
         // evento de scroll para detectar cuando mostrar el boton flotante
-        onScroll={({ nativeEvent }) =>
-          setShowTop(
-            nativeEvent.contentSize.height > nativeEvent.layoutMeasurement.height + 1 &&
-              nativeEvent.contentOffset.y > 80
-          )
+        onScroll={
+          /* Actualiza si corresponde mostrar el botón para subir. */ ({
+            nativeEvent,
+          }) =>
+            setShowTop(
+              nativeEvent.contentSize.height >
+                nativeEvent.layoutMeasurement.height + 1 &&
+                nativeEvent.contentOffset.y > 80,
+            )
         }
         scrollEventThrottle={16}
       >
         {/* encabezado principal con titulo y boton de tema */}
         <View style={styles.heading}>
           <View style={{ flex: 1 }}>
-            <Text accessibilityRole="header" style={[styles.title, { color: palette.text }]}>
+            <Text
+              accessibilityRole="header"
+              style={[styles.title, { color: palette.text }]}
+            >
               Estilos
             </Text>
             <Text style={[styles.subtitle, { color: palette.secondary }]}>
@@ -83,9 +92,13 @@ export function StylesScreen() {
         >
           {/* cabecera de la vista previa */}
           <View style={styles.previewHeader}>
-            <View style={[styles.previewBadge, { backgroundColor: palette.soft }]}>
+            <View
+              style={[styles.previewBadge, { backgroundColor: palette.soft }]}
+            >
               <Ionicons name="sparkles" size={13} color={palette.accent} />
-              <Text style={[styles.previewBadgeText, { color: palette.accent }]}>
+              <Text
+                style={[styles.previewBadgeText, { color: palette.accent }]}
+              >
                 VISTA PREVIA EN VIVO
               </Text>
             </View>
@@ -103,7 +116,7 @@ export function StylesScreen() {
                   color: palette.text,
                   fontSize: sizeValue(appearance.textSize),
                   fontFamily: getFontFamily(appearance.font),
-                  textAlign: 'center',
+                  textAlign: "center",
                 },
                 getFontStyle(appearance.font),
               ]}
@@ -121,7 +134,9 @@ export function StylesScreen() {
           ]}
         >
           <View style={styles.cardHeader}>
-            <View style={[styles.iconContainer, { backgroundColor: palette.soft }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: palette.soft }]}
+            >
               <Ionicons name="color-palette" size={18} color={palette.accent} />
             </View>
             <View>
@@ -136,50 +151,73 @@ export function StylesScreen() {
 
           {/* ciclo para renderizar cada circulo de color de la paleta */}
           <View style={styles.colorsGrid}>
-            {colorOptions.map(({ name, color }) => {
-              const selected = appearance.color === name;
-              return (
-                // boton con animacion al tocarlo para elegir este color
-                <Pressable
-                  key={name}
-                  accessibilityRole="button"
-                  accessibilityLabel={name}
-                  accessibilityState={{ selected }}
-                  onPress={() => updateSetting('color', name)}
-                  style={({ pressed }) => [
-                    styles.colorItem,
-                    {
-                      transform: [{ scale: pressed ? 0.93 : 1 }],
-                    },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.colorRing,
-                      {
-                        borderColor: selected ? color : 'transparent',
-                        backgroundColor: selected ? `${color}15` : 'transparent',
-                      },
-                    ]}
+            {colorOptions.map(
+              /* Crea un control por cada color disponible. */ ({
+                name,
+                color,
+              }) => {
+                // Indica si este color es el que está seleccionado.
+                const selected = appearance.color === name;
+                return (
+                  // boton con animacion al tocarlo para elegir este color
+                  <Pressable
+                    key={name}
+                    accessibilityRole="button"
+                    accessibilityLabel={name}
+                    accessibilityState={{ selected }}
+                    onPress={
+                      /* Guarda el color que se acaba de elegir. */ () =>
+                        updateSetting("color", name)
+                    }
+                    style={
+                      /* Anima el control mientras se presiona. */ ({
+                        pressed,
+                      }) => [
+                        styles.colorItem,
+                        {
+                          transform: [{ scale: pressed ? 0.93 : 1 }],
+                        },
+                      ]
+                    }
                   >
-                    <View style={[styles.colorDot, { backgroundColor: color }]}>
-                      {selected && <Ionicons name="checkmark" size={18} color="#FFFFFF" />}
+                    <View
+                      style={[
+                        styles.colorRing,
+                        {
+                          borderColor: selected ? color : "transparent",
+                          backgroundColor: selected
+                            ? `${color}15`
+                            : "transparent",
+                        },
+                      ]}
+                    >
+                      <View
+                        style={[styles.colorDot, { backgroundColor: color }]}
+                      >
+                        {selected && (
+                          <Ionicons
+                            name="checkmark"
+                            size={18}
+                            color="#FFFFFF"
+                          />
+                        )}
+                      </View>
                     </View>
-                  </View>
-                  <Text
-                    style={[
-                      styles.colorLabel,
-                      {
-                        color: selected ? palette.accent : palette.secondary,
-                        fontWeight: selected ? '700' : '500',
-                      },
-                    ]}
-                  >
-                    {name}
-                  </Text>
-                </Pressable>
-              );
-            })}
+                    <Text
+                      style={[
+                        styles.colorLabel,
+                        {
+                          color: selected ? palette.accent : palette.secondary,
+                          fontWeight: selected ? "700" : "500",
+                        },
+                      ]}
+                    >
+                      {name}
+                    </Text>
+                  </Pressable>
+                );
+              },
+            )}
           </View>
         </View>
 
@@ -191,11 +229,15 @@ export function StylesScreen() {
           ]}
         >
           <View style={styles.cardHeader}>
-            <View style={[styles.iconContainer, { backgroundColor: palette.soft }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: palette.soft }]}
+            >
               <Ionicons name="text" size={18} color={palette.accent} />
             </View>
             <View>
-              <Text style={[styles.cardTitle, { color: palette.text }]}>Tipografía</Text>
+              <Text style={[styles.cardTitle, { color: palette.text }]}>
+                Tipografía
+              </Text>
               <Text style={[styles.cardHint, { color: palette.secondary }]}>
                 Fuente del texto principal
               </Text>
@@ -204,73 +246,100 @@ export function StylesScreen() {
 
           {/* ciclo para listar las opciones de fuente con su ejemplo visual */}
           <View style={styles.fontsList}>
-            {fontOptions.map((font) => {
-              const selected = appearance.font === font.value;
-              const optionFontFamily = getFontFamily(font.value);
-              const optionFontStyle = getFontStyle(font.value);
+            {fontOptions.map(
+              /* Crea una opción para cada tipografía. */ (font) => {
+                // Comprueba si esta fuente está seleccionada.
+                const selected = appearance.font === font.value;
+                // Obtiene el nombre de fuente compatible con la plataforma.
+                const optionFontFamily = getFontFamily(font.value);
+                // Obtiene cursiva, peso y espaciado de esta fuente.
+                const optionFontStyle = getFontStyle(font.value);
 
-              return (
-                // tarjeta presionable para seleccionar la fuente de forma directa
-                <Pressable
-                  key={font.value}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  onPress={() => updateSetting('font', font.value)}
-                  style={({ pressed }) => [
-                    styles.fontCard,
-                    {
-                      borderColor: selected ? palette.accent : palette.border,
-                      backgroundColor: selected ? palette.soft : 'transparent',
-                      opacity: pressed ? 0.8 : 1,
-                    },
-                  ]}
-                >
-                  <View style={styles.fontCardLeft}>
-                    {/* muestra visual dibujada con la tipografia real */}
-                    <Text
-                      style={[
-                        styles.fontSample,
+                return (
+                  // tarjeta presionable para seleccionar la fuente de forma directa
+                  <Pressable
+                    key={font.value}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={
+                      /* Guarda la tipografía elegida. */ () =>
+                        updateSetting("font", font.value)
+                    }
+                    style={
+                      /* Cambia la apariencia mientras se presiona. */ ({
+                        pressed,
+                      }) => [
+                        styles.fontCard,
                         {
-                          fontFamily: optionFontFamily,
-                          color: selected ? palette.accent : palette.text,
+                          borderColor: selected
+                            ? palette.accent
+                            : palette.border,
+                          backgroundColor: selected
+                            ? palette.soft
+                            : "transparent",
+                          opacity: pressed ? 0.8 : 1,
                         },
-                        optionFontStyle,
-                      ]}
-                    >
-                      Aa
-                    </Text>
-                    <View>
+                      ]
+                    }
+                  >
+                    <View style={styles.fontCardLeft}>
+                      {/* muestra visual dibujada con la tipografia real */}
                       <Text
                         style={[
-                          styles.fontName,
+                          styles.fontSample,
                           {
-                            color: palette.text,
-                            fontWeight: selected ? '700' : '600',
+                            fontFamily: optionFontFamily,
+                            color: selected ? palette.accent : palette.text,
                           },
+                          optionFontStyle,
                         ]}
                       >
-                        {font.label}
+                        Aa
                       </Text>
-                      <Text style={[styles.fontType, { color: palette.secondary }]}>
-                        {font.description}
-                      </Text>
+                      <View>
+                        <Text
+                          style={[
+                            styles.fontName,
+                            {
+                              color: palette.text,
+                              fontWeight: selected ? "700" : "600",
+                            },
+                          ]}
+                        >
+                          {font.label}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.fontType,
+                            { color: palette.secondary },
+                          ]}
+                        >
+                          {font.description}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
 
-                  <View
-                    style={[
-                      styles.checkCircle,
-                      {
-                        borderColor: selected ? palette.accent : palette.border,
-                        backgroundColor: selected ? palette.accent : 'transparent',
-                      },
-                    ]}
-                  >
-                    {selected && <Ionicons name="checkmark" size={13} color="#FFFFFF" />}
-                  </View>
-                </Pressable>
-              );
-            })}
+                    <View
+                      style={[
+                        styles.checkCircle,
+                        {
+                          borderColor: selected
+                            ? palette.accent
+                            : palette.border,
+                          backgroundColor: selected
+                            ? palette.accent
+                            : "transparent",
+                        },
+                      ]}
+                    >
+                      {selected && (
+                        <Ionicons name="checkmark" size={13} color="#FFFFFF" />
+                      )}
+                    </View>
+                  </Pressable>
+                );
+              },
+            )}
           </View>
         </View>
 
@@ -282,7 +351,9 @@ export function StylesScreen() {
           ]}
         >
           <View style={styles.cardHeader}>
-            <View style={[styles.iconContainer, { backgroundColor: palette.soft }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: palette.soft }]}
+            >
               <Ionicons name="resize" size={18} color={palette.accent} />
             </View>
             <View>
@@ -299,46 +370,59 @@ export function StylesScreen() {
           <View
             style={[
               styles.segmentContainer,
-              { backgroundColor: palette.background, borderColor: palette.border },
+              {
+                backgroundColor: palette.background,
+                borderColor: palette.border,
+              },
             ]}
           >
-            {textSizes.map(({ label, value }) => {
-              const selected = appearance.textSize === label;
-              return (
-                // boton de opcion de tamano individual
-                <Pressable
-                  key={label}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  onPress={() => updateSetting('textSize', label as TextSize)}
-                  style={({ pressed }) => [
-                    styles.segmentButton,
-                    selected && {
-                      backgroundColor: palette.accent,
-                      shadowColor: palette.accent,
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 4,
-                      elevation: 3,
-                    },
-                    { opacity: pressed ? 0.75 : 1 },
-                  ]}
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.segmentText,
-                      {
-                        color: selected ? '#FFFFFF' : palette.secondary,
-                        fontWeight: selected ? '700' : '600',
-                      },
-                    ]}
+            {textSizes.map(
+              /* Crea una opción por tamaño de texto. */ ({ label, value }) => {
+                // Comprueba si este tamaño está seleccionado.
+                const selected = appearance.textSize === label;
+                return (
+                  // boton de opcion de tamano individual
+                  <Pressable
+                    key={label}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={
+                      /* Guarda el tamaño seleccionado. */ () =>
+                        updateSetting("textSize", label as TextSize)
+                    }
+                    style={
+                      /* Indica visualmente que el control está presionado. */ ({
+                        pressed,
+                      }) => [
+                        styles.segmentButton,
+                        selected && {
+                          backgroundColor: palette.accent,
+                          shadowColor: palette.accent,
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 4,
+                          elevation: 3,
+                        },
+                        { opacity: pressed ? 0.75 : 1 },
+                      ]
+                    }
                   >
-                    {label} ({value}px)
-                  </Text>
-                </Pressable>
-              );
-            })}
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.segmentText,
+                        {
+                          color: selected ? "#FFFFFF" : palette.secondary,
+                          fontWeight: selected ? "700" : "600",
+                        },
+                      ]}
+                    >
+                      {label} ({value}px)
+                    </Text>
+                  </Pressable>
+                );
+              },
+            )}
           </View>
         </View>
 
@@ -350,7 +434,9 @@ export function StylesScreen() {
           ]}
         >
           <View style={styles.cardHeader}>
-            <View style={[styles.iconContainer, { backgroundColor: palette.soft }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: palette.soft }]}
+            >
               <Ionicons name="image" size={18} color={palette.accent} />
             </View>
             <View>
@@ -365,82 +451,98 @@ export function StylesScreen() {
 
           {/* ciclo para mostrar las tarjetas en miniatura de cada fondo */}
           <View style={styles.bgGrid}>
-            {(['Claro', 'Bruma', 'Olas'] as const).map((name) => {
-              const selected = appearance.background === name;
-              return (
-                // tarjeta miniatura de cada fondo con su ilustracion
-                <Pressable
-                  key={name}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  onPress={() => updateSetting('background', name)}
-                  style={({ pressed }) => [
-                    styles.bgCard,
-                    {
-                      borderColor: selected ? palette.accent : palette.border,
-                      transform: [{ scale: pressed ? 0.95 : 1 }],
-                    },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.bgCanvas,
-                      {
-                        backgroundColor: backgrounds[name].light,
-                      },
-                    ]}
+            {(["Claro", "Bruma", "Olas"] as const).map(
+              /* Crea una miniatura por cada fondo. */ (name) => {
+                // Comprueba si este fondo está seleccionado.
+                const selected = appearance.background === name;
+                return (
+                  // tarjeta miniatura de cada fondo con su ilustracion
+                  <Pressable
+                    key={name}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={
+                      /* Guarda el fondo elegido. */ () =>
+                        updateSetting("background", name)
+                    }
+                    style={
+                      /* Anima la miniatura mientras se presiona. */ ({
+                        pressed,
+                      }) => [
+                        styles.bgCard,
+                        {
+                          borderColor: selected
+                            ? palette.accent
+                            : palette.border,
+                          transform: [{ scale: pressed ? 0.95 : 1 }],
+                        },
+                      ]
+                    }
                   >
-                    {name === 'Olas' && (
-                      <View
-                        style={[
-                          styles.previewWave,
-                          { backgroundColor: palette.accent },
-                        ]}
-                      />
-                    )}
-                    {name === 'Bruma' && (
-                      <View
-                        style={[
-                          styles.previewBruma,
-                          { backgroundColor: palette.soft },
-                        ]}
-                      />
-                    )}
-                    {name === 'Claro' && (
-                      <Ionicons
-                        name="sunny-outline"
-                        size={22}
-                        color={palette.secondary}
-                        style={{ opacity: 0.6 }}
-                      />
-                    )}
+                    <View
+                      style={[
+                        styles.bgCanvas,
+                        {
+                          backgroundColor: backgrounds[name].light,
+                        },
+                      ]}
+                    >
+                      {name === "Olas" && (
+                        <View
+                          style={[
+                            styles.previewWave,
+                            { backgroundColor: palette.accent },
+                          ]}
+                        />
+                      )}
+                      {name === "Bruma" && (
+                        <View
+                          style={[
+                            styles.previewBruma,
+                            { backgroundColor: palette.soft },
+                          ]}
+                        />
+                      )}
+                      {name === "Claro" && (
+                        <Ionicons
+                          name="sunny-outline"
+                          size={22}
+                          color={palette.secondary}
+                          style={{ opacity: 0.6 }}
+                        />
+                      )}
 
-                    {selected && (
-                      <View
-                        style={[
-                          styles.bgSelectedBadge,
-                          { backgroundColor: palette.accent },
-                        ]}
-                      >
-                        <Ionicons name="checkmark" size={13} color="#FFFFFF" />
-                      </View>
-                    )}
-                  </View>
+                      {selected && (
+                        <View
+                          style={[
+                            styles.bgSelectedBadge,
+                            { backgroundColor: palette.accent },
+                          ]}
+                        >
+                          <Ionicons
+                            name="checkmark"
+                            size={13}
+                            color="#FFFFFF"
+                          />
+                        </View>
+                      )}
+                    </View>
 
-                  <Text
-                    style={[
-                      styles.bgLabel,
-                      {
-                        color: selected ? palette.accent : palette.text,
-                        fontWeight: selected ? '700' : '600',
-                      },
-                    ]}
-                  >
-                    {name}
-                  </Text>
-                </Pressable>
-              );
-            })}
+                    <Text
+                      style={[
+                        styles.bgLabel,
+                        {
+                          color: selected ? palette.accent : palette.text,
+                          fontWeight: selected ? "700" : "600",
+                        },
+                      ]}
+                    >
+                      {name}
+                    </Text>
+                  </Pressable>
+                );
+              },
+            )}
           </View>
         </View>
 
@@ -460,15 +562,20 @@ export function StylesScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Volver arriba"
-          onPress={() => scroll.current?.scrollTo({ y: 0, animated: true })}
-          style={({ pressed }) => [
-            styles.floating,
-            {
-              right: Math.max(24, insets.right),
-              backgroundColor: palette.accent,
-              opacity: pressed ? 0.8 : 1,
-            },
-          ]}
+          onPress={
+            /* Lleva la pantalla hasta el inicio. */ () =>
+              scroll.current?.scrollTo({ y: 0, animated: true })
+          }
+          style={
+            /* Cambia la opacidad mientras se presiona. */ ({ pressed }) => [
+              styles.floating,
+              {
+                right: Math.max(24, insets.right),
+                backgroundColor: palette.accent,
+                opacity: pressed ? 0.8 : 1,
+              },
+            ]
+          }
         >
           <Ionicons name="arrow-up" size={22} color="#FFFFFF" />
         </Pressable>
@@ -479,56 +586,62 @@ export function StylesScreen() {
 
 // funcion auxiliar para obtener el valor numerico en pixeles de cada tamano
 function sizeValue(size: TextSize) {
-  return textSizes.find((option) => option.label === size)?.value ?? 42;
+  return (
+    textSizes.find(
+      /* Busca el valor numérico del tamaño indicado. */ (option) =>
+        option.label === size,
+    )?.value ?? 42
+  );
 }
 
 // definicion de todos los estilos visuales de la pantalla
+// Reúne los estilos de los controles y secciones.
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
   content: {
-    width: '100%',
+    width: "100%",
     maxWidth: 680,
-    alignSelf: 'center',
+    alignSelf: "center",
     paddingBottom: 40,
     gap: 16,
   },
   heading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingBottom: 6,
   },
   title: {
     fontSize: 30,
-    fontWeight: '800',
+    fontWeight: "800",
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
     marginTop: 4,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   previewCard: {
     borderRadius: 24,
     borderWidth: 1.5,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
     shadowRadius: 12,
     elevation: 3,
   },
   previewHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 12,
   },
   previewBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -536,17 +649,17 @@ const styles = StyleSheet.create({
   },
   previewBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.4,
   },
   liveHint: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   previewBody: {
     minHeight: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 14,
   },
   card: {
@@ -554,27 +667,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 18,
     gap: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
   },
   cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   iconContainer: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardTitle: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: -0.2,
   },
   cardHint: {
@@ -582,14 +695,14 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   colorsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     gap: 10,
   },
   colorItem: {
-    alignItems: 'center',
-    width: '30%',
+    alignItems: "center",
+    width: "30%",
     minWidth: 80,
     gap: 6,
     paddingVertical: 4,
@@ -599,40 +712,40 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     borderWidth: 2.5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   colorDot: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   colorLabel: {
     fontSize: 13,
-    textAlign: 'center',
+    textAlign: "center",
   },
   fontsList: {
     gap: 10,
   },
   fontCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     borderWidth: 1.5,
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
   fontCardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 14,
   },
   fontSample: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     width: 34,
   },
   fontName: {
@@ -647,11 +760,11 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 11,
     borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   segmentContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderRadius: 16,
     borderWidth: 1,
     padding: 4,
@@ -661,47 +774,47 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 44,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 8,
   },
   segmentText: {
     fontSize: 13,
   },
   bgGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 12,
   },
   bgCard: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 8,
     borderRadius: 16,
     borderWidth: 1.5,
     padding: 8,
   },
   bgCanvas: {
-    width: '100%',
+    width: "100%",
     height: 64,
     borderRadius: 12,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
   },
   previewWave: {
-    position: 'absolute',
+    position: "absolute",
     width: 80,
     height: 40,
     borderRadius: 30,
     bottom: -15,
     left: -10,
     opacity: 0.6,
-    transform: [{ rotate: '-15deg' }],
+    transform: [{ rotate: "-15deg" }],
   },
   previewBruma: {
-    position: 'absolute',
+    position: "absolute",
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -710,21 +823,21 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   bgSelectedBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 6,
     right: 6,
     width: 20,
     height: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   bgLabel: {
     fontSize: 13,
   },
   errorBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     padding: 12,
     borderRadius: 12,
@@ -732,21 +845,20 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   floating: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 24,
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 6,
   },
 });
-

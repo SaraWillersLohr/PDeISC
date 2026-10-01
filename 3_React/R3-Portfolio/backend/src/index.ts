@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { db } from "./database.js";
 import { requireAdmin } from "./middlewares/auth.js";
-
+// Configuración del servidor Express
 const app = express();
 const port = Number(process.env.PORT || 3001);
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
@@ -25,7 +25,10 @@ app.use(
 );
 app.use(express.json());
 app.use("/uploads", express.static(path.resolve("uploads")));
-
+// Configuración de Multer para subir imágenes
+//multer es un middleware para manejar la subida de archivos en Express.
+// Aquí se configura para almacenar imágenes en la carpeta "uploads" con un nombre único generado por crypto.randomUUID() y
+//  una extensión basada en el nombre original del archivo.
 const upload = multer({
   storage: multer.diskStorage({
     destination: "uploads",
@@ -57,6 +60,7 @@ const collection = (value: string | string[]): Collection | null =>
     : null;
 
 // Lectura pública: una respuesta única evita cascadas de peticiones en la landing.
+//llama a la base de datos para obtener todos los datos necesarios para mostrar el portfolio en la página principal.
 app.get("/api/portfolio", async (_req, res) => {
   try {
     const [
@@ -119,7 +123,9 @@ app.get("/api/:collection", async (req, res) => {
     res.sendStatus(503);
   }
 });
-
+//ruta de login del admin
+//valida el email y la contraseña del administrador,
+//genera un token JWT si son correctos y devuelve el token junto con un indicador de si es el primer inicio de sesión.
 app.post("/api/admin/login", async (req: Request, res: Response) => {
   const parsed = z
     .object({ email: z.string().email(), password: z.string().min(8) })

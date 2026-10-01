@@ -26,7 +26,11 @@ La pantalla principal recorre un arreglo de componentes y crea una tarjeta por c
 
 ## Organización
 
-- `App.tsx` contiene la pantalla, sus estados y las demostraciones.
+- `App.tsx` coordina la pantalla y conserva los estados compartidos.
+- `src/AppHeader.tsx` muestra la cabecera y el control de tema.
+- `src/ComponentCard.tsx` presenta cada componente del catálogo.
+- `src/ComponentDetailsModal.tsx` muestra la descripción, la demo y el código.
+- `src/ComponentDemo.tsx` contiene las demostraciones interactivas.
 - `components.ts` contiene los datos de cada componente.
 - `app.json`, `package.json` y `tsconfig.json` configuran Expo y TypeScript.
 

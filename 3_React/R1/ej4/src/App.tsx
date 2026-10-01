@@ -1,26 +1,26 @@
 // componente principal de la app
 // aquí se maneja el estado global de las tareas
 
-import { useState, useEffect } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { ArrowUp } from "lucide-react";
 
-import type { Task } from './types/Task';
-import type { TabActiva } from './components/TaskTabs';
+import type { Task } from "./types/Task";
+import type { TabActiva } from "./components/TaskTabs";
 
-import Header from './components/Header';
-import TaskForm from './components/TaskForm';
-import TaskTabs from './components/TaskTabs';
-import TaskList from './components/TaskList';
-import Footer from './components/Footer';
+import Header from "./components/Header";
+import TaskForm from "./components/TaskForm";
+import TaskTabs from "./components/TaskTabs";
+import TaskList from "./components/TaskList";
+import Footer from "./components/Footer";
 
-import './styles/app.css';
+import "./styles/app.css";
 
 function App() {
   // estado principal con todas las tareas
   const [tareas, setTareas] = useState<Task[]>([]);
 
   // estado para la pestaña activa
-  const [tabActiva, setTabActiva] = useState<TabActiva>('todas');
+  const [tabActiva, setTabActiva] = useState<TabActiva>("todas");
 
   // estado para el modo oscuro
   const [modoOscuro, setModoOscuro] = useState<boolean>(false);
@@ -30,7 +30,7 @@ function App() {
 
   // carga las tareas guardadas en localStorage al iniciar la app
   useEffect(() => {
-    const guardadas = localStorage.getItem('tareas');
+    const guardadas = localStorage.getItem("tareas");
     if (guardadas) {
       setTareas(JSON.parse(guardadas));
     }
@@ -38,26 +38,26 @@ function App() {
 
   // carga el modo de tema guardado en localStorage al iniciar la app
   useEffect(() => {
-    const modoGuardado = localStorage.getItem('modoOscuro');
-    if (modoGuardado === 'true') {
+    const modoGuardado = localStorage.getItem("modoOscuro");
+    if (modoGuardado === "true") {
       setModoOscuro(true);
     }
   }, []);
 
   // guarda las tareas en localStorage cada vez que cambian
   useEffect(() => {
-    localStorage.setItem('tareas', JSON.stringify(tareas));
+    localStorage.setItem("tareas", JSON.stringify(tareas));
   }, [tareas]);
 
   // guarda el modo y aplica la clase al body cada vez que cambia
   useEffect(() => {
-    localStorage.setItem('modoOscuro', String(modoOscuro));
+    localStorage.setItem("modoOscuro", String(modoOscuro));
     if (modoOscuro) {
-      document.body.classList.add('modo-oscuro');
-      document.body.classList.remove('modo-claro');
+      document.body.classList.add("modo-oscuro");
+      document.body.classList.remove("modo-claro");
     } else {
-      document.body.classList.add('modo-claro');
-      document.body.classList.remove('modo-oscuro');
+      document.body.classList.add("modo-claro");
+      document.body.classList.remove("modo-oscuro");
     }
   }, [modoOscuro]);
 
@@ -66,8 +66,8 @@ function App() {
     function handleScroll() {
       setMostrarBotonArriba(window.scrollY > 200);
     }
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // cambia entre modo claro y oscuro
@@ -81,10 +81,10 @@ function App() {
       id: Date.now(),
       texto: texto,
       completada: false,
-      fechaCreacion: new Date().toLocaleDateString('es-AR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
+      fechaCreacion: new Date().toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       }),
     };
     setTareas([...tareas, nuevaTarea]);
@@ -101,23 +101,30 @@ function App() {
     setTareas(actualizadas);
   }
 
-  // elimina una tarea del arreglo
+  // actualiza el texto de una tarea existente
+  function editarTarea(id: number, texto: string) {
+    setTareas((actuales) =>
+      actuales.map((tarea) => (tarea.id === id ? { ...tarea, texto } : tarea)),
+    );
+  }
+
   function eliminarTarea(id: number) {
-    const filtradas = tareas.filter((tarea) => tarea.id !== id);
-    setTareas(filtradas);
+    setTareas((actuales) =>
+      actuales.filter((tarea) => tarea.id !== id || !tarea.completada),
+    );
   }
 
   // vuelve al inicio de la página
   function volverArriba() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   // filtra las tareas según la pestaña activa
   function obtenerTareasFiltradas(): Task[] {
-    if (tabActiva === 'pendientes') {
+    if (tabActiva === "pendientes") {
       return tareas.filter((t) => !t.completada);
     }
-    if (tabActiva === 'completadas') {
+    if (tabActiva === "completadas") {
       return tareas.filter((t) => t.completada);
     }
     return tareas;
@@ -146,6 +153,7 @@ function App() {
         <TaskList
           tareas={tareasFiltradas}
           onCompletar={completarTarea}
+          onEditar={editarTarea}
           onEliminar={eliminarTarea}
         />
 

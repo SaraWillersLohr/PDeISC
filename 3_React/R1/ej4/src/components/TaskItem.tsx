@@ -1,41 +1,107 @@
 // representa una sola tarea en la lista
 
-import { Trash2 } from 'lucide-react';
-import type { Task } from '../types/Task';
+import { Check, Pencil, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import type { Task } from "../types/Task";
 
 // props que recibe el componente
 interface TaskItemProps {
   tarea: Task;
   onCompletar: (id: number) => void;
+  onEditar: (id: number, texto: string) => void;
   onEliminar: (id: number) => void;
 }
 
-function TaskItem({ tarea, onCompletar, onEliminar }: TaskItemProps) {
-  return (
-    <li className={`task-item ${tarea.completada ? 'completada' : ''}`}>
+function TaskItem({ tarea, onCompletar, onEditar, onEliminar }: TaskItemProps) {
+  const [editando, setEditando] = useState(false);
+  const [texto, setTexto] = useState(tarea.texto);
 
-      {/* checkbox para marcar o desmarcar la tarea */}
+  function guardarEdicion(evento: React.FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    const textoActualizado = texto.trim();
+    if (!textoActualizado) return;
+    onEditar(tarea.id, textoActualizado);
+    setEditando(false);
+  }
+
+  function cancelarEdicion() {
+    setTexto(tarea.texto);
+    setEditando(false);
+  }
+
+  return (
+    <li className={`task-item ${tarea.completada ? "completada" : ""}`}>
+      {/* radio para marcar o desmarcar la tarea */}
       <input
-        type="checkbox"
-        className="task-checkbox"
+        type="radio"
+        name={`tarea-${tarea.id}`}
+        className="task-radio"
         checked={tarea.completada}
-        onChange={() => onCompletar(tarea.id)}
+        onChange={() => {
+          if (!tarea.completada) onCompletar(tarea.id);
+        }}
+        onClick={() => {
+          if (tarea.completada) onCompletar(tarea.id);
+        }}
+        aria-label={`Marcar como ${tarea.completada ? "pendiente" : "completada"}: ${tarea.texto}`}
       />
 
       <div className="task-info">
-        {/* texto con tachado si está completada */}
-        <span className="task-texto">{tarea.texto}</span>
+        {editando ? (
+          <form className="task-edit-form" onSubmit={guardarEdicion}>
+            <input
+              className="task-edit-input"
+              aria-label="Editar tarea"
+              value={texto}
+              onChange={(evento) => setTexto(evento.target.value)}
+              autoFocus
+            />
+            <button
+              className="btn-accion-tarea"
+              type="submit"
+              title="Guardar cambios"
+              aria-label="Guardar cambios"
+            >
+              <Check size={18} />
+            </button>
+            <button
+              className="btn-accion-tarea"
+              type="button"
+              onClick={cancelarEdicion}
+              title="Cancelar edición"
+              aria-label="Cancelar edición"
+            >
+              <X size={18} />
+            </button>
+          </form>
+        ) : (
+          <span className="task-texto">{tarea.texto}</span>
+        )}
         <span className="task-fecha">{tarea.fechaCreacion}</span>
       </div>
 
-      {/* botón para eliminar la tarea */}
-      <button
-        className="btn-eliminar"
-        onClick={() => onEliminar(tarea.id)}
-        title="Eliminar tarea"
-      >
-        <Trash2 size={18} />
-      </button>
+      {!editando && (
+        <>
+          <button
+            className="btn-accion-tarea"
+            onClick={() => setEditando(true)}
+            title="Editar tarea"
+            aria-label="Editar tarea"
+          >
+            <Pencil size={18} />
+          </button>
+          {tarea.completada && (
+            <button
+              className="btn-accion-tarea btn-borrar-tarea"
+              onClick={() => onEliminar(tarea.id)}
+              title="Borrar tarea completada"
+              aria-label={`Borrar tarea: ${tarea.texto}`}
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
+        </>
+      )}
     </li>
   );
 }

@@ -1,4 +1,5 @@
 import { FlatList, Image, ImageSourcePropType, Pressable, StyleSheet } from 'react-native';
+import { useAppTheme } from '@/theme';
 
 const emojiImages: ImageSourcePropType[] = [
   require('@/assets/images/emoji1.png'),
@@ -12,6 +13,7 @@ const emojiImages: ImageSourcePropType[] = [
 type Props = { onSelect: (emoji: ImageSourcePropType) => void; onCloseModal: () => void };
 
 export default function EmojiList({ onSelect, onCloseModal }: Props) {
+  const { colors } = useAppTheme();
   return (
     <FlatList
       data={emojiImages}
@@ -20,7 +22,7 @@ export default function EmojiList({ onSelect, onCloseModal }: Props) {
       contentContainerStyle={styles.list}
       keyExtractor={(_, index) => `emoji-${index}`}
       renderItem={({ item, index }) => (
-        <Pressable accessibilityRole="button" accessibilityLabel={`Choose sticker ${index + 1}`} onPress={() => { onSelect(item); onCloseModal(); }} style={({ pressed }) => [styles.option, pressed && styles.pressed]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={`Choose sticker ${index + 1}`} onPress={() => { onSelect(item); onCloseModal(); }} style={({ pressed }) => [styles.option, { backgroundColor: pressed ? colors.accentSoft : 'transparent' }]}>
           <Image source={item} style={styles.image} />
         </Pressable>
       )}
@@ -28,4 +30,4 @@ export default function EmojiList({ onSelect, onCloseModal }: Props) {
   );
 }
 
-const styles = StyleSheet.create({ list: { alignItems: 'center', gap: 16, paddingHorizontal: 8 }, option: { padding: 8, borderRadius: 14 }, pressed: { backgroundColor: '#454b52' }, image: { width: 88, height: 88, resizeMode: 'contain' } });
+const styles = StyleSheet.create({ list: { alignItems: 'center', gap: 16, paddingHorizontal: 8 }, option: { padding: 8, borderRadius: 14 }, image: { width: 88, height: 88, resizeMode: 'contain' } });

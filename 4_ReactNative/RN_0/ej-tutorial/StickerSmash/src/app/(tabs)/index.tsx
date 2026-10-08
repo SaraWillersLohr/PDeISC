@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { ImageSourcePropType, Platform, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Alert, ImageSourcePropType, Platform, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library/legacy';
 import { captureRef } from 'react-native-view-shot';
@@ -22,12 +22,7 @@ export default function Index() {
   const [showAppOptions, setShowAppOptions] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [pickedEmoji, setPickedEmoji] = useState<ImageSourcePropType>();
-  const [permissionResponse, requestPermission] = ImagePicker.useMediaLibraryPermissions();
   const imageRef = useRef<View>(null);
-
-  useEffect(() => {
-    if (!permissionResponse?.granted) void requestPermission();
-  }, [permissionResponse?.granted, requestPermission]);
 
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -43,18 +38,31 @@ export default function Index() {
   };
 
   const saveImageAsync = async () => {
-    if (Platform.OS === 'web') {
-      if (!imageRef.current) return;
-      const { default: domtoimage } = await import('dom-to-image');
-      const dataUrl = await domtoimage.toJpeg(imageRef.current, { quality: 0.95, width: 320, height: 440 });
-      const link = document.createElement('a');
-      link.download = 'sticker-smash.jpeg';
-      link.href = dataUrl;
-      link.click();
-    } else {
+    try {
+      if (Platform.OS === 'web') {
+        if (!imageRef.current) return;
+        const { default: domtoimage } = await import('dom-to-image');
+        const dataUrl = await domtoimage.toJpeg(imageRef.current, { quality: 0.95, width: 320, height: 440 });
+        const link = document.createElement('a');
+        link.download = 'sticker-smash.jpeg';
+        link.href = dataUrl;
+        link.click();
+        return;
+      }
+
+      // Pedimos permiso de escritura al guardar, justo cuando hace falta.
+      const permission = await MediaLibrary.requestPermissionsAsync(true, ['photo']);
+      if (!permission.granted) {
+        Alert.alert('Permission required', 'Allow photo access to save your creation.');
+        return;
+      }
+
       const localUri = await captureRef(imageRef, { height: 440, quality: 1, format: 'jpg' });
-      // La API legacy funciona con la interfaz de MediaLibrary disponible en Expo Go.
       await MediaLibrary.createAssetAsync(localUri);
+      Alert.alert('Saved', 'Your creation was saved to your photos.');
+    } catch (error) {
+      console.error('Could not save the image:', error);
+      Alert.alert('Could not save', 'Please check photo permissions and try again.');
     }
   };
 

@@ -2,6 +2,7 @@ import mysql from "mysql2/promise";
 import "dotenv/config";
 
 // El pool se comparte entre repositorios para no abrir una conexión por request.
+// Crea y configura las conexiones compartidas con la base de datos.
 export const db = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 3306),

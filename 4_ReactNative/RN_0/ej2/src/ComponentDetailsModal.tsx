@@ -61,9 +61,14 @@ export function ComponentDetailsModal({
             <Pressable
               accessibilityRole="button"
               onPress={onCerrar}
-              style={styles.botonCerrar}
+              style={[
+                styles.botonCerrar,
+                { backgroundColor: oscuro ? "#3b356c" : "#635bdb18" },
+              ]}
             >
-              <Text style={styles.cerrar}>Cerrar ✕</Text>
+              <Text style={[styles.cerrar, { color: oscuro ? "#d2ccff" : "#635bdb" }]}>
+                Cerrar ✕
+              </Text>
             </Pressable>
           </View>
           <Text style={[styles.descripcion, { color: tenue }]}>

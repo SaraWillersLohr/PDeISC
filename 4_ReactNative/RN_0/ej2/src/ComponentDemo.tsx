@@ -55,11 +55,17 @@ export function ComponentDemo(props: Props) {
     mostrarCarga,
     onCambiarCarga,
   } = props;
+  const colorAcento = oscuro ? "#b5adff" : "#635bdb";
 
   switch (item?.nombre) {
     case "View":
       return (
-        <View style={styles.cajaDemo}>
+        <View
+          style={[
+            styles.cajaDemo,
+            { backgroundColor: oscuro ? "#26384a" : "#d9f5e9" },
+          ]}
+        >
           <Text style={{ color: tinta }}>
             Este contenedor agrupa texto y espacio.
           </Text>
@@ -67,7 +73,7 @@ export function ComponentDemo(props: Props) {
       );
     case "Text":
       return (
-        <Text style={[styles.textoGrande, { color: "#635bdb" }]}>
+        <Text style={[styles.textoGrande, { color: colorAcento }]}>
           Hola, estoy aprendiendo
         </Text>
       );
@@ -94,7 +100,13 @@ export function ComponentDemo(props: Props) {
             "Quinto elemento",
           ].map(
             /* Muestra cada texto de la lista desplazable. */ (fila) => (
-              <Text key={fila} style={[styles.fila, { color: tinta }]}>
+              <Text
+                key={fila}
+                style={[
+                  styles.fila,
+                  { color: tinta, backgroundColor: oscuro ? "#273449" : "#ffffff" },
+                ]}
+              >
                 {fila}
               </Text>
             ),
@@ -110,7 +122,11 @@ export function ComponentDemo(props: Props) {
           placeholderTextColor={tenue}
           style={[
             styles.input,
-            { color: tinta, borderColor: oscuro ? "#475569" : "#d8deea" },
+            {
+              color: tinta,
+              borderColor: oscuro ? "#64748b" : "#d8deea",
+              backgroundColor: oscuro ? "#273449" : "#ffffff",
+            },
           ]}
         />
       );
@@ -145,7 +161,12 @@ export function ComponentDemo(props: Props) {
           <Text style={{ color: tinta }}>
             Estado: {activo ? "activado" : "desactivado"}
           </Text>
-          <Switch value={activo} onValueChange={onCambiarActivo} />
+          <Switch
+            value={activo}
+            onValueChange={onCambiarActivo}
+            trackColor={{ false: oscuro ? "#475569" : "#d0d5dd", true: colorAcento }}
+            thumbColor={activo ? "#ffffff" : oscuro ? "#cbd5e1" : "#f9fafb"}
+          />
         </View>
       );
     case "FlatList":
@@ -158,7 +179,14 @@ export function ComponentDemo(props: Props) {
           }
           renderItem={
             /* Dibuja una fila por cada fruta. */ ({ item: fruta }) => (
-              <Text style={[styles.fila, { color: tinta }]}>{fruta}</Text>
+              <Text
+                style={[
+                  styles.fila,
+                  { color: tinta, backgroundColor: oscuro ? "#273449" : "#ffffff" },
+                ]}
+              >
+                {fruta}
+              </Text>
             )
           }
         />
@@ -176,7 +204,7 @@ export function ComponentDemo(props: Props) {
           }
           renderSectionHeader={
             /* Muestra el título de cada sección. */ ({ section }) => (
-              <Text style={[styles.subtitulo, { color: "#635bdb" }]}>
+              <Text style={[styles.subtitulo, { color: colorAcento }]}>
                 {section.title}
               </Text>
             )
@@ -191,7 +219,7 @@ export function ComponentDemo(props: Props) {
     case "ActivityIndicator":
       return (
         <View style={styles.centrado}>
-          <ActivityIndicator size="large" color="#635bdb" />
+          <ActivityIndicator size="large" color={colorAcento} />
           <Button
             title={mostrarCarga ? "Ocultar carga" : "Mostrar carga"}
             onPress={
@@ -256,14 +284,13 @@ export function ComponentDemo(props: Props) {
 
 // Reúne los estilos compartidos por las demostraciones.
 const styles = StyleSheet.create({
-  cajaDemo: { padding: 18, backgroundColor: "#d9f5e9", borderRadius: 12 },
+  cajaDemo: { padding: 18, borderRadius: 12 },
   textoGrande: { fontSize: 20, fontWeight: "800", textAlign: "center" },
   imagePlaceholder: { alignItems: "center", gap: 8 },
   imagenDemo: { width: "100%", height: 110, borderRadius: 10 },
   scrollDemo: { maxHeight: 145 },
   fila: {
     padding: 10,
-    backgroundColor: "#ffffffaa",
     borderRadius: 8,
     marginBottom: 5,
   },

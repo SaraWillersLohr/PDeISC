@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playwrite+AU+QLD:wght@100..400&display=swap");
+/* Este archivo define los estilos, colores y diseños para las vistas del sitio. */
 :root {
   --bg: #f6f4ee;
   --paper: #fffefa;
@@ -348,13 +349,50 @@ h2 {
   text-transform: uppercase;
   margin-top: 18px;
 }
-.project-actions { display: flex; align-items: stretch; gap: 8px; margin-top: 18px; }
-.project-card .project-link, .project-card .github-link { margin: 0; border: 1px solid currentColor; display: inline-flex; align-items: center; justify-content: center; transition: transform .2s, background .2s, color .2s; }
-.project-card .project-link { padding: 11px 13px; }
-.project-card .github-link { width: 39px; min-height: 39px; }
-.project-card .github-link svg { width: 19px; height: 19px; }
-.project-card .project-link:hover, .project-card .github-link:hover, .project-card .project-link:focus-visible, .project-card .github-link:focus-visible { background: var(--ink); color: var(--paper); transform: translate(-2px,-2px); }
-.project-card:nth-child(2) .project-link:hover, .project-card:nth-child(2) .github-link:hover, .project-card:nth-child(2) .project-link:focus-visible, .project-card:nth-child(2) .github-link:focus-visible { background: #171717; color: #fff; }
+.project-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 18px;
+}
+.project-card .project-link,
+.project-card .github-link {
+  margin: 0;
+  border: 1px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+.project-card .project-link {
+  padding: 11px 13px;
+}
+.project-card .github-link {
+  width: 39px;
+  min-height: 39px;
+}
+.project-card .github-link svg {
+  width: 19px;
+  height: 19px;
+}
+.project-card .project-link:hover,
+.project-card .github-link:hover,
+.project-card .project-link:focus-visible,
+.project-card .github-link:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translate(-2px, -2px);
+}
+.project-card:nth-child(2) .project-link:hover,
+.project-card:nth-child(2) .github-link:hover,
+.project-card:nth-child(2) .project-link:focus-visible,
+.project-card:nth-child(2) .github-link:focus-visible {
+  background: #171717;
+  color: #fff;
+}
 .education-row {
   display: grid;
   grid-template-columns: 120px 1fr 160px;

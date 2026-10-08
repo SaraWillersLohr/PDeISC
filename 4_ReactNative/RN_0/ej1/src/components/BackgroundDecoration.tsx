@@ -6,17 +6,23 @@ import { BackgroundName } from "../constants/appearance";
 interface BackgroundDecorationProps {
   enabled?: boolean;
   type?: BackgroundName;
+  accentColor?: string;
+  softColor?: string;
 }
 
 // componente para dibujar las formas decorativas de fondo (olas o bruma)
 export function BackgroundDecoration({
   enabled,
   type,
+  accentColor,
+  softColor,
 }: BackgroundDecorationProps) {
   // Obtiene los colores y la apariencia actuales del tema.
   const { palette, appearance } = useTheme();
   // Elige el fondo recibido o, si no existe, el configurado en la app.
   const currentBg = type ?? appearance.background;
+  const decorationAccent = accentColor ?? palette.accent;
+  const decorationSoft = softColor ?? palette.soft;
   // Decide si se deben mostrar las decoraciones.
   const isEnabled = enabled !== undefined ? enabled : currentBg !== "Claro";
 
@@ -31,14 +37,14 @@ export function BackgroundDecoration({
           style={[
             styles.brumaAura,
             styles.brumaTop,
-            { backgroundColor: palette.soft },
+            { backgroundColor: decorationSoft },
           ]}
         />
         <View
           style={[
             styles.brumaAura,
             styles.brumaBottom,
-            { backgroundColor: palette.soft },
+            { backgroundColor: decorationSoft },
           ]}
         />
       </View>
@@ -49,27 +55,27 @@ export function BackgroundDecoration({
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <View
-        style={[styles.wave, styles.topWave, { backgroundColor: palette.soft }]}
+        style={[styles.wave, styles.topWave, { backgroundColor: decorationSoft }]}
       />
       <View
         style={[
           styles.waveSecondary,
           styles.topWaveSecondary,
-          { backgroundColor: palette.accent },
+          { backgroundColor: decorationAccent },
         ]}
       />
       <View
         style={[
           styles.wave,
           styles.bottomWave,
-          { backgroundColor: palette.soft },
+          { backgroundColor: decorationSoft },
         ]}
       />
       <View
         style={[
           styles.waveSecondary,
           styles.bottomWaveSecondary,
-          { backgroundColor: palette.accent },
+          { backgroundColor: decorationAccent },
         ]}
       />
     </View>

@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "EstanciaApp",
+    "slug": "estancia-app-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#f4f5ef"
+    },
+    "plugins": ["expo-secure-store"],
+    "android": {
+      "package": "app.estancia.mobile"
+    },
+    "ios": {
+      "bundleIdentifier": "app.estancia.mobile"
+    }
+  }
+}

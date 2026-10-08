@@ -59,7 +59,7 @@ export function AppTabs() {
             headerTitleStyle: {
               fontWeight: "700",
               fontSize: 19,
-              color: palette.text,
+              color: palette.accent,
             },
             headerShadowVisible: false,
             tabBarActiveTintColor: palette.accent,
@@ -71,7 +71,7 @@ export function AppTabs() {
             },
             // estilos de la barra de pestanas inferior
             tabBarStyle: {
-              backgroundColor: palette.surface,
+              backgroundColor: palette.background,
               borderTopColor: palette.border,
               borderTopWidth: 1,
               height: Platform.OS === "ios" ? 88 : 66,

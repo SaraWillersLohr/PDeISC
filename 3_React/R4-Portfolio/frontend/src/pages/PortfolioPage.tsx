@@ -4,7 +4,8 @@ import { PhotoCarousel } from "../components/PhotoCarousel";
 import { Reveal, SectionTitle } from "../components/ui";
 import { usePortfolio, useTheme } from "../hooks";
 import type { Item } from "../types";
-//secciones de la página
+// Este archivo muestra las secciones públicas del portfolio.
+// Define los enlaces que aparecen en la navegación.
 const nav = [
   ["inicio", "inicio"],
   ["sobre-mi", "sobre mí"],
@@ -16,14 +17,20 @@ const nav = [
   ["objetivos", "objetivos"],
   ["contacto", "contacto"],
 ];
+// Obtiene un valor de un elemento y lo convierte en texto.
 const text = (item: Item, key: string) => String(item[key] || "");
 // Componente principal de la página de portfolio
 export function PortfolioPage() {
+  // Carga el contenido público y cualquier error de la API.
   const { data, error } = usePortfolio();
+  // Lee el tema actual y la acción para alternarlo.
   const { theme, toggle } = useTheme();
+  // Controla si la navegación móvil está abierta.
   const [menu, setMenu] = useState(false);
+  // Indica cuándo mostrar el botón para volver arriba.
   const [top, setTop] = useState(false);
   useEffect(() => {
+    // Actualiza el estado según la posición actual del desplazamiento.
     const handler = () => setTop(scrollY > 500);
     addEventListener("scroll", handler);
     handler();
@@ -43,6 +50,7 @@ export function PortfolioPage() {
         <p>cargando portfolio…</p>
       </main>
     );
+  // Guarda la configuración de textos y contacto del portfolio.
   const s = data.settings;
   return (
     <>
@@ -59,6 +67,7 @@ export function PortfolioPage() {
           ☰
         </button>
         <nav className={menu ? "open" : ""}>
+          {/* Recorre los enlaces para construir la navegación. */}
           {nav.map(([id, label]) => (
             <a href={`#${id}`} key={id} onClick={() => setMenu(false)}>
               {label}
@@ -163,6 +172,7 @@ export function PortfolioPage() {
         <section id="proyectos" className="section">
           <SectionTitle eyebrow="desarrollo web" title="proyectos destacados" />
           <div className="project-grid">
+            {/* Recorre los proyectos y muestra una tarjeta para cada uno. */}
             {data.projects.map((project, i) => (
               <Reveal key={project.id} delay={i * 0.08}>
                 <article className="project-card">
@@ -211,6 +221,7 @@ export function PortfolioPage() {
         <section id="formacion" className="section education">
           <SectionTitle eyebrow="aprendizaje constante" title="mi formación" />
           <div>
+            {/* Recorre los estudios y cursos para mostrarlos en la sección. */}
             {data.education.map((item) => (
               <Reveal key={item.id}>
                 <article className="education-row">
@@ -234,6 +245,7 @@ export function PortfolioPage() {
             title="stack & habilidades"
           />
           <div className="skills">
+            {/* Recorre las habilidades para mostrarlas como etiquetas. */}
             {data.skills.map((item) => (
               <span key={item.id}>{text(item, "name")}</span>
             ))}
@@ -244,6 +256,7 @@ export function PortfolioPage() {
             eyebrow="paso a paso"
             title="mi recorrido en la informática"
           />
+          {/* Recorre los eventos para construir la línea de tiempo. */}
           {data.timeline.map((item) => (
             <Reveal key={item.id}>
               <article>
@@ -259,6 +272,7 @@ export function PortfolioPage() {
         <section className="section learn">
           <SectionTitle eyebrow="en construcción" title="lo que aprendí" />
           <div>
+            {/* Recorre los temas de aprendizaje para mostrarlos en la lista. */}
             {data.learning.map((item) => (
               <Reveal key={item.id}>
                 <article>
@@ -281,6 +295,7 @@ export function PortfolioPage() {
             </p>
           </SectionTitle>
           <ul>
+            {/* Recorre los objetivos y crea un elemento para cada uno. */}
             {data.objectives.map((item) => (
               <li key={item.id}>{text(item, "text")}</li>
             ))}
@@ -292,6 +307,7 @@ export function PortfolioPage() {
             <h2>¿hablamos?</h2>
             <a href={`mailto:${s.contact_email}`}>{s.contact_email}</a>
             <div>
+              {/* Recorre los enlaces de contacto y redes sociales. */}
               {data.links.map((link) => (
                 <a
                   key={link.id}

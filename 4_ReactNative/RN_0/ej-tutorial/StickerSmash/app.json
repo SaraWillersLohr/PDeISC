@@ -27,6 +27,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow StickerSmash to access your photos.",
+          "savePhotosPermission": "Allow StickerSmash to save photos.",
+          "granularPermissions": ["photo"]
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",

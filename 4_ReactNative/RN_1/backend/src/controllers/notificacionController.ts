@@ -3,9 +3,10 @@ import { Request, Response, NextFunction } from "express";
 import * as notificacionService from "../services/notificacionService";
 
 // lista notificaciones sanitarias activas
-export async function list(_req: Request, res: Response, next: NextFunction) {
+export async function list(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await notificacionService.getNotificacionesSanitarias();
+    if (!req.usuario) { res.status(401).json({ success: false, message: 'no autenticado' }); return; }
+    const data = await notificacionService.getNotificacionesSanitarias(req.usuario.id_usuario);
     res.json({ success: true, message: "notificaciones obtenidas", data });
   } catch (error) {
     next(error);

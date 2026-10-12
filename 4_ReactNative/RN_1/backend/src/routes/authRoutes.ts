@@ -9,6 +9,8 @@ const router = Router();
 router.post("/register", authController.register);
 router.post("/verify-email", authController.verifyEmail);
 router.post("/resend-verification", authController.resendVerification);
+router.post("/access-token", authController.redeemAccessToken);
+router.post("/resend-access-token", authController.resendAccessToken);
 router.post("/login", authController.login);
 router.get("/me", authenticate, authController.me);
 router.post(
@@ -16,6 +18,7 @@ router.post(
   authenticate,
   authController.cambiarPasswordInicial,
 );
+router.get('/social/providers', socialAuthController.listSocialProviders);
 router.get('/:provider/callback', socialAuthController.completeSocialLogin);
 router.get('/:provider', socialAuthController.startSocialLogin);
 router.post('/social/exchange', socialAuthController.exchangeSocialCode);

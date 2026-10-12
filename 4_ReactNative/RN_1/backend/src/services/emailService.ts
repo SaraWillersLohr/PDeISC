@@ -23,18 +23,33 @@ export async function sendVerificationCode(email: string, code: string): Promise
   });
 }
 
-export async function sendRegistrationDecision(email: string, name: string, approved: boolean): Promise<void> {
+export async function sendRegistrationRejection(email: string, name: string): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) throw new Error('El servicio de correo no está configurado.');
   const transporter = nodemailer.createTransport({
     host: SMTP_HOST, port: Number(SMTP_PORT ?? 465), secure: SMTP_SECURE !== 'false',
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
-  const subject = approved ? 'Tu solicitud fue aceptada — EstanciaApp' : 'Actualización de tu solicitud — EstanciaApp';
-  const text = approved
-    ? `Hola ${name}, tu solicitud fue aceptada. Tu cuenta ya está activa con el rol inicial de peón. Ingresá con el correo y la contraseña que elegiste al registrarte.`
-    : `Hola ${name}, el administrador resolvió tu solicitud de acceso. Si necesitás más información, contactá al establecimiento.`;
-  await transporter.sendMail({ from: MAIL_FROM, replyTo: REPLY_TO || SMTP_USER, to: email, subject, text });
+  await transporter.sendMail({
+    from: MAIL_FROM, replyTo: REPLY_TO || SMTP_USER, to: email,
+    subject: 'Actualización de tu solicitud — EstanciaApp',
+    text: `Hola ${name}, el administrador denegó tu solicitud de acceso. Si necesitás más información, contactá al establecimiento.`,
+  });
+}
+
+/** Envía el token temporal emitido tras la aprobación del administrador. */
+export async function sendAccessToken(email: string, name: string, token: string, setupPassword = false): Promise<void> {
+  const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) throw new Error('El servicio de correo no está configurado.');
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST, port: Number(SMTP_PORT ?? 465), secure: SMTP_SECURE !== 'false',
+    auth: { user: SMTP_USER, pass: SMTP_PASS },
+  });
+  await transporter.sendMail({
+    from: MAIL_FROM, replyTo: REPLY_TO || SMTP_USER, to: email,
+    subject: 'Tu acceso a EstanciaApp fue aprobado',
+    text: `Hola ${name}, tu solicitud fue aprobada con el rol inicial de peón. Ingresá a EstanciaApp, elegí “Ingresar con token de acceso” y usá este token de un solo uso: ${token}. Vence en 24 horas. ${setupPassword ? 'Al canjearlo, la app te va a pedir crear una contraseña; después podrás ingresar con esa contraseña o con la cuenta social que usaste para registrarte.' : 'Después de canjearlo, podés iniciar sesión con tu correo y la contraseña que elegiste al registrarte.'} Si no solicitaste este acceso, ignorá este mensaje.`,
+  });
 }
 
 export async function sendAdministratorRegistrationNotice(adminEmail: string, applicantName: string, applicantEmail: string): Promise<void> {

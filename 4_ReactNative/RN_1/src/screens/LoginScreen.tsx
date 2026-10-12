@@ -1,16 +1,26 @@
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { AuthPage } from '../components/AuthPage';
+import { useFeedback } from '../components/FeedbackProvider';
+import { SocialLoginButtons } from '../components/SocialLoginButtons';
+import type { SocialProviderId } from '../services/authApi';
 
 interface LoginScreenProps {
   onLogin: (email: string, password: string, remember: boolean) => Promise<void>;
+  onAccessTokenPress: (email: string) => void;
   onRegisterPress: () => void;
+  socialProviders: SocialProviderId[];
+  onSocialLogin: (provider: SocialProviderId, remember: boolean) => void;
   busy: boolean;
   error: string | null;
   notice?: string | null;
 }
 
-export function LoginScreen({ onLogin, onRegisterPress, busy, error, notice }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onAccessTokenPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice }: LoginScreenProps) {
+  const { showMessage } = useFeedback();
+  const { width } = useWindowDimensions();
+  const gutter = Math.max(18, Math.min(36, width * 0.07));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
@@ -26,14 +36,11 @@ export function LoginScreen({ onLogin, onRegisterPress, busy, error, notice }: L
     void onLogin(cleanEmail, password, remember);
   };
 
-  return (
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-        <View style={styles.brandMark}><Text style={styles.brandMarkText}>E</Text></View>
-        <Text style={styles.eyebrow}>ESTANCIA APP</Text>
+  return <AuthPage>
+    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView contentContainerStyle={[styles.page, { paddingHorizontal: gutter }]} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Bienvenida</Text>
         <Text style={styles.subtitle}>Ingresá con tu cuenta para continuar.</Text>
-
         <View style={styles.form}>
           <Text style={styles.label}>Correo electrónico</Text>
           <TextInput
@@ -69,40 +76,34 @@ export function LoginScreen({ onLogin, onRegisterPress, busy, error, notice }: L
           <Pressable accessibilityRole="button" onPress={onRegisterPress} style={styles.linkButton}>
             <Text style={styles.link}>¿No tenés cuenta? Crear una cuenta</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => Alert.alert('Recuperar contraseña', 'La API todavía no ofrece recuperación de contraseña.')} style={styles.linkButton}>
+          <Pressable accessibilityRole="button" onPress={() => onAccessTokenPress(email.trim().toLowerCase())} style={styles.linkButton}>
+            <Text style={styles.link}>¿Aprobaron tu solicitud? Ingresar con token</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={() => showMessage('Recuperar contraseña', 'La API todavía no ofrece recuperación de contraseña.', 'info')} style={styles.linkButton}>
             <Text style={styles.link}>Olvidé mi contraseña</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => Alert.alert('Acceso con Google', 'Google requiere completar primero la incorporación y configurar OAuth para la app móvil.')} style={styles.googleButton}>
-            <Text style={styles.googleLabel}>Continuar con Google (próximamente)</Text>
-          </Pressable>
-          <Text style={styles.futureOption}>Google y recuperación de contraseña se habilitarán al completar esos servicios en la API.</Text>
+          <SocialLoginButtons providers={socialProviders} rememberMe={remember} onSelect={onSocialLogin} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  );
+  </AuthPage>;
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#f4f5ef' },
-  page: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 26, paddingVertical: 34 },
-  brandMark: { width: 58, height: 58, borderRadius: 18, backgroundColor: '#315a3c', alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
-  brandMarkText: { color: '#fff', fontSize: 28, fontWeight: '800' },
-  eyebrow: { color: '#52765a', fontWeight: '800', fontSize: 12, letterSpacing: 2 },
-  title: { color: '#1f2a21', fontSize: 34, fontWeight: '800', marginTop: 9 },
-  subtitle: { color: '#606960', fontSize: 16, marginTop: 8, marginBottom: 30 },
+  flex: { flex: 1 },
+  page: { flexGrow: 1, justifyContent: 'center', paddingVertical: 28, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  title: { color: '#1a3020', fontSize: 34, fontWeight: '800', marginTop: 9 },
+  subtitle: { color: '#6b756b', fontSize: 16, marginTop: 8, marginBottom: 24 },
   form: { gap: 11 },
   label: { color: '#2f3931', fontSize: 14, fontWeight: '700', marginTop: 7 },
-  input: { minHeight: 52, borderWidth: 1, borderColor: '#d8ddd3', borderRadius: 13, backgroundColor: '#fff', paddingHorizontal: 15, color: '#1f2a21', fontSize: 16 },
+  input: { minHeight: 52, borderWidth: 1, borderColor: '#e1e7e1', borderRadius: 13, backgroundColor: '#f9faf8', paddingHorizontal: 15, color: '#1a3020', fontSize: 16 },
   rememberRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
   checkbox: { width: 21, height: 21, borderWidth: 1.5, borderColor: '#9ca69a', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
-  checked: { backgroundColor: '#315a3c', borderColor: '#315a3c' },
+  checked: { backgroundColor: '#2d5a27', borderColor: '#2d5a27' },
   checkmark: { color: '#fff', fontWeight: '800', fontSize: 14, lineHeight: 17 },
   rememberText: { color: '#4d574e', fontSize: 14 },
-  error: { color: '#a33232', fontSize: 14, lineHeight: 20 },
-  notice: { color: '#315a3c', fontSize: 14, lineHeight: 20 },
+  error: { color: '#a33232', backgroundColor: '#fff0ed', borderRadius: 11, padding: 12, fontSize: 14, lineHeight: 20 },
+  notice: { color: '#315a3c', backgroundColor: '#eef5ed', borderRadius: 11, padding: 12, fontSize: 14, lineHeight: 20 },
   linkButton: { alignItems: 'center', paddingVertical: 8 },
-  link: { color: '#315a3c', fontSize: 14, fontWeight: '700' },
-  googleButton: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: '#d8ddd3', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 14 },
-  googleLabel: { color: '#384239', fontSize: 14, fontWeight: '600' },
-  futureOption: { color: '#737c72', fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 4 },
+  link: { color: '#2d5a27', fontSize: 14, fontWeight: '700' },
 });

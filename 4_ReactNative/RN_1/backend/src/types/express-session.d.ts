@@ -4,6 +4,8 @@ import 'express-session';
 declare module 'express-session' {
   interface SessionData {
     rememberMe?: boolean;
+    socialRedirect?: string;
+    socialMode?: 'login' | 'register';
   }
 }
 

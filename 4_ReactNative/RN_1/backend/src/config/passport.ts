@@ -7,7 +7,6 @@ import { Strategy as DiscordStrategy } from "passport-discord";
 import { Strategy as TwitchStrategy } from "passport-twitch-new";
 import { Strategy as TwitterStrategy } from "passport-twitter";
 import type { SocialProvider } from "../types";
-import { authorizeSocialIdentity } from "../services/socialAuthService";
 
 const apiUrl = process.env.SOCIAL_AUTH_API_URL ?? "http://localhost:3001";
 
@@ -28,16 +27,18 @@ function extractEmail(profile: {
   return email?.trim().toLowerCase() || null;
 }
 
-/** Construye el callback de Passport que aplica la autorización propia de EstanciaApp. */
+/** Passport solo valida con el proveedor; el controlador separa registro de ingreso. */
 function verifySocialProfile(provider: SocialProvider) {
   return async (
     _accessToken: string,
     _refreshToken: string | undefined,
     profile: {
       id: string;
+      displayName?: string;
+      username?: string;
       email?: string;
       emails?: Array<{ value?: string }>;
-      _json?: { email?: string; data?: { email?: string } };
+      _json?: { email?: string; name?: string; login?: string; data?: { email?: string } };
       data?: { email?: string };
     },
     done: (
@@ -47,19 +48,9 @@ function verifySocialProfile(provider: SocialProvider) {
     ) => void,
   ): Promise<void> => {
     try {
-      const user = await authorizeSocialIdentity({
-        provider,
-        providerUserId: profile.id,
-        email: extractEmail(profile),
-      });
-      done(null, user);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "no se pudo validar la cuenta social";
-      done(null, false, { message });
-    }
+      const name = profile.displayName?.trim() || profile.username?.trim() || profile._json?.name?.trim() || profile._json?.login?.trim() || '';
+      done(null, { provider, providerUserId: profile.id, email: extractEmail(profile), name });
+    } catch (error) { done(error instanceof Error ? error : new Error('no se pudo validar la cuenta social')); }
   };
 }
 

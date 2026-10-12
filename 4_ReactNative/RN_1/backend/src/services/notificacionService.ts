@@ -38,16 +38,17 @@ export async function createNotificacion(
   mensaje: string,
   tipo: 'alerta_sanitaria' | 'en_tratamiento' | 'alta' | 'info' = 'alerta_sanitaria',
   idAnimal: number | null = null,
+  idUsuarioDestinatario: number | null = null,
 ): Promise<number> {
   const [result] = await pool.query<ResultSetHeader>(
-    `INSERT INTO notificaciones (id_animal, titulo, mensaje, tipo) VALUES (?, ?, ?, ?)`,
-    [idAnimal, titulo, mensaje, tipo],
+    `INSERT INTO notificaciones (id_animal, id_usuario_destinatario, titulo, mensaje, tipo) VALUES (?, ?, ?, ?, ?)`,
+    [idAnimal, idUsuarioDestinatario, titulo, mensaje, tipo],
   );
   return result.insertId;
 }
 
 // obtengo todas las notificaciones persistentes ordenadas por fecha reciente
-export async function getNotificacionesSanitarias(): Promise<NotificacionAlerta[]> {
+export async function getNotificacionesSanitarias(idUsuario: number): Promise<NotificacionAlerta[]> {
   const [rows] = await pool.query<NotificacionRow[]>(
     `SELECT n.id_notificacion,
             n.id_animal,
@@ -65,7 +66,9 @@ export async function getNotificacionesSanitarias(): Promise<NotificacionAlerta[
      LEFT JOIN animales a ON a.id_animal = n.id_animal
      LEFT JOIN corrales c ON c.id_corral = a.id_corral
      LEFT JOIN corrales co ON co.id_corral = a.id_corral_origen
+     WHERE n.id_usuario_destinatario IS NULL OR n.id_usuario_destinatario = ?
      ORDER BY n.created_at DESC`,
+    [idUsuario],
   );
 
   return rows.map((r) => ({

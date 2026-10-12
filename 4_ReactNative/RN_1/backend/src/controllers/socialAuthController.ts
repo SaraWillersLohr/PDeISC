@@ -8,6 +8,8 @@ import {
 } from "../services/socialTicketService";
 import { signToken } from "../utils/jwt";
 import type { SocialProvider, UsuarioPublico } from "../types";
+import { authorizeSocialIdentity } from '../services/socialAuthService';
+import * as registrationService from '../services/registrationService';
 
 const providers: SocialProvider[] = [
   "google",
@@ -17,8 +19,12 @@ const providers: SocialProvider[] = [
   "twitch",
   "twitter",
 ];
-const frontendUrl =
-  process.env.SOCIAL_AUTH_FRONTEND_URL ?? "http://localhost:5173";
+const frontendUrl = process.env.SOCIAL_AUTH_FRONTEND_URL ?? "http://localhost:8081";
+
+function makeRedirectUrl(base: string, params: Record<string, string>): string {
+  const query = new URLSearchParams(params).toString();
+  return `${base}${base.includes('?') ? '&' : '?'}${query}`;
+}
 
 /** Comprueba que el parámetro de ruta representa un proveedor soportado. */
 function getProvider(value: string): SocialProvider | null {
@@ -28,10 +34,13 @@ function getProvider(value: string): SocialProvider | null {
 }
 
 /** Redirige al login mostrando un mensaje URL-codificado y sin filtrar detalles internos. */
-function redirectWithError(res: Response, message: string): void {
-  res.redirect(
-    `${frontendUrl}/login?socialError=${encodeURIComponent(message)}`,
-  );
+function redirectWithError(res: Response, message: string, redirectUri?: string, mode: 'login' | 'register' = 'login'): void {
+  res.redirect(makeRedirectUrl(redirectUri ?? frontendUrl, { socialError: message, socialMode: mode }));
+}
+
+/** Expone únicamente los proveedores que cuentan con sus dos credenciales. */
+export function listSocialProviders(_req: Request, res: Response): void {
+  res.json({ success: true, message: 'proveedores sociales disponibles', data: { providers: providers.filter(isSocialProviderEnabled) } });
 }
 
 /** Inicia la autorización en el proveedor y conserva la preferencia de persistencia en la sesión temporal. */
@@ -45,6 +54,13 @@ export function startSocialLogin(
   if (!isSocialProviderEnabled(provider))
     return redirectWithError(res, "este proveedor aún no está configurado");
 
+  const requestedRedirect = typeof req.query.redirect === 'string' ? req.query.redirect : '';
+  const allowedMobileRedirect = process.env.SOCIAL_AUTH_MOBILE_REDIRECT_URI ?? 'estanciaapp://auth/callback';
+  if (requestedRedirect && requestedRedirect !== allowedMobileRedirect) {
+    return redirectWithError(res, 'la dirección de retorno de la app no está autorizada');
+  }
+  req.session.socialRedirect = requestedRedirect || undefined;
+  req.session.socialMode = req.query.mode === 'register' ? 'register' : 'login';
   req.session.rememberMe = req.query.remember === "1";
   const scopes: Record<SocialProvider, string[] | undefined> = {
     google: ["profile", "email"],
@@ -76,19 +92,34 @@ export function completeSocialLogin(
     { session: false, failureRedirect: undefined },
     (
       error: Error | null,
-      user: UsuarioPublico | false,
+      user: unknown | false,
       info?: { message?: string },
     ) => {
+      const redirectTarget = req.session.socialRedirect;
+      const mode = req.session.socialMode ?? 'login';
       if (error || !user)
-        return redirectWithError(
+        return req.session.destroy(() => redirectWithError(
           res,
           info?.message ?? "no se pudo iniciar sesión con la cuenta social",
-        );
-      const code = createSocialTicket(user, req.session.rememberMe === true);
-      req.session.destroy(() => undefined);
-      res.redirect(
-        `${frontendUrl}/login?socialCode=${encodeURIComponent(code)}`,
-      );
+          redirectTarget,
+          mode,
+        ));
+      void (async () => {
+        const profile = user as { provider: SocialProvider; providerUserId: string; email: string | null; name: string };
+        if (mode === 'register') {
+          if (!profile.email) throw new Error('El proveedor no compartió un correo. Elegí otro método de registro.');
+          const parts = profile.name.trim().split(/\s+/);
+          await registrationService.registerSocial({ nombre: parts.shift() ?? '', apellido: parts.join(' '), email: profile.email, provider: profile.provider, providerUserId: profile.providerUserId });
+          req.session.destroy(() => res.redirect(makeRedirectUrl(redirectTarget ?? frontendUrl, { socialRegistered: '1', socialMode: 'register' })));
+          return;
+        }
+        const authorized = await authorizeSocialIdentity(profile);
+        const code = createSocialTicket(authorized, req.session.rememberMe === true);
+        req.session.destroy(() => res.redirect(makeRedirectUrl(redirectTarget ?? frontendUrl, { socialCode: code, socialMode: 'login' })));
+      })().catch((cause: unknown) => {
+        const message = cause instanceof Error ? cause.message : 'No se pudo completar la autenticación social.';
+        req.session.destroy(() => redirectWithError(res, message, redirectTarget, mode));
+      });
     },
   )(req, res, next);
 }

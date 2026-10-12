@@ -41,6 +41,31 @@ export async function resendVerification(req: Request, res: Response): Promise<v
   }
 }
 
+export async function redeemAccessToken(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, token } = req.body as { email?: string; token?: string };
+    if (!email?.trim() || !token?.trim()) { res.status(400).json({ success: false, message: 'Correo y token son obligatorios.' }); return; }
+    const data = await registrationService.redeemAccessToken(email, token);
+    res.json({ success: true, message: 'Token canjeado. Sesión iniciada.', data });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo validar el token.';
+    res.status(400).json({ success: false, message });
+  }
+}
+
+export async function resendAccessToken(req: Request, res: Response): Promise<void> {
+  try {
+    const { email } = req.body as { email?: string };
+    if (!email?.trim()) { res.status(400).json({ success: false, message: 'El correo es obligatorio.' }); return; }
+    await registrationService.resendAccessToken(email);
+    res.json({ success: true, message: 'Si la cuenta fue aprobada y todavía no ingresó, enviaremos un token al correo indicado.' });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo reenviar el token.';
+    const status = /esperá|límite diario/i.test(message) ? 429 : 400;
+    res.status(status).json({ success: false, message });
+  }
+}
+
 // POST /api/auth/login  valida credenciales y devuelve jwt
 // esta funcion maneja la solicitud de inicio de sesi�n,
 // valida las credenciales del usuario y devuelve un token jwt si son correctas.

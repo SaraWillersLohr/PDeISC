@@ -22,8 +22,24 @@ if (process.env.NODE_ENV === 'production' && !sessionSecret) {
   throw new Error('SESSION_SECRET es obligatoria en producción');
 }
 
-// middlewares globales
-app.use(cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:5173" }));
+// middlewares globales. Expo Web suele usar localhost:8081; las apps nativas
+// no envían Origin, por eso también se permiten solicitudes sin ese header.
+const allowedOrigins = new Set([
+  // Expo Web local defaults remain enabled even if .env has an older Vite origin.
+  "http://localhost:8081",
+  "http://127.0.0.1:8081",
+  "http://localhost:5173",
+  ...(process.env.CORS_ORIGIN ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+]);
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+    return callback(new Error(`Origen no permitido por CORS: ${origin}`));
+  },
+}));
 app.use(express.json());
 app.use(session({
   secret: sessionSecret ?? 'solo-desarrollo-cambiar-en-produccion',

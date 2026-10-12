@@ -21,7 +21,7 @@ export function PrimaryButton({ label, onPress, loading = false, disabled = fals
 }
 
 const styles = StyleSheet.create({
-  button: { minHeight: 52, borderRadius: 14, backgroundColor: '#315a3c', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
+  button: { minHeight: 52, borderRadius: 999, backgroundColor: '#1a3020', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   pressed: { opacity: 0.86 },
   disabled: { opacity: 0.55 },
   label: { color: '#fff', fontSize: 16, fontWeight: '700' },

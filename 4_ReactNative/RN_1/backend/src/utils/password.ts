@@ -1,5 +1,13 @@
+// Archivo backend/src/utils/password.ts: utilidades compartidas del backend relacionado con password. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
+
+
+
 // hash bcrypt de contrasenas
 import bcrypt from 'bcryptjs';
+
+
+
+// Configuración: SALT_ROUNDS establece costo de cálculo usado al generar hashes de contraseñas; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 
 const SALT_ROUNDS = 10;
 

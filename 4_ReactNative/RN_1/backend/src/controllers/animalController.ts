@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/animalController.ts: controlador http de la api relacionado con animal controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // controlador de animales
 // gestiona las solicitudes relacionadas con los animales, como listar, crear, actualizar,
 // eliminar, reportar enfermedades y dar de alta a los animales.

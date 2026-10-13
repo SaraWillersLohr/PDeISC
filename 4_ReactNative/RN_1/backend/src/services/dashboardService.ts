@@ -1,7 +1,9 @@
+// Archivo backend/src/services/dashboardService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con dashboard service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // servicio de m�tricas del dashboard � consultas agregadas a mariadb
 import pool from '../config/database';
 import type { RowDataPacket } from 'mysql2';
 
+// Contrato de datos DashboardSummary: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface DashboardSummary {
   totalAnimales: number;
   variacionMes: number;
@@ -15,20 +17,24 @@ export interface DashboardSummary {
   resumenMensual: { mes: string; bovinos: number; ovinos: number; equinos: number }[];
 }
 
+// Contrato de datos CountRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface CountRow extends RowDataPacket {
   total: number;
 }
 
+// Contrato de datos AlertasRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface AlertasRow extends RowDataPacket {
   total: number;
   sanitarias: number;
 }
 
+// Contrato de datos CorralesRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface CorralesRow extends RowDataPacket {
   total: number;
   enUso: number;
 }
 
+// Contrato de datos ChartRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface ChartRow extends RowDataPacket {
   mes: number;
   especie: string;
@@ -90,6 +96,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
       (f) => f.mes === i + 1,
     );
     // ejecuto get
+    // Esta función implementa la operación «get» sobre dashboard: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe esp como entrada.
     const get = (esp: string) =>
       Number(filas.find((f) => f.especie === esp)?.cantidad ?? 0);
     return { mes, bovinos: get('Bovino'), ovinos: get('Ovino'), equinos: get('Equino') };

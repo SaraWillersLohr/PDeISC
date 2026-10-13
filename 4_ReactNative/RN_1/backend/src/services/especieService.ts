@@ -1,24 +1,29 @@
+// Archivo backend/src/services/especieService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con especie service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // servicio de especies y razas
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
+// Contrato de datos RazaItem: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface RazaItem {
   id_raza: number;
   id_especie: number;
   nombre: string;
 }
 
+// Contrato de datos EspecieItem: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface EspecieItem {
   id_especie: number;
   nombre: string;
   razas: RazaItem[];
 }
 
+// Contrato de datos EspecieRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface EspecieRow extends RowDataPacket {
   id_especie: number;
   nombre: string;
 }
 
+// Contrato de datos RazaRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface RazaRow extends RowDataPacket {
   id_raza: number;
   id_especie: number;

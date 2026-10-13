@@ -1,7 +1,9 @@
+// Archivo backend/src/services/socialTicketService.ts: los códigos temporales de un solo uso para completar el acceso social. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // Códigos efímeros para completar OAuth sin exponer JWT en la URL.
 import crypto from 'crypto';
 import type { UsuarioPublico } from '../types';
 
+// Contrato de datos SocialTicket: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface SocialTicket {
   usuario: UsuarioPublico;
   rememberMe: boolean;
@@ -9,9 +11,10 @@ interface SocialTicket {
 }
 
 const tickets = new Map<string, SocialTicket>();
+// Configuración: TICKET_TTL_MS establece un valor compartido por el módulo; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const TICKET_TTL_MS = 60_000;
 
-/** Elimina códigos vencidos para limitar memoria y evitar que sean reutilizados. */
+// Elimina códigos vencidos para limitar memoria y evitar que sean reutilizados.
 function removeExpiredTickets(): void {
   const now = Date.now();
   for (const [code, ticket] of tickets.entries()) {
@@ -19,7 +22,7 @@ function removeExpiredTickets(): void {
   }
 }
 
-/** Genera un código aleatorio de un solo uso asociado temporalmente a la sesión social. */
+// Genera un código aleatorio de un solo uso asociado temporalmente a la sesión social.
 export function createSocialTicket(usuario: UsuarioPublico, rememberMe: boolean): string {
   removeExpiredTickets();
   const code = crypto.randomBytes(32).toString('base64url');
@@ -27,7 +30,7 @@ export function createSocialTicket(usuario: UsuarioPublico, rememberMe: boolean)
   return code;
 }
 
-/** Consume un código OAuth una única vez y devuelve la sesión correspondiente. */
+// Consume un código OAuth una única vez y devuelve la sesión correspondiente.
 export function consumeSocialTicket(code: string): Omit<SocialTicket, 'expiresAt'> | null {
   const ticket = tickets.get(code);
   tickets.delete(code);

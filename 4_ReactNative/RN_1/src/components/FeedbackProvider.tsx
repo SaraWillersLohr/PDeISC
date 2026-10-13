@@ -1,12 +1,17 @@
+// Archivo src/components/FeedbackProvider.tsx: los mensajes, confirmaciones y opciones visuales compartidas de la app. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+// Contrato de datos Tone: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 type Tone = 'success' | 'error' | 'info';
+// Contrato de datos Choice: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 type Choice = { label: string; value: string };
+// Contrato de datos Dialog: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 type Dialog =
   | { kind: 'confirm'; title: string; message: string; confirmText: string; cancelText: string; destructive: boolean }
   | { kind: 'choose'; title: string; message: string; choices: Choice[] };
 
+// Contrato de datos FeedbackApi: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface FeedbackApi {
   showMessage: (title: string, message: string, tone?: Tone) => void;
   confirm: (title: string, message: string, confirmText?: string, destructive?: boolean) => Promise<boolean>;
@@ -15,7 +20,7 @@ interface FeedbackApi {
 
 const FeedbackContext = createContext<FeedbackApi | null>(null);
 let toastId = 0;
-
+// Esta función renderiza el componente reutilizable FeedbackProvider, usando sus props para mostrar estado y comunicar acciones al componente padre. Recibe children como entrada.
 export function FeedbackProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<{ id: number; title: string; message: string; tone: Tone } | null>(null);
   const [dialog, setDialog] = useState<Dialog | null>(null);
@@ -42,7 +47,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       resolverRef.current = (value) => resolve(typeof value === 'string' ? value : null);
       setDialog({ kind: 'choose', title, message, choices });
     }), []);
-
+  // Esta función cierra el diálogo propio de la aplicación y resuelve la promesa pendiente con la opción elegida. Recibe value como entrada.
   const closeDialog = (value: boolean | string | null) => {
     resolverRef.current?.(value);
     resolverRef.current = null;
@@ -80,7 +85,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     </View>
   </FeedbackContext.Provider>;
 }
-
+// Esta función maneja la operación «use feedback» del componente feedback provider y actualiza o resuelve el estado de interacción correspondiente.
 export function useFeedback() {
   const context = useContext(FeedbackContext);
   if (!context) throw new Error('useFeedback debe usarse dentro de FeedbackProvider');

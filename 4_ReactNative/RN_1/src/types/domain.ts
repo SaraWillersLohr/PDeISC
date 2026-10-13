@@ -1,5 +1,7 @@
+// Archivo src/types/domain.ts: tipos e interfaces compartidos relacionado con domain. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 export type Role = 'administrador' | 'dueno' | 'copropietario' | 'peon' | 'veterinario' | 'empleado';
 
+// Contrato de datos PublicUser: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface PublicUser {
   id_usuario: number;
   nombre: string;
@@ -11,6 +13,7 @@ export interface PublicUser {
   debe_cambiar_password?: boolean;
 }
 
+// Contrato de datos DashboardSummary: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface DashboardSummary {
   totalAnimales: number;
   variacionMes: number;
@@ -23,6 +26,7 @@ export interface DashboardSummary {
   clima: { temperatura: number; descripcion: string };
 }
 
+// Contrato de datos Animal: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface Animal {
   id_animal: number;
   identificador: string;
@@ -38,6 +42,7 @@ export interface Animal {
   activo: boolean;
 }
 
+// Contrato de datos Corral: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface Corral {
   id_corral: number;
   nombre: string;
@@ -47,6 +52,7 @@ export interface Corral {
   ocupados: number;
 }
 
+// Contrato de datos Notification: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface Notification {
   id: string;
   id_notificacion?: number;
@@ -56,6 +62,7 @@ export interface Notification {
   tipo: string;
 }
 
+// Contrato de datos ApiResponse: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

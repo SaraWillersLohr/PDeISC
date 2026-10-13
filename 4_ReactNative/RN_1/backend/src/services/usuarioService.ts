@@ -1,41 +1,43 @@
+// Archivo backend/src/services/usuarioService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con usuario service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import pool from '../config/database';
 import { hashPassword } from '../utils/password';
 import { getRolLabel, isAdmin } from '../utils/roles';
 import type { CreateUsuarioRequest, RolNombre, UpdateUsuarioRequest, UsuarioPublico } from '../types';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
+// Contrato de datos UsuarioRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface UsuarioRow extends RowDataPacket {
   id_usuario: number; id_rol: number; nombre: string; apellido: string; email: string;
   activo: number; rol_nombre: RolNombre;
 }
-
+// Esta función convierte la fila o estructura de origen en el formato usuario que consume el resto de la aplicación. Recibe row como entrada.
 function toPublico(row: UsuarioRow): UsuarioPublico {
   return { id_usuario: row.id_usuario, nombre: row.nombre, apellido: row.apellido,
     email: row.email, rol: row.rol_nombre, rolLabel: getRolLabel(row.rol_nombre), activo: row.activo === 1 };
 }
-
+// Esta función implementa la operación «get rol id» sobre usuario: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe nombre como entrada.
 async function getRolId(nombre: RolNombre): Promise<number> {
   const [rows] = await pool.query<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1', [nombre]);
   if (!rows[0]) throw new Error(`rol "${nombre}" no existe`);
   return Number(rows[0].id_rol);
 }
-
+// Esta función implementa la operación «is administrator user» sobre usuario: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe id como entrada.
 async function isAdministratorUser(id: number): Promise<boolean> {
   const [rows] = await pool.query<RowDataPacket[]>(
     "SELECT 1 AS encontrado FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol WHERE u.id_usuario = ? AND r.nombre = 'administrador' LIMIT 1", [id],
   );
   return rows.length > 0;
 }
-
+// Configuración: USER_SELECT establece un valor compartido por el módulo; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const USER_SELECT = `SELECT u.id_usuario, u.id_rol, u.nombre, u.apellido, u.email, u.activo, r.nombre AS rol_nombre
   FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol`;
 
-/** Solo el administrador superior puede gestionar las cuentas. */
+// Solo el administrador superior puede gestionar las cuentas.
 export async function listUsuarios(): Promise<UsuarioPublico[]> {
   const [rows] = await pool.query<UsuarioRow[]>(`${USER_SELECT} ORDER BY u.nombre`);
   return rows.map(toPublico);
 }
-
+// Esta función implementa la operación «create usuario» sobre usuario: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe data, creatorRole como entrada.
 export async function createUsuario(data: CreateUsuarioRequest, creatorRole: RolNombre): Promise<UsuarioPublico> {
   if (!isAdmin(creatorRole)) throw new Error('solo el administrador superior puede crear usuarios');
   const role = data.rol ?? 'peon';
@@ -51,7 +53,7 @@ export async function createUsuario(data: CreateUsuarioRequest, creatorRole: Rol
   const [rows] = await pool.query<UsuarioRow[]>(`${USER_SELECT} WHERE u.id_usuario = ?`, [result.insertId]);
   return toPublico(rows[0]);
 }
-
+// Esta función implementa la operación «update usuario» sobre usuario: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe id, data, editorRole como entrada.
 export async function updateUsuario(id: number, data: UpdateUsuarioRequest, editorRole: RolNombre): Promise<UsuarioPublico> {
   if (!isAdmin(editorRole)) throw new Error('solo el administrador superior puede modificar usuarios');
   if (data.rol !== undefined && !(['peon', 'veterinario', 'copropietario', 'dueno'] as string[]).includes(data.rol)) throw new Error('rol no permitido');
@@ -76,7 +78,7 @@ export async function updateUsuario(id: number, data: UpdateUsuarioRequest, edit
   if (!rows.length) throw new Error('usuario no encontrado');
   return toPublico(rows[0]);
 }
-
+// Esta función implementa la operación «deactivate usuario» sobre usuario: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe id como entrada.
 export async function deactivateUsuario(id: number): Promise<void> {
   if (await isAdministratorUser(id)) throw new Error('no se puede desactivar al administrador superior');
   const [result] = await pool.execute<ResultSetHeader>("UPDATE usuarios SET activo = 0, estado_cuenta = 'inactivo' WHERE id_usuario = ?", [id]);

@@ -1,3 +1,4 @@
+// Archivo backend/src/config/passport.ts: la configuración de estrategias OAuth y la validación de perfiles sociales. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // Configuración aislada de estrategias Passport para proveedores sociales.
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
@@ -10,7 +11,7 @@ import type { SocialProvider } from "../types";
 
 const apiUrl = process.env.SOCIAL_AUTH_API_URL ?? "http://localhost:3001";
 
-/** Normaliza los formatos de correo usados por las estrategias y sus respuestas nativas. */
+// Normaliza los formatos de correo usados por las estrategias y sus respuestas nativas.
 function extractEmail(profile: {
   email?: string;
   emails?: Array<{ value?: string }>;
@@ -27,7 +28,7 @@ function extractEmail(profile: {
   return email?.trim().toLowerCase() || null;
 }
 
-/** Passport solo valida con el proveedor; el controlador separa registro de ingreso. */
+// Passport solo valida con el proveedor; el controlador separa registro de ingreso.
 function verifySocialProfile(provider: SocialProvider) {
   return async (
     _accessToken: string,
@@ -54,7 +55,7 @@ function verifySocialProfile(provider: SocialProvider) {
   };
 }
 
-/** Indica si el proveedor está configurado completamente y puede exponerse al navegador. */
+// Indica si el proveedor está configurado completamente y puede exponerse al navegador.
 export function isSocialProviderEnabled(provider: SocialProvider): boolean {
   const keys: Record<SocialProvider, [string, string]> = {
     google: ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
@@ -67,7 +68,7 @@ export function isSocialProviderEnabled(provider: SocialProvider): boolean {
   return keys[provider].every((key) => Boolean(process.env[key]?.trim()));
 }
 
-/** Registra únicamente las estrategias que poseen sus credenciales de entorno. */
+// Registra únicamente las estrategias que poseen sus credenciales de entorno.
 export function configurePassport(): void {
   if (isSocialProviderEnabled("google")) {
     passport.use(

@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/socialAuthController.ts: controlador http de la api relacionado con social auth controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // Controladores HTTP del flujo OAuth y del canje seguro de su código efímero.
 import type { Request, Response } from "express";
 import passport from "passport";
@@ -20,30 +21,30 @@ const providers: SocialProvider[] = [
   "twitter",
 ];
 const frontendUrl = process.env.SOCIAL_AUTH_FRONTEND_URL ?? "http://localhost:8081";
-
+// Esta función recibe la petición del endpoint para social auth, valida o extrae sus parámetros, llama al servicio correspondiente y responde con JSON o delega el error al middleware. Recibe base, params como entrada.
 function makeRedirectUrl(base: string, params: Record<string, string>): string {
   const query = new URLSearchParams(params).toString();
   return `${base}${base.includes('?') ? '&' : '?'}${query}`;
 }
 
-/** Comprueba que el parámetro de ruta representa un proveedor soportado. */
+// Comprueba que el parámetro de ruta representa un proveedor soportado.
 function getProvider(value: string): SocialProvider | null {
   return providers.includes(value as SocialProvider)
     ? (value as SocialProvider)
     : null;
 }
 
-/** Redirige al login mostrando un mensaje URL-codificado y sin filtrar detalles internos. */
+// Redirige al login mostrando un mensaje URL-codificado y sin filtrar detalles internos.
 function redirectWithError(res: Response, message: string, redirectUri?: string, mode: 'login' | 'register' = 'login'): void {
   res.redirect(makeRedirectUrl(redirectUri ?? frontendUrl, { socialError: message, socialMode: mode }));
 }
 
-/** Expone únicamente los proveedores que cuentan con sus dos credenciales. */
+// Expone únicamente los proveedores que cuentan con sus dos credenciales.
 export function listSocialProviders(_req: Request, res: Response): void {
   res.json({ success: true, message: 'proveedores sociales disponibles', data: { providers: providers.filter(isSocialProviderEnabled) } });
 }
 
-/** Inicia la autorización en el proveedor y conserva la preferencia de persistencia en la sesión temporal. */
+// Inicia la autorización en el proveedor y conserva la preferencia de persistencia en la sesión temporal.
 export function startSocialLogin(
   req: Request,
   res: Response,
@@ -77,7 +78,7 @@ export function startSocialLogin(
   })(req, res, next);
 }
 
-/** Procesa el callback, crea un código temporal y devuelve al frontend sin incluir un JWT en la URL. */
+// Procesa el callback, crea un código temporal y devuelve al frontend sin incluir un JWT en la URL.
 export function completeSocialLogin(
   req: Request,
   res: Response,
@@ -124,7 +125,7 @@ export function completeSocialLogin(
   )(req, res, next);
 }
 
-/** Canjea un código social de un solo uso por el mismo JWT usado en el login tradicional. */
+// Canjea un código social de un solo uso por el mismo JWT usado en el login tradicional.
 export function exchangeSocialCode(req: Request, res: Response): void {
   const code = typeof req.body?.code === "string" ? req.body.code : "";
   const ticket = consumeSocialTicket(code);

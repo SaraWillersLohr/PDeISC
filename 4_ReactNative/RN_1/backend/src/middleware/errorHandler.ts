@@ -1,3 +1,4 @@
+// Archivo backend/src/middleware/errorHandler.ts: middleware de express que procesa o protege solicitudes relacionado con error handler. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // middleware global de errores
 import { Request, Response, NextFunction } from "express";
 

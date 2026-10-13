@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/dashboardController.ts: controlador http de la api relacionado con dashboard controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // controlador del dashboard � expone m�tricas al frontend
 import { Request, Response } from "express";
 import * as dashboardService from "../services/dashboardService";

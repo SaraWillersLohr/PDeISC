@@ -1,6 +1,7 @@
+// Archivo backend/src/services/emailService.ts: los correos de verificación, aprobación, acceso y rechazo. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import nodemailer from 'nodemailer';
 
-/** Envía el código sin exponerlo en respuestas ni logs. */
+// Envía el código sin exponerlo en respuestas ni logs.
 export async function sendVerificationCode(email: string, code: string): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) {
@@ -22,7 +23,7 @@ export async function sendVerificationCode(email: string, code: string): Promise
     html: `<div style="font-family:Arial,sans-serif;color:#243528"><h2>Verificá tu correo</h2><p>Ingresá este código en EstanciaApp:</p><p style="font-size:30px;font-weight:bold;letter-spacing:8px">${code}</p><p>Vence en 10 minutos. Si no solicitaste esta cuenta, ignorá este mensaje.</p></div>`,
   });
 }
-
+// Esta función prepara y envía el correo que comunica el rechazo de la solicitud sin revertir la decisión ya guardada. Recibe email, name como entrada.
 export async function sendRegistrationRejection(email: string, name: string): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) throw new Error('El servicio de correo no está configurado.');
@@ -37,7 +38,7 @@ export async function sendRegistrationRejection(email: string, name: string): Pr
   });
 }
 
-/** Envía el token temporal emitido tras la aprobación del administrador. */
+// Envía el token temporal emitido tras la aprobación del administrador.
 export async function sendAccessToken(email: string, name: string, token: string, setupPassword = false): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) throw new Error('El servicio de correo no está configurado.');
@@ -51,7 +52,7 @@ export async function sendAccessToken(email: string, name: string, token: string
     text: `Hola ${name}, tu solicitud fue aprobada con el rol inicial de peón. Ingresá a EstanciaApp, elegí “Ingresar con token de acceso” y usá este token de un solo uso: ${token}. Vence en 24 horas. ${setupPassword ? 'Al canjearlo, la app te va a pedir crear una contraseña; después podrás ingresar con esa contraseña o con la cuenta social que usaste para registrarte.' : 'Después de canjearlo, podés iniciar sesión con tu correo y la contraseña que elegiste al registrarte.'} Si no solicitaste este acceso, ignorá este mensaje.`,
   });
 }
-
+// Esta función prepara y envía por correo el mensaje asociado con solicitud de registro; ante fallos, permite que la capa superior informe el resultado. Recibe adminEmail, applicantName, applicantEmail como entrada.
 export async function sendAdministratorRegistrationNotice(adminEmail: string, applicantName: string, applicantEmail: string): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) throw new Error('El servicio de correo no está configurado.');

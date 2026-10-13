@@ -1,3 +1,4 @@
+// Archivo backend/src/services/authService.ts: el inicio de sesión, la lectura del perfil y el cambio de contraseña. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // logica de login y perfil
 import pool from '../config/database';
 import { comparePassword, hashPassword } from '../utils/password';
@@ -6,6 +7,7 @@ import { getRolLabel } from '../utils/roles';
 import type { LoginRequest, UsuarioDB, UsuarioPublico } from '../types';
 import type { RowDataPacket } from 'mysql2';
 
+// Contrato de datos UsuarioRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface UsuarioRow extends RowDataPacket, UsuarioDB {}
 
 // busco usuario por email incluyendo nombre del rol

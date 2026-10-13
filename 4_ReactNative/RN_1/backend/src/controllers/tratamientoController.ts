@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/tratamientoController.ts: controlador http de la api relacionado con tratamiento controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // controlador de tratamientos m�dicos
 // esto es para el veterinario, para registrar tratamientos y
 // notas m�dicas de los animales, y para listar los tratamientos de un animal espec�fico.

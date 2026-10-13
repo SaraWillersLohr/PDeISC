@@ -11,7 +11,7 @@ Esta carpeta es el proyecto móvil del sistema. Se conservó `bd_final.sql` como
 - Recordar sesión mediante SecureStore; no almacena contraseña.
 - Menú y vistas nativas de resumen, animales, corrales, equipo, campo, veterinaria y avisos. Las listas consultan los endpoints existentes.
 - Formularios nativos para reportar síntomas desde Campo y registrar el alta veterinaria; se pueden usar también en Android.
-- Diseño adaptable a móvil y tablet: contenido con ancho máximo, desplazamiento vertical, teclado contemplado en formularios y navegación horizontal.
+- Diseño adaptable a móvil y tablet para todos los roles: encabezado en tarjeta, menú de secciones que se ajusta en varias líneas sin recortar controles, contenido con ancho máximo, desplazamiento vertical y teclado contemplado en formularios. La campanita usa el icono Material Community bell-outline, aparece en el encabezado de todos los roles, muestra el total de avisos de ese usuario y abre la sección Avisos; la lista se consulta nuevamente cada 30 segundos.
 - Bundle web habilitado con las dependencias compatibles de Expo SDK 57. En navegador la sesión recordada vive solo en `sessionStorage`; en Android/iOS se conserva en SecureStore.
 - Diseño alineado con el proyecto R5: pantalla de acceso adaptable con la imagen original de la vaca, panel verde oscuro y escritorio con navegación lateral. Los formularios de registro, verificación y token comparten la misma identidad visual. Confirmaciones y mensajes usan componentes propios dentro de la app; no se usan cuadros `Alert` del sistema ni diálogos nativos del navegador.
 - Registro e ingreso social conectados al backend OAuth de R5 para Google, Facebook, GitHub, Discord, Twitch y X. Cada acción tiene su flujo: ingresar exige una cuenta activa aprobada; registrarse crea una solicitud nueva que espera aprobación y token, igual que el registro por correo.
@@ -38,6 +38,12 @@ RN_1/
     ├── database/migrations/ # estados, solicitudes, tokens y avisos dirigidos
     └── .env.example         # SMTP, DB y secretos de ejemplo
 ```
+
+## Cómo leer el código
+
+Los archivos TypeScript y TSX de `App.tsx`, `src/` y `backend/src/` tienen comentarios en español con `//`. Cada archivo comienza con su propósito; las funciones explican qué reciben, qué operación realizan y qué devuelven o actualizan. También se comentan los contratos de tipos, las constantes de seguridad y las rutas HTTP. En particular, `backend/src/services/registrationService.ts` documenta el recorrido de registro, verificación del correo, aprobación administrativa y emisión/canje del token.
+
+Los archivos JSON no admiten comentarios `//` sin dejar de ser válidos. Su función está resumida acá: `package.json` define dependencias y comandos de Expo; `backend/package.json` define dependencias y comandos de la API; `app.json` configura Expo, plataformas y esquema de retorno social; los dos `tsconfig.json` fijan la compilación y comprobación de tipos del cliente y del backend. Los archivos `.env.example` enumeran variables de configuración de muestra; los secretos reales deben quedar en los `.env` locales y no publicarse.
 
 ## Desarrollo local
 
@@ -82,7 +88,7 @@ Fuera del entorno local se debe configurar HTTPS y secretos reales mediante el e
 2. Verificado el correo, la solicitud queda `pendiente_aprobacion` fuera de `usuarios` y no puede iniciar sesión. El administrador superior recibe un aviso por correo y otro en la bandeja in-app, y revisa la pestaña Solicitudes.
 3. Solo cuando el administrador acepta, se crea la cuenta con rol inicial `peon`, bloqueada en `pendiente_acceso`, y se genera y envía al correo un token aleatorio válido por 24 horas y de un solo uso. Ese es el token que habilita el primer acceso; la pantalla “Ingresar con token” lo canjea por la sesión de la app. Hay reenvío con límite de frecuencia y cantidad diaria.
 4. Registro social: desde **Crear una cuenta**, elegí un proveedor y autorizá EstanciaApp. Si el proveedor entrega un correo, se crea una solicitud verificada por OAuth directamente en `pendiente_aprobacion` (no crea un usuario todavía), se guarda la identidad social pendiente y el administrador recibe aviso por correo e inbox. Al aprobar, se crea el usuario como peón, se vincula la identidad social y se envía el mismo token de acceso de un solo uso que en el flujo por correo. Al canjearlo, la app pide crear una contraseña; luego puede ingresar tanto con esa contraseña como con el proveedor social. El flujo **Ingresar** sigue exigiendo una cuenta activa y aprobada. Si el proveedor no comparte un correo, se muestra el error para completar el registro por correo.
-5. Pendiente: formularios nativos para alta/edición/baja de animales y corrales, más acciones completas de avisos y veterinaria. Las consultas, el reporte de síntomas y el alta veterinaria ya están conectados. Las notificaciones son correo e inbox dentro de la app; no hay notificaciones push del sistema operativo.
+5. Pendiente: formularios nativos para alta/edición/baja de animales y corrales, más acciones completas de veterinaria. Las consultas, el reporte de síntomas y el alta veterinaria ya están conectados. Todos los roles pueden abrir la campanita; cada persona recibe los avisos globales y los dirigidos a su cuenta. Las notificaciones son correo e inbox dentro de la app; no hay notificaciones push del sistema operativo.
 
 En Expo Web, los proveedores vuelven a `SOCIAL_AUTH_FRONTEND_URL` (por defecto `http://localhost:8081`). En Android/iOS, la app recibe el código de un solo uso mediante el esquema `estanciaapp://auth/callback`; para probarlo hace falta una development build que registre el esquema (`npx expo run:android` o `npx expo run:ios`), no Expo Go. Los proveedores deben conservar registrados los callbacks del backend que ya se usaban en R5, por ejemplo `http://localhost:3001/api/auth/google/callback`. Para probar desde un teléfono físico, el backend debe tener una dirección accesible desde el teléfono y el proveedor debe aceptar ese callback; `localhost` solo sirve en la misma computadora.
 

@@ -1,3 +1,4 @@
+// Archivo backend/src/middleware/authMiddleware.ts: middleware de express que procesa o protege solicitudes relacionado con auth middleware. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // valida el token y carga el usuario autenticado
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils/jwt";

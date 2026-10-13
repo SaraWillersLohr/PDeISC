@@ -1,7 +1,9 @@
+// Archivo backend/src/services/notificacionService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con notificacion service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // servicio de notificaciones y alertas sanitarias en tiempo real
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
+// Contrato de datos NotificacionAlerta: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface NotificacionAlerta {
   id: string;
   id_notificacion: number;
@@ -17,6 +19,7 @@ export interface NotificacionAlerta {
   tipo: 'alerta_sanitaria' | 'en_tratamiento' | 'alta' | 'info';
 }
 
+// Contrato de datos NotificacionRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface NotificacionRow extends RowDataPacket {
   id_notificacion: number;
   id_animal: number | null;

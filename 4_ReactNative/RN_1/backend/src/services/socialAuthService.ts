@@ -1,12 +1,14 @@
+// Archivo backend/src/services/socialAuthService.ts: la asociación y autenticación de identidades sociales. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // Reglas de negocio para vincular proveedores externos con usuarios autorizados.
 import type { RowDataPacket } from 'mysql2';
 import pool from '../config/database';
 import { getRolLabel } from '../utils/roles';
 import type { SocialProvider, UsuarioDB, UsuarioPublico } from '../types';
 
+// Contrato de datos UsuarioSocialRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface UsuarioSocialRow extends RowDataPacket, UsuarioDB {}
 
-/** Busca un usuario activo de la lista blanca mediante su correo normalizado. */
+// Busca un usuario activo de la lista blanca mediante su correo normalizado.
 async function findActiveUserByEmail(email: string): Promise<UsuarioSocialRow | null> {
   const [rows] = await pool.query<UsuarioSocialRow[]>(
     `SELECT u.*, r.nombre AS rol_nombre
@@ -19,7 +21,7 @@ async function findActiveUserByEmail(email: string): Promise<UsuarioSocialRow | 
   return rows[0] ?? null;
 }
 
-/** Busca si la identidad externa ya se vinculó a otro usuario del sistema. */
+// Busca si la identidad externa ya se vinculó a otro usuario del sistema.
 async function findIdentityOwner(provider: SocialProvider, providerUserId: string): Promise<number | null> {
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT id_usuario FROM identidades_sociales
@@ -29,7 +31,7 @@ async function findIdentityOwner(provider: SocialProvider, providerUserId: strin
   return rows[0]?.id_usuario ?? null;
 }
 
-/** Crea la relación social sólo después de comprobar la lista blanca y su unicidad. */
+// Crea la relación social sólo después de comprobar la lista blanca y su unicidad.
 async function linkIdentity(idUsuario: number, provider: SocialProvider, providerUserId: string): Promise<void> {
   await pool.query(
     `INSERT INTO identidades_sociales (id_usuario, proveedor, proveedor_usuario_id)
@@ -38,7 +40,7 @@ async function linkIdentity(idUsuario: number, provider: SocialProvider, provide
   );
 }
 
-/** Convierte la fila de base de datos a un perfil seguro para devolver al cliente. */
+// Convierte la fila de base de datos a un perfil seguro para devolver al cliente.
 function toPublicUser(user: UsuarioSocialRow): UsuarioPublico {
   const rol = user.rol_nombre!;
   return {
@@ -53,7 +55,7 @@ function toPublicUser(user: UsuarioSocialRow): UsuarioPublico {
   };
 }
 
-/** Valida una identidad social contra la lista blanca y la vincula en el primer ingreso. */
+// Valida una identidad social contra la lista blanca y la vincula en el primer ingreso.
 export async function authorizeSocialIdentity(input: {
   provider: SocialProvider;
   providerUserId: string;

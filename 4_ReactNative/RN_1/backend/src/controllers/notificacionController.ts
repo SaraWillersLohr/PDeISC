@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/notificacionController.ts: controlador http de la api relacionado con notificacion controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // controlador de notificaciones y alertas
 import { Request, Response, NextFunction } from "express";
 import * as notificacionService from "../services/notificacionService";

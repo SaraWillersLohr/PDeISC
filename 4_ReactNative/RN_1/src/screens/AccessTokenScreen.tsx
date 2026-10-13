@@ -1,8 +1,10 @@
+// Archivo src/screens/AccessTokenScreen.tsx: el canje o reenvío del token recibido tras la aprobación. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { AuthPage } from '../components/AuthPage';
 
+// Contrato de datos Props: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface Props {
   initialEmail: string;
   busy: boolean;
@@ -12,7 +14,7 @@ interface Props {
   onRedeem: (email: string, token: string, remember: boolean) => void;
   onResend: (email: string) => void;
 }
-
+// Esta función renderiza el bloque de interfaz AccessTokenScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe initialEmail, busy, error, notice, onBack, onRedeem, onResend como entrada.
 export function AccessTokenScreen({ initialEmail, busy, error, notice, onBack, onRedeem, onResend }: Props) {
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));
@@ -20,7 +22,7 @@ export function AccessTokenScreen({ initialEmail, busy, error, notice, onBack, o
   const [token, setToken] = useState('');
   const [remember, setRemember] = useState(false);
   const [validation, setValidation] = useState<string | null>(null);
-
+  // Esta función comprueba los valores del formulario y llama a la acción recibida por props solo si las validaciones locales pasan.
   const submit = () => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanToken = token.trim();
@@ -31,7 +33,7 @@ export function AccessTokenScreen({ initialEmail, busy, error, notice, onBack, o
     setValidation(null);
     onRedeem(cleanEmail, cleanToken, remember);
   };
-
+  // Esta función solicita el reenvío del token de acceso y presenta el resultado mediante el mensaje recibido por props.
   const resend = () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {

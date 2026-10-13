@@ -1,3 +1,4 @@
+// Archivo src/screens/RegistrationScreen.tsx: el formulario para crear una solicitud de registro. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -5,13 +6,15 @@ import { AuthPage } from '../components/AuthPage';
 import { SocialLoginButtons } from '../components/SocialLoginButtons';
 import type { SocialProviderId } from '../services/authApi';
 
+// Contrato de datos Props: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface Props { busy: boolean; error: string | null; socialProviders: SocialProviderId[]; onSocialRegister: (provider: SocialProviderId) => void; onBack: () => void; onSubmit: (data: { nombre: string; apellido: string; email: string; password: string }) => void }
-
+// Esta función renderiza el bloque de interfaz RegistrationScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe busy, error, socialProviders, onSocialRegister, onBack, onSubmit como entrada.
 export function RegistrationScreen({ busy, error, socialProviders, onSocialRegister, onBack, onSubmit }: Props) {
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));
   const [nombre, setNombre] = useState(''); const [apellido, setApellido] = useState(''); const [email, setEmail] = useState('');
   const [password, setPassword] = useState(''); const [confirm, setConfirm] = useState(''); const [validation, setValidation] = useState<string | null>(null);
+  // Esta función comprueba los valores del formulario y llama a la acción recibida por props solo si las validaciones locales pasan.
   const submit = () => {
     if (!nombre.trim() || !apellido.trim() || !/^\S+@\S+\.\S+$/.test(email.trim()) || password.length < 10) { setValidation('Completá tus datos y usá una contraseña de al menos 10 caracteres.'); return; }
     if (password !== confirm) { setValidation('Las contraseñas no coinciden.'); return; }

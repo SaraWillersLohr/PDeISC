@@ -1,3 +1,4 @@
+// Archivo src/components/SocialLoginButtons.tsx: los botones para iniciar o registrar una cuenta con un proveedor social. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { SocialProviderId } from '../services/authApi';
 
@@ -9,7 +10,7 @@ const PROVIDERS: Record<SocialProviderId, { label: string; mark: string; color: 
   twitch: { label: 'Twitch', mark: '▣', color: '#9146ff', ink: '#fff' },
   twitter: { label: 'X', mark: '𝕏', color: '#111', ink: '#fff' },
 };
-
+// Esta función renderiza el componente reutilizable SocialLoginButtons, usando sus props para mostrar estado y comunicar acciones al componente padre. Recibe providers, rememberMe, onSelect, intent = 'login' como entrada.
 export function SocialLoginButtons({ providers, rememberMe, onSelect, intent = 'login' }: {
   providers: SocialProviderId[];
   rememberMe: boolean;

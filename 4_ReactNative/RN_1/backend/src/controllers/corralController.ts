@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/corralController.ts: controlador http de la api relacionado con corral controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // controlador de corrales
 
 import { Request, Response, NextFunction } from "express";

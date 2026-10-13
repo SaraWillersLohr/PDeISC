@@ -1,15 +1,17 @@
+// Archivo src/screens/WelcomeScreen.tsx: la bienvenida posterior al inicio de sesión y los datos recibidos por props. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { AuthPage } from '../components/AuthPage';
 import type { PublicUser } from '../types/auth';
 
+// Contrato de datos WelcomeScreenProps: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface WelcomeScreenProps {
-  /** La pantalla recibe explícitamente el perfil público mediante Props. */
+  // La pantalla recibe explícitamente el perfil público mediante Props.
   user: PublicUser;
   onLogout: () => void;
   onContinue: () => void;
 }
-
+// Esta función renderiza el bloque de interfaz WelcomeScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe user, onLogout, onContinue como entrada.
 export function WelcomeScreen({ user, onLogout, onContinue }: WelcomeScreenProps) {
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));

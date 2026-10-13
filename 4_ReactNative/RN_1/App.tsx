@@ -1,3 +1,4 @@
+// Archivo App.tsx: el estado raíz, los flujos de autenticación, la navegación y el ciclo de sesión. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Linking, Platform, StatusBar, StyleSheet, Text, View } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
@@ -12,7 +13,7 @@ import { AccessTokenScreen } from './src/screens/AccessTokenScreen';
 import { FeedbackProvider, useFeedback } from './src/components/FeedbackProvider';
 import { ApiError, changeInitialPasswordApi, exchangeSocialCodeApi, getProfileApi, listSocialProvidersApi, loginApi, redeemAccessTokenApi, registerApi, resendAccessTokenApi, resendVerificationApi, verifyEmailApi, type SocialProviderId } from './src/services/authApi';
 import type { PublicUser } from './src/types/auth';
-
+// Esta función recupera la sesión recordada desde sessionStorage en web o SecureStore en Android/iOS.
 async function readSavedSession(): Promise<string | null> {
   if (Platform.OS === 'web') {
     try { return typeof window === 'undefined' ? null : window.sessionStorage.getItem(SESSION_KEY); }
@@ -20,27 +21,31 @@ async function readSavedSession(): Promise<string | null> {
   }
   return SecureStore.getItemAsync(SESSION_KEY);
 }
-
+// Esta función guarda el JWT de sesión en el almacenamiento correspondiente a la plataforma cuando la persona elige recordarla. Recibe token como entrada.
 async function saveSession(token: string): Promise<void> {
   if (Platform.OS === 'web') {
-    try { if (typeof window !== 'undefined') window.sessionStorage.setItem(SESSION_KEY, token); } catch { /* el navegador puede bloquear storage */ }
+    try { if (typeof window !== 'undefined') window.sessionStorage.setItem(SESSION_KEY, token); } catch {
+      // El navegador puede bloquear sessionStorage; en ese caso la sesión sigue activa en memoria.
+    }
     return;
   }
   await SecureStore.setItemAsync(SESSION_KEY, token);
 }
-
+// Esta función elimina el JWT local al cerrar sesión o cuando se debe descartar una sesión inválida.
 async function clearSavedSession(): Promise<void> {
   if (Platform.OS === 'web') {
-    try { if (typeof window !== 'undefined') window.sessionStorage.removeItem(SESSION_KEY); } catch { /* el navegador puede bloquear storage */ }
+    try { if (typeof window !== 'undefined') window.sessionStorage.removeItem(SESSION_KEY); } catch {
+      // No se interrumpe el cierre de sesión si el navegador bloquea sessionStorage.
+    }
     return;
   }
   await SecureStore.deleteItemAsync(SESSION_KEY);
 }
-
+// Esta función coordina app dentro de la aplicación: mantiene el estado necesario, ejecuta las acciones de usuario y determina qué pantalla se presenta.
 export default function App() {
   return <FeedbackProvider><AppContent /></FeedbackProvider>;
 }
-
+// Esta función coordina app dentro de la aplicación: mantiene el estado necesario, ejecuta las acciones de usuario y determina qué pantalla se presenta.
 function AppContent() {
   const { showMessage } = useFeedback();
   const [user, setUser] = useState<PublicUser | null>(null);
@@ -86,7 +91,7 @@ function AppContent() {
     void listSocialProvidersApi().then((providers) => { if (mounted) setSocialProviders(providers); }).catch(() => { if (mounted) setSocialProviders([]); });
     return () => { mounted = false; };
   }, []);
-
+  // Esta función inicia sesión con correo y contraseña, guarda o elimina el JWT según la preferencia elegida y actualiza el perfil y el estado de navegación. Recibe email, password, remember como entrada.
   const signIn = async (email: string, password: string, remember: boolean) => {
     setBusy(true);
     setError(null);
@@ -106,7 +111,7 @@ function AppContent() {
       setBusy(false);
     }
   };
-
+  // Esta función construye la URL OAuth con el proveedor, el modo de ingreso o registro y la preferencia de sesión; luego abre el proveedor en el navegador apropiado para la plataforma. Recibe provider, remember, mode como entrada.
   const startSocialLogin = (provider: SocialProviderId, remember: boolean, mode: 'login' | 'register' = 'login') => {
     setError(null); setNotice(null);
     const query = new URLSearchParams({ remember: remember ? '1' : '0', mode });
@@ -166,7 +171,7 @@ function AppContent() {
     }
     return () => subscription.remove();
   }, [completeSocialCallback]);
-
+  // Esta función envía los datos del formulario para crear una solicitud de registro y prepara la pantalla para ingresar el código recibido por correo. Recibe data como entrada.
   const startRegistration = async (data: { nombre: string; apellido: string; email: string; password: string }) => {
     setBusy(true); setError(null); setNotice(null);
     try {
@@ -175,7 +180,7 @@ function AppContent() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo registrar la cuenta.'); }
     finally { setBusy(false); }
   };
-
+  // Esta función envía el código de verificación y comunica que el correo quedó confirmado mientras la solicitud espera aprobación administrativa. Recibe code como entrada.
   const verifyEmail = async (code: string) => {
     setBusy(true); setError(null); setNotice(null);
     try {
@@ -184,14 +189,14 @@ function AppContent() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo verificar el correo.'); }
     finally { setBusy(false); }
   };
-
+  // Esta función solicita otro código para verificar el correo y presenta el resultado de la operación en la interfaz.
   const resendCode = async () => {
     setBusy(true); setError(null); setNotice(null);
     try { setNotice(await resendVerificationApi(pendingEmail)); }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo reenviar el código.'); }
     finally { setBusy(false); }
   };
-
+  // Esta función canjea el token enviado tras la aprobación, guarda la sesión si se pidió recordarla y lleva a la persona a la bienvenida o al cambio de contraseña inicial. Recibe email, accessToken, remember como entrada.
   const redeemAccessToken = async (email: string, accessToken: string, remember: boolean) => {
     setBusy(true); setError(null); setNotice(null);
     try {
@@ -206,14 +211,14 @@ function AppContent() {
         : message);
     } finally { setBusy(false); }
   };
-
+  // Esta función solicita el reenvío del token de acceso para una cuenta aprobada que todavía no inició sesión. Recibe email como entrada.
   const resendAccessToken = async (email: string) => {
     setBusy(true); setError(null); setNotice(null);
     try { setNotice(await resendAccessTokenApi(email)); }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo reenviar el token.'); }
     finally { setBusy(false); }
   };
-
+  // Esta función cambia la contraseña inicial usando la sesión autenticada y actualiza el perfil que mantiene la app. Recibe password como entrada.
   const changeInitialPassword = async (password: string) => {
     if (!token) return;
     setBusy(true); setError(null);
@@ -221,7 +226,7 @@ function AppContent() {
     catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo cambiar la contraseña.'); }
     finally { setBusy(false); }
   };
-
+  // Esta función elimina el token local y limpia el usuario y los estados de navegación para volver a la pantalla de ingreso.
   const signOut = async () => {
     try {
       await clearSavedSession();

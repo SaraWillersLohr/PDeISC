@@ -1,3 +1,4 @@
+// Archivo backend/src/config/database.ts: la conexión agrupada con MySQL y su comprobación. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // pool de conexion mariadb
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';

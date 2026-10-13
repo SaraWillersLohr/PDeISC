@@ -1,3 +1,4 @@
+// Archivo backend/src/middleware/roleMiddleware.ts: middleware de express que procesa o protege solicitudes relacionado con role middleware. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // limita el acceso segun los roles permitidos
 import { Request, Response, NextFunction } from "express";
 import type { RolNombre } from "../types";

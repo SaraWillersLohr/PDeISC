@@ -1,7 +1,9 @@
+// Archivo backend/src/services/corralService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con corral service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // servicio de gesti�n de corrales
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
+// Contrato de datos CorralItem: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface CorralItem {
   id_corral: number;
   nombre: string;
@@ -11,6 +13,7 @@ export interface CorralItem {
   ocupados: number;
 }
 
+// Contrato de datos CorralRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface CorralRow extends RowDataPacket {
   id_corral: number;
   nombre: string;
@@ -20,12 +23,14 @@ interface CorralRow extends RowDataPacket {
   ocupados: number;
 }
 
+// Contrato de datos CreateCorralRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface CreateCorralRequest {
   nombre: string;
   capacidad: number;
   es_enfermeria?: boolean;
 }
 
+// Contrato de datos UpdateCorralRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface UpdateCorralRequest {
   nombre?: string;
   capacidad?: number;

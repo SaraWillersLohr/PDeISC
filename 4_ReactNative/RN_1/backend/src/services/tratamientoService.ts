@@ -1,7 +1,9 @@
+// Archivo backend/src/services/tratamientoService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con tratamiento service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // servicio de gesti�n de tratamientos m�dicos e historial cl�nico
 import pool from '../config/database';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
+// Contrato de datos TratamientoItem: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface TratamientoItem {
   id_tratamiento: number;
   id_animal: number;
@@ -15,6 +17,7 @@ export interface TratamientoItem {
   created_at: string;
 }
 
+// Contrato de datos TratamientoRow: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface TratamientoRow extends RowDataPacket {
   id_tratamiento: number;
   id_animal: number;
@@ -28,6 +31,7 @@ interface TratamientoRow extends RowDataPacket {
   created_at: string;
 }
 
+// Contrato de datos CreateTratamientoRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface CreateTratamientoRequest {
   id_animal: number;
   id_veterinario: number;

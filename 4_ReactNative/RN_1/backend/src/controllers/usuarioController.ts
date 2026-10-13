@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/usuarioController.ts: controlador http de la api relacionado con usuario controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // controlador de usuarios
 import { Request, Response } from "express";
 import * as usuarioService from "../services/usuarioService";
@@ -15,7 +16,7 @@ export async function list(req: Request, res: Response): Promise<void> {
     res.status(500).json({ success: false, message });
   }
 }
-
+// Esta función recibe la petición del endpoint para solicitud de registro, valida o extrae sus parámetros, llama al servicio correspondiente y responde con JSON o delega el error al middleware. Recibe _req, res como entrada.
 export async function listRegistrationRequests(_req: Request, res: Response): Promise<void> {
   try {
     const requests = await registrationService.listPendingRequests();
@@ -24,7 +25,7 @@ export async function listRegistrationRequests(_req: Request, res: Response): Pr
     res.status(500).json({ success: false, message: error instanceof Error ? error.message : 'error al listar solicitudes' });
   }
 }
-
+// Esta función atiende el endpoint HTTP: valida el identificador de la solicitud y delega su aprobación al administrador autenticado. Recibe req, res como entrada.
 export async function approveRegistrationRequest(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
   if (!Number.isSafeInteger(id) || id < 1 || !req.usuario) { res.status(400).json({ success: false, message: 'solicitud inválida' }); return; }
@@ -36,7 +37,7 @@ export async function approveRegistrationRequest(req: Request, res: Response): P
     res.status(message.includes('permisos') ? 403 : 400).json({ success: false, message });
   }
 }
-
+// Esta función atiende el endpoint HTTP: valida el identificador de la solicitud y delega su rechazo al administrador autenticado. Recibe req, res como entrada.
 export async function rejectRegistrationRequest(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
   if (!Number.isSafeInteger(id) || id < 1 || !req.usuario) { res.status(400).json({ success: false, message: 'solicitud inválida' }); return; }

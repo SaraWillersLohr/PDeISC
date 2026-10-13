@@ -1,3 +1,4 @@
+// Archivo src/screens/LoginScreen.tsx: el formulario de ingreso y las alternativas de autenticación disponibles. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -6,6 +7,7 @@ import { useFeedback } from '../components/FeedbackProvider';
 import { SocialLoginButtons } from '../components/SocialLoginButtons';
 import type { SocialProviderId } from '../services/authApi';
 
+// Contrato de datos LoginScreenProps: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface LoginScreenProps {
   onLogin: (email: string, password: string, remember: boolean) => Promise<void>;
   onAccessTokenPress: (email: string) => void;
@@ -16,7 +18,7 @@ interface LoginScreenProps {
   error: string | null;
   notice?: string | null;
 }
-
+// Esta función renderiza el bloque de interfaz LoginScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe onLogin, onAccessTokenPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice como entrada.
 export function LoginScreen({ onLogin, onAccessTokenPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice }: LoginScreenProps) {
   const { showMessage } = useFeedback();
   const { width } = useWindowDimensions();
@@ -25,7 +27,7 @@ export function LoginScreen({ onLogin, onAccessTokenPress, onRegisterPress, soci
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [validation, setValidation] = useState<string | null>(null);
-
+  // Esta función comprueba los valores del formulario y llama a la acción recibida por props solo si las validaciones locales pasan.
   const submit = () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail) || !password) {

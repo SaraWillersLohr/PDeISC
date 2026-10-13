@@ -1,3 +1,4 @@
+// Archivo backend/src/app.ts: la configuración de Express, CORS, sesión, Passport y montaje de rutas. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // configura middlewares y rutas de la api
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
@@ -35,6 +36,7 @@ const allowedOrigins = new Set([
     .filter(Boolean),
 ]);
 app.use(cors({
+  // Esta función implementa la operación «origin» del módulo de app. Recibe origin, callback como entrada.
   origin(origin, callback) {
     if (!origin || allowedOrigins.has(origin)) return callback(null, true);
     return callback(new Error(`Origen no permitido por CORS: ${origin}`));

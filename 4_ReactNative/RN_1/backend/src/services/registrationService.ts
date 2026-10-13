@@ -1,3 +1,4 @@
+// Archivo backend/src/services/registrationService.ts: el ciclo de registro, verificación, aprobación administrativa y entrega del token. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { PoolConnection } from 'mysql2/promise';
@@ -8,32 +9,38 @@ import { getRolLabel } from '../utils/roles';
 import { createNotificacion } from './notificacionService';
 import { sendAccessToken, sendAdministratorRegistrationNotice, sendRegistrationRejection, sendVerificationCode } from './emailService';
 import type { SocialProvider } from '../types';
-
+// Configuración: CODE_TTL_MINUTES establece minutos durante los que un código de verificación sigue vigente; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const CODE_TTL_MINUTES = 10;
+// Configuración: MAX_ATTEMPTS establece cantidad máxima de intentos permitidos para verificar un código; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const MAX_ATTEMPTS = 5;
+// Configuración: RESEND_COOLDOWN_SECONDS establece espera mínima antes de permitir reenviar un código; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const RESEND_COOLDOWN_SECONDS = 60;
+// Configuración: MAX_DAILY_SENDS establece cantidad máxima de códigos o tokens que pueden enviarse en un día; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const MAX_DAILY_SENDS = 5;
+// Configuración: ACCESS_TOKEN_TTL_HOURS establece horas de vigencia del token de acceso de una cuenta aprobada; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const ACCESS_TOKEN_TTL_HOURS = 24;
 
+// Contrato de datos RegistrationInput: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface RegistrationInput { nombre: string; apellido: string; email: string; password: string }
+// Contrato de datos RegistrationRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface RegistrationRequest { id_solicitud: number; nombre: string; apellido: string; email: string; created_at: string }
-
+// Esta función calcula un HMAC del código de verificación asociado a la solicitud con un secreto del servidor; en la base se guarda el hash y no el valor utilizable. Recibe requestId, code como entrada.
 function digest(requestId: number, code: string): string {
   const secret = process.env.VERIFICATION_CODE_SECRET;
   if (!secret || secret.length < 32) throw new Error('VERIFICATION_CODE_SECRET debe tener al menos 32 caracteres.');
   return createHmac('sha256', secret).update(`${requestId}:registro:${code}`).digest('hex');
 }
-
+// Esta función calcula un HMAC del token de acceso asociado a la cuenta con un secreto del servidor; en la base se guarda el hash y no el valor utilizable. Recibe userId, token como entrada.
 function accessDigest(userId: number, token: string): string {
   const secret = process.env.VERIFICATION_CODE_SECRET;
   if (!secret || secret.length < 32) throw new Error('VERIFICATION_CODE_SECRET debe tener al menos 32 caracteres.');
   return createHmac('sha256', secret).update(`${userId}:acceso:${token}`).digest('hex');
 }
-
+// Esta función genera un token de acceso aleatorio y criptográficamente seguro que se entrega una sola vez a la persona aprobada.
 function createAccessToken(): string {
   return randomBytes(32).toString('base64url');
 }
-
+// Esta función invalida tokens de acceso anteriores, guarda el hash del token nuevo con su vencimiento dentro de la transacción y devuelve el token en claro para enviarlo por correo. Recibe connection, userId como entrada.
 async function storeAccessToken(connection: PoolConnection, userId: number): Promise<string> {
   const token = createAccessToken();
   await connection.query(
@@ -47,12 +54,12 @@ async function storeAccessToken(connection: PoolConnection, userId: number): Pro
   );
   return token;
 }
-
+// Esta función impide habilitar el flujo de registro si faltan el secreto para firmar códigos o las credenciales SMTP necesarias para enviar correo.
 function assertMailAndCodeConfig(): void {
   if (!process.env.VERIFICATION_CODE_SECRET || process.env.VERIFICATION_CODE_SECRET.length < 32) throw new Error('Configurá VERIFICATION_CODE_SECRET (mínimo 32 caracteres).');
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.MAIL_FROM) throw new Error('Configurá SMTP antes de habilitar el registro.');
 }
-
+// Esta función aplica los límites de frecuencia, genera un código de seis dígitos, guarda su HMAC con vencimiento en una transacción y lo envía al correo de la solicitud. Recibe requestId, email como entrada.
 async function issueCode(requestId: number, email: string): Promise<void> {
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT COUNT(*) AS total, MAX(creado_at) AS ultimo FROM codigos_verificacion_solicitud
@@ -75,7 +82,7 @@ async function issueCode(requestId: number, email: string): Promise<void> {
   await sendVerificationCode(email, code);
 }
 
-/** Solicitudes permanecen fuera de usuarios hasta aprobación del administrador. */
+// Solicitudes permanecen fuera de usuarios hasta aprobación del administrador.
 export async function register(input: RegistrationInput): Promise<void> {
   assertMailAndCodeConfig();
   if (!input || typeof input.nombre !== 'string' || typeof input.apellido !== 'string' || typeof input.email !== 'string') throw new Error('Completá todos los campos del registro.');
@@ -109,7 +116,7 @@ export async function register(input: RegistrationInput): Promise<void> {
   await issueCode(requestId, email);
 }
 
-/** Crea una solicitud mediante OAuth: la identidad del proveedor confirma el correo; aun así requiere aprobación y token. */
+// Crea una solicitud mediante OAuth: la identidad del proveedor confirma el correo; aun así requiere aprobación y token.
 export async function registerSocial(input: { nombre: string; apellido: string; email: string; provider: SocialProvider; providerUserId: string }): Promise<void> {
   assertMailAndCodeConfig();
   const nombre = input.nombre.trim().slice(0, 100) || 'Usuario';
@@ -133,7 +140,7 @@ export async function registerSocial(input: { nombre: string; apellido: string; 
   await notifyAdminsOfRegistration(nombre, email);
 }
 
-/** Envía aviso in-app y por correo al administrador luego de verificar un correo. */
+// Envía aviso in-app y por correo al administrador luego de verificar un correo.
 export async function notifyAdminsOfRegistration(applicantName: string, email: string): Promise<void> {
   const [admins] = await pool.query<RowDataPacket[]>("SELECT u.id_usuario, u.email FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol WHERE r.nombre = 'administrador' AND u.activo = 1 ORDER BY u.id_usuario");
   for (const admin of admins) {
@@ -143,7 +150,7 @@ export async function notifyAdminsOfRegistration(applicantName: string, email: s
     catch { console.error('[registration] No se pudo enviar el correo de aviso al administrador.'); }
   }
 }
-
+// Esta función aplica los límites de reenvío y genera un nuevo código de verificación para una solicitud que todavía no confirmó su correo. Recibe emailInput como entrada.
 export async function resendVerification(emailInput: string): Promise<void> {
   assertMailAndCodeConfig();
   const email = emailInput.trim().toLowerCase();
@@ -151,7 +158,7 @@ export async function resendVerification(emailInput: string): Promise<void> {
   if (rows.length) await issueCode(Number(rows[0].id_solicitud), email);
 }
 
-/** Reenvía un token de acceso solo a cuentas aprobadas que todavía no lo canjearon. */
+// Reenvía un token de acceso solo a cuentas aprobadas que todavía no lo canjearon.
 export async function resendAccessToken(emailInput: string): Promise<void> {
   assertMailAndCodeConfig();
   const email = emailInput.trim().toLowerCase();
@@ -186,7 +193,7 @@ export async function resendAccessToken(emailInput: string): Promise<void> {
   await sendAccessToken(email, String(users[0].nombre), token, Number(users[0].debe_cambiar_password) === 1);
 }
 
-/** Canjea el token de aprobación, activa el usuario y devuelve su sesión normal. */
+// Canjea el token de aprobación, activa el usuario y devuelve su sesión normal.
 export async function redeemAccessToken(emailInput: string, tokenInput: string): Promise<{ token: string; usuario: import('../types').UsuarioPublico }> {
   const email = emailInput.trim().toLowerCase();
   const token = tokenInput.trim();
@@ -220,7 +227,12 @@ export async function redeemAccessToken(emailInput: string, tokenInput: string):
     await connection.query('UPDATE codigos_acceso_usuario SET consumido_at = NOW() WHERE id_codigo = ?', [codes[0].id_codigo]);
     await connection.query("UPDATE usuarios SET estado_cuenta = 'activo' WHERE id_usuario = ?", [userId]);
     await connection.commit();
-  } catch (error) { try { await connection.rollback(); } catch { /* ya confirmado */ } throw error; }
+  } catch (error) {
+    try { await connection.rollback(); } catch {
+      // La transacción ya se había confirmado antes de propagar el error.
+    }
+    throw error;
+  }
   finally { connection.release(); }
 
   const rol = String(userRow!.rol_nombre) as import('../types').RolNombre;
@@ -236,7 +248,7 @@ export async function redeemAccessToken(emailInput: string, tokenInput: string):
   };
   return { token: signToken({ id_usuario: userId, email: publicUser.email, rol }), usuario: publicUser };
 }
-
+// Esta función comprueba el código de verificación, registra que el correo fue confirmado y deja la solicitud esperando la decisión del administrador. Recibe emailInput, code como entrada.
 export async function verifyEmail(emailInput: string, code: string): Promise<void> {
   const email = emailInput.trim().toLowerCase();
   if (!/^\d{6}$/.test(code)) throw new Error('El código debe tener 6 dígitos.');
@@ -262,12 +274,19 @@ export async function verifyEmail(emailInput: string, code: string): Promise<voi
     await connection.query('UPDATE codigos_verificacion_solicitud SET consumido_at = NOW() WHERE id_codigo = ?', [codes[0].id_codigo]);
     await connection.query("UPDATE solicitudes_registro SET estado = 'pendiente_aprobacion', email_verificado_at = NOW() WHERE id_solicitud = ?", [requestId]);
     await connection.commit();
-  } catch (error) { try { await connection.rollback(); } catch { /* transacción ya confirmada */ } throw error; }
+  } catch (error) {
+    try { await connection.rollback(); } catch {
+      // La transacción ya se había confirmado antes de propagar el error.
+    }
+    throw error;
+  }
   finally { connection.release(); }
   try { await notifyAdminsOfRegistration(applicantName, email); }
-  catch { /* la verificación ya quedó guardada; el administrador verá la solicitud en la app */ }
+  catch {
+    // La verificación ya quedó guardada; el administrador también verá la solicitud en la app.
+  }
 }
-
+// Esta función implementa la operación «list pending requests» sobre registration: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador.
 export async function listPendingRequests(): Promise<RegistrationRequest[]> {
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT id_solicitud, nombre, apellido, email, created_at FROM solicitudes_registro
@@ -275,7 +294,7 @@ export async function listPendingRequests(): Promise<RegistrationRequest[]> {
   );
   return rows as RegistrationRequest[];
 }
-
+// Esta función aprueba la solicitud o cambio solicitado, aplica las reglas de rol y estado, y prepara el token de acceso que se envía a la persona. Recibe requestId, adminId como entrada.
 export async function approveRequest(requestId: number, adminId: number): Promise<void> {
   const connection = await pool.getConnection();
   let email = ''; let nombre = ''; let accessToken = ''; let setupPassword = false;
@@ -306,7 +325,7 @@ export async function approveRequest(requestId: number, adminId: number): Promis
   try { await sendAccessToken(email, nombre, accessToken, setupPassword); }
   catch { throw new Error('La solicitud fue aprobada, pero no se pudo enviar el token. La persona puede pedir que se lo reenviemos desde la pantalla de ingreso.'); }
 }
-
+// Esta función rechaza la solicitud indicada y registra la decisión administrativa; según el flujo, también comunica el resultado por correo. Recibe requestId, adminId como entrada.
 export async function rejectRequest(requestId: number, adminId: number): Promise<void> {
   const connection = await pool.getConnection(); let email = ''; let nombre = '';
   try {
@@ -317,5 +336,7 @@ export async function rejectRequest(requestId: number, adminId: number): Promise
     await connection.commit(); email = requests[0].email; nombre = requests[0].nombre;
   } catch (error) { await connection.rollback(); throw error; }
   finally { connection.release(); }
-  try { await sendRegistrationRejection(email, nombre); } catch { /* no revierte la decisión guardada */ }
+  try { await sendRegistrationRejection(email, nombre); } catch {
+    // Un error de correo no revierte el rechazo administrativo ya guardado.
+  }
 }

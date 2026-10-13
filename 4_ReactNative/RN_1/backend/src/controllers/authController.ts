@@ -1,3 +1,4 @@
+// Archivo backend/src/controllers/authController.ts: controlador http de la api relacionado con auth controller. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // en este archivo se encuentran los controladores de autenticaci�n,
 // que manejan las solicitudes relacionadas con el inicio de sesi�n,
 // la obtenci�n del perfil del usuario y el cambio de contrase�a inicial.
@@ -5,7 +6,7 @@ import { Request, Response } from "express";
 import * as authService from "../services/authService";
 import type { LoginRequest } from "../types";
 import * as registrationService from '../services/registrationService';
-
+// Esta función atiende el endpoint HTTP: recibe los datos del formulario y comienza el flujo de registro; responde que el código de verificación fue solicitado. Recibe req, res como entrada.
 export async function register(req: Request, res: Response): Promise<void> {
   try {
     const { nombre, apellido, email, password } = req.body as Record<string, string>;
@@ -16,7 +17,7 @@ export async function register(req: Request, res: Response): Promise<void> {
     res.status(400).json({ success: false, message });
   }
 }
-
+// Esta función atiende el endpoint HTTP: comprueba que se enviaron correo y código, delega la verificación y responde que la solicitud espera la aprobación administrativa. Recibe req, res como entrada.
 export async function verifyEmail(req: Request, res: Response): Promise<void> {
   try {
     const { email, code } = req.body as { email?: string; code?: string };
@@ -28,7 +29,7 @@ export async function verifyEmail(req: Request, res: Response): Promise<void> {
     res.status(400).json({ success: false, message });
   }
 }
-
+// Esta función atiende el endpoint HTTP: valida el correo recibido, solicita un nuevo código y devuelve una respuesta que no revela si el correo existe. Recibe req, res como entrada.
 export async function resendVerification(req: Request, res: Response): Promise<void> {
   try {
     const { email } = req.body as { email?: string };
@@ -40,7 +41,7 @@ export async function resendVerification(req: Request, res: Response): Promise<v
     res.status(429).json({ success: false, message });
   }
 }
-
+// Esta función atiende el endpoint HTTP: valida correo y token, consume el token aprobado y responde con el JWT y el perfil público. Recibe req, res como entrada.
 export async function redeemAccessToken(req: Request, res: Response): Promise<void> {
   try {
     const { email, token } = req.body as { email?: string; token?: string };
@@ -52,7 +53,7 @@ export async function redeemAccessToken(req: Request, res: Response): Promise<vo
     res.status(400).json({ success: false, message });
   }
 }
-
+// Esta función atiende el endpoint HTTP: valida el correo y solicita el reenvío del token de primer acceso con respuesta que evita revelar cuentas. Recibe req, res como entrada.
 export async function resendAccessToken(req: Request, res: Response): Promise<void> {
   try {
     const { email } = req.body as { email?: string };

@@ -1,3 +1,4 @@
+// Archivo backend/src/utils/roles.ts: utilidades compartidas del backend relacionado con roles. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // labels de roles para la api
 import type { RolNombre } from '../types';
 

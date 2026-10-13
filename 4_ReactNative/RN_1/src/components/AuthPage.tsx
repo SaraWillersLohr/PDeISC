@@ -1,8 +1,9 @@
+// Archivo src/components/AuthPage.tsx: el marco visual compartido por las pantallas de autenticación. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import type { ReactNode } from 'react';
 import { ImageBackground, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 const cowPhoto = require('../../assets/img_login.png');
-
+// Esta función renderiza el componente reutilizable AuthPage, usando sus props para mostrar estado y comunicar acciones al componente padre. Recibe children como entrada.
 export function AuthPage({ children }: { children: ReactNode }) {
   const { width } = useWindowDimensions();
   const wide = width >= 820;

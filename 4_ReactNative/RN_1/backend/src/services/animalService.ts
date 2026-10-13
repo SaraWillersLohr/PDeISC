@@ -1,8 +1,10 @@
+// Archivo backend/src/services/animalService.ts: servicio que conecta con la api o implementa lógica de negocio relacionado con animal service. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // servicio de gesti�n de animales
 import pool from "../config/database";
 import type { RowDataPacket, ResultSetHeader } from "mysql2";
 import { createNotificacion } from "./notificacionService";
 
+// Contrato de datos EstadoSalud: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export type EstadoSalud = "sano" | "enfermo" | "herido" | "en_tratamiento";
 // intefaxz de animal
 // muestra informacion
@@ -119,6 +121,7 @@ export async function listAnimales(
   return rows.map(toAnimal);
 }
 
+// Contrato de datos CreateAnimalRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface CreateAnimalRequest {
   identificador: string;
   nombre?: string | null;
@@ -195,6 +198,7 @@ export async function createAnimal(
   }
 }
 
+// Contrato de datos UpdateAnimalRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface UpdateAnimalRequest {
   identificador?: string;
   nombre?: string | null;

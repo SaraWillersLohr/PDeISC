@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { apiRequest } from '../services/api';
 import type { Animal, Corral, DashboardSummary, Notification, PublicUser, Role } from '../types/domain';
 import { useFeedback } from '../components/FeedbackProvider';
+import { AnimalsManagementScreen, CorralsManagementScreen, FarmDashboardScreen, FieldOperationsScreen, VeterinaryOperationsScreen } from './FarmOperationScreens';
 
 // Contrato de datos Section: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 type Section = 'inicio' | 'animales' | 'corrales' | 'equipo' | 'solicitudes' | 'campo' | 'veterinaria' | 'avisos';
@@ -15,14 +16,14 @@ interface EquipoItem { id_usuario: number; nombre: string; apellido: string; ema
 // Contrato de datos SignupRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface SignupRequest { id_solicitud: number; nombre: string; apellido: string; email: string; created_at: string; }
 const NAV: { id: Section; title: string; roles: PublicUser['rol'][] }[] = [
-  { id: 'inicio', title: 'Inicio', roles: ['administrador', 'dueno', 'copropietario'] },
+  { id: 'inicio', title: 'Inicio', roles: ['dueno', 'copropietario'] },
   { id: 'animales', title: 'Animales', roles: ['dueno', 'copropietario', 'peon', 'veterinario'] },
   { id: 'corrales', title: 'Corrales', roles: ['dueno', 'copropietario'] },
   { id: 'equipo', title: 'Usuarios', roles: ['administrador'] },
   { id: 'solicitudes', title: 'Solicitudes', roles: ['administrador'] },
-  { id: 'campo', title: 'Campo', roles: ['peon'] },
-  { id: 'veterinaria', title: 'Veterinaria', roles: ['veterinario'] },
-  { id: 'avisos', title: 'Avisos', roles: ['dueno', 'copropietario', 'peon', 'veterinario', 'empleado'] },
+  { id: 'campo', title: 'Campo', roles: ['peon', 'dueno', 'copropietario'] },
+  { id: 'veterinaria', title: 'Veterinaria', roles: ['veterinario', 'dueno', 'copropietario'] },
+  { id: 'avisos', title: 'Avisos', roles: ['administrador', 'dueno', 'copropietario', 'peon', 'veterinario', 'empleado'] },
 ];
 // Esta función renderiza el bloque de interfaz HomeScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe user, token, onLogout como entrada.
 export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
@@ -30,7 +31,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
   const wide = width >= 980;
   const { showMessage, confirm, choose } = useFeedback();
   const gutter = Math.max(14, Math.min(32, width * 0.05));
-  const [section, setSection] = useState<Section>(user.rol === 'peon' ? 'campo' : user.rol === 'veterinario' ? 'veterinaria' : user.rol === 'empleado' ? 'avisos' : 'inicio');
+  const [section, setSection] = useState<Section>(user.rol === 'peon' ? 'campo' : user.rol === 'veterinario' ? 'veterinaria' : user.rol === 'empleado' || user.rol === 'administrador' ? 'avisos' : 'inicio');
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [corrals, setCorrals] = useState<Corral[]>([]);
@@ -47,14 +48,9 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
   const loadSection = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true); else setLoading(true);
     try {
-      if (section === 'inicio') setSummary(await apiRequest<DashboardSummary>('/dashboard/summary', token));
-      else if (section === 'animales' || section === 'campo' || section === 'veterinaria') {
-        const params = section === 'veterinaria' ? '?id_corral=6' : '';
-        setAnimals(await apiRequest<Animal[]>(`/animales${params}`, token));
-      } else if (section === 'corrales') setCorrals(await apiRequest<Corral[]>('/corrales', token));
-      else if (section === 'equipo') setTeam(await apiRequest<EquipoItem[]>('/usuarios', token));
+      if (section === 'equipo') setTeam(await apiRequest<EquipoItem[]>('/usuarios', token));
       else if (section === 'solicitudes') setRequests(await apiRequest<SignupRequest[]>('/usuarios/solicitudes', token));
-      else setAlerts(await apiRequest<Notification[]>('/notificaciones', token));
+      else if (section === 'avisos') setAlerts(await apiRequest<Notification[]>('/notificaciones', token));
     } catch (cause) {
       showMessage('No se pudo actualizar', cause instanceof Error ? cause.message : 'Error de conexión.', 'error');
     } finally { setLoading(false); setRefreshing(false); }
@@ -77,7 +73,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
     const timer = setInterval(() => void refreshNotifications(), 30_000);
     return () => { mounted = false; clearInterval(timer); };
   }, [token]);
-  const navItems = NAV.filter((item) => user.rol === 'administrador' || item.roles.includes(user.rol));
+  const navItems = NAV.filter((item) => item.roles.includes(user.rol));
   // Esta función valida los datos ingresados para la acción veterinaria o de campo, envía la operación a la API y actualiza la lista si se completa.
   const submitAnimalAction = async () => {
     if (!animalAction || actionBusy) return;
@@ -94,9 +90,8 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
     } catch (error) { showMessage('No se pudo guardar', error instanceof Error ? error.message : 'Error de API.', 'error'); }
     finally { setActionBusy(false); }
   };
-  const records: (Animal | Corral | EquipoItem | SignupRequest | Notification)[] = section === 'animales' || section === 'campo' || section === 'veterinaria'
-    ? animals.filter((item) => `${item.identificador} ${item.nombre ?? ''} ${item.estado_salud}`.toLowerCase().includes(search.toLowerCase()))
-    : section === 'corrales' ? corrals : section === 'equipo' ? team : section === 'solicitudes' ? requests : section === 'avisos' ? alerts : [];
+  const farmSection = ['inicio', 'animales', 'corrales', 'campo', 'veterinaria'].includes(section);
+  const records: (Animal | Corral | EquipoItem | SignupRequest | Notification)[] = section === 'equipo' ? team : section === 'solicitudes' ? requests : section === 'avisos' ? alerts : [];
   // Esta función solicita confirmación para aprobar o denegar un registro, llama al endpoint de administración y recarga las solicitudes pendientes. Recibe request, approve como entrada.
   const handleRequestDecision = async (request: SignupRequest, approve: boolean) => {
     const action = approve ? 'aprobar' : 'rechazar';
@@ -155,9 +150,13 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
       contentContainerStyle={[styles.content, { paddingHorizontal: wide ? 42 : gutter, maxWidth: Math.max(620, Math.min(1200, width)), width: '100%', alignSelf: 'center' }]}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadSection(true)} tintColor="#315a3c" />}
       ListHeaderComponent={loading ? <View style={styles.loading}><ActivityIndicator color="#315a3c" /><Text style={styles.muted}>Cargando…</Text></View>
-        : section === 'inicio' ? <Dashboard summary={summary} />
+        : section === 'inicio' ? <FarmDashboardScreen token={token} user={user} onNavigate={setSection} />
+          : section === 'animales' ? <AnimalsManagementScreen token={token} user={user} />
+            : section === 'corrales' ? <CorralsManagementScreen token={token} user={user} />
+              : section === 'campo' ? <FieldOperationsScreen token={token} user={user} />
+                : section === 'veterinaria' ? <VeterinaryOperationsScreen token={token} user={user} />
           : <View><Text style={styles.sectionTitle}>{NAV.find((item) => item.id === section)?.title}</Text>{section === 'equipo' ? <CreateUserCard token={token} onCreated={() => loadSection(true)} /> : null}{['animales', 'campo', 'veterinaria'].includes(section) ? <TextInput placeholder="Buscar por caravana, nombre o estado" value={search} onChangeText={setSearch} style={styles.search} /> : null}</View>}
-      ListEmptyComponent={!loading && section !== 'inicio' ? <Text style={styles.empty}>No hay elementos para mostrar.</Text> : null}
+      ListEmptyComponent={!loading && !farmSection ? <Text style={styles.empty}>No hay elementos para mostrar.</Text> : null}
       renderItem={({ item }: { item: Animal | Corral | EquipoItem | SignupRequest | Notification }) => <RecordCard item={item} section={section} token={token} currentUser={user} onChanged={() => loadSection(true)} onAnimalAction={(animal, kind) => { setActionText(''); setAnimalAction({ animal, kind }); }} onRequestDecision={(request, approve) => void handleRequestDecision(request, approve)} onChooseRole={(member) => void handleRoleChange(member)} showMessage={showMessage} />}
     />
     <Modal visible={!!animalAction} transparent animationType="fade" onRequestClose={() => { if (!actionBusy) setAnimalAction(null); }}>

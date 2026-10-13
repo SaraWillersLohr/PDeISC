@@ -71,6 +71,8 @@ export async function updateUsuario(id: number, data: UpdateUsuarioRequest, edit
     fields.push('activo = ?'); values.push(data.activo ? 1 : 0);
     fields.push("estado_cuenta = ?"); values.push(data.activo ? 'activo' : 'inactivo');
   }
+  // Un cambio de permisos o de estado revoca los JWT existentes y obliga a iniciar sesión con los permisos vigentes.
+  if (data.rol !== undefined || data.activo !== undefined) fields.push('token_version = token_version + 1');
   if (!fields.length) throw new Error('no hay campos para actualizar');
   values.push(id);
   await pool.execute<ResultSetHeader>(`UPDATE usuarios SET ${fields.join(', ')} WHERE id_usuario = ?`, values);
@@ -81,6 +83,6 @@ export async function updateUsuario(id: number, data: UpdateUsuarioRequest, edit
 // Esta función implementa la operación «deactivate usuario» sobre usuario: valida las reglas de negocio, consulta o modifica MySQL cuando corresponde y devuelve el resultado al controlador. Recibe id como entrada.
 export async function deactivateUsuario(id: number): Promise<void> {
   if (await isAdministratorUser(id)) throw new Error('no se puede desactivar al administrador superior');
-  const [result] = await pool.execute<ResultSetHeader>("UPDATE usuarios SET activo = 0, estado_cuenta = 'inactivo' WHERE id_usuario = ?", [id]);
+  const [result] = await pool.execute<ResultSetHeader>("UPDATE usuarios SET activo = 0, estado_cuenta = 'inactivo', token_version = token_version + 1 WHERE id_usuario = ?", [id]);
   if (!result.affectedRows) throw new Error('usuario no encontrado');
 }

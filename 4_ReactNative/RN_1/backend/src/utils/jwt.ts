@@ -8,6 +8,7 @@ export interface JwtPayload {
   id_usuario: number;
   email: string;
   rol: RolNombre;
+  token_version: number;
 }
 
 const JWT_SECRET: string = process.env.JWT_SECRET ?? '';

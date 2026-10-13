@@ -11,6 +11,8 @@ import { signToken } from "../utils/jwt";
 import type { SocialProvider, UsuarioPublico } from "../types";
 import { authorizeSocialIdentity } from '../services/socialAuthService';
 import * as registrationService from '../services/registrationService';
+import pool from '../config/database';
+import type { RowDataPacket } from 'mysql2';
 
 const providers: SocialProvider[] = [
   "google",
@@ -126,7 +128,7 @@ export function completeSocialLogin(
 }
 
 // Canjea un código social de un solo uso por el mismo JWT usado en el login tradicional.
-export function exchangeSocialCode(req: Request, res: Response): void {
+export async function exchangeSocialCode(req: Request, res: Response): Promise<void> {
   const code = typeof req.body?.code === "string" ? req.body.code : "";
   const ticket = consumeSocialTicket(code);
   if (!ticket) {
@@ -139,10 +141,21 @@ export function exchangeSocialCode(req: Request, res: Response): void {
     return;
   }
 
+  // Lee la versión actual para que la sesión social respete las mismas revocaciones que el acceso por contraseña.
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT token_version FROM usuarios WHERE id_usuario = ? AND activo = 1 AND estado_cuenta = 'activo' LIMIT 1",
+    [ticket.usuario.id_usuario],
+  );
+  if (!rows.length) {
+    res.status(401).json({ success: false, message: 'No se pudo iniciar sesión con esta cuenta.' });
+    return;
+  }
+
   const token = signToken({
     id_usuario: ticket.usuario.id_usuario,
     email: ticket.usuario.email,
     rol: ticket.usuario.rol,
+    token_version: Number(rows[0].token_version),
   });
   res.json({
     success: true,

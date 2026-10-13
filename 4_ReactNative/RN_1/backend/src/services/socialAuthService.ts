@@ -67,27 +67,7 @@ export async function authorizeSocialIdentity(input: {
 
   const user = await findActiveUserByEmail(input.email);
   if (!user) {
-    const email = input.email.trim().toLowerCase();
-    const [accounts] = await pool.query<RowDataPacket[]>(
-      'SELECT estado_cuenta FROM usuarios WHERE email = ? AND activo = 1 LIMIT 1', [email],
-    );
-    if (accounts[0]?.estado_cuenta === 'pendiente_acceso') {
-      throw new Error('Tu solicitud fue aprobada. Ingresá con el token que te enviamos por correo para habilitar tu cuenta.');
-    }
-    const [requests] = await pool.query<RowDataPacket[]>(
-      'SELECT estado FROM solicitudes_registro WHERE email = ? LIMIT 1', [email],
-    );
-    const state = requests[0]?.estado as string | undefined;
-    if (state === 'pendiente_verificacion') {
-      throw new Error('Tu solicitud existe, pero falta verificar el correo con el código que te enviamos.');
-    }
-    if (state === 'pendiente_aprobacion') {
-      throw new Error('Tu correo ya está verificado; falta que el administrador apruebe tu solicitud. Cuando la apruebe, te enviaremos el token de acceso.');
-    }
-    if (state === 'rechazada') {
-      throw new Error('El administrador rechazó esta solicitud. Contactá al establecimiento para obtener ayuda.');
-    }
-    throw new Error('No encontramos una cuenta aprobada con este correo. Para solicitar acceso, volvé atrás y elegí “Crear una cuenta” y “Registrarme con este proveedor”.');
+    throw new Error('No se pudo iniciar sesión con esta cuenta. Si solicitaste acceso, revisá tu correo o contactá al administrador.');
   }
 
   const identityOwner = await findIdentityOwner(input.provider, input.providerUserId);

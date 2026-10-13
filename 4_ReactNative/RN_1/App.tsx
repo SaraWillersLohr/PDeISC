@@ -10,8 +10,9 @@ import { RegistrationScreen } from './src/screens/RegistrationScreen';
 import { EmailVerificationScreen } from './src/screens/EmailVerificationScreen';
 import { PasswordChangeScreen } from './src/screens/PasswordChangeScreen';
 import { AccessTokenScreen } from './src/screens/AccessTokenScreen';
+import { PasswordRecoveryScreen } from './src/screens/PasswordRecoveryScreen';
 import { FeedbackProvider, useFeedback } from './src/components/FeedbackProvider';
-import { ApiError, changeInitialPasswordApi, exchangeSocialCodeApi, getProfileApi, listSocialProvidersApi, loginApi, redeemAccessTokenApi, registerApi, resendAccessTokenApi, resendVerificationApi, verifyEmailApi, type SocialProviderId } from './src/services/authApi';
+import { ApiError, changeInitialPasswordApi, exchangeSocialCodeApi, getProfileApi, listSocialProvidersApi, loginApi, logoutApi, redeemAccessTokenApi, registerApi, requestPasswordRecoveryApi, resendAccessTokenApi, resendVerificationApi, resetPasswordApi, verifyEmailApi, type SocialProviderId } from './src/services/authApi';
 import type { PublicUser } from './src/types/auth';
 // Esta función recupera la sesión recordada desde sessionStorage en web o SecureStore en Android/iOS.
 async function readSavedSession(): Promise<string | null> {
@@ -54,9 +55,10 @@ function AppContent() {
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [authView, setAuthView] = useState<'login' | 'register' | 'verify' | 'access'>('login');
+  const [authView, setAuthView] = useState<'login' | 'register' | 'verify' | 'access' | 'recover'>('login');
   const [pendingEmail, setPendingEmail] = useState('');
   const [accessEmail, setAccessEmail] = useState('');
+  const [recoveryEmail, setRecoveryEmail] = useState('');
   const [socialProviders, setSocialProviders] = useState<SocialProviderId[]>([]);
   const handledSocialCallbacks = useRef(new Set<string>());
 
@@ -218,6 +220,30 @@ function AppContent() {
     catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo reenviar el token.'); }
     finally { setBusy(false); }
   };
+
+  // Pide un código de recuperación y conserva la respuesta neutra para que la interfaz no pueda enumerar cuentas.
+  const requestRecoveryCode = async (email: string): Promise<boolean> => {
+    setBusy(true); setError(null);
+    try {
+      setNotice(await requestPasswordRecoveryApi(email));
+      return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No se pudo solicitar el código. Intentá de nuevo.');
+      return false;
+    } finally { setBusy(false); }
+  };
+
+  // Envía el código y la contraseña nueva; al completarse el servidor revoca los JWT anteriores.
+  const completePasswordRecovery = async (email: string, code: string, password: string): Promise<boolean> => {
+    setBusy(true); setError(null);
+    try {
+      setNotice(await resetPasswordApi(email, code, password));
+      return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No se pudo actualizar la contraseña.');
+      return false;
+    } finally { setBusy(false); }
+  };
   // Esta función cambia la contraseña inicial usando la sesión autenticada y actualiza el perfil que mantiene la app. Recibe password como entrada.
   const changeInitialPassword = async (password: string) => {
     if (!token) return;
@@ -228,12 +254,19 @@ function AppContent() {
   };
   // Esta función elimina el token local y limpia el usuario y los estados de navegación para volver a la pantalla de ingreso.
   const signOut = async () => {
+    let serverRevoked = false;
+    try {
+      if (token) { await logoutApi(token); serverRevoked = true; }
+    } catch {
+      // Aunque no haya conexión para revocar el JWT, se borra la copia local y se informa que la revocación remota quedó pendiente.
+    }
     try {
       await clearSavedSession();
       setUser(null);
       setToken(null);
       setEntered(false);
       setError(null);
+      if (token && !serverRevoked) showMessage('Sesión cerrada en este dispositivo', 'No se pudo contactar la API para revocar las sesiones guardadas. Volvé a conectarte e iniciá sesión para comprobar el estado.', 'info');
     } catch {
       showMessage('No se pudo cerrar la sesión', 'Volvé a intentarlo.', 'error');
     }
@@ -261,8 +294,11 @@ function AppContent() {
                 onBack={() => { setAuthView('login'); setError(null); setNotice(null); }}
                 onRedeem={(email, accessToken, remember) => void redeemAccessToken(email, accessToken, remember)}
                 onResend={(email) => void resendAccessToken(email)} />
-              : <LoginScreen onLogin={signIn} socialProviders={socialProviders} onSocialLogin={startSocialLogin}
+              : authView === 'recover'
+                ? <PasswordRecoveryScreen initialEmail={recoveryEmail} busy={busy} error={error} onRequestCode={requestRecoveryCode} onResetPassword={completePasswordRecovery} onBack={() => { setAuthView('login'); setError(null); setNotice(null); }} />
+                : <LoginScreen onLogin={signIn} socialProviders={socialProviders} onSocialLogin={startSocialLogin}
                 onAccessTokenPress={(email) => { setAccessEmail(email); setError(null); setNotice(null); setAuthView('access'); }}
+                onRecoveryPress={(email) => { setRecoveryEmail(email); setError(null); setNotice(null); setAuthView('recover'); }}
                 onRegisterPress={() => { setError(null); setNotice(null); setAuthView('register'); }} busy={busy} error={error} notice={notice} />}
     </View>
   );

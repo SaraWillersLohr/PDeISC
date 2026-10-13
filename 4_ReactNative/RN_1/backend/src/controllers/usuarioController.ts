@@ -31,7 +31,7 @@ export async function approveRegistrationRequest(req: Request, res: Response): P
   if (!Number.isSafeInteger(id) || id < 1 || !req.usuario) { res.status(400).json({ success: false, message: 'solicitud inválida' }); return; }
   try {
     await registrationService.approveRequest(id, req.usuario.id_usuario);
-    res.json({ success: true, message: 'solicitud aprobada; se creó la cuenta con rol peón y se envió el token de acceso' });
+    res.json({ success: true, message: 'solicitud aprobada; se creó la cuenta con rol peón y se envió el código de acceso' });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'no se pudo aprobar la solicitud';
     res.status(message.includes('permisos') ? 403 : 400).json({ success: false, message });

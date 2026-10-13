@@ -72,6 +72,24 @@ export async function changeInitialPasswordApi(token: string, password: string):
   return readResponse<PublicUser>(response);
 }
 
+// Esta función pide un código de recuperación con una respuesta genérica para no revelar si existe una cuenta con ese correo.
+export async function requestPasswordRecoveryApi(email: string): Promise<string> {
+  return postMessage('password-recovery/request', { email });
+}
+
+// Esta función canjea el código de seis dígitos para guardar una contraseña nueva e invalidar las sesiones anteriores.
+export async function resetPasswordApi(email: string, code: string, password: string): Promise<string> {
+  return postMessage('password-recovery/reset', { email, code, password });
+}
+
+// Esta función revoca la sesión en el backend antes de que la app borre el JWT local.
+export async function logoutApi(token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` },
+  });
+  await readResponse<unknown>(response);
+}
+
 // Contrato de datos SocialProviderId: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export type SocialProviderId = 'google' | 'facebook' | 'github' | 'discord' | 'twitch' | 'twitter';
 // Contrato de datos SocialLoginResult: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.

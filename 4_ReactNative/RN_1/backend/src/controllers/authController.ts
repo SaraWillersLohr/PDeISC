@@ -67,6 +67,51 @@ export async function resendAccessToken(req: Request, res: Response): Promise<vo
   }
 }
 
+// Esta función acepta solicitudes de recuperación con una respuesta neutra, incluso si el correo no existe, para evitar enumerar cuentas.
+export async function requestPasswordRecovery(req: Request, res: Response): Promise<void> {
+  const email = typeof req.body?.email === 'string' ? req.body.email : '';
+  try {
+    await authService.requestPasswordRecovery(email);
+  } catch {
+    // No se revela si el correo existe ni si falló el servicio de correo.
+    console.error('[auth] No se pudo completar una solicitud de recuperación.');
+  }
+  res.status(202).json({ success: true, message: 'Si la cuenta puede recuperar el acceso, enviaremos un código al correo indicado.' });
+}
+
+// Esta función recibe el código de seis dígitos y la contraseña nueva; el servicio consume el código e invalida las sesiones previas.
+export async function resetPassword(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, code, password } = req.body as { email?: string; code?: string; password?: string };
+    if (!email?.trim() || !code || !password) {
+      res.status(400).json({ success: false, message: 'Completá correo, código y contraseña nueva.' });
+      return;
+    }
+    await authService.resetPasswordWithCode(email, code, password);
+    res.json({ success: true, message: 'Contraseña actualizada. Iniciá sesión con tu nueva contraseña.' });
+  } catch (error) {
+    const rawMessage = error instanceof Error ? error.message : '';
+    const message = rawMessage.includes('entre 10 y 72 bytes')
+      ? rawMessage
+      : 'El código no es válido o venció. Revisá los datos e intentá de nuevo.';
+    res.status(400).json({ success: false, message });
+  }
+}
+
+// Esta función revoca todos los tokens activos de la cuenta autenticada al cerrar sesión.
+export async function logout(req: Request, res: Response): Promise<void> {
+  if (!req.usuario) {
+    res.status(401).json({ success: false, message: 'No hay una sesión activa.' });
+    return;
+  }
+  try {
+    await authService.revokeUserSessions(req.usuario.id_usuario);
+    res.json({ success: true, message: 'Sesión cerrada.' });
+  } catch {
+    res.status(500).json({ success: false, message: 'No se pudo cerrar la sesión en el servidor.' });
+  }
+}
+
 // POST /api/auth/login  valida credenciales y devuelve jwt
 // esta funcion maneja la solicitud de inicio de sesi�n,
 // valida las credenciales del usuario y devuelve un token jwt si son correctas.
@@ -91,9 +136,8 @@ export async function login(req: Request, res: Response): Promise<void> {
       data: result,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "error al iniciar sesión";
-    res.status(401).json({ success: false, message });
+    // La misma respuesta cubre correo inexistente, clave incorrecta y cuenta pendiente o inactiva.
+    res.status(401).json({ success: false, message: 'No se pudo iniciar sesión. Revisá tus datos o recuperá el acceso.' });
   }
 }
 

@@ -29,11 +29,11 @@ export async function authenticate(
   try {
     const payload = verifyToken(token);
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT u.activo, r.nombre AS rol FROM usuarios u
+      `SELECT u.activo, u.token_version, r.nombre AS rol FROM usuarios u
        INNER JOIN roles r ON r.id_rol = u.id_rol WHERE u.id_usuario = ? LIMIT 1`,
       [payload.id_usuario],
     );
-    if (!rows.length || Number(rows[0].activo) !== 1) {
+    if (!rows.length || Number(rows[0].activo) !== 1 || Number(rows[0].token_version) !== payload.token_version) {
       res.status(401).json({ success: false, message: 'cuenta inactiva o inexistente' });
       return;
     }

@@ -17,8 +17,10 @@ const MAX_ATTEMPTS = 5;
 const RESEND_COOLDOWN_SECONDS = 60;
 // Configuración: MAX_DAILY_SENDS establece cantidad máxima de códigos o tokens que pueden enviarse en un día; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const MAX_DAILY_SENDS = 5;
-// Configuración: ACCESS_TOKEN_TTL_HOURS establece horas de vigencia del token de acceso de una cuenta aprobada; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
-const ACCESS_TOKEN_TTL_HOURS = 24;
+// Configuración: ACCESS_CODE_TTL_MINUTES fija la vigencia corta del código de seis dígitos para limitar su ventana de uso.
+const ACCESS_CODE_TTL_MINUTES = 10;
+// Configuración: RECOVERY_CODE_TTL_MINUTES limita el tiempo para completar la recuperación de contraseña.
+const RECOVERY_CODE_TTL_MINUTES = 10;
 
 // Contrato de datos RegistrationInput: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface RegistrationInput { nombre: string; apellido: string; email: string; password: string }
@@ -36,9 +38,16 @@ function accessDigest(userId: number, token: string): string {
   if (!secret || secret.length < 32) throw new Error('VERIFICATION_CODE_SECRET debe tener al menos 32 caracteres.');
   return createHmac('sha256', secret).update(`${userId}:acceso:${token}`).digest('hex');
 }
+
+// Esta función firma el código numérico de recuperación para guardar solo su HMAC y evitar que una filtración revele códigos vigentes.
+function recoveryDigest(userId: number, code: string): string {
+  const secret = process.env.VERIFICATION_CODE_SECRET;
+  if (!secret || secret.length < 32) throw new Error('VERIFICATION_CODE_SECRET debe tener al menos 32 caracteres.');
+  return createHmac('sha256', secret).update(`${userId}:recuperacion:${code}`).digest('hex');
+}
 // Esta función genera un token de acceso aleatorio y criptográficamente seguro que se entrega una sola vez a la persona aprobada.
 function createAccessToken(): string {
-  return randomBytes(32).toString('base64url');
+  return String(randomInt(0, 1_000_000)).padStart(6, '0');
 }
 // Esta función invalida tokens de acceso anteriores, guarda el hash del token nuevo con su vencimiento dentro de la transacción y devuelve el token en claro para enviarlo por correo. Recibe connection, userId como entrada.
 async function storeAccessToken(connection: PoolConnection, userId: number): Promise<string> {
@@ -49,7 +58,7 @@ async function storeAccessToken(connection: PoolConnection, userId: number): Pro
   );
   await connection.execute(
     `INSERT INTO codigos_acceso_usuario (id_usuario, token_hash, expira_at)
-     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ${ACCESS_TOKEN_TTL_HOURS} HOUR))`,
+     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ${ACCESS_CODE_TTL_MINUTES} MINUTE))`,
     [userId, accessDigest(userId, token)],
   );
   return token;
@@ -197,14 +206,14 @@ export async function resendAccessToken(emailInput: string): Promise<void> {
 export async function redeemAccessToken(emailInput: string, tokenInput: string): Promise<{ token: string; usuario: import('../types').UsuarioPublico }> {
   const email = emailInput.trim().toLowerCase();
   const token = tokenInput.trim();
-  if (!/^\S+@\S+\.\S+$/.test(email) || !token || token.length > 128) throw new Error('Correo o token inválido.');
+  if (!/^\S+@\S+\.\S+$/.test(email) || !/^\d{6}$/.test(token)) throw new Error('El correo o el código no son válidos.');
   const connection = await pool.getConnection();
   let userId = 0;
   let userRow: RowDataPacket | undefined;
   try {
     await connection.beginTransaction();
     const [users] = await connection.query<RowDataPacket[]>(
-      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.id_rol, u.activo, u.debe_cambiar_password, r.nombre AS rol_nombre
+      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.id_rol, u.activo, u.debe_cambiar_password, u.token_version, r.nombre AS rol_nombre
        FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol
        WHERE u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'pendiente_acceso' LIMIT 1 FOR UPDATE`, [email],
     );
@@ -246,7 +255,7 @@ export async function redeemAccessToken(emailInput: string, tokenInput: string):
     activo: Number(userRow!.activo) === 1,
     debe_cambiar_password: Number(userRow!.debe_cambiar_password) === 1,
   };
-  return { token: signToken({ id_usuario: userId, email: publicUser.email, rol }), usuario: publicUser };
+  return { token: signToken({ id_usuario: userId, email: publicUser.email, rol, token_version: Number(userRow!.token_version) }), usuario: publicUser };
 }
 // Esta función comprueba el código de verificación, registra que el correo fue confirmado y deja la solicitud esperando la decisión del administrador. Recibe emailInput, code como entrada.
 export async function verifyEmail(emailInput: string, code: string): Promise<void> {

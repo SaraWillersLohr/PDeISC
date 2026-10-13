@@ -1,9 +1,9 @@
 // Archivo src/screens/LoginScreen.tsx: el formulario de ingreso y las alternativas de autenticación disponibles. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { AuthPage } from '../components/AuthPage';
-import { useFeedback } from '../components/FeedbackProvider';
 import { SocialLoginButtons } from '../components/SocialLoginButtons';
 import type { SocialProviderId } from '../services/authApi';
 
@@ -11,6 +11,7 @@ import type { SocialProviderId } from '../services/authApi';
 interface LoginScreenProps {
   onLogin: (email: string, password: string, remember: boolean) => Promise<void>;
   onAccessTokenPress: (email: string) => void;
+  onRecoveryPress: (email: string) => void;
   onRegisterPress: () => void;
   socialProviders: SocialProviderId[];
   onSocialLogin: (provider: SocialProviderId, remember: boolean) => void;
@@ -19,13 +20,13 @@ interface LoginScreenProps {
   notice?: string | null;
 }
 // Esta función renderiza el bloque de interfaz LoginScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe onLogin, onAccessTokenPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice como entrada.
-export function LoginScreen({ onLogin, onAccessTokenPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice }: LoginScreenProps) {
-  const { showMessage } = useFeedback();
+export function LoginScreen({ onLogin, onAccessTokenPress, onRecoveryPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice }: LoginScreenProps) {
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [validation, setValidation] = useState<string | null>(null);
   // Esta función comprueba los valores del formulario y llama a la acción recibida por props solo si las validaciones locales pasan.
   const submit = () => {
@@ -57,17 +58,26 @@ export function LoginScreen({ onLogin, onAccessTokenPress, onRegisterPress, soci
             value={email}
           />
           <Text style={styles.label}>Contraseña</Text>
-          <TextInput
-            accessibilityLabel="Contraseña"
-            autoComplete="password"
-            onChangeText={setPassword}
-            onSubmitEditing={submit}
-            placeholder="Tu contraseña"
-            placeholderTextColor="#8a9188"
-            secureTextEntry
-            style={styles.input}
-            value={password}
-          />
+          <View style={styles.passwordRow}>
+            <TextInput
+              accessibilityLabel="Contraseña"
+              autoCapitalize="none"
+              autoComplete="current-password"
+              autoCorrect={false}
+              onChangeText={setPassword}
+              onSubmitEditing={submit}
+              placeholder="Tu contraseña"
+              placeholderTextColor="#8a9188"
+              secureTextEntry={!showPassword}
+              spellCheck={false}
+              style={[styles.input, styles.passwordInput]}
+              textContentType="password"
+              value={password}
+            />
+            <Pressable accessibilityRole="button" accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} onPress={() => setShowPassword((visible) => !visible)} style={styles.passwordVisibility}>
+              <MaterialCommunityIcons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color="#315a3c" />
+            </Pressable>
+          </View>
           <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: remember }} onPress={() => setRemember(!remember)} style={styles.rememberRow}>
             <View style={[styles.checkbox, remember && styles.checked]}>{remember ? <Text style={styles.checkmark}>✓</Text> : null}</View>
             <Text style={styles.rememberText}>Recordar sesión en este dispositivo</Text>
@@ -81,7 +91,7 @@ export function LoginScreen({ onLogin, onAccessTokenPress, onRegisterPress, soci
           <Pressable accessibilityRole="button" onPress={() => onAccessTokenPress(email.trim().toLowerCase())} style={styles.linkButton}>
             <Text style={styles.link}>¿Aprobaron tu solicitud? Ingresar con token</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => showMessage('Recuperar contraseña', 'La API todavía no ofrece recuperación de contraseña.', 'info')} style={styles.linkButton}>
+          <Pressable accessibilityRole="button" onPress={() => onRecoveryPress(email.trim().toLowerCase())} style={styles.linkButton}>
             <Text style={styles.link}>Olvidé mi contraseña</Text>
           </Pressable>
           <SocialLoginButtons providers={socialProviders} rememberMe={remember} onSelect={onSocialLogin} />
@@ -99,6 +109,9 @@ const styles = StyleSheet.create({
   form: { gap: 11 },
   label: { color: '#2f3931', fontSize: 14, fontWeight: '700', marginTop: 7 },
   input: { minHeight: 52, borderWidth: 1, borderColor: '#e1e7e1', borderRadius: 13, backgroundColor: '#f9faf8', paddingHorizontal: 15, color: '#1a3020', fontSize: 16 },
+  passwordRow: { position: 'relative', justifyContent: 'center' },
+  passwordInput: { paddingRight: 52 },
+  passwordVisibility: { position: 'absolute', right: 8, height: 44, minWidth: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   rememberRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
   checkbox: { width: 21, height: 21, borderWidth: 1.5, borderColor: '#9ca69a', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
   checked: { backgroundColor: '#2d5a27', borderColor: '#2d5a27' },

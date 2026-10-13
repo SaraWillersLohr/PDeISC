@@ -6,9 +6,10 @@ import { apiRequest } from '../services/api';
 import type { Animal, Corral, DashboardSummary, Notification, PublicUser, Role } from '../types/domain';
 import { useFeedback } from '../components/FeedbackProvider';
 import { AnimalsManagementScreen, CorralsManagementScreen, FarmDashboardScreen, FieldOperationsScreen, VeterinaryOperationsScreen } from './FarmOperationScreens';
+import { ReproductionScreen } from './ReproductionScreen';
 
 // Contrato de datos Section: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
-type Section = 'inicio' | 'animales' | 'corrales' | 'equipo' | 'solicitudes' | 'campo' | 'veterinaria' | 'avisos';
+type Section = 'inicio' | 'animales' | 'corrales' | 'equipo' | 'solicitudes' | 'campo' | 'veterinaria' | 'reproduccion' | 'avisos';
 // Contrato de datos HomeScreenProps: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface HomeScreenProps { user: PublicUser; token: string; onLogout: () => void; }
 // Contrato de datos EquipoItem: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
@@ -23,6 +24,7 @@ const NAV: { id: Section; title: string; roles: PublicUser['rol'][] }[] = [
   { id: 'solicitudes', title: 'Solicitudes', roles: ['administrador'] },
   { id: 'campo', title: 'Campo', roles: ['peon', 'dueno', 'copropietario'] },
   { id: 'veterinaria', title: 'Veterinaria', roles: ['veterinario', 'dueno', 'copropietario'] },
+  { id: 'reproduccion', title: 'Reproducción', roles: ['dueno', 'copropietario', 'peon', 'veterinario'] },
   { id: 'avisos', title: 'Avisos', roles: ['administrador', 'dueno', 'copropietario', 'peon', 'veterinario', 'empleado'] },
 ];
 // Esta función renderiza el bloque de interfaz HomeScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe user, token, onLogout como entrada.
@@ -90,7 +92,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
     } catch (error) { showMessage('No se pudo guardar', error instanceof Error ? error.message : 'Error de API.', 'error'); }
     finally { setActionBusy(false); }
   };
-  const farmSection = ['inicio', 'animales', 'corrales', 'campo', 'veterinaria'].includes(section);
+  const farmSection = ['inicio', 'animales', 'corrales', 'campo', 'veterinaria', 'reproduccion'].includes(section);
   const records: (Animal | Corral | EquipoItem | SignupRequest | Notification)[] = section === 'equipo' ? team : section === 'solicitudes' ? requests : section === 'avisos' ? alerts : [];
   // Esta función solicita confirmación para aprobar o denegar un registro, llama al endpoint de administración y recarga las solicitudes pendientes. Recibe request, approve como entrada.
   const handleRequestDecision = async (request: SignupRequest, approve: boolean) => {
@@ -155,6 +157,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
             : section === 'corrales' ? <CorralsManagementScreen token={token} user={user} />
               : section === 'campo' ? <FieldOperationsScreen token={token} user={user} />
                 : section === 'veterinaria' ? <VeterinaryOperationsScreen token={token} user={user} />
+                  : section === 'reproduccion' ? <ReproductionScreen token={token} />
           : <View><Text style={styles.sectionTitle}>{NAV.find((item) => item.id === section)?.title}</Text>{section === 'equipo' ? <CreateUserCard token={token} onCreated={() => loadSection(true)} /> : null}{['animales', 'campo', 'veterinaria'].includes(section) ? <TextInput placeholder="Buscar por caravana, nombre o estado" value={search} onChangeText={setSearch} style={styles.search} /> : null}</View>}
       ListEmptyComponent={!loading && !farmSection ? <Text style={styles.empty}>No hay elementos para mostrar.</Text> : null}
       renderItem={({ item }: { item: Animal | Corral | EquipoItem | SignupRequest | Notification }) => <RecordCard item={item} section={section} token={token} currentUser={user} onChanged={() => loadSection(true)} onAnimalAction={(animal, kind) => { setActionText(''); setAnimalAction({ animal, kind }); }} onRequestDecision={(request, approve) => void handleRequestDecision(request, approve)} onChooseRole={(member) => void handleRoleChange(member)} showMessage={showMessage} />}

@@ -4,18 +4,19 @@
 // eliminar, reportar enfermedades y dar de alta a los animales.
 import { Request, Response, NextFunction } from "express";
 import * as animalService from "../services/animalService";
-import type { EstadoSalud } from "../services/animalService";
+import type { EstadoSalud, SexoAnimal } from "../services/animalService";
 
 // esta funci�n maneja la solicitud para listar animales,
 // aplicando filtros opcionales como id_corral, estado_salud, id_especie y
 // b�squeda por nombre o descripci�n.
 export async function list(req: Request, res: Response, next: NextFunction) {
   try {
-    const { id_corral, estado_salud, id_especie, search } = req.query;
+    const { id_corral, estado_salud, id_especie, sexo, search } = req.query;
     const filters = {
       id_corral: id_corral ? Number(id_corral) : undefined,
       estado_salud: estado_salud as EstadoSalud | undefined,
       id_especie: id_especie ? Number(id_especie) : undefined,
+      sexo: sexo as SexoAnimal | undefined,
       search: search as string | undefined,
     };
     const animales = await animalService.listAnimales(filters);
@@ -29,7 +30,7 @@ export async function list(req: Request, res: Response, next: NextFunction) {
 // devolviendo el animal creado.
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const animal = await animalService.createAnimal(req.body);
+    const animal = await animalService.createAnimal(req.body, req.usuario?.id_usuario);
     res
       .status(201)
       .json({ success: true, message: "animal registrado", data: animal });
@@ -43,7 +44,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
-    const animal = await animalService.updateAnimal(id, req.body);
+    const animal = await animalService.updateAnimal(id, req.body, req.usuario?.id_usuario);
     res.json({ success: true, message: "animal actualizado", data: animal });
   } catch (error) {
     next(error);

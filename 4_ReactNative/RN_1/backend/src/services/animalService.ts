@@ -6,12 +6,19 @@ import { createNotificacion } from "./notificacionService";
 
 // Contrato de datos EstadoSalud: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export type EstadoSalud = "sano" | "enfermo" | "herido" | "en_tratamiento";
+// Contrato de datos SexoAnimal: define los sexos necesarios para aplicar reglas de parentesco y reproducción.
+export type SexoAnimal = "hembra" | "macho" | "indeterminado";
 // intefaxz de animal
 // muestra informacion
 export interface AnimalItem {
   id_animal: number;
   identificador: string;
   nombre: string | null;
+  sexo: SexoAnimal;
+  id_madre: number | null;
+  madre_nombre: string | null;
+  id_padre: number | null;
+  padre_nombre: string | null;
   id_corral: number;
   corral_nombre: string;
   corral_es_enfermeria: boolean;
@@ -32,6 +39,11 @@ interface AnimalRow extends RowDataPacket {
   id_animal: number;
   identificador: string;
   nombre: string | null;
+  sexo: SexoAnimal;
+  id_madre: number | null;
+  madre_nombre: string | null;
+  id_padre: number | null;
+  padre_nombre: string | null;
   id_corral: number;
   corral_nombre: string;
   corral_es_enfermeria: number;
@@ -53,6 +65,11 @@ function toAnimal(row: AnimalRow): AnimalItem {
     id_animal: row.id_animal,
     identificador: row.identificador,
     nombre: row.nombre,
+    sexo: row.sexo,
+    id_madre: row.id_madre,
+    madre_nombre: row.madre_nombre,
+    id_padre: row.id_padre,
+    padre_nombre: row.padre_nombre,
     id_corral: row.id_corral,
     corral_nombre: row.corral_nombre,
     corral_es_enfermeria: row.corral_es_enfermeria === 1,
@@ -75,6 +92,7 @@ export interface AnimalFilters {
   id_corral?: number;
   estado_salud?: EstadoSalud;
   id_especie?: number;
+  sexo?: SexoAnimal;
   search?: string;
 }
 // esta funci�n lista los animales aplicando filtros opcionales como id_corral, estado_salud, id_especie y b�squeda por nombre o descripci�n.
@@ -96,6 +114,10 @@ export async function listAnimales(
     conditions.push("e.id_especie = ?");
     params.push(filters.id_especie);
   }
+  if (filters.sexo) {
+    conditions.push("a.sexo = ?");
+    params.push(filters.sexo);
+  }
   if (filters.search) {
     conditions.push("(a.identificador LIKE ? OR a.nombre LIKE ?)");
     const term = `%${filters.search.trim()}%`;
@@ -103,7 +125,10 @@ export async function listAnimales(
   }
 
   const query = `
-    SELECT a.id_animal, a.identificador, a.nombre, a.id_corral, a.id_raza,
+    SELECT a.id_animal, a.identificador, a.nombre, a.sexo, a.id_madre, a.id_padre,
+           CONCAT(m.identificador, IF(m.nombre IS NULL, '', CONCAT(' · ', m.nombre))) AS madre_nombre,
+           CONCAT(p.identificador, IF(p.nombre IS NULL, '', CONCAT(' · ', p.nombre))) AS padre_nombre,
+           a.id_corral, a.id_raza,
            a.fecha_nacimiento, a.peso_kg, a.estado_salud, a.id_corral_origen,
            a.activo, a.created_at,
            c.nombre AS corral_nombre, c.es_enfermeria AS corral_es_enfermeria,
@@ -113,6 +138,8 @@ export async function listAnimales(
     INNER JOIN corrales c ON c.id_corral = a.id_corral
     INNER JOIN razas r ON r.id_raza = a.id_raza
     INNER JOIN especies e ON e.id_especie = r.id_especie
+    LEFT JOIN animales m ON m.id_animal = a.id_madre
+    LEFT JOIN animales p ON p.id_animal = a.id_padre
     WHERE ${conditions.join(" AND ")}
     ORDER BY a.created_at DESC
   `;
@@ -125,6 +152,9 @@ export async function listAnimales(
 export interface CreateAnimalRequest {
   identificador: string;
   nombre?: string | null;
+  sexo?: SexoAnimal;
+  id_madre?: number | null;
+  id_padre?: number | null;
   id_corral: number;
   id_raza: number;
   fecha_nacimiento?: string | null;
@@ -132,15 +162,74 @@ export interface CreateAnimalRequest {
   estado_salud?: EstadoSalud;
 }
 
+// Esta función valida una fecha de calendario real, no solo el formato de sus números.
+function isValidDateOnly(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10) === value;
+}
+
+// Esta función obtiene el día civil del servidor sin convertirlo a UTC.
+function localToday(): string { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
+
+// Esta función valida que la madre sea hembra, el padre macho y ambos compartan especie con la cría.
+async function validateLineage(speciesId: number, sexo: SexoAnimal, idMadre?: number | null, idPadre?: number | null, animalId?: number, fechaNacimiento?: string | null): Promise<void> {
+  if (sexo !== "hembra" && sexo !== "macho" && sexo !== "indeterminado") throw new Error("el sexo seleccionado no es válido");
+  if ((idMadre && idMadre === animalId) || (idPadre && idPadre === animalId) || (idMadre && idMadre === idPadre)) throw new Error("un animal no puede ser su propio progenitor ni ocupar ambos parentescos");
+  const parents = [
+    ...(idMadre ? [{ id: Number(idMadre), expected: "hembra" as const, label: "madre" }] : []),
+    ...(idPadre ? [{ id: Number(idPadre), expected: "macho" as const, label: "padre" }] : []),
+  ];
+  if (animalId && parents.length) {
+    // Camino hacia abajo por generaciones para impedir ciclos indirectos en el árbol genealógico.
+    const descendants = new Set<number>([animalId]);
+    let frontier = [animalId];
+    while (frontier.length) {
+      const placeholders = frontier.map(() => "?").join(", ");
+      const [children] = await pool.query<RowDataPacket[]>(
+        `SELECT id_animal FROM animales WHERE activo = 1 AND (id_madre IN (${placeholders}) OR id_padre IN (${placeholders}))`,
+        [...frontier, ...frontier],
+      );
+      frontier = children.map((child) => Number(child.id_animal)).filter((childId) => !descendants.has(childId));
+      frontier.forEach((childId) => descendants.add(childId));
+    }
+    if (parents.some((parent) => descendants.has(parent.id))) throw new Error("la relación de parentesco generaría un ciclo en el árbol genealógico");
+  }
+  for (const parent of parents) {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT a.id_animal, a.sexo, a.fecha_nacimiento, e.id_especie
+       FROM animales a JOIN razas r ON r.id_raza = a.id_raza
+       JOIN especies e ON e.id_especie = r.id_especie
+       WHERE a.id_animal = ? AND a.activo = 1 LIMIT 1`,
+      [parent.id],
+    );
+    const row = rows[0];
+    if (!row) throw new Error(`la ficha seleccionada como ${parent.label} no existe o está inactiva`);
+    if (row.sexo !== parent.expected) throw new Error(`el progenitor seleccionado como ${parent.label} debe tener sexo ${parent.expected}`);
+    if (Number(row.id_especie) !== speciesId) throw new Error("la cría y sus progenitores deben pertenecer a la misma especie");
+    if (fechaNacimiento && row.fecha_nacimiento && new Date(fechaNacimiento) < new Date(String(row.fecha_nacimiento).split("T")[0])) throw new Error("la fecha de nacimiento de la cría debe ser posterior a la de sus progenitores");
+  }
+}
+
 // ejecuto createanimal
 export async function createAnimal(
   data: CreateAnimalRequest,
+  userId?: number,
 ): Promise<AnimalItem> {
   const identificador = data.identificador?.trim();
   if (!identificador)
     throw new Error("el identificador/caravana es obligatorio");
   if (!data.id_corral) throw new Error("debes asignar un corral");
   if (!data.id_raza) throw new Error("debes asignar una raza");
+  if (data.fecha_nacimiento && (!isValidDateOnly(data.fecha_nacimiento) || data.fecha_nacimiento > localToday())) throw new Error("la fecha de nacimiento no es válida o está en el futuro");
+
+  // Consulto la especie de la raza para aplicar reglas de parentesco antes de insertar.
+  const [[breedInfo]] = await pool.query<RowDataPacket[]>(
+    "SELECT id_especie FROM razas WHERE id_raza = ? LIMIT 1",
+    [data.id_raza],
+  );
+  if (!breedInfo) throw new Error("la raza seleccionada no existe");
+  await validateLineage(Number(breedInfo.id_especie), data.sexo ?? "indeterminado", data.id_madre, data.id_padre, undefined, data.fecha_nacimiento);
 
   // chequeo capacidad del corral
   const [[corralInfo]] = await pool.query<RowDataPacket[]>(
@@ -168,17 +257,27 @@ export async function createAnimal(
 
   try {
     const [result] = await pool.query<ResultSetHeader>(
-      `INSERT INTO animales (identificador, nombre, id_corral, id_raza, fecha_nacimiento, peso_kg, estado_salud, activo)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      `INSERT INTO animales (identificador, nombre, sexo, id_madre, id_padre, id_corral, id_raza, fecha_nacimiento, peso_kg, estado_salud, activo)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
       [
         identificador,
         nombre,
+        data.sexo ?? "indeterminado",
+        data.id_madre || null,
+        data.id_padre || null,
         data.id_corral,
         data.id_raza,
         fechaNac,
         peso,
         estadoSalud,
       ],
+    );
+
+    // Inicio el historial de corrales en el primer destino asignado al animal.
+    await pool.query(
+      `INSERT INTO historial_movimientos_animales (id_animal, id_corral_origen, id_corral_destino, motivo, id_usuario_registro)
+       VALUES (?, NULL, ?, 'alta_inicial', ?)`,
+      [result.insertId, data.id_corral, userId ?? null],
     );
 
     const animales = await listAnimales();
@@ -202,6 +301,9 @@ export async function createAnimal(
 export interface UpdateAnimalRequest {
   identificador?: string;
   nombre?: string | null;
+  sexo?: SexoAnimal;
+  id_madre?: number | null;
+  id_padre?: number | null;
   id_corral?: number;
   id_raza?: number;
   fecha_nacimiento?: string | null;
@@ -214,12 +316,41 @@ export interface UpdateAnimalRequest {
 export async function updateAnimal(
   id: number,
   data: UpdateAnimalRequest,
+  userId?: number,
 ): Promise<AnimalItem> {
   const [[actual]] = await pool.query<RowDataPacket[]>(
     "SELECT * FROM animales WHERE id_animal = ? AND activo = 1",
     [id],
   );
   if (!actual) throw new Error("animal no encontrado");
+  if (data.fecha_nacimiento && (!isValidDateOnly(data.fecha_nacimiento) || data.fecha_nacimiento > localToday())) throw new Error("la fecha de nacimiento no es válida o está en el futuro");
+
+  // Revalido el linaje completo si se modifica sexo, raza o alguno de los progenitores.
+  if (data.sexo !== undefined || data.id_raza !== undefined || data.id_madre !== undefined || data.id_padre !== undefined) {
+    const [[breedInfo]] = await pool.query<RowDataPacket[]>(
+      "SELECT id_especie FROM razas WHERE id_raza = ? LIMIT 1",
+      [data.id_raza ?? actual.id_raza],
+    );
+    if (!breedInfo) throw new Error("la raza seleccionada no existe");
+    const [[lineage]] = await pool.query<RowDataPacket[]>("SELECT sexo, id_madre, id_padre FROM animales WHERE id_animal = ?", [id]);
+    await validateLineage(Number(breedInfo.id_especie), data.sexo ?? lineage.sexo, data.id_madre !== undefined ? data.id_madre : lineage.id_madre, data.id_padre !== undefined ? data.id_padre : lineage.id_padre, id, data.fecha_nacimiento ?? actual.fecha_nacimiento);
+
+    // Evito que una edición vuelva incoherente el sexo o la especie de crías ya relacionadas.
+    if (data.sexo !== undefined && data.sexo !== actual.sexo) {
+      const [[references]] = await pool.query<RowDataPacket[]>("SELECT SUM(id_madre = ?) AS madres, SUM(id_padre = ?) AS padres FROM animales WHERE activo = 1", [id, id]);
+      if (Number(references?.madres ?? 0) > 0 && data.sexo !== "hembra") throw new Error("no se puede cambiar el sexo: este animal figura como madre de otras fichas");
+      if (Number(references?.padres ?? 0) > 0 && data.sexo !== "macho") throw new Error("no se puede cambiar el sexo: este animal figura como padre de otras fichas");
+    }
+    if (data.id_raza !== undefined) {
+      const [[offspring]] = await pool.query<RowDataPacket[]>(
+        `SELECT COUNT(*) AS total FROM animales child
+         JOIN razas child_breed ON child_breed.id_raza = child.id_raza
+         WHERE (child.id_madre = ? OR child.id_padre = ?) AND child.activo = 1 AND child_breed.id_especie <> ?`,
+        [id, id, Number(breedInfo.id_especie)],
+      );
+      if (Number(offspring?.total ?? 0) > 0) throw new Error("no se puede cambiar la especie mientras existan crías vinculadas de otra especie");
+    }
+  }
 
   const fields: string[] = [];
   const values: unknown[] = [];
@@ -234,6 +365,9 @@ export async function updateAnimal(
     fields.push("nombre = ?");
     values.push(data.nombre ? data.nombre.trim() : null);
   }
+  if (data.sexo !== undefined) { fields.push("sexo = ?"); values.push(data.sexo); }
+  if (data.id_madre !== undefined) { fields.push("id_madre = ?"); values.push(data.id_madre || null); }
+  if (data.id_padre !== undefined) { fields.push("id_padre = ?"); values.push(data.id_padre || null); }
   if (data.id_raza !== undefined) {
     fields.push("id_raza = ?");
     values.push(data.id_raza);
@@ -293,6 +427,15 @@ export async function updateAnimal(
       `UPDATE animales SET ${fields.join(", ")} WHERE id_animal = ?`,
       values,
     );
+
+    // Registro el cambio de corral para que el historial mantenga origen, destino y responsable del movimiento.
+    if (data.id_corral !== undefined && data.id_corral !== actual.id_corral) {
+      await pool.query(
+        `INSERT INTO historial_movimientos_animales (id_animal, id_corral_origen, id_corral_destino, motivo, id_usuario_registro)
+         VALUES (?, ?, ?, 'traslado', ?)`,
+        [id, actual.id_corral, data.id_corral, userId ?? null],
+      );
+    }
 
     // si cambi� el estado de salud se registra la notificaci�n correspondiente
     if (data.estado_salud && data.estado_salud !== actual.estado_salud) {
@@ -373,6 +516,13 @@ export async function reportarEnfermedad(
     [animal.id_corral, enfermeria.id_corral, idAnimal],
   );
 
+  // Registro el movimiento sanitario para que la derivación y el corral de origen queden auditables.
+  await pool.query(
+    `INSERT INTO historial_movimientos_animales (id_animal, id_corral_origen, id_corral_destino, motivo, observaciones, id_usuario_registro)
+     VALUES (?, ?, ?, 'derivacion_enfermeria', ?, ?)`,
+    [idAnimal, animal.id_corral, enfermeria.id_corral, comentarios?.trim() || null, idUsuarioReporta],
+  );
+
   // registro reporte inicial en tabla tratamientos si se enviaron comentarios
   const descripcionReporte = comentarios?.trim()
     ? `reporte de ingreso a enfermería: ${comentarios.trim()}`
@@ -448,6 +598,13 @@ export async function darDeAlta(
      SET id_corral = ?, estado_salud = 'sano', id_corral_origen = NULL
      WHERE id_animal = ?`,
     [destCorralId, idAnimal],
+  );
+
+  // Registro la salida de enfermería y el corral general al que vuelve el animal.
+  await pool.query(
+    `INSERT INTO historial_movimientos_animales (id_animal, id_corral_origen, id_corral_destino, motivo, observaciones, id_usuario_registro)
+     VALUES (?, ?, ?, 'alta_enfermeria', ?, ?)`,
+    [idAnimal, animal.id_corral, destCorralId, notasAlta?.trim() || null, idVeterinario],
   );
 
   // registro nota de alta m�dica

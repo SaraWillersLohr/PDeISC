@@ -6,6 +6,7 @@
 // endpoints para obtener o modificar la informaci�n de los animales.
 import { Router } from "express";
 import * as animalController from "../controllers/animalController";
+import * as animalHistoryController from "../controllers/animalHistoryController";
 import { authenticate } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/roleMiddleware";
 
@@ -13,6 +14,11 @@ const router = Router();
 
 
 router.use(authenticate);
+
+// Historiales secundarios de ficha: el pesaje se registra solo por roles que trabajan con animales.
+router.get("/:id/pesajes", animalHistoryController.listPesajes);
+router.post("/:id/pesajes", authorize("dueno", "copropietario", "peon", "veterinario"), animalHistoryController.createPesaje);
+router.get("/:id/movimientos", animalHistoryController.listMovimientos);
 
 // Endpoint GET /: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador animalController.list procesa la solicitud.
 router.get("/", animalController.list);

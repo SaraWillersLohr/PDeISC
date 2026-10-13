@@ -4,6 +4,13 @@ export type Role = 'administrador' | 'dueno' | 'copropietario' | 'peon' | 'veter
 // Contrato de datos EstadoSalud: enumera los estados sanitarios que acepta actualmente la API del proyecto.
 export type EstadoSalud = 'sano' | 'enfermo' | 'herido' | 'en_tratamiento';
 
+// Contrato SexoAnimal: representa el dato actual de la ficha sin inferirlo por raza o edad.
+export type SexoAnimal = 'hembra' | 'macho' | 'indeterminado';
+// Contrato ReproductionEventType: enumera los eventos de ciclo reproductivo guardados en la API.
+export type ReproductionEventType = 'servicio' | 'inseminacion' | 'diagnostico_gestacion' | 'parto' | 'aborto' | 'destete';
+// Contrato ReproductionResult: mantiene resultados explícitos para consultas y alertas de gestación.
+export type ReproductionResult = 'pendiente' | 'prenada' | 'vacia' | 'inconcluso' | 'exitoso' | 'fallido';
+
 // Contrato de datos PublicUser: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface PublicUser {
   id_usuario: number;
@@ -35,6 +42,11 @@ export interface Animal {
   id_animal: number;
   identificador: string;
   nombre: string | null;
+  sexo: SexoAnimal;
+  id_madre: number | null;
+  madre_nombre: string | null;
+  id_padre: number | null;
+  padre_nombre: string | null;
   id_corral: number;
   corral_nombre: string;
   corral_es_enfermeria: boolean;
@@ -87,6 +99,31 @@ export interface Tratamiento {
   observaciones: string | null;
   created_at: string;
 }
+
+// Contrato de ReproductionEvent: representa un servicio, diagnóstico de gestación, parto, aborto o destete.
+export interface ReproductionEvent {
+  id_evento: number;
+  id_animal: number;
+  animal_identificador: string;
+  animal_nombre: string | null;
+  id_reproductor: number | null;
+  reproductor_identificador: string | null;
+  reproductor_nombre: string | null;
+  id_cria: number | null;
+  cria_identificador: string | null;
+  cria_nombre: string | null;
+  tipo: ReproductionEventType;
+  fecha_evento: string;
+  resultado: ReproductionResult | null;
+  fecha_probable_parto: string | null;
+  observaciones: string | null;
+  usuario_nombre: string | null;
+}
+
+// Contrato AnimalWeight: representa un peso histórico junto con la persona que hizo la medición.
+export interface AnimalWeight { id_pesaje: number; id_animal: number; fecha_pesaje: string; peso_kg: number; observaciones: string | null; usuario_nombre: string | null; }
+// Contrato AnimalMovement: describe el origen, destino, motivo y responsable de un traslado.
+export interface AnimalMovement { id_movimiento: number; id_animal: number; fecha_movimiento: string; motivo: string; observaciones: string | null; corral_origen: string | null; corral_destino: string; usuario_nombre: string | null; }
 
 // Contrato de datos Notification: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface Notification {

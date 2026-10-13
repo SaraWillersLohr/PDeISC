@@ -1,11 +1,14 @@
 // Archivo src/services/farmApi.ts: agrupa las llamadas tipadas para las funciones ganaderas que comparte RN_1 con R5.
 import { apiRequest } from './api';
-import type { Animal, Corral, Especie, EstadoSalud, Raza, Tratamiento } from '../types/domain';
+import type { Animal, AnimalMovement, AnimalWeight, Corral, Especie, EstadoSalud, Raza, ReproductionEvent, ReproductionEventType, ReproductionResult, SexoAnimal, Tratamiento } from '../types/domain';
 
 // Contrato de datos AnimalPayload: describe los campos que se pueden registrar o modificar en la ficha actual del animal.
 export interface AnimalPayload {
   identificador: string;
   nombre?: string | null;
+  sexo?: SexoAnimal;
+  id_madre?: number | null;
+  id_padre?: number | null;
   id_corral: number;
   id_raza: number;
   fecha_nacimiento?: string | null;
@@ -30,12 +33,25 @@ export interface TratamientoPayload {
   observaciones?: string | null;
 }
 
+// Contrato ReproductionEventPayload: describe las fechas, participantes y resultado que se registran por evento.
+export interface ReproductionEventPayload {
+  id_animal: number;
+  id_reproductor?: number | null;
+  id_cria?: number | null;
+  tipo: ReproductionEventType;
+  fecha_evento: string;
+  resultado?: ReproductionResult | null;
+  fecha_probable_parto?: string | null;
+  observaciones?: string | null;
+}
+
 // Esta función consulta el catálogo de animales y envía filtros opcionales al backend para reutilizar la API de R5.
-export function listAnimals(token: string, filters: { id_corral?: number; id_especie?: number; estado_salud?: EstadoSalud; search?: string } = {}): Promise<Animal[]> {
+export function listAnimals(token: string, filters: { id_corral?: number; id_especie?: number; sexo?: SexoAnimal; estado_salud?: EstadoSalud; search?: string } = {}): Promise<Animal[]> {
   const params = new URLSearchParams();
   if (filters.id_corral) params.set('id_corral', String(filters.id_corral));
   if (filters.id_especie) params.set('id_especie', String(filters.id_especie));
   if (filters.estado_salud) params.set('estado_salud', filters.estado_salud);
+  if (filters.sexo) params.set('sexo', filters.sexo);
   if (filters.search?.trim()) params.set('search', filters.search.trim());
   const query = params.toString();
   return apiRequest<Animal[]>(`/animales${query ? `?${query}` : ''}`, token);
@@ -99,4 +115,39 @@ export function listTreatments(token: string, idAnimal: number): Promise<Tratami
 // Esta función registra el diagnóstico y los detalles del tratamiento con la identidad del veterinario tomada de la sesión.
 export function createTreatment(token: string, payload: TratamientoPayload): Promise<Tratamiento> {
   return apiRequest<Tratamiento>('/tratamientos', token, { method: 'POST', body: JSON.stringify(payload) });
+}
+
+// Esta función crea una especie en el catálogo compartido por todas las fichas del establecimiento.
+export function createSpecies(token: string, nombre: string): Promise<Especie> {
+  return apiRequest<Especie>('/especies', token, { method: 'POST', body: JSON.stringify({ nombre }) });
+}
+
+// Esta función agrega una raza bajo una especie existente y conserva la relación definida por la API.
+export function createBreed(token: string, idEspecie: number, nombre: string): Promise<Raza> {
+  return apiRequest<Raza>(`/especies/${idEspecie}/razas`, token, { method: 'POST', body: JSON.stringify({ nombre }) });
+}
+
+// Esta función consulta eventos reproductivos recientes o el historial asociado a una hembra concreta.
+export function listReproductionEvents(token: string, idAnimal?: number): Promise<ReproductionEvent[]> {
+  return apiRequest<ReproductionEvent[]>(`/reproduccion${idAnimal ? `?id_animal=${idAnimal}` : ''}`, token);
+}
+
+// Esta función registra el evento reproductivo; la API valida sexos, especie y reglas del tipo seleccionado.
+export function createReproductionEvent(token: string, payload: ReproductionEventPayload): Promise<ReproductionEvent> {
+  return apiRequest<ReproductionEvent>('/reproduccion', token, { method: 'POST', body: JSON.stringify(payload) });
+}
+
+// Esta función obtiene el historial de pesajes que respalda el peso actual de una ficha.
+export function listAnimalWeights(token: string, id: number): Promise<AnimalWeight[]> {
+  return apiRequest<AnimalWeight[]>(`/animales/${id}/pesajes`, token);
+}
+
+// Esta función registra una medición, actualiza el peso vigente y devuelve el historial reciente.
+export function createAnimalWeight(token: string, id: number, payload: { peso_kg: number; fecha_pesaje: string; observaciones?: string | null }): Promise<AnimalWeight[]> {
+  return apiRequest<AnimalWeight[]>(`/animales/${id}/pesajes`, token, { method: 'POST', body: JSON.stringify(payload) });
+}
+
+// Esta función lista la trazabilidad de movimientos entre corrales para una ficha individual.
+export function listAnimalMovements(token: string, id: number): Promise<AnimalMovement[]> {
+  return apiRequest<AnimalMovement[]>(`/animales/${id}/movimientos`, token);
 }

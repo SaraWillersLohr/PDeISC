@@ -13,6 +13,7 @@ import especieRoutes from "./routes/especieRoutes";
 import animalRoutes from "./routes/animalRoutes";
 import tratamientoRoutes from "./routes/tratamientoRoutes";
 import notificacionRoutes from "./routes/notificacionRoutes";
+import reproduccionRoutes from "./routes/reproduccionRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import { configurePassport } from './config/passport';
 
@@ -77,6 +78,7 @@ app.use("/api/especies", especieRoutes);
 app.use("/api/animales", animalRoutes);
 app.use("/api/tratamientos", tratamientoRoutes);
 app.use("/api/notificaciones", notificacionRoutes);
+app.use("/api/reproduccion", reproduccionRoutes);
 
 // manejador global de errores
 app.use(errorHandler);

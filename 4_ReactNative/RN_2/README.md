@@ -92,7 +92,7 @@ El stock inicial positivo se registra como una entrada inicial. Las entradas/sal
 
 ## APK con EAS
 
-Configurar antes una URL de API alcanzable por el teléfono en `EXPO_PUBLIC_API_URL`; para distribución fuera de una red local, la API debe tener HTTPS. Luego:
+Antes de compilar, guardá `EXPO_PUBLIC_API_URL` como variable pública del entorno `preview` del proyecto EAS (en el sitio de Expo), con una URL alcanzable por el teléfono. Para un APK instalable usá una API HTTPS. Luego:
 
 ```powershell
 cd frontend
@@ -104,7 +104,7 @@ El perfil `preview` produce APK. El APK contiene solo el cliente móvil: Node.js
 
 ## Escáner, vencimientos y validaciones
 
-La cámara solicita permiso, se bloquea tras una detección mientras consulta la API y ofrece búsqueda manual. Un código no registrado se conserva para iniciar el alta. Cada producto tiene una fecha de vencimiento única y opcional: esta primera versión no contempla lotes con vencimientos distintos ni descuenta stock automáticamente cuando vence. No hay notificaciones push ni sincronización offline.
+La cámara solicita permiso, se bloquea tras una detección mientras consulta la API y ofrece búsqueda manual. Un código no registrado se conserva para iniciar el alta. Cada producto tiene una fecha de vencimiento única y opcional: se carga manualmente con formato `AAAA-MM-DD`; esta primera versión no incluye un selector visual de fecha, lotes con vencimientos distintos ni notificaciones push. No hay sincronización offline.
 
 El backend valida nombre, código, precio, cantidades, categorías y tipo de movimiento. Los errores internos no exponen consultas SQL ni secretos. Esta versión no incluye autenticación y es educativa: restringí la API a una red controlada, no la publiques libremente en Internet.
 

@@ -1,12 +1,120 @@
-import { Link } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
-import { api } from '../../src/services/api';
-import { Dashboard } from '../../src/types';
-import { useTheme } from '../../src/theme/ThemeContext';
+import { Href, Link } from "expo-router";
+import { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useFocusEffect } from "expo-router";
+import { api } from "../../src/services/api";
+import { Dashboard } from "../../src/types";
+import { ThemeColors, useTheme } from "../../src/theme/ThemeContext";
 
 // Muestra indicadores reales que entrega el servidor.
-export default function Home(){const {colors}=useTheme();const [data,setData]=useState<Dashboard|null>(null);const [error,setError]=useState('');const load=useCallback(()=>{api<Dashboard>('/dashboard').then(setData).catch(e=>setError(e.message));},[]);useFocusEffect(useCallback(()=>{load();},[load]));return <ScrollView contentContainerStyle={s.page}><Text style={[s.heading,{color:colors.text}]}>Tu inventario, al día</Text><Text style={{color:colors.muted}}>Resumen de existencias</Text>{error?<Pressable onPress={load}><Text style={{color:colors.danger,marginVertical:16}}>{error} · Tocar para reintentar</Text></Pressable>:!data?<ActivityIndicator style={{margin:28}} color={colors.primary}/>:<View style={s.grid}>{[['Productos activos',data.productos],['Unidades',data.unidades],['Stock bajo',data.stock_bajo],['Por vencer',data.proximos_vencer],['Vencidos',data.vencidos]].map(([label,value])=><View key={String(label)} style={[s.card,{backgroundColor:colors.card,borderColor:colors.border}]}><Text style={{color:colors.muted}}>{label}</Text><Text style={[s.number,{color:colors.text}]}>{value}</Text></View>)}</View>}<View style={s.actions}><Action href="/scanner" label="Escanear producto" colors={colors}/><Action href="/producto-form" label="Registrar producto" colors={colors}/><Action href="/productos" label="Ver inventario" colors={colors}/><Action href="/historial" label="Consultar historial" colors={colors}/></View></ScrollView>}
-function Action({href,label,colors}:any){return <Link href={href} asChild><Pressable style={[s.action,{backgroundColor:colors.primary}]}><Text style={{color:'white',fontWeight:'700'}}>{label}</Text></Pressable></Link>}
-const s=StyleSheet.create({page:{padding:20,paddingBottom:30},heading:{fontSize:27,fontWeight:'800',marginTop:8},grid:{flexDirection:'row',flexWrap:'wrap',gap:12,marginTop:22},card:{flexGrow:1,minWidth:'45%',borderWidth:1,borderRadius:18,padding:16},number:{fontSize:30,fontWeight:'800',marginTop:10},actions:{gap:10,marginTop:24},action:{minHeight:52,borderRadius:14,alignItems:'center',justifyContent:'center'}});
+export default function Home() {
+  const { colors } = useTheme();
+  const [data, setData] = useState<Dashboard | null>(null);
+  const [error, setError] = useState("");
+  // Consulta nuevamente los contadores cada vez que se abre la pantalla.
+  const load = useCallback(() => {
+    api<Dashboard>("/dashboard")
+      .then(setData)
+      .catch((e) => setError(e.message));
+  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
+  return (
+    <ScrollView contentContainerStyle={s.page}>
+      <Text style={[s.heading, { color: colors.text }]}>
+        Tu inventario, al día
+      </Text>
+      <Text style={{ color: colors.muted }}>Resumen de existencias</Text>
+      {/* Si no hay datos todavía, muestra carga o el mensaje de error correspondiente. */}
+      {error ? (
+        <Pressable onPress={load}>
+          <Text style={{ color: colors.danger, marginVertical: 16 }}>
+            {error} · Tocar para reintentar
+          </Text>
+        </Pressable>
+      ) : !data ? (
+        <ActivityIndicator style={{ margin: 28 }} color={colors.primary} />
+      ) : (
+        <View style={s.grid}>
+          {[
+            ["Productos activos", data.productos],
+            ["Unidades", data.unidades],
+            ["Stock bajo", data.stock_bajo],
+            ["Por vencer", data.proximos_vencer],
+            ["Vencidos", data.vencidos],
+          ].map(([label, value]) => (
+            <View
+              key={String(label)}
+              style={[
+                s.card,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Text style={{ color: colors.muted }}>{label}</Text>
+              <Text style={[s.number, { color: colors.text }]}>{value}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      <View style={s.actions}>
+        <Action href="/scanner" label="Escanear producto" colors={colors} />
+        <Action
+          href="/producto-form"
+          label="Registrar producto"
+          colors={colors}
+        />
+        <Action href="/productos" label="Ver inventario" colors={colors} />
+        <Action href="/historial" label="Consultar historial" colors={colors} />
+      </View>
+    </ScrollView>
+  );
+}
+// Crea un botón de acceso directo que navega a otra pantalla.
+function Action({
+  href,
+  label,
+  colors,
+}: {
+  href: Href;
+  label: string;
+  colors: ThemeColors;
+}) {
+  return (
+    <Link href={href} asChild>
+      <Pressable style={[s.action, { backgroundColor: colors.primary }]}>
+        <Text style={{ color: "white", fontWeight: "700" }}>{label}</Text>
+      </Pressable>
+    </Link>
+  );
+}
+// Agrupa los estilos del panel y sus tarjetas de estadísticas.
+const s = StyleSheet.create({
+  page: { padding: 20, paddingBottom: 30 },
+  heading: { fontSize: 27, fontWeight: "800", marginTop: 8 },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 22 },
+  card: {
+    flexGrow: 1,
+    minWidth: "45%",
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 16,
+  },
+  number: { fontSize: 30, fontWeight: "800", marginTop: 10 },
+  actions: { gap: 10, marginTop: 24 },
+  action: {
+    minHeight: 52,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

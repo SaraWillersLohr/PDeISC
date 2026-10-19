@@ -1,13 +1,286 @@
-import { Link, router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
-import { CustomModal } from '../../src/components/CustomModal';
-import { ScrollToTopButton } from '../../src/components/ScrollToTopButton';
-import { api } from '../../src/services/api';
-import { Category, Product } from '../../src/types';
-import { useTheme } from '../../src/theme/ThemeContext';
+import { Link, router } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useFocusEffect } from "expo-router";
+import { CustomModal } from "../../src/components/CustomModal";
+import { ScrollToTopButton } from "../../src/components/ScrollToTopButton";
+import { api } from "../../src/services/api";
+import { Category, Product } from "../../src/types";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 // Lista, busca y filtra productos activos y permite eliminarlos en grupo.
-export default function Products(){const {colors}=useTheme();const [items,setItems]=useState<Product[]>([]),[categories,setCategories]=useState<Category[]>([]),[query,setQuery]=useState(''),[category,setCategory]=useState(0),[selected,setSelected]=useState<number[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[modal,setModal]=useState(false),[offset,setOffset]=useState(0);const list=useRef<FlatList<Product>>(null);const load=useCallback(async()=>{setLoading(true);try{const [p,c]=await Promise.all([api<Product[]>('/productos'),api<Category[]>('/categorias')]);setItems(p);setCategories(c);setError('');}catch(e){setError((e as Error).message);}finally{setLoading(false);}},[]);useFocusEffect(useCallback(()=>{void load();},[load]));const visible=useMemo(()=>items.filter(p=>(!category||String(p.categorias||'').split(', ').includes(categories.find(c=>c.id===category)?.nombre||''))&&`${p.nombre} ${p.codigo}`.toLowerCase().includes(query.toLowerCase())),[items,category,categories,query]);useEffect(()=>setSelected([]),[category,query]);const toggle=(id:number)=>setSelected(v=>v.includes(id)?v.filter(x=>x!==id):[...v,id]);const remove=async()=>{try{await api('/productos/eliminar-multiples',{method:'POST',body:JSON.stringify({ids:selected})});setSelected([]);setModal(false);await load();}catch(e){setError((e as Error).message);setModal(false);}};return <View style={[s.page,{backgroundColor:colors.background}]}><TextInput placeholder="Buscar producto o código" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} style={[s.search,{color:colors.text,borderColor:colors.border,backgroundColor:colors.card}]}/><FlatList horizontal showsHorizontalScrollIndicator={false} data={[{id:0,nombre:'Todos'},...categories]} keyExtractor={x=>String(x.id)} style={{maxHeight:50,flexGrow:0}} renderItem={({item})=><Pressable onPress={()=>setCategory(item.id)} style={[s.chip,{backgroundColor:category===item.id?colors.primary:colors.card,borderColor:colors.border}]}><Text style={{color:category===item.id?'white':colors.text}}>{item.nombre}</Text></Pressable>}/><View style={s.toolbar}><Text style={{color:colors.muted}}>{selected.length} seleccionados</Text><Pressable onPress={()=>setSelected(selected.length===visible.length?[]:visible.map(x=>x.id))}><Text style={{color:colors.primary}}>Seleccionar todos</Text></Pressable>{selected.length>0&&<Pressable onPress={()=>setModal(true)}><Text style={{color:colors.danger}}>Eliminar</Text></Pressable>}</View>{error?<Pressable onPress={()=>void load()}><Text style={{color:colors.danger,padding:12}}>{error} · Reintentar</Text></Pressable>:null}{loading?<ActivityIndicator color={colors.primary}/>:<FlatList ref={list} data={visible} keyExtractor={x=>String(x.id)} contentContainerStyle={{paddingBottom:90}} onScroll={e=>setOffset(e.nativeEvent.contentOffset.y)} scrollEventThrottle={16} ListEmptyComponent={<Text style={{color:colors.muted,padding:20}}>No hay productos para mostrar.</Text>} renderItem={({item})=><View style={[s.card,{backgroundColor:colors.card,borderColor:colors.border}]}><Pressable onLongPress={()=>toggle(item.id)} onPress={()=>selected.length?toggle(item.id):router.push(`/producto/${item.id}`)} style={{flex:1}}><Text style={[s.name,{color:colors.text}]}>{item.nombre}</Text><Text style={{color:colors.muted}}>Código {item.codigo} · Stock {item.stock_actual}</Text>{item.stock_actual<=item.stock_minimo&&<Text style={{color:colors.warning}}>Stock bajo</Text>}{item.fecha_vencimiento&&<Text style={{color:colors.muted}}>Vence {String(item.fecha_vencimiento).slice(0,10)}</Text>}</Pressable><Pressable onPress={()=>toggle(item.id)} accessibilityLabel="Seleccionar producto"><Text style={{color:colors.primary,fontSize:22}}>{selected.includes(item.id)?'☑':'□'}</Text></Pressable></View>}/>}<Link href="/producto-form" asChild><Pressable style={[s.fab,{backgroundColor:colors.primary}]}><Text style={{color:'white',fontSize:24}}>＋</Text></Pressable></Link><ScrollToTopButton visible={offset>300} onPress={()=>list.current?.scrollToOffset({offset:0,animated:true})}/><CustomModal visible={modal} title="¿Eliminar los productos seleccionados?" message={`Se desactivarán ${selected.length} productos. El historial se conservará.`} onClose={()=>setModal(false)} onConfirm={()=>void remove()} confirmText="Eliminar productos"/></View>}
-const s=StyleSheet.create({page:{flex:1,paddingHorizontal:14,paddingTop:10},search:{borderWidth:1,borderRadius:12,paddingHorizontal:14,minHeight:46,marginBottom:10},chip:{paddingHorizontal:15,paddingVertical:10,borderRadius:18,borderWidth:1,marginRight:8},toolbar:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingVertical:12,flexWrap:'wrap',gap:8},card:{borderWidth:1,borderRadius:15,padding:14,marginBottom:9,flexDirection:'row',alignItems:'center',gap:12},name:{fontSize:17,fontWeight:'700',marginBottom:4},fab:{position:'absolute',right:18,bottom:18,width:58,height:58,borderRadius:30,justifyContent:'center',alignItems:'center',elevation:4}});
+export default function Products() {
+  const { colors } = useTheme();
+  const [items, setItems] = useState<Product[]>([]),
+    [categories, setCategories] = useState<Category[]>([]),
+    [query, setQuery] = useState(""),
+    [category, setCategory] = useState(0),
+    [selected, setSelected] = useState<number[]>([]),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState(""),
+    [modal, setModal] = useState(false),
+    [offset, setOffset] = useState(0);
+  const list = useRef<FlatList<Product>>(null);
+  // Obtiene productos y categorías en paralelo para actualizar pestañas y resultados.
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [p, c] = await Promise.all([
+        api<Product[]>("/productos"),
+        api<Category[]>("/categorias"),
+      ]);
+      setItems(p);
+      setCategories(c);
+      setError("");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
+  // Aplica al listado la categoría activa y el texto escrito en el buscador.
+  const visible = useMemo(
+    () =>
+      items.filter(
+        (p) =>
+          (!category ||
+            String(p.categorias || "")
+              .split(", ")
+              .includes(
+                categories.find((c) => c.id === category)?.nombre || "",
+              )) &&
+          `${p.nombre} ${p.codigo}`.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [items, category, categories, query],
+  );
+  useEffect(() => setSelected([]), [category, query]);
+  // Alterna la selección del producto mediante su identificador interno.
+  const toggle = (id: number) =>
+    setSelected((v) =>
+      v.includes(id) ? v.filter((x) => x !== id) : [...v, id],
+    );
+  // Desactiva los productos seleccionados y vuelve a cargar el inventario.
+  const remove = async () => {
+    try {
+      await api("/productos/eliminar-multiples", {
+        method: "POST",
+        body: JSON.stringify({ ids: selected }),
+      });
+      setSelected([]);
+      setModal(false);
+      await load();
+    } catch (e) {
+      setError((e as Error).message);
+      setModal(false);
+    }
+  };
+  return (
+    <View style={[s.page, { backgroundColor: colors.background }]}>
+      <TextInput
+        placeholder="Buscar producto o código"
+        placeholderTextColor={colors.muted}
+        value={query}
+        onChangeText={setQuery}
+        style={[
+          s.search,
+          {
+            color: colors.text,
+            borderColor: colors.border,
+            backgroundColor: colors.card,
+          },
+        ]}
+      />
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={[{ id: 0, nombre: "Todos" }, ...categories]}
+        keyExtractor={(x) => String(x.id)}
+        style={{ maxHeight: 50, flexGrow: 0 }}
+        renderItem={({ item }) => (
+          <Pressable
+            onPress={() => setCategory(item.id)}
+            style={[
+              s.chip,
+              {
+                backgroundColor:
+                  category === item.id ? colors.primary : colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Text
+              style={{ color: category === item.id ? "white" : colors.text }}
+            >
+              {item.nombre}
+            </Text>
+          </Pressable>
+        )}
+      />
+      <View style={s.toolbar}>
+        <Text style={{ color: colors.muted }}>
+          {selected.length} seleccionados
+        </Text>
+        <Pressable
+          onPress={() =>
+            setSelected(
+              selected.length === visible.length
+                ? []
+                : visible.map((x) => x.id),
+            )
+          }
+        >
+          <Text style={{ color: colors.primary }}>Seleccionar todos</Text>
+        </Pressable>
+        {selected.length > 0 && (
+          <Pressable onPress={() => setModal(true)}>
+            <Text style={{ color: colors.danger }}>Eliminar</Text>
+          </Pressable>
+        )}
+      </View>
+      {error ? (
+        <Pressable onPress={() => void load()}>
+          <Text style={{ color: colors.danger, padding: 12 }}>
+            {error} · Reintentar
+          </Text>
+        </Pressable>
+      ) : null}
+      {loading ? (
+        <ActivityIndicator color={colors.primary} />
+      ) : (
+        <FlatList
+          ref={list}
+          data={visible}
+          keyExtractor={(x) => String(x.id)}
+          contentContainerStyle={{ paddingBottom: 90 }}
+          onScroll={(e) => setOffset(e.nativeEvent.contentOffset.y)}
+          scrollEventThrottle={16}
+          ListEmptyComponent={
+            <Text style={{ color: colors.muted, padding: 20 }}>
+              No hay productos para mostrar.
+            </Text>
+          }
+          renderItem={({ item }) => (
+            <View
+              style={[
+                s.card,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Pressable
+                onLongPress={() => toggle(item.id)}
+                onPress={() =>
+                  selected.length
+                    ? toggle(item.id)
+                    : router.push(`/producto/${item.id}`)
+                }
+                style={{ flex: 1 }}
+              >
+                <Text style={[s.name, { color: colors.text }]}>
+                  {item.nombre}
+                </Text>
+                <Text style={{ color: colors.muted }}>
+                  Código {item.codigo} · Stock {item.stock_actual}
+                </Text>
+                {item.stock_actual <= item.stock_minimo && (
+                  <Text style={{ color: colors.warning }}>Stock bajo</Text>
+                )}
+                {item.fecha_vencimiento && (
+                  <Text style={{ color: colors.muted }}>
+                    Vence {String(item.fecha_vencimiento).slice(0, 10)}
+                  </Text>
+                )}
+              </Pressable>
+              <Pressable
+                onPress={() => toggle(item.id)}
+                accessibilityLabel="Seleccionar producto"
+              >
+                <Text style={{ color: colors.primary, fontSize: 22 }}>
+                  {selected.includes(item.id) ? "☑" : "□"}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        />
+      )}
+      <Link href="/producto-form" asChild>
+        <Pressable style={[s.fab, { backgroundColor: colors.primary }]}>
+          <Text style={{ color: "white", fontSize: 24 }}>＋</Text>
+        </Pressable>
+      </Link>
+      <ScrollToTopButton
+        visible={offset > 300}
+        onPress={() =>
+          list.current?.scrollToOffset({ offset: 0, animated: true })
+        }
+      />
+      <CustomModal
+        visible={modal}
+        title="¿Eliminar los productos seleccionados?"
+        message={`Se desactivarán ${selected.length} productos. El historial se conservará.`}
+        onClose={() => setModal(false)}
+        onConfirm={() => void remove()}
+        confirmText="Eliminar productos"
+      />
+    </View>
+  );
+}
+// Agrupa los estilos de búsqueda, filtros, tarjetas y botón flotante.
+const s = StyleSheet.create({
+  page: { flex: 1, paddingHorizontal: 14, paddingTop: 10 },
+  search: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    minHeight: 46,
+    marginBottom: 10,
+  },
+  chip: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginRight: 8,
+  },
+  toolbar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  card: {
+    borderWidth: 1,
+    borderRadius: 15,
+    padding: 14,
+    marginBottom: 9,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  name: { fontSize: 17, fontWeight: "700", marginBottom: 4 },
+  fab: {
+    position: "absolute",
+    right: 18,
+    bottom: 18,
+    width: 58,
+    height: 58,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 4,
+  },
+});

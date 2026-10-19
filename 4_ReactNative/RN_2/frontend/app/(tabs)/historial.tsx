@@ -1,11 +1,118 @@
-import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
-import { ScrollToTopButton } from '../../src/components/ScrollToTopButton';
-import { api } from '../../src/services/api';
-import { Movement } from '../../src/types';
-import { useTheme } from '../../src/theme/ThemeContext';
+import { useCallback, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useFocusEffect } from "expo-router";
+import { ScrollToTopButton } from "../../src/components/ScrollToTopButton";
+import { api } from "../../src/services/api";
+import { Movement } from "../../src/types";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 // Muestra los movimientos más recientes y permite reintentar la consulta.
-export default function History(){const {colors}=useTheme();const [rows,setRows]=useState<Movement[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState(true),[offset,setOffset]=useState(0);const list=useRef<FlatList<Movement>>(null);const load=useCallback(()=>{setBusy(true);api<Movement[]>('/movimientos').then(setRows).catch(e=>setError(e.message)).finally(()=>setBusy(false));},[]);useFocusEffect(useCallback(()=>{load();},[load]));return <View style={s.page}>{error?<Pressable onPress={load}><Text style={{color:colors.danger,padding:12}}>{error} · Reintentar</Text></Pressable>:null}{busy?<ActivityIndicator color={colors.primary}/>:<FlatList ref={list} data={rows} keyExtractor={x=>String(x.id)} onScroll={e=>setOffset(e.nativeEvent.contentOffset.y)} scrollEventThrottle={16} contentContainerStyle={{padding:14,paddingBottom:80}} ListEmptyComponent={<Text style={{color:colors.muted}}>Todavía no hay movimientos.</Text>} renderItem={({item})=><View style={[s.card,{backgroundColor:colors.card,borderColor:colors.border}]}><View style={{flex:1}}><Text style={{color:colors.text,fontWeight:'700'}}>{item.producto}</Text><Text style={{color:colors.muted}}>{new Date(item.created_at).toLocaleString()}</Text><Text style={{color:colors.muted}}>Saldo {item.stock_anterior} → {item.stock_posterior}</Text></View><View style={[s.badge,{backgroundColor:item.tipo==='entrada'?'#16834A':'#C83B3B'}]}><Text style={{color:'white',fontWeight:'700'}}>{item.tipo} · {item.cantidad}</Text></View></View>}/>}<ScrollToTopButton visible={offset>300} onPress={()=>list.current?.scrollToOffset({offset:0,animated:true})}/></View>}
-const s=StyleSheet.create({page:{flex:1},card:{borderWidth:1,borderRadius:14,padding:14,marginBottom:10,flexDirection:'row',alignItems:'center',gap:10},badge:{paddingHorizontal:10,paddingVertical:8,borderRadius:10}});
+export default function History() {
+  const { colors } = useTheme();
+  const [rows, setRows] = useState<Movement[]>([]),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(true),
+    [offset, setOffset] = useState(0);
+  const list = useRef<FlatList<Movement>>(null);
+  // Vuelve a consultar los movimientos cada vez que se abre la pestaña.
+  const load = useCallback(() => {
+    setBusy(true);
+    api<Movement[]>("/movimientos")
+      .then(setRows)
+      .catch((e) => setError(e.message))
+      .finally(() => setBusy(false));
+  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
+  return (
+    <View style={s.page}>
+      {error ? (
+        <Pressable onPress={load}>
+          <Text style={{ color: colors.danger, padding: 12 }}>
+            {error} · Reintentar
+          </Text>
+        </Pressable>
+      ) : null}
+      {busy ? (
+        <ActivityIndicator color={colors.primary} />
+      ) : (
+        <FlatList
+          ref={list}
+          data={rows}
+          keyExtractor={(x) => String(x.id)}
+          onScroll={(e) => setOffset(e.nativeEvent.contentOffset.y)}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ padding: 14, paddingBottom: 80 }}
+          ListEmptyComponent={
+            <Text style={{ color: colors.muted }}>
+              Todavía no hay movimientos.
+            </Text>
+          }
+          renderItem={({ item }) => (
+            <View
+              style={[
+                s.card,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: colors.text, fontWeight: "700" }}>
+                  {item.producto}
+                </Text>
+                <Text style={{ color: colors.muted }}>
+                  {new Date(item.created_at).toLocaleString()}
+                </Text>
+                <Text style={{ color: colors.muted }}>
+                  Saldo {item.stock_anterior} → {item.stock_posterior}
+                </Text>
+              </View>
+              <View
+                style={[
+                  s.badge,
+                  {
+                    backgroundColor:
+                      item.tipo === "entrada" ? "#16834A" : "#C83B3B",
+                  },
+                ]}
+              >
+                <Text style={{ color: "white", fontWeight: "700" }}>
+                  {item.tipo} · {item.cantidad}
+                </Text>
+              </View>
+            </View>
+          )}
+        />
+      )}
+      <ScrollToTopButton
+        visible={offset > 300}
+        onPress={() =>
+          list.current?.scrollToOffset({ offset: 0, animated: true })
+        }
+      />
+    </View>
+  );
+}
+// Agrupa los estilos del listado y sus etiquetas de entrada/salida.
+const s = StyleSheet.create({
+  page: { flex: 1 },
+  card: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  badge: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10 },
+});

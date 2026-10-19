@@ -22,6 +22,12 @@ frontend/  aplicación móvil Expo
 backend/   API Express y scripts SQL
 ```
 
+`frontend/app/+html.tsx` es un archivo especial de Expo Router para el HTML base de la versión web. Ajusta el idioma, la etiqueta de pantalla, el desplazamiento y el color de fondo antes de que cargue la interfaz. No es una pantalla de navegación y no participa en Android ni iOS; está incluido porque lo genera la plantilla oficial de Expo.
+
+`frontend/app/+not-found.tsx` es la pantalla de respaldo que Expo Router muestra cuando alguien abre una ruta que no existe. El prefijo `+` identifica archivos especiales del enrutador. El archivo `_layout.tsx` configura la navegación y `(tabs)` agrupa las cinco pestañas sin agregar ese nombre a las rutas visibles.
+
+`frontend/app.json` define el nombre, el identificador Android y los permisos de cámara. `frontend/eas.json` indica a EAS que el perfil `preview` genere un APK. JSON no admite comentarios dentro del archivo; por eso estas decisiones se explican aquí y no se agregan comentarios que invaliden su formato.
+
 ## Requisitos
 
 Node.js 22.13 o superior, npm, un servidor MariaDB accesible desde la computadora y HeidiSQL u otro cliente SQL. Para APK se necesita una cuenta Expo y EAS CLI.

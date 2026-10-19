@@ -1,6 +1,8 @@
+-- Crea y selecciona la base propia de ScanStock sin afectar otras bases.
 CREATE DATABASE IF NOT EXISTS scanstock CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE scanstock;
 
+-- Guarda los datos generales y el saldo vigente de cada producto.
 CREATE TABLE IF NOT EXISTS productos (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   codigo VARCHAR(100) NOT NULL UNIQUE,
@@ -18,6 +20,7 @@ CREATE TABLE IF NOT EXISTS productos (
   INDEX idx_productos_activo_nombre (activo, nombre), INDEX idx_productos_vencimiento (fecha_vencimiento)
 ) ENGINE=InnoDB;
 
+-- Mantiene nombres únicos sin importar mayúsculas ni espacios equivalentes.
 CREATE TABLE IF NOT EXISTS categorias (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(80) NOT NULL,
@@ -25,6 +28,7 @@ CREATE TABLE IF NOT EXISTS categorias (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- Relaciona productos y categorías con una asociación por cada par.
 CREATE TABLE IF NOT EXISTS producto_categorias (
   producto_id INT UNSIGNED NOT NULL,
   categoria_id INT UNSIGNED NOT NULL,
@@ -33,6 +37,7 @@ CREATE TABLE IF NOT EXISTS producto_categorias (
   CONSTRAINT fk_pc_categoria FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- Conserva cada cambio de stock, incluso si el producto se desactiva.
 CREATE TABLE IF NOT EXISTS movimientos (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   producto_id INT UNSIGNED NOT NULL,

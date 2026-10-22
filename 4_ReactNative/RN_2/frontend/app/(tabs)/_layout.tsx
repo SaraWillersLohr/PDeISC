@@ -1,8 +1,10 @@
 import { Tabs } from "expo-router";
-import { colors } from "../../src/theme/colors";
+import { useAppTheme } from "../../src/theme/useAppTheme";
 
 // Mantiene una sola pestaña principal porque el catálogo es la entrada de la app.
 export default function CatalogTabs() {
+  const { colors } = useAppTheme();
+
   return (
     <Tabs screenOptions={{
       headerStyle: { backgroundColor: colors.paper },

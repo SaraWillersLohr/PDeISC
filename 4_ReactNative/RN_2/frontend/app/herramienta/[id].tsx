@@ -5,8 +5,10 @@ import * as Location from "expo-location";
 import { Stack, useLocalSearchParams, useIsFocused } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ThemeToggle } from "../../src/components/ThemeToggle";
 import { functions, type FunctionId } from "../../src/data/functions";
-import { colors } from "../../src/theme/colors";
+import type { AppColors } from "../../src/theme/colors";
+import { useAppTheme } from "../../src/theme/useAppTheme";
 
 // Define una forma común para mostrar las tres coordenadas de cada sensor.
 type Axes = { x: number; y: number; z: number };
@@ -18,6 +20,8 @@ function errorText(error: unknown) {
 
 // Muestra una demostración de hardware y mantiene su estado dentro de la ficha elegida.
 export default function FunctionScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
   const { id } = useLocalSearchParams<{ id: string }>();
   const focused = useIsFocused();
   const selected = functions.find((item) => item.id === id);
@@ -187,7 +191,10 @@ export default function FunctionScreen() {
       <Stack.Screen options={{ title: selected.title }} />
       <ScrollView style={styles.screen} contentContainerStyle={styles.page}>
         {/* Explica qué función del dispositivo se puede probar en esta ficha. */}
-        <Text style={styles.eyebrow}>{selected.category}</Text>
+        <View style={styles.pageTop}>
+          <Text style={styles.eyebrow}>{selected.category}</Text>
+          <ThemeToggle />
+        </View>
         <Text style={styles.pageTitle}>{selected.title}</Text>
         <Text style={styles.body}>{selected.summary}</Text>
 
@@ -198,7 +205,7 @@ export default function FunctionScreen() {
               {!permission ? <ActivityIndicator color={colors.accent} /> : !permission.granted ? (
                 <View style={styles.permissionBox}>
                   <Text style={styles.body}>Se necesita permiso para usar la cámara.</Text>
-                  <ActionButton label="Permitir cámara" onPress={() => void askCameraPermission()} />
+                  <ActionButton styles={styles} colors={colors} label="Permitir cámara" onPress={() => void askCameraPermission()} />
                 </View>
               ) : focused ? (
                 <>
@@ -217,14 +224,14 @@ export default function FunctionScreen() {
                   </View>
                   {functionId === "camara" ? (
                     <View style={styles.buttonRow}>
-                      <ActionButton label={torchEnabled ? "Apagar flash" : "Encender flash"} kind="secondary" onPress={() => setTorchEnabled((value) => !value)} />
-                      <ActionButton label="Tomar foto" onPress={() => void takePhoto()} />
+                      <ActionButton styles={styles} colors={colors} label={torchEnabled ? "Apagar flash" : "Encender flash"} kind="secondary" onPress={() => setTorchEnabled((value) => !value)} />
+                      <ActionButton styles={styles} colors={colors} label="Tomar foto" onPress={() => void takePhoto()} />
                     </View>
                   ) : (
                     <>
                       <Text style={styles.helper}>{codeResult ? "Código leído:" : cameraReady ? "Centrá el código dentro del marco y mantené el teléfono quieto." : "Preparando la cámara…"}</Text>
                       {codeResult ? <Text selectable style={styles.result}>{codeResult}</Text> : null}
-                      <ActionButton label="Leer otro código" kind="secondary" onPress={() => setCodeResult("")} />
+                      <ActionButton styles={styles} colors={colors} label="Leer otro código" kind="secondary" onPress={() => setCodeResult("")} />
                     </>
                   )}
                 </>
@@ -235,12 +242,12 @@ export default function FunctionScreen() {
 
           {functionId === "ubicacion" && (
             <>
-              <ActionButton label={loading ? "Buscando ubicación…" : "Obtener ubicación actual"} disabled={loading} onPress={() => void readLocation()} />
+              <ActionButton styles={styles} colors={colors} label={loading ? "Buscando ubicación…" : "Obtener ubicación actual"} disabled={loading} onPress={() => void readLocation()} />
               {coordinates && (
                 <View style={styles.dataCard}>
-                  <DataLine label="Latitud" value={coordinates.coords.latitude.toFixed(6)} />
-                  <DataLine label="Longitud" value={coordinates.coords.longitude.toFixed(6)} />
-                  <DataLine label="Precisión" value={`±${Math.round(coordinates.coords.accuracy ?? 0)} m`} />
+                  <DataLine styles={styles} label="Latitud" value={coordinates.coords.latitude.toFixed(6)} />
+                  <DataLine styles={styles} label="Longitud" value={coordinates.coords.longitude.toFixed(6)} />
+                  <DataLine styles={styles} label="Precisión" value={`±${Math.round(coordinates.coords.accuracy ?? 0)} m`} />
                 </View>
               )}
             </>
@@ -248,29 +255,29 @@ export default function FunctionScreen() {
 
           {functionId === "movimiento" && (
             <>
-              <ToggleButton active={sensorsRunning} onPress={() => { setMessage(""); setSensorsRunning((value) => !value); }} />
-              {sensorsRunning && <><AxesCard title="Acelerómetro" axes={accelerometer} unit="g" /><AxesCard title="Giroscopio" axes={gyroscope} unit="rad/s" /></>}
+              <ToggleButton styles={styles} colors={colors} active={sensorsRunning} onPress={() => { setMessage(""); setSensorsRunning((value) => !value); }} />
+              {sensorsRunning && <><AxesCard styles={styles} title="Acelerómetro" axes={accelerometer} unit="g" /><AxesCard styles={styles} title="Giroscopio" axes={gyroscope} unit="rad/s" /></>}
             </>
           )}
 
           {functionId === "brujula" && (
             <>
-              <ToggleButton active={sensorsRunning} onPress={() => { setMessage(""); setSensorsRunning((value) => !value); }} />
-              {sensorsRunning && <Compass heading={headingDegrees} axes={magnetometer} />}
+              <ToggleButton styles={styles} colors={colors} active={sensorsRunning} onPress={() => { setMessage(""); setSensorsRunning((value) => !value); }} />
+              {sensorsRunning && <Compass styles={styles} heading={headingDegrees} axes={magnetometer} />}
             </>
           )}
 
           {functionId === "pasos" && (
             <>
-              <ToggleButton active={sensorsRunning} onPress={() => { setMessage(""); setSteps(null); setSensorsRunning((value) => !value); }} />
+              <ToggleButton styles={styles} colors={colors} active={sensorsRunning} onPress={() => { setMessage(""); setSteps(null); setSensorsRunning((value) => !value); }} />
               {sensorsRunning && <View style={styles.stepCard}><Text style={styles.stepNumber}>{steps ?? 0}</Text><Text style={styles.body}>pasos detectados desde que iniciaste esta prueba</Text></View>}
             </>
           )}
 
           {functionId === "biometria" && (
             <>
-              <ActionButton label={loading ? "Comprobando…" : "Comprobar biometría"} disabled={loading} onPress={() => void checkBiometrics()} />
-              {message.startsWith("Métodos configurados") && <ActionButton label={loading ? "Esperando…" : "Probar autenticación"} disabled={loading} onPress={() => void authenticate()} />}
+              <ActionButton styles={styles} colors={colors} label={loading ? "Comprobando…" : "Comprobar biometría"} disabled={loading} onPress={() => void checkBiometrics()} />
+              {message.startsWith("Métodos configurados") && <ActionButton styles={styles} colors={colors} label={loading ? "Esperando…" : "Probar autenticación"} disabled={loading} onPress={() => void authenticate()} />}
             </>
           )}
         </View>
@@ -284,27 +291,29 @@ export default function FunctionScreen() {
 }
 
 // Reutiliza un botón accesible con el mismo estilo en todas las demostraciones.
-function ActionButton({ label, onPress, kind = "primary", disabled = false }: { label: string; onPress: () => void; kind?: "primary" | "secondary"; disabled?: boolean }) {
-  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, kind === "secondary" && styles.buttonSecondary, disabled && styles.disabled, pressed && !disabled && styles.pressed]}><Text style={[styles.buttonText, kind === "secondary" && styles.buttonSecondaryText]}>{label}</Text></Pressable>;
+type ThemeStyles = ReturnType<typeof createStyles>;
+
+function ActionButton({ styles, colors, label, onPress, kind = "primary", disabled = false }: { styles: ThemeStyles; colors: AppColors; label: string; onPress: () => void; kind?: "primary" | "secondary"; disabled?: boolean }) {
+  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, kind === "secondary" && styles.buttonSecondary, disabled && styles.disabled, pressed && !disabled && styles.pressed]}><Text style={[styles.buttonText, kind === "secondary" && { color: colors.accent }]}>{label}</Text></Pressable>;
 }
 
 // Ofrece un control común para iniciar y detener las lecturas de sensores.
-function ToggleButton({ active, onPress }: { active: boolean; onPress: () => void }) {
-  return <ActionButton label={active ? "Detener lectura" : "Iniciar lectura"} kind={active ? "secondary" : "primary"} onPress={onPress} />;
+function ToggleButton({ styles, colors, active, onPress }: { styles: ThemeStyles; colors: AppColors; active: boolean; onPress: () => void }) {
+  return <ActionButton styles={styles} colors={colors} label={active ? "Detener lectura" : "Iniciar lectura"} kind={active ? "secondary" : "primary"} onPress={onPress} />;
 }
 
 // Formatea las tres lecturas en vivo del acelerómetro, giroscopio o magnetómetro.
-function AxesCard({ title, axes, unit }: { title: string; axes: Axes; unit: string }) {
+function AxesCard({ styles, title, axes, unit }: { styles: ThemeStyles; title: string; axes: Axes; unit: string }) {
   return <View style={styles.dataCard}><Text style={styles.dataTitle}>{title}</Text><Text style={styles.axes}>{`X  ${axes.x.toFixed(2)}   Y  ${axes.y.toFixed(2)}   Z  ${axes.z.toFixed(2)} ${unit}`}</Text></View>;
 }
 
 // Alinea cada etiqueta con su valor para coordenadas y precisión.
-function DataLine({ label, value }: { label: string; value: string }) {
+function DataLine({ styles, label, value }: { styles: ThemeStyles; label: string; value: string }) {
   return <View style={styles.dataLine}><Text style={styles.dataLabel}>{label}</Text><Text selectable style={styles.dataValue}>{value}</Text></View>;
 }
 
 // Dibuja una brújula circular y gira la aguja hacia el norte magnético.
-function Compass({ heading, axes }: { heading: number | null; axes: Axes }) {
+function Compass({ styles, heading, axes }: { styles: ThemeStyles; heading: number | null; axes: Axes }) {
   const direction = heading === null ? "--" : `${Math.round(heading)}°`;
   return (
     <View style={styles.compassCard}>
@@ -321,16 +330,18 @@ function Compass({ heading, axes }: { heading: number | null; axes: Axes }) {
       </View>
       <Text style={styles.headingValue}>{direction}</Text>
       <Text style={styles.helper}>Norte magnético</Text>
-      <AxesCard title="Magnetómetro" axes={axes} unit="µT" />
+          <AxesCard styles={styles} title="Magnetómetro" axes={axes} unit="µT" />
     </View>
   );
 }
 
-// Mantiene los controles legibles en teléfonos, tabletas y vistas web.
-const styles = StyleSheet.create({
+// Mantiene legibles los controles en móvil y aprovecha el espacio de escritorio.
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  page: { padding: 20, paddingBottom: 38, width: "100%", maxWidth: 900, alignSelf: "center" },
+  page: { padding: 20, paddingBottom: 38, width: "100%", maxWidth: 960, alignSelf: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center", gap: 12, padding: 24, backgroundColor: colors.background },
+  pageTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 },
   eyebrow: { color: colors.accent, fontSize: 11, fontWeight: "800", letterSpacing: 1.3 },
   pageTitle: { color: colors.ink, fontSize: 27, lineHeight: 34, fontWeight: "800", marginTop: 7 },
   body: { color: colors.muted, fontSize: 15, lineHeight: 23, marginTop: 8 },
@@ -341,7 +352,7 @@ const styles = StyleSheet.create({
   buttonRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   button: { minHeight: 50, paddingHorizontal: 17, borderRadius: 14, backgroundColor: colors.accent, alignItems: "center", justifyContent: "center", flexGrow: 1 },
   buttonSecondary: { backgroundColor: colors.paper, borderColor: colors.line, borderWidth: 1 },
-  buttonText: { color: "white", fontSize: 14, fontWeight: "800", textAlign: "center" },
+  buttonText: { color: colors.background, fontSize: 14, fontWeight: "800", textAlign: "center" },
   buttonSecondaryText: { color: colors.accent },
   disabled: { opacity: 0.55 },
   pressed: { opacity: 0.78 },
@@ -368,6 +379,7 @@ const styles = StyleSheet.create({
   headingValue: { color: colors.ink, fontSize: 28, fontWeight: "900", fontVariant: ["tabular-nums"] },
   stepCard: { alignItems: "center", padding: 24, borderRadius: 18, backgroundColor: colors.hero },
   stepNumber: { color: colors.accent, fontSize: 56, fontWeight: "800" },
-  message: { color: colors.warning, marginTop: 14, padding: 13, borderRadius: 12, backgroundColor: "#FFF3E6", lineHeight: 21 },
+  message: { color: colors.warning, marginTop: 14, padding: 13, borderRadius: 12, backgroundColor: colors.warningBackground, lineHeight: 21 },
   disclaimer: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 24 },
-});
+  });
+}

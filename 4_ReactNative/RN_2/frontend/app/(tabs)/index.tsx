@@ -1,20 +1,27 @@
 import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { ThemeToggle } from "../../src/components/ThemeToggle";
 import { functions } from "../../src/data/functions";
-import { colors } from "../../src/theme/colors";
+import type { AppColors } from "../../src/theme/colors";
+import { useAppTheme } from "../../src/theme/useAppTheme";
 
 // Presenta el catálogo principal y ajusta la cantidad de columnas al ancho disponible.
 export default function CatalogScreen() {
   const { width } = useWindowDimensions();
-  const columns = width >= 900 ? 3 : width >= 580 ? 2 : 1;
-  const contentWidth = Math.min(width, 1120) - 40;
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+  const columns = width >= 1024 ? 3 : width >= 640 ? 2 : 1;
+  const contentWidth = Math.min(width, 1180) - 40;
   const cardWidth = (contentWidth - 12 * (columns - 1)) / columns;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       {/* La cabecera explica de inmediato el propósito educativo de la aplicación. */}
       <View style={styles.hero}>
-        <Text style={styles.kicker}>CATÁLOGO INTERACTIVO</Text>
+        <View style={styles.heroTop}>
+          <Text style={styles.kicker}>CATÁLOGO INTERACTIVO</Text>
+          <ThemeToggle />
+        </View>
         <Text style={styles.title}>Funciones del teléfono</Text>
         <Text style={styles.intro}>
           Explorá las herramientas de hardware de tu dispositivo. Abrí una ficha y probá cada función.
@@ -54,10 +61,12 @@ export default function CatalogScreen() {
 }
 
 // Mantiene una jerarquía visual clara y un espacio adaptable entre tarjetas.
-const styles = StyleSheet.create({
+function createStyles(colors: AppColors) {
+  return StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  content: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 34, maxWidth: 1120, width: "100%", alignSelf: "center" },
+  content: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 34, maxWidth: 1180, width: "100%", alignSelf: "center" },
   hero: { padding: 22, marginBottom: 20, borderRadius: 24, backgroundColor: colors.hero },
+  heroTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 },
   kicker: { color: colors.accent, fontWeight: "800", letterSpacing: 1.4, fontSize: 12 },
   title: { color: colors.ink, fontSize: 32, lineHeight: 39, fontWeight: "800", marginTop: 9 },
   intro: { color: colors.muted, fontSize: 15, lineHeight: 23, marginTop: 9, maxWidth: 650 },
@@ -70,4 +79,5 @@ const styles = StyleSheet.create({
   cardText: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 6 },
   link: { color: colors.accent, fontWeight: "800", fontSize: 13, marginTop: "auto", paddingTop: 16 },
   footnote: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 19 },
-});
+  });
+}

@@ -17,7 +17,7 @@ export default function Root({ children }: { children: ReactNode }) {
         {/* Ajusta el desplazamiento web para que las pantallas ScrollView se comporten como en móvil. */}
         <ScrollViewStyleReset />
 
-        {/* Aplica el fondo del catálogo desde el primer render para evitar un destello blanco. */}
+        {/* Evita que los márgenes de la página web queden blancos en modo oscuro. */}
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
       </head>
       <body>{children}</body>
@@ -25,9 +25,17 @@ export default function Root({ children }: { children: ReactNode }) {
   );
 }
 
-// Usa el mismo fondo claro del catálogo antes de que cargue React Native Web.
+// Usa el color del sistema antes de que cargue React Native Web.
 const responsiveBackground = `
+html, body {
+  min-height: 100%;
+  background-color: #F4F7F6;
+}
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: #101814;
+  }
+}
 body {
   margin: 0;
-  background-color: #F4F7F6;
 }`;

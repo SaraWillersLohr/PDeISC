@@ -1,13 +1,14 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
-import { colors } from "../src/theme/colors";
+import { useAppTheme } from "../src/theme/useAppTheme";
 
 // Explica cómo regresar cuando se abre una ruta desconocida.
 export default function NotFound() {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.page}>
-      <Text style={styles.title}>No encontramos esta pantalla.</Text>
-      <Link href="/" style={styles.link}>Volver al catálogo</Link>
+    <View style={[styles.page, { backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.ink }]}>No encontramos esta pantalla.</Text>
+      <Link href="/" style={[styles.link, { color: colors.accent }]}>Volver al catálogo</Link>
     </View>
   );
 }
@@ -19,8 +20,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
     gap: 12,
-    backgroundColor: colors.background,
   },
-  title: { color: colors.ink, fontSize: 20, fontWeight: "700" },
-  link: { color: colors.accent, fontWeight: "700" },
+  title: { fontSize: 20, fontWeight: "700" },
+  link: { fontWeight: "700" },
 });

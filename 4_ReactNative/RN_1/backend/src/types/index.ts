@@ -48,15 +48,6 @@ export interface LoginRequest {
   password: string;
 }
 
-// Contrato de datos SocialProvider: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
-export type SocialProvider =
-  | 'google'
-  | 'facebook'
-  | 'github'
-  | 'discord'
-  | 'twitch'
-  | 'twitter';
-
 // Contrato de datos CreateUsuarioRequest: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 export interface CreateUsuarioRequest {
   nombre: string;

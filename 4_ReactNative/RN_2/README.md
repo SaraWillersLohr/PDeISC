@@ -1,104 +1,34 @@
-# ScanStock
+# Catálogo de funciones del teléfono
 
-Aplicación móvil para controlar el inventario de un pequeño comercio. La app Expo consume una API REST en Node.js y la API conserva los datos en MariaDB. No se conecta desde el móvil directamente a la base.
+Aplicación educativa hecha con Expo y React Native. Presenta un catálogo de funciones del dispositivo y permite abrir una demostración práctica de cada una. La aplicación funciona de forma independiente y no requiere backend.
 
-## Funcionalidades
+## Funciones disponibles
 
-- Panel con productos, unidades, stock bajo y vencimientos consultados en MariaDB.
-- Alta y edición de productos, código QR/barras y vencimiento opcional.
-- Categorías asignables y filtro de inventario.
-- Escaneo con cámara o búsqueda manual.
-- Entradas y salidas transaccionales con saldo anterior y posterior.
-- Historial, tema claro/oscuro/automático, selección y desactivación masiva.
+- Cámara trasera con captura de foto y control del flash.
+- Lector de códigos QR y códigos comerciales.
+- Ubicación GPS con latitud, longitud y precisión.
+- Acelerómetro y giroscopio con lecturas en tiempo real.
+- Brújula digital mediante el magnetómetro.
+- Podómetro para observar pasos durante la prueba.
+- Biometría para consultar disponibilidad y probar la autenticación del sistema.
 
-## Tecnologías y estructura
+Las funciones dependen del hardware del teléfono y de los permisos autorizados. Las lecturas se muestran dentro de la app; no se envían a un servidor.
 
-- Frontend: Expo SDK 58, React Native, TypeScript, Expo Router, Expo Camera y AsyncStorage para la preferencia de tema.
-- Backend: Node.js, TypeScript, Express y driver oficial `mariadb`.
-- Datos: MariaDB/InnoDB, tablas normalizadas de productos, categorías, asociaciones y movimientos.
+## Iniciar el proyecto
 
-```text
-frontend/  aplicación móvil Expo
-backend/   API Express y scripts SQL
-```
-
-`frontend/app/+html.tsx` es un archivo especial de Expo Router para el HTML base de la versión web. Ajusta el idioma, la etiqueta de pantalla, el desplazamiento y el color de fondo antes de que cargue la interfaz. No es una pantalla de navegación y no participa en Android ni iOS; está incluido porque lo genera la plantilla oficial de Expo.
-
-`frontend/app/+not-found.tsx` es la pantalla de respaldo que Expo Router muestra cuando alguien abre una ruta que no existe. El prefijo `+` identifica archivos especiales del enrutador. El archivo `_layout.tsx` configura la navegación y `(tabs)` agrupa las cinco pestañas sin agregar ese nombre a las rutas visibles.
-
-`frontend/app.json` define el nombre, el identificador Android y los permisos de cámara. `frontend/eas.json` indica a EAS que el perfil `preview` genere un APK. JSON no admite comentarios dentro del archivo; por eso estas decisiones se explican aquí y no se agregan comentarios que invaliden su formato.
-
-## Requisitos
-
-Node.js 22.13 o superior, npm, un servidor MariaDB accesible desde la computadora y HeidiSQL u otro cliente SQL. Para APK se necesita una cuenta Expo y EAS CLI.
-
-## Base de datos
-
-1. En HeidiSQL ejecutá `backend/sql/schema.sql`. El script crea y selecciona `scanstock`, y solo crea las tablas si faltan.
-2. Opcional: ejecutá `backend/sql/seed.sql` una vez para insertar categorías de muestra (se pueden ejecutar repetidamente sin duplicarlas).
-3. Para desarrollo se recomienda crear en MariaDB un usuario propio con permisos mínimos de lectura/escritura sobre `scanstock`; evitá utilizar `root` en la app.
-
-El modelo separa categorías y productos mediante `producto_categorias` (muchos a muchos). `movimientos` registra cada operación; las claves foráneas conservan el historial. La eliminación es lógica mediante `productos.activo`.
-
-## Iniciar backend (PowerShell)
-
-```powershell
-cd backend
-npm install
-Copy-Item .env.example .env
-notepad .env
-npm run dev
-```
-
-En `backend/.env`, configurá `DB_HOST=Estanga`, `DB_PORT=3307`, `DB_NAME=scanstock`, `DB_USER` y `DB_PASSWORD`. Las credenciales se mantienen solo en el backend. La contraseña no debe copiarse al README ni al frontend. El servidor API utiliza el puerto `3000`. Comprobá `http://localhost:3000/api/health`.
-
-Antes de intentar conectarte al servidor, desde PowerShell verificá nombre y puerto:
-
-```powershell
-Resolve-DnsName Estanga
-Test-NetConnection Estanga -Port 3307
-```
-
-Si el nombre no resuelve, necesitás el hostname o IP correcto desde la red donde se encuentre la base; no se debe asumir que `Estanga` es alcanzable desde cualquier red. El archivo `.env.example` usa `scanstock_app` como usuario sugerido; crealo en MariaDB o configurá un usuario de prueba autorizado.
-
-## Iniciar frontend
-
-En otra terminal:
+Requisitos: Node.js, npm y conexión a Internet para instalar dependencias.
 
 ```powershell
 cd frontend
 npm install
-Copy-Item .env.example .env
-notepad .env
 npx expo start
 ```
 
-Asigná `EXPO_PUBLIC_API_URL` a la dirección de la API, por ejemplo `http://192.168.1.25:3000`. Para averiguar la IP local, usá `ipconfig` y tomá la dirección IPv4 de la misma red Wi-Fi que el teléfono. `localhost` solo sirve en el emulador/host correspondiente, no en un teléfono físico. Permití el acceso entrante al puerto 3000 solo en la red de prueba si el firewall lo bloquea. El backend debe estar ejecutándose.
+Expo Go debe ser compatible con la versión SDK del proyecto. Si muestra que el proyecto requiere una versión más nueva, actualizá Expo Go o instalá el APK de prueba generado con EAS. La cámara, los sensores físicos y la biometría se prueban mejor en un teléfono real.
 
-Para un APK instalable, usá una API HTTPS. Android puede bloquear HTTP sin cifrar en aplicaciones compiladas; esta configuración mantiene esa protección y no habilita tráfico HTTP globalmente. Expo Go puede tener un comportamiento distinto durante pruebas locales.
+## Generar el APK de prueba
 
-Expo Go puede no incluir los módulos nativos que requiere cada SDK; la cámara puede necesitar una compilación de desarrollo compatible. Para Android conectado por USB se puede usar `npx expo run:android` si Android Studio y Android SDK están instalados. No se verificó en un teléfono físico.
-
-## Endpoints principales
-
-| Método | Ruta | Uso |
-| --- | --- | --- |
-| GET | `/api/health` | Estado de API y MariaDB |
-| GET/POST | `/api/productos` | Listar/crear productos |
-| GET/PUT/DELETE | `/api/productos/:id` | Consultar/editar/desactivar |
-| GET | `/api/productos/codigo/:codigo` | Búsqueda del escáner |
-| POST | `/api/productos/eliminar-multiples` | Desactivación grupal |
-| PATCH | `/api/productos/:id/reactivar` | Reactivación |
-| GET/POST/PUT/DELETE | `/api/categorias` | Categorías |
-| GET/POST | `/api/movimientos` | Historial y nuevo movimiento |
-| GET | `/api/productos/:id/movimientos` | Historial por producto |
-| GET | `/api/dashboard` | Contadores del panel |
-
-El stock inicial positivo se registra como una entrada inicial. Las entradas/salidas bloquean el producto dentro de una transacción y no permiten saldos negativos. Los productos con stock `<= stock_minimo` cuentan como bajo. Próximos a vencer son los que vencen entre hoy y los próximos siete días inclusive.
-
-## APK con EAS
-
-Antes de compilar, guardá `EXPO_PUBLIC_API_URL` como variable pública del entorno `preview` del proyecto EAS (en el sitio de Expo), con una URL alcanzable por el teléfono. Para un APK instalable usá una API HTTPS. Luego:
+El perfil `preview` en `frontend/eas.json` genera un APK de distribución interna. Iniciá sesión en Expo y ejecutá:
 
 ```powershell
 cd frontend
@@ -106,17 +36,15 @@ npx eas-cli login
 npx eas-cli build --platform android --profile preview
 ```
 
-El perfil `preview` produce APK. El APK contiene solo el cliente móvil: Node.js y MariaDB deben permanecer disponibles en el servidor. No ejecutar EAS Build hasta haber instalado dependencias, comprobado la API y probado la app.
+Al finalizar, EAS entrega un enlace para descargar e instalar el APK en Android. No hace falta configurar una API.
 
-## Escáner, vencimientos y validaciones
+## Código principal
 
-La cámara solicita permiso, se bloquea tras una detección mientras consulta la API y ofrece búsqueda manual. Un código no registrado se conserva para iniciar el alta. Cada producto tiene una fecha de vencimiento única y opcional: se carga manualmente con formato `AAAA-MM-DD`; esta primera versión no incluye un selector visual de fecha, lotes con vencimientos distintos ni notificaciones push. No hay sincronización offline.
+- `frontend/app/(tabs)/index.tsx`: catálogo responsive de funciones.
+- `frontend/app/herramienta/[id].tsx`: demostraciones de hardware y manejo de permisos.
+- `frontend/src/data/functions.ts`: textos e identificadores de las tarjetas del catálogo.
+- `frontend/src/theme/colors.ts`: paleta visual compartida.
+- `frontend/app.json`: nombre, identificador y permisos nativos.
+- `frontend/eas.json`: perfiles de compilación EAS.
 
-El backend valida nombre, código, precio, cantidades, categorías y tipo de movimiento. Los errores internos no exponen consultas SQL ni secretos. Esta versión no incluye autenticación y es educativa: restringí la API a una red controlada, no la publiques libremente en Internet.
-
-## Limitaciones conocidas
-
-- La conexión real depende de la resolución de `Estanga`, disponibilidad de MariaDB y las credenciales válidas.
-- No hay autenticación, paginación, lotes de vencimiento ni notificaciones.
-- La carga del APK y las pruebas físicas requieren cuenta EAS y dispositivo/entorno Android disponibles.
-- La interfaz contiene flujos principales; conviene terminar pruebas integrales de categorías, edición, reactivación de inactivos y tamaños/orientaciones antes de entregar.
+Las pantallas incluyen comentarios en español para explicar sus responsabilidades y las decisiones principales de implementación. Los errores y resultados se muestran en la interfaz sin ventanas `alert`.

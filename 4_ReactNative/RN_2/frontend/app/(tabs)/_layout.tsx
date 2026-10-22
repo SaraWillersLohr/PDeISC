@@ -1,26 +1,17 @@
 import { Tabs } from "expo-router";
-import { useTheme } from "../../src/theme/ThemeContext";
+import { colors } from "../../src/theme/colors";
 
-// Presenta las secciones principales mediante navegación inferior.
-export default function TabLayout() {
-  const { colors } = useTheme();
+// Mantiene una sola pestaña principal porque el catálogo es la entrada de la app.
+export default function CatalogTabs() {
   return (
-    <Tabs
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.card },
-        headerTintColor: colors.text,
-        tabBarStyle: { backgroundColor: colors.card },
-        tabBarActiveTintColor: colors.primary,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{ title: "Inicio", tabBarLabel: "Inicio" }}
-      />
-      <Tabs.Screen name="productos" options={{ title: "Productos" }} />
-      <Tabs.Screen name="scanner" options={{ title: "Escáner" }} />
-      <Tabs.Screen name="historial" options={{ title: "Historial" }} />
-      <Tabs.Screen name="configuracion" options={{ title: "Ajustes" }} />
+    <Tabs screenOptions={{
+      headerStyle: { backgroundColor: colors.paper },
+      headerTintColor: colors.ink,
+      headerTitleStyle: { fontWeight: "700" },
+      tabBarStyle: { display: "none" },
+    }}>
+      {/* Oculta la barra inferior: la navegación ocurre desde las tarjetas. */}
+      <Tabs.Screen name="index" options={{ title: "Catálogo de funciones" }} />
     </Tabs>
   );
 }

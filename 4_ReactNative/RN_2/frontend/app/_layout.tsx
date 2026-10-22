@@ -1,37 +1,23 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ThemeProvider, useTheme } from "../src/theme/ThemeContext";
+import { colors } from "../src/theme/colors";
 
-// Configura la navegación principal de ScanStock.
-// Aplica el tema a la barra de estado y define las rutas principales y secundarias.
-function Navigation() {
-  const { colors, dark } = useTheme();
-  return (
-    <>
-      <StatusBar style={dark ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.card },
-          headerTintColor: colors.text,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="producto-form" options={{ title: "Producto" }} />
-        <Stack.Screen
-          name="producto/[id]"
-          options={{ title: "Detalle del producto" }}
-        />
-      </Stack>
-    </>
-  );
-}
-
-// Provee el tema guardado a todas las pantallas.
+// Define la navegación de la app y el color común de la barra de estado.
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <Navigation />
-    </ThemeProvider>
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{
+        headerStyle: { backgroundColor: colors.paper },
+        headerTintColor: colors.ink,
+        headerTitleStyle: { fontWeight: "700" },
+        contentStyle: { backgroundColor: colors.background },
+      }}>
+        {/* La ruta principal contiene el catálogo de funciones del dispositivo. */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {/* Las fichas se abren encima del catálogo para facilitar el regreso. */}
+        <Stack.Screen name="herramienta/[id]" options={{ title: "Demostración" }} />
+      </Stack>
+    </>
   );
 }

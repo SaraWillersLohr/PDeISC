@@ -1,6 +1,6 @@
 // Archivo App.tsx: el estado raíz, los flujos de autenticación, la navegación y el ciclo de sesión. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Linking, Platform, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, StatusBar, StyleSheet, Text, View } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { API_BASE_URL, SESSION_KEY } from './src/config/api';
 import { LoginScreen } from './src/screens/LoginScreen';
@@ -12,7 +12,7 @@ import { PasswordChangeScreen } from './src/screens/PasswordChangeScreen';
 import { AccessTokenScreen } from './src/screens/AccessTokenScreen';
 import { PasswordRecoveryScreen } from './src/screens/PasswordRecoveryScreen';
 import { FeedbackProvider, useFeedback } from './src/components/FeedbackProvider';
-import { ApiError, changeInitialPasswordApi, exchangeSocialCodeApi, getProfileApi, listSocialProvidersApi, loginApi, logoutApi, redeemAccessTokenApi, registerApi, requestPasswordRecoveryApi, resendAccessTokenApi, resendVerificationApi, resetPasswordApi, verifyEmailApi, type SocialProviderId } from './src/services/authApi';
+import { ApiError, changeInitialPasswordApi, getProfileApi, loginApi, logoutApi, redeemAccessTokenApi, redeemPasswordRecoveryCodeApi, registerApi, requestPasswordRecoveryApi, resendAccessTokenApi, resendVerificationApi, resetPasswordApi, verifyEmailApi } from './src/services/authApi';
 import type { PublicUser } from './src/types/auth';
 // Esta función recupera la sesión recordada desde sessionStorage en web o SecureStore en Android/iOS.
 async function readSavedSession(): Promise<string | null> {
@@ -59,8 +59,6 @@ function AppContent() {
   const [pendingEmail, setPendingEmail] = useState('');
   const [accessEmail, setAccessEmail] = useState('');
   const [recoveryEmail, setRecoveryEmail] = useState('');
-  const [socialProviders, setSocialProviders] = useState<SocialProviderId[]>([]);
-  const handledSocialCallbacks = useRef(new Set<string>());
 
   // Si se eligió recordar, restauramos el token seguro y pedimos el perfil vigente.
   useEffect(() => {
@@ -88,11 +86,6 @@ function AppContent() {
     return () => { mounted = false; };
   }, []);
 
-  useEffect(() => {
-    let mounted = true;
-    void listSocialProvidersApi().then((providers) => { if (mounted) setSocialProviders(providers); }).catch(() => { if (mounted) setSocialProviders([]); });
-    return () => { mounted = false; };
-  }, []);
   // Esta función inicia sesión con correo y contraseña, guarda o elimina el JWT según la preferencia elegida y actualiza el perfil y el estado de navegación. Recibe email, password, remember como entrada.
   const signIn = async (email: string, password: string, remember: boolean) => {
     setBusy(true);
@@ -113,66 +106,6 @@ function AppContent() {
       setBusy(false);
     }
   };
-  // Esta función construye la URL OAuth con el proveedor, el modo de ingreso o registro y la preferencia de sesión; luego abre el proveedor en el navegador apropiado para la plataforma. Recibe provider, remember, mode como entrada.
-  const startSocialLogin = (provider: SocialProviderId, remember: boolean, mode: 'login' | 'register' = 'login') => {
-    setError(null); setNotice(null);
-    const query = new URLSearchParams({ remember: remember ? '1' : '0', mode });
-    if (Platform.OS !== 'web') query.set('redirect', 'estanciaapp://auth/callback');
-    const url = `${API_BASE_URL}/auth/${provider}?${query.toString()}`;
-    if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined') window.location.assign(url);
-      return;
-    }
-    void Linking.openURL(url).catch((cause) => {
-      setError(cause instanceof Error ? `No se pudo abrir el acceso con ${provider}: ${cause.message}` : 'No se pudo abrir el acceso social.');
-    });
-  };
-
-  const completeSocialCallback = useCallback(async (callbackUrl: string) => {
-    let parsed: URL;
-    try { parsed = new URL(callbackUrl); } catch { return; }
-    const code = parsed.searchParams.get('socialCode');
-    const socialError = parsed.searchParams.get('socialError');
-    const socialRegistered = parsed.searchParams.get('socialRegistered');
-    if (!code && !socialError && socialRegistered !== '1') return;
-    const uniqueValue = code ?? socialError ?? socialRegistered ?? '';
-    if (handledSocialCallbacks.current.has(uniqueValue)) return;
-    handledSocialCallbacks.current.add(uniqueValue);
-
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      window.history.replaceState({}, '', parsed.pathname || '/');
-    }
-    const mode = parsed.searchParams.get('socialMode') === 'register' ? 'register' : 'login';
-    setAuthView(mode);
-    if (socialRegistered === '1') {
-      setNotice('Solicitud creada y correo confirmado por el proveedor. El administrador debe aprobarla; después te llegará el token para ingresar.');
-      setError(null); setBusy(false); return;
-    }
-    if (socialError) {
-      setError(socialError); setBusy(false); return;
-    }
-
-    setBusy(true); setError(null); setNotice(null);
-    try {
-      const result = await exchangeSocialCodeApi(code!);
-      if (result.rememberMe) await saveSession(result.token);
-      else await clearSavedSession();
-      setToken(result.token); setUser(result.usuario); setEntered(false);
-      setNotice('Iniciaste sesión con tu cuenta social.');
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No se pudo completar el inicio de sesión social.');
-    } finally { setBusy(false); }
-  }, []);
-
-  useEffect(() => {
-    const subscription = Linking.addEventListener('url', ({ url }) => { void completeSocialCallback(url); });
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      void completeSocialCallback(window.location.href);
-    } else {
-      void Linking.getInitialURL().then((url) => { if (url) void completeSocialCallback(url); }).catch(() => undefined);
-    }
-    return () => subscription.remove();
-  }, [completeSocialCallback]);
   // Esta función envía los datos del formulario para crear una solicitud de registro y prepara la pantalla para ingresar el código recibido por correo. Recibe data como entrada.
   const startRegistration = async (data: { nombre: string; apellido: string; email: string; password: string }) => {
     setBusy(true); setError(null); setNotice(null);
@@ -222,25 +155,38 @@ function AppContent() {
   };
 
   // Pide un código de recuperación y conserva la respuesta neutra para que la interfaz no pueda enumerar cuentas.
-  const requestRecoveryCode = async (email: string): Promise<boolean> => {
-    setBusy(true); setError(null);
+  const requestRecoveryCode = async (email: string): Promise<void> => {
+    setBusy(true); setError(null); setNotice(null);
     try {
       setNotice(await requestPasswordRecoveryApi(email));
-      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo solicitar el código. Intentá de nuevo.');
-      return false;
     } finally { setBusy(false); }
   };
 
-  // Envía el código y la contraseña nueva; al completarse el servidor revoca los JWT anteriores.
-  const completePasswordRecovery = async (email: string, code: string, password: string): Promise<boolean> => {
-    setBusy(true); setError(null);
+  // Comprueba el código del correo y obtiene un permiso corto que solo puede usarse para guardar una contraseña nueva.
+  const redeemRecoveryCode = async (email: string, code: string): Promise<string | null> => {
+    setBusy(true); setError(null); setNotice(null);
     try {
-      setNotice(await resetPasswordApi(email, code, password));
+      return await redeemPasswordRecoveryCodeApi(email, code);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No se pudo canjear el código.');
+      return null;
+    } finally { setBusy(false); }
+  };
+
+  // Guarda la contraseña nueva, recibe la sesión ya autenticada y lleva a la bienvenida del portal.
+  const completePasswordRecovery = async (resetToken: string, password: string): Promise<boolean> => {
+    setBusy(true); setError(null); setNotice(null);
+    try {
+      const result = await resetPasswordApi(resetToken, password);
+      await clearSavedSession();
+      setToken(result.token);
+      setUser(result.usuario);
+      setEntered(false);
       return true;
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No se pudo actualizar la contraseña.');
+      setError(cause instanceof Error ? cause.message : 'No se pudo cambiar la contraseña.');
       return false;
     } finally { setBusy(false); }
   };
@@ -286,7 +232,7 @@ function AppContent() {
             ? <HomeScreen user={user} token={token} onLogout={() => void signOut()} />
             : <WelcomeScreen user={user} onContinue={() => setEntered(true)} onLogout={() => void signOut()} />
         : authView === 'register'
-          ? <RegistrationScreen busy={busy} error={error} socialProviders={socialProviders} onSocialRegister={(provider) => startSocialLogin(provider, false, 'register')} onBack={() => { setAuthView('login'); setError(null); }} onSubmit={(data) => void startRegistration(data)} />
+          ? <RegistrationScreen busy={busy} error={error} onBack={() => { setAuthView('login'); setError(null); }} onSubmit={(data) => void startRegistration(data)} />
           : authView === 'verify'
             ? <EmailVerificationScreen email={pendingEmail} busy={busy} error={error} notice={notice} onBack={() => { setAuthView('login'); setError(null); }} onVerify={(code) => void verifyEmail(code)} onResend={() => void resendCode()} />
             : authView === 'access'
@@ -295,8 +241,8 @@ function AppContent() {
                 onRedeem={(email, accessToken, remember) => void redeemAccessToken(email, accessToken, remember)}
                 onResend={(email) => void resendAccessToken(email)} />
               : authView === 'recover'
-                ? <PasswordRecoveryScreen initialEmail={recoveryEmail} busy={busy} error={error} onRequestCode={requestRecoveryCode} onResetPassword={completePasswordRecovery} onBack={() => { setAuthView('login'); setError(null); setNotice(null); }} />
-                : <LoginScreen onLogin={signIn} socialProviders={socialProviders} onSocialLogin={startSocialLogin}
+                ? <PasswordRecoveryScreen initialEmail={recoveryEmail} busy={busy} error={error} notice={notice} onRequestCode={requestRecoveryCode} onRedeemCode={redeemRecoveryCode} onResetPassword={completePasswordRecovery} onBack={() => { setAuthView('login'); setError(null); setNotice(null); }} />
+                : <LoginScreen onLogin={signIn}
                 onAccessTokenPress={(email) => { setAccessEmail(email); setError(null); setNotice(null); setAuthView('access'); }}
                 onRecoveryPress={(email) => { setRecoveryEmail(email); setError(null); setNotice(null); setAuthView('recover'); }}
                 onRegisterPress={() => { setError(null); setNotice(null); setAuthView('register'); }} busy={busy} error={error} notice={notice} />}

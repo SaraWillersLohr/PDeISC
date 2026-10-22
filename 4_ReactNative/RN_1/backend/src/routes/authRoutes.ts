@@ -3,7 +3,6 @@
 import { Router } from "express";
 import * as authController from "../controllers/authController";
 import { authenticate } from "../middleware/authMiddleware";
-import * as socialAuthController from '../controllers/socialAuthController';
 
 
 const router = Router();
@@ -18,11 +17,13 @@ router.post("/resend-verification", authController.resendVerification);
 router.post("/access-token", authController.redeemAccessToken);
 // Endpoint POST /resend-access-token: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador authController.resendAccessToken procesa la solicitud.
 router.post("/resend-access-token", authController.resendAccessToken);
-// Estas rutas permiten solicitar y completar la recuperación de contraseña mediante un código enviado por correo.
-// Endpoint POST /password-recovery/request: solicita un código de recuperación sin revelar si el correo existe.
+// Estas rutas verifican el correo, el código temporal y la contraseña nueva del flujo de recuperación.
+// Endpoint POST /password-recovery/request: solicita el código sin revelar si el correo existe.
 router.post('/password-recovery/request', authController.requestPasswordRecovery);
-// Endpoint POST /password-recovery/reset: comprueba el código temporal y cambia la contraseña.
-router.post('/password-recovery/reset', authController.resetPassword);
+// Endpoint POST /password-recovery/redeem: valida y consume el código, y devuelve un permiso temporal para cambiar la contraseña.
+router.post('/password-recovery/redeem', authController.redeemPasswordRecoveryCode);
+// Endpoint POST /password-recovery/reset: guarda la contraseña nueva y devuelve la sesión después del cambio obligatorio.
+router.post('/password-recovery/reset', authController.completePasswordRecovery);
 // Endpoint POST /login: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador authController.login procesa la solicitud.
 router.post("/login", authController.login);
 // Endpoint GET /me: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador authController.me procesa la solicitud.
@@ -36,14 +37,6 @@ router.post(
   authenticate,
   authController.cambiarPasswordInicial,
 );
-// Endpoint GET /social/providers: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador socialAuthController.listSocialProviders procesa la solicitud.
-router.get('/social/providers', socialAuthController.listSocialProviders);
-// Endpoint GET /:provider/callback: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador socialAuthController.completeSocialLogin procesa la solicitud.
-router.get('/:provider/callback', socialAuthController.completeSocialLogin);
-// Endpoint GET /:provider: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador socialAuthController.startSocialLogin procesa la solicitud.
-router.get('/:provider', socialAuthController.startSocialLogin);
-// Endpoint POST /social/exchange: publica esta operación del backend y aplica el middleware que aparece entre la ruta y el controlador. El controlador socialAuthController.exchangeSocialCode procesa la solicitud.
-router.post('/social/exchange', socialAuthController.exchangeSocialCode);
 
 export default router;
 

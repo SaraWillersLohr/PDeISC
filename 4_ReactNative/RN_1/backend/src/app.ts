@@ -1,9 +1,7 @@
-// Archivo backend/src/app.ts: la configuración de Express, CORS, sesión, Passport y montaje de rutas. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
+// Archivo backend/src/app.ts: la configuración de Express, CORS y montaje de rutas de la API. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 // configura middlewares y rutas de la api
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
-import session from 'express-session';
-import passport from 'passport';
 import { testConnection } from "./config/database";
 import authRoutes from "./routes/authRoutes";
 import usuarioRoutes from "./routes/usuarioRoutes";
@@ -15,14 +13,8 @@ import tratamientoRoutes from "./routes/tratamientoRoutes";
 import notificacionRoutes from "./routes/notificacionRoutes";
 import reproduccionRoutes from "./routes/reproduccionRoutes";
 import { errorHandler } from "./middleware/errorHandler";
-import { configurePassport } from './config/passport';
 
 const app: Application = express();
-const sessionSecret = process.env.SESSION_SECRET;
-
-if (process.env.NODE_ENV === 'production' && !sessionSecret) {
-  throw new Error('SESSION_SECRET es obligatoria en producción');
-}
 
 // middlewares globales. Expo Web suele usar localhost:8081; las apps nativas
 // no envían Origin, por eso también se permiten solicitudes sin ese header.
@@ -44,19 +36,6 @@ app.use(cors({
   },
 }));
 app.use(express.json());
-app.use(session({
-  secret: sessionSecret ?? 'solo-desarrollo-cambiar-en-produccion',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 10 * 60 * 1000,
-  },
-}));
-app.use(passport.initialize());
-configurePassport();
 
 // health check � confirma que la api y la db est�n activas
 app.get("/api/health", async (_req: Request, res: Response) => {

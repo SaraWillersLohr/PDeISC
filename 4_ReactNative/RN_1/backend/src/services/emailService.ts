@@ -39,7 +39,7 @@ export async function sendRegistrationRejection(email: string, name: string): Pr
 }
 
 // Envía el token temporal emitido tras la aprobación del administrador.
-export async function sendAccessToken(email: string, name: string, token: string, setupPassword = false): Promise<void> {
+export async function sendAccessToken(email: string, name: string, token: string): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, MAIL_FROM, REPLY_TO } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !MAIL_FROM) throw new Error('El servicio de correo no está configurado.');
   const transporter = nodemailer.createTransport({
@@ -49,7 +49,7 @@ export async function sendAccessToken(email: string, name: string, token: string
   await transporter.sendMail({
     from: MAIL_FROM, replyTo: REPLY_TO || SMTP_USER, to: email,
     subject: 'Tu acceso a EstanciaApp fue aprobado',
-    text: `Hola ${name}, tu solicitud fue aprobada con el rol inicial de peón. Ingresá a EstanciaApp, elegí “Ingresar con código” y escribí este código de seis dígitos: ${token}. Vence en 10 minutos y solo se puede usar una vez. ${setupPassword ? 'Al canjearlo, la app te va a pedir crear una contraseña; después podrás ingresar con esa contraseña o con la cuenta social que usaste para registrarte.' : 'Después de canjearlo, podés iniciar sesión con tu correo y la contraseña que elegiste al registrarte.'} Si no solicitaste este acceso, ignorá este mensaje.`,
+    text: `Hola ${name}, tu solicitud fue aprobada con el rol inicial de peón. Ingresá a EstanciaApp, elegí “Ingresar con código” y escribí este código de seis dígitos: ${token}. Vence en 10 minutos y solo se puede usar una vez. Después de canjearlo, podés iniciar sesión con tu correo y la contraseña que elegiste al registrarte. Si no solicitaste este acceso, ignorá este mensaje.`,
   });
 }
 
@@ -64,8 +64,8 @@ export async function sendPasswordRecoveryCode(email: string, name: string, code
   await transporter.sendMail({
     from: MAIL_FROM, replyTo: REPLY_TO || SMTP_USER, to: email,
     subject: 'Código para recuperar tu acceso — EstanciaApp',
-    text: `Hola ${name}, ingresá este código de seis dígitos para cambiar tu contraseña: ${code}. Vence en 10 minutos, permite hasta cinco intentos y solo se puede usar una vez. Si no solicitaste este cambio, ignorá este correo; tu contraseña actual seguirá vigente.`,
-    html: `<div style="font-family:Arial,sans-serif;color:#243528"><h2>Recuperá tu acceso</h2><p>Ingresá este código en EstanciaApp para cambiar tu contraseña:</p><p style="font-size:30px;font-weight:bold;letter-spacing:8px">${code}</p><p>Vence en 10 minutos y solo se puede usar una vez. Si no solicitaste este cambio, ignorá este correo.</p></div>`,
+    text: `Hola ${name}, ingresá este código de seis dígitos en EstanciaApp para verificar tu solicitud de cambio de contraseña: ${code}. Vence en 10 minutos, permite hasta cinco intentos y solo se puede usar una vez. Después deberás elegir una contraseña nueva para entrar. Si no solicitaste este cambio, ignorá este correo.`,
+    html: `<div style="font-family:Arial,sans-serif;color:#243528"><h2>Recuperá tu contraseña</h2><p>Escribí este código de un solo uso en la app para verificar tu identidad:</p><p style="font-size:30px;font-weight:bold;letter-spacing:8px">${code}</p><p>Vence en 10 minutos y solo se puede usar una vez. Luego deberás elegir una contraseña nueva para ingresar. Si no solicitaste este cambio, ignorá este correo.</p></div>`,
   });
 }
 // Esta función prepara y envía por correo el mensaje asociado con solicitud de registro; ante fallos, permite que la capa superior informe el resultado. Recibe adminEmail, applicantName, applicantEmail como entrada.

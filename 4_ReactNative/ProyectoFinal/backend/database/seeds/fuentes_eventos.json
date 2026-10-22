@@ -1,0 +1,101 @@
+[
+  {
+    "codigo_fuente": "angus_argentina",
+    "nombre": "asociación argentina de angus",
+    "url": "https://angus.org.ar/",
+    "especie": "bovino",
+    "raza": "angus",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "hereford_argentina",
+    "nombre": "asociación argentina de criadores de hereford",
+    "url": "https://hereford.org.ar",
+    "especie": "bovino",
+    "raza": "hereford",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "brangus_argentina",
+    "nombre": "asociación argentina de brangus",
+    "url": "https://brangus.org.ar/",
+    "especie": "bovino",
+    "raza": "brangus",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "bonsmara_argentina",
+    "nombre": "asociación argentina de criadores de bonsmara",
+    "url": "https://bonsmara.org.ar/",
+    "especie": "bovino",
+    "raza": "bonsmara",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "bovino_criollo_argentina",
+    "nombre": "asociación argentina de criadores de ganado bovino criollo",
+    "url": "https://bovinocriollo.com.ar/",
+    "especie": "bovino",
+    "raza": "criollo",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "cuarto_de_milla_argentina",
+    "nombre": "criadores argentinos de caballos cuarto de milla",
+    "url": "https://www.caccm.com.ar/",
+    "especie": "equino",
+    "raza": "cuarto de milla",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "caballo_de_polo_argentina",
+    "nombre": "asociación argentina de criadores de caballos de polo",
+    "url": "https://criapoloargentino.com.ar",
+    "especie": "equino",
+    "raza": "caballo de polo",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "caballos_arabes_argentina",
+    "nombre": "asociación argentina de criadores de caballos árabes",
+    "url": "https://www.aacca.com.ar/",
+    "especie": "equino",
+    "raza": "árabe",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "spc_argentina",
+    "nombre": "criadores argentinos del sangre pura de carrera",
+    "url": "https://criadores-spc.com.ar/",
+    "especie": "equino",
+    "raza": "sangre pura de carrera",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "caballo_peruano_argentina",
+    "nombre": "asociación argentina de criadores de caballos peruanos",
+    "url": "https://aaccpp.org.ar/",
+    "especie": "equino",
+    "raza": "caballo peruano",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "caballos_criollos_argentina",
+    "nombre": "asociación argentina de criadores de caballos criollos",
+    "url": "https://caballoscriollos.com",
+    "especie": "equino",
+    "raza": "criollo",
+    "pais": "argentina",
+    "habilitada": true
+  }
+]

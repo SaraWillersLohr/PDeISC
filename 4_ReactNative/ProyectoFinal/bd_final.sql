@@ -15,11 +15,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
--- Volcando estructura de base de datos para estancia_app_r5
-CREATE DATABASE IF NOT EXISTS `estancia_app_r5` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
-USE `estancia_app_r5`;
+-- Volcando estructura de base de datos para estancia_app
+CREATE DATABASE IF NOT EXISTS `estancia_app` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+USE `estancia_app`;
 
--- Volcando estructura para tabla estancia_app_r5.animales
+-- Volcando estructura para tabla estancia_app.animales
 CREATE TABLE IF NOT EXISTS `animales` (
   `id_animal` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_corral` int(10) unsigned NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `animales` (
   CONSTRAINT `fk_animal_raza` FOREIGN KEY (`id_raza`) REFERENCES `razas` (`id_raza`)
 ) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.animales: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.animales: ~5 rows (aproximadamente)
 INSERT INTO `animales` (`id_animal`, `id_corral`, `id_raza`, `identificador`, `nombre`, `fecha_nacimiento`, `peso_kg`, `estado_salud`, `id_corral_origen`, `activo`, `created_at`, `updated_at`) VALUES
 	(128, 3, 1, 'AN-001', NULL, '2026-09-09', 100.00, 'sano', NULL, 0, '2026-09-21 01:12:53', '2026-09-21 01:27:43'),
 	(130, 6, 4, 'AN-002', 'Fogata', '2026-08-20', 250.00, 'enfermo', 13, 0, '2026-09-21 12:35:09', '2026-09-21 16:42:08'),
@@ -51,7 +51,7 @@ INSERT INTO `animales` (`id_animal`, `id_corral`, `id_raza`, `identificador`, `n
 	(132, 3, 4, 'AN-0001', '...', NULL, 300.00, 'sano', NULL, 1, '2026-09-23 22:59:14', '2026-09-23 22:59:49'),
 	(133, 6, 1, 'BOV-001', '...', '2026-09-23', 300.00, 'en_tratamiento', 13, 1, '2026-09-23 23:06:04', '2026-09-24 22:42:42');
 
--- Volcando estructura para tabla estancia_app_r5.corrales
+-- Volcando estructura para tabla estancia_app.corrales
 CREATE TABLE IF NOT EXISTS `corrales` (
   `id_corral` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(80) NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `corrales` (
   UNIQUE KEY `nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.corrales: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.corrales: ~7 rows (aproximadamente)
 INSERT INTO `corrales` (`id_corral`, `nombre`, `capacidad`, `es_enfermeria`, `activo`, `created_at`) VALUES
 	(1, 'Corral Norte', 40, 0, 1, '2026-09-20 22:31:13'),
 	(2, 'Corral Sur', 35, 0, 1, '2026-09-20 22:31:13'),
@@ -73,7 +73,7 @@ INSERT INTO `corrales` (`id_corral`, `nombre`, `capacidad`, `es_enfermeria`, `ac
 	(6, 'Enfermería', 15, 1, 1, '2026-09-20 22:31:13'),
 	(13, 'Campo abierto', 100, 0, 1, '2026-09-21 12:34:23');
 
--- Volcando estructura para tabla estancia_app_r5.especies
+-- Volcando estructura para tabla estancia_app.especies
 CREATE TABLE IF NOT EXISTS `especies` (
   `id_especie` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(60) NOT NULL,
@@ -82,13 +82,13 @@ CREATE TABLE IF NOT EXISTS `especies` (
   UNIQUE KEY `nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.especies: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.especies: ~3 rows (aproximadamente)
 INSERT INTO `especies` (`id_especie`, `nombre`, `created_at`) VALUES
 	(1, 'Bovino', '2026-09-20 22:31:13'),
 	(2, 'Ovino', '2026-09-20 22:31:13'),
 	(3, 'Equino', '2026-09-20 22:31:13');
 
--- Volcando estructura para tabla estancia_app_r5.identidades_sociales
+-- Volcando estructura para tabla estancia_app.identidades_sociales
 CREATE TABLE IF NOT EXISTS `identidades_sociales` (
   `id_identidad` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_usuario` int(10) unsigned NOT NULL,
@@ -102,13 +102,13 @@ CREATE TABLE IF NOT EXISTS `identidades_sociales` (
   CONSTRAINT `fk_identidad_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.identidades_sociales: ~2 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.identidades_sociales: ~2 rows (aproximadamente)
 INSERT INTO `identidades_sociales` (`id_identidad`, `id_usuario`, `proveedor`, `proveedor_usuario_id`, `created_at`, `updated_at`) VALUES
 	(7, 26, 'google', '110834360255219560973', '2026-09-24 14:21:38', '2026-09-24 14:21:38'),
 	(8, 28, 'google', '114261324705831967944', '2026-09-24 14:22:55', '2026-09-24 14:22:55'),
 	(9, 26, 'facebook', '122101180863486236', '2026-09-24 23:32:50', '2026-09-24 23:32:50');
 
--- Volcando estructura para tabla estancia_app_r5.notificaciones
+-- Volcando estructura para tabla estancia_app.notificaciones
 CREATE TABLE IF NOT EXISTS `notificaciones` (
   `id_notificacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_animal` int(10) unsigned DEFAULT NULL,
@@ -122,9 +122,9 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
   CONSTRAINT `fk_notificacion_animal` FOREIGN KEY (`id_animal`) REFERENCES `animales` (`id_animal`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.notificaciones: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.notificaciones: ~0 rows (aproximadamente)
 
--- Volcando estructura para tabla estancia_app_r5.razas
+-- Volcando estructura para tabla estancia_app.razas
 CREATE TABLE IF NOT EXISTS `razas` (
   `id_raza` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_especie` int(10) unsigned NOT NULL,
@@ -135,14 +135,14 @@ CREATE TABLE IF NOT EXISTS `razas` (
   CONSTRAINT `fk_raza_especie` FOREIGN KEY (`id_especie`) REFERENCES `especies` (`id_especie`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.razas: ~4 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.razas: ~4 rows (aproximadamente)
 INSERT INTO `razas` (`id_raza`, `id_especie`, `nombre`, `created_at`) VALUES
 	(1, 1, 'Angus', '2026-09-20 22:31:13'),
 	(2, 1, 'Hereford', '2026-09-20 22:31:13'),
 	(3, 2, 'Merino', '2026-09-20 22:31:13'),
 	(4, 3, 'Criollo', '2026-09-20 22:31:13');
 
--- Volcando estructura para tabla estancia_app_r5.roles
+-- Volcando estructura para tabla estancia_app.roles
 CREATE TABLE IF NOT EXISTS `roles` (
   `id_rol` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -152,14 +152,14 @@ CREATE TABLE IF NOT EXISTS `roles` (
   UNIQUE KEY `nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.roles: ~4 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.roles: ~4 rows (aproximadamente)
 INSERT INTO `roles` (`id_rol`, `nombre`, `descripcion`, `created_at`) VALUES
 	(1, 'dueno', 'Dueño original de la estancia — acceso total', '2026-09-20 22:31:13'),
 	(2, 'copropietario', 'Copropietario con permisos administrativos', '2026-09-20 22:31:13'),
 	(3, 'peon', 'Operativo de campo — traslados y alertas', '2026-09-20 22:31:13'),
 	(4, 'veterinario', 'Sanidad — corral enfermería y tratamientos', '2026-09-20 22:31:13');
 
--- Volcando estructura para tabla estancia_app_r5.tratamientos
+-- Volcando estructura para tabla estancia_app.tratamientos
 CREATE TABLE IF NOT EXISTS `tratamientos` (
   `id_tratamiento` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_animal` int(10) unsigned NOT NULL,
@@ -177,13 +177,13 @@ CREATE TABLE IF NOT EXISTS `tratamientos` (
   CONSTRAINT `fk_tratamiento_vet` FOREIGN KEY (`id_veterinario`) REFERENCES `usuarios` (`id_usuario`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.tratamientos: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.tratamientos: ~3 rows (aproximadamente)
 INSERT INTO `tratamientos` (`id_tratamiento`, `id_animal`, `id_veterinario`, `descripcion`, `medicamento`, `fecha_inicio`, `fecha_fin`, `observaciones`, `created_at`) VALUES
 	(3, 130, 3, 'reporte de ingreso a enfermería: decaimineto', NULL, '2026-09-21', NULL, NULL, '2026-09-21 12:36:44'),
 	(4, 133, 3, 'reporte de ingreso a enfermería por síntomas observados en campo', NULL, '2026-09-23', NULL, NULL, '2026-09-23 23:11:38'),
 	(5, 133, 4, 'vdssdvdvd', 'gggg', '2026-09-23', NULL, '.....', '2026-09-23 23:12:43');
 
--- Volcando estructura para tabla estancia_app_r5.usuarios
+-- Volcando estructura para tabla estancia_app.usuarios
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id_usuario` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_rol` int(10) unsigned NOT NULL,
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla estancia_app_r5.usuarios: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla estancia_app.usuarios: ~6 rows (aproximadamente)
 INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre`, `apellido`, `email`, `password_hash`, `activo`, `created_at`, `updated_at`, `debe_cambiar_password`) VALUES
 	(1, 1, 'Sara', 'Willers', 'dueno@estancia.app', '$2b$10$edn7NvaKw3A6rYzyM5b.F.kSDxlJWjN4fo4.dnIr/v3UDP9LUTA1C', 1, '2026-09-20 22:31:13', '2026-09-24 14:19:10', 0),
 	(2, 2, 'Martín', 'López', 'coprop@estancia.app', '$2a$10$VFt8EMqmR136yHf4SaALmuO.Hp2KrDSXOgkbEiRINm29zhh/unsUW', 0, '2026-09-20 22:31:13', '2026-09-24 14:19:32', 1),

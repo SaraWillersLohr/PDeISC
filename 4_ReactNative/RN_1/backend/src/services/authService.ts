@@ -2,7 +2,7 @@
 // logica de login y perfil
 import pool from '../config/database';
 import { comparePassword, hashPassword } from '../utils/password';
-import { signToken } from '../utils/jwt';
+import { signPasswordRecoveryToken, signToken, verifyPasswordRecoveryToken } from '../utils/jwt';
 import { getRolLabel } from '../utils/roles';
 import type { LoginRequest, UsuarioDB, UsuarioPublico } from '../types';
 import type { RowDataPacket } from 'mysql2';
@@ -157,22 +157,22 @@ export async function requestPasswordRecovery(emailInput: string): Promise<void>
   await sendPasswordRecoveryCode(email, String(users[0].nombre), code);
 }
 
-// Esta función verifica el código temporal, cambia el hash de contraseña y aumenta la versión de sesión para invalidar todos los JWT emitidos antes de la recuperación.
-export async function resetPasswordWithCode(emailInput: string, code: string, newPassword: string): Promise<void> {
+// Esta función valida el código de una cuenta activa, lo consume y emite un permiso temporal que solo sirve para establecer una contraseña nueva.
+export async function redeemPasswordRecoveryCode(emailInput: string, code: string): Promise<{ resetToken: string }> {
   const email = emailInput.trim().toLowerCase();
   if (!/^\S+@\S+\.\S+$/.test(email) || !/^\d{6}$/.test(code)) throw new Error('El correo o el código no son válidos.');
-  if (typeof newPassword !== 'string' || newPassword.length < 10 || Buffer.byteLength(newPassword, 'utf8') > 72) {
-    throw new Error('La contraseña debe tener entre 10 y 72 bytes.');
-  }
-  const passwordHash = await hashPassword(newPassword);
   const connection = await pool.getConnection();
+  let usuario: UsuarioRow;
   try {
     await connection.beginTransaction();
-    const [users] = await connection.query<RowDataPacket[]>(
-      "SELECT id_usuario FROM usuarios WHERE email = ? AND activo = 1 AND estado_cuenta = 'activo' LIMIT 1 FOR UPDATE", [email],
+    const [users] = await connection.query<UsuarioRow[]>(
+      `SELECT u.*, r.nombre AS rol_nombre FROM usuarios u
+       INNER JOIN roles r ON r.id_rol = u.id_rol
+       WHERE u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1 FOR UPDATE`, [email],
     );
     if (!users.length) throw new Error('El código no es válido o venció.');
-    const userId = Number(users[0].id_usuario);
+    usuario = users[0];
+    const userId = Number(usuario.id_usuario);
     const [codes] = await connection.query<RowDataPacket[]>(
       `SELECT id_codigo, codigo_hash, intentos FROM codigos_recuperacion_password
        WHERE id_usuario = ? AND consumido_at IS NULL AND invalidado_at IS NULL AND expira_at > NOW()
@@ -188,9 +188,6 @@ export async function resetPasswordWithCode(emailInput: string, code: string, ne
     }
     await connection.execute('UPDATE codigos_recuperacion_password SET consumido_at = NOW() WHERE id_codigo = ?', [codes[0].id_codigo]);
     await connection.execute(
-      'UPDATE usuarios SET password_hash = ?, token_version = token_version + 1 WHERE id_usuario = ?', [passwordHash, userId],
-    );
-    await connection.execute(
       'UPDATE codigos_recuperacion_password SET invalidado_at = NOW() WHERE id_usuario = ? AND id_codigo <> ? AND consumido_at IS NULL AND invalidado_at IS NULL',
       [userId, codes[0].id_codigo],
     );
@@ -201,6 +198,63 @@ export async function resetPasswordWithCode(emailInput: string, code: string, ne
   } finally {
     connection.release();
   }
+  const resetToken = signPasswordRecoveryToken({
+    id_usuario: usuario.id_usuario,
+    email: usuario.email,
+    rol: usuario.rol_nombre!,
+    token_version: Number(usuario.token_version),
+  });
+  return { resetToken };
+}
+
+// Esta función acepta únicamente un permiso de recuperación válido, actualiza la contraseña, revoca sesiones anteriores e inicia la sesión nueva.
+export async function completePasswordRecovery(resetToken: string, newPassword: string): Promise<{ token: string; usuario: UsuarioPublico }> {
+  if (typeof newPassword !== 'string' || newPassword.length < 10 || Buffer.byteLength(newPassword, 'utf8') > 72) {
+    throw new Error('La contraseña debe tener entre 10 y 72 bytes.');
+  }
+  const recovery = verifyPasswordRecoveryToken(resetToken);
+  const passwordHash = await hashPassword(newPassword);
+  const connection = await pool.getConnection();
+  let usuario: UsuarioRow;
+  let newTokenVersion = 0;
+  try {
+    await connection.beginTransaction();
+    const [users] = await connection.query<UsuarioRow[]>(
+      `SELECT u.*, r.nombre AS rol_nombre FROM usuarios u
+       INNER JOIN roles r ON r.id_rol = u.id_rol
+       WHERE u.id_usuario = ? AND u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1 FOR UPDATE`,
+      [recovery.id_usuario, recovery.email],
+    );
+    if (!users.length || Number(users[0].token_version) !== Number(recovery.token_version)) {
+      throw new Error('El permiso de recuperación venció o ya fue utilizado.');
+    }
+    usuario = users[0];
+    newTokenVersion = Number(usuario.token_version) + 1;
+    await connection.execute(
+      'UPDATE usuarios SET password_hash = ?, debe_cambiar_password = 0, token_version = ? WHERE id_usuario = ?',
+      [passwordHash, newTokenVersion, usuario.id_usuario],
+    );
+    await connection.execute(
+      'UPDATE codigos_recuperacion_password SET invalidado_at = NOW() WHERE id_usuario = ? AND consumido_at IS NULL AND invalidado_at IS NULL',
+      [usuario.id_usuario],
+    );
+    await connection.commit();
+  } catch (error) {
+    try { await connection.rollback(); } catch { /* La transacción pudo haberse confirmado antes de propagar el error. */ }
+    throw error;
+  } finally {
+    connection.release();
+  }
+
+  usuario.token_version = newTokenVersion;
+  usuario.debe_cambiar_password = 0;
+  const token = signToken({
+    id_usuario: usuario.id_usuario,
+    email: usuario.email,
+    rol: usuario.rol_nombre!,
+    token_version: newTokenVersion,
+  });
+  return { token, usuario: toPublico(usuario) };
 }
 
 // Esta función revoca todas las sesiones JWT del usuario al incrementar la versión que valida el middleware en cada petición.

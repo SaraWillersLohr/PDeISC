@@ -1,11 +1,9 @@
-// Archivo src/screens/LoginScreen.tsx: el formulario de ingreso y las alternativas de autenticación disponibles. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
+// Archivo src/screens/LoginScreen.tsx: el formulario de ingreso por correo y contraseña. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { AuthPage } from '../components/AuthPage';
-import { SocialLoginButtons } from '../components/SocialLoginButtons';
-import type { SocialProviderId } from '../services/authApi';
 
 // Contrato de datos LoginScreenProps: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 interface LoginScreenProps {
@@ -13,14 +11,12 @@ interface LoginScreenProps {
   onAccessTokenPress: (email: string) => void;
   onRecoveryPress: (email: string) => void;
   onRegisterPress: () => void;
-  socialProviders: SocialProviderId[];
-  onSocialLogin: (provider: SocialProviderId, remember: boolean) => void;
   busy: boolean;
   error: string | null;
   notice?: string | null;
 }
-// Esta función renderiza el bloque de interfaz LoginScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe onLogin, onAccessTokenPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice como entrada.
-export function LoginScreen({ onLogin, onAccessTokenPress, onRecoveryPress, onRegisterPress, socialProviders, onSocialLogin, busy, error, notice }: LoginScreenProps) {
+// Esta función renderiza el formulario de ingreso y conecta sus props con las acciones disponibles. Recibe onLogin, onAccessTokenPress, onRecoveryPress, onRegisterPress, busy, error y notice como entrada.
+export function LoginScreen({ onLogin, onAccessTokenPress, onRecoveryPress, onRegisterPress, busy, error, notice }: LoginScreenProps) {
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));
   const [email, setEmail] = useState('');
@@ -40,8 +36,8 @@ export function LoginScreen({ onLogin, onAccessTokenPress, onRecoveryPress, onRe
   };
 
   return <AuthPage>
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView contentContainerStyle={[styles.page, { paddingHorizontal: gutter }]} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView style={styles.flex} contentContainerStyle={[styles.page, { paddingHorizontal: gutter }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Bienvenida</Text>
         <Text style={styles.subtitle}>Ingresá con tu cuenta para continuar.</Text>
         <View style={styles.form}>
@@ -94,7 +90,6 @@ export function LoginScreen({ onLogin, onAccessTokenPress, onRecoveryPress, onRe
           <Pressable accessibilityRole="button" onPress={() => onRecoveryPress(email.trim().toLowerCase())} style={styles.linkButton}>
             <Text style={styles.link}>Olvidé mi contraseña</Text>
           </Pressable>
-          <SocialLoginButtons providers={socialProviders} rememberMe={remember} onSelect={onSocialLogin} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -103,9 +98,9 @@ export function LoginScreen({ onLogin, onAccessTokenPress, onRecoveryPress, onRe
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  page: { flexGrow: 1, justifyContent: 'center', paddingVertical: 28, width: '100%', maxWidth: 520, alignSelf: 'center' },
-  title: { color: '#1a3020', fontSize: 34, fontWeight: '800', marginTop: 9 },
-  subtitle: { color: '#6b756b', fontSize: 16, marginTop: 8, marginBottom: 24 },
+  page: { flexGrow: 1, justifyContent: 'center', paddingVertical: 18, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  title: { color: '#1a3020', fontSize: 34, fontWeight: '800', marginTop: 4 },
+  subtitle: { color: '#6b756b', fontSize: 16, lineHeight: 23, marginTop: 7, marginBottom: 17 },
   form: { gap: 11 },
   label: { color: '#2f3931', fontSize: 14, fontWeight: '700', marginTop: 7 },
   input: { minHeight: 52, borderWidth: 1, borderColor: '#e1e7e1', borderRadius: 13, backgroundColor: '#f9faf8', paddingHorizontal: 15, color: '#1a3020', fontSize: 16 },

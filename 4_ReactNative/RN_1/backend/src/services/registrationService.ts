@@ -1,5 +1,5 @@
 // Archivo backend/src/services/registrationService.ts: el ciclo de registro, verificación, aprobación administrativa y entrega del token. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
-import { createHmac, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { PoolConnection } from 'mysql2/promise';
 import pool from '../config/database';
@@ -8,7 +8,6 @@ import { signToken } from '../utils/jwt';
 import { getRolLabel } from '../utils/roles';
 import { createNotificacion } from './notificacionService';
 import { sendAccessToken, sendAdministratorRegistrationNotice, sendRegistrationRejection, sendVerificationCode } from './emailService';
-import type { SocialProvider } from '../types';
 // Configuración: CODE_TTL_MINUTES establece minutos durante los que un código de verificación sigue vigente; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
 const CODE_TTL_MINUTES = 10;
 // Configuración: MAX_ATTEMPTS establece cantidad máxima de intentos permitidos para verificar un código; modificá esta constante solo si querés cambiar esa regla para toda la aplicación.
@@ -125,30 +124,6 @@ export async function register(input: RegistrationInput): Promise<void> {
   await issueCode(requestId, email);
 }
 
-// Crea una solicitud mediante OAuth: la identidad del proveedor confirma el correo; aun así requiere aprobación y token.
-export async function registerSocial(input: { nombre: string; apellido: string; email: string; provider: SocialProvider; providerUserId: string }): Promise<void> {
-  assertMailAndCodeConfig();
-  const nombre = input.nombre.trim().slice(0, 100) || 'Usuario';
-  const apellido = input.apellido.trim().slice(0, 100) || 'Social';
-  const email = input.email.trim().toLowerCase();
-  if (!input.providerUserId || input.providerUserId.length > 255) throw new Error('No se pudo validar el identificador de la cuenta social.');
-  // Hash aleatorio válido: estas cuentas autentican con OAuth y nunca quedan con hash vacío.
-  const socialPasswordHash = await hashPassword(randomBytes(32).toString('hex'));
-  if (!/^\S+@\S+\.\S+$/.test(email) || email.length > 150) throw new Error('El proveedor no entregó un correo válido. Elegí otro método de registro.');
-  const [users] = await pool.query<RowDataPacket[]>('SELECT id_usuario FROM usuarios WHERE email = ? LIMIT 1', [email]);
-  if (users.length) throw new Error('Ya existe una cuenta con ese correo. Ingresá con tu cuenta o vinculá este proveedor desde el administrador.');
-  const [existing] = await pool.query<RowDataPacket[]>('SELECT id_solicitud, estado FROM solicitudes_registro WHERE email = ? LIMIT 1', [email]);
-  if (existing.length && existing[0].estado === 'pendiente_aprobacion') throw new Error('Tu solicitud ya fue verificada y espera la decisión del administrador.');
-  if (existing.length && existing[0].estado === 'aprobada') throw new Error('Ya existe una cuenta con ese correo. Ingresá con tu cuenta.');
-  if (existing.length) {
-    await pool.execute(`UPDATE solicitudes_registro SET nombre = ?, apellido = ?, email = ?, password_hash = ?, proveedor_social = ?, proveedor_usuario_id = ?, estado = 'pendiente_aprobacion', email_verificado_at = NOW(), resuelta_at = NULL, resuelta_por = NULL WHERE id_solicitud = ?`, [nombre, apellido, email, socialPasswordHash, input.provider, input.providerUserId, Number(existing[0].id_solicitud)]);
-    await pool.execute('UPDATE codigos_verificacion_solicitud SET invalidado_at = NOW() WHERE id_solicitud = ? AND consumido_at IS NULL AND invalidado_at IS NULL', [Number(existing[0].id_solicitud)]);
-  } else {
-    await pool.execute(`INSERT INTO solicitudes_registro (nombre, apellido, email, password_hash, proveedor_social, proveedor_usuario_id, estado, email_verificado_at) VALUES (?, ?, ?, ?, ?, ?, 'pendiente_aprobacion', NOW())`, [nombre, apellido, email, socialPasswordHash, input.provider, input.providerUserId]);
-  }
-  await notifyAdminsOfRegistration(nombre, email);
-}
-
 // Envía aviso in-app y por correo al administrador luego de verificar un correo.
 export async function notifyAdminsOfRegistration(applicantName: string, email: string): Promise<void> {
   const [admins] = await pool.query<RowDataPacket[]>("SELECT u.id_usuario, u.email FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol WHERE r.nombre = 'administrador' AND u.activo = 1 ORDER BY u.id_usuario");
@@ -199,7 +174,7 @@ export async function resendAccessToken(emailInput: string): Promise<void> {
     await connection.commit();
   } catch (error) { await connection.rollback(); throw error; }
   finally { connection.release(); }
-  await sendAccessToken(email, String(users[0].nombre), token, Number(users[0].debe_cambiar_password) === 1);
+  await sendAccessToken(email, String(users[0].nombre), token);
 }
 
 // Canjea el token de aprobación, activa el usuario y devuelve su sesión normal.
@@ -306,11 +281,11 @@ export async function listPendingRequests(): Promise<RegistrationRequest[]> {
 // Esta función aprueba la solicitud o cambio solicitado, aplica las reglas de rol y estado, y prepara el token de acceso que se envía a la persona. Recibe requestId, adminId como entrada.
 export async function approveRequest(requestId: number, adminId: number): Promise<void> {
   const connection = await pool.getConnection();
-  let email = ''; let nombre = ''; let accessToken = ''; let setupPassword = false;
+  let email = ''; let nombre = ''; let accessToken = '';
   try {
     await connection.beginTransaction();
     const [requests] = await connection.query<RowDataPacket[]>(
-      `SELECT id_solicitud, nombre, apellido, email, password_hash, proveedor_social, proveedor_usuario_id FROM solicitudes_registro
+      `SELECT id_solicitud, nombre, apellido, email, password_hash FROM solicitudes_registro
        WHERE id_solicitud = ? AND estado = 'pendiente_aprobacion' FOR UPDATE`, [requestId],
     );
     if (!requests.length) throw new Error('La solicitud no existe o ya fue resuelta.');
@@ -320,18 +295,15 @@ export async function approveRequest(requestId: number, adminId: number): Promis
     const [created] = await connection.execute<ResultSetHeader>(
       `INSERT INTO usuarios (id_rol, nombre, apellido, email, password_hash, activo, debe_cambiar_password, estado_cuenta, email_verificado_at)
        VALUES (?, ?, ?, ?, ?, 1, ?, 'pendiente_acceso', NOW())`,
-      [roles[0].id_rol, request.nombre, request.apellido, request.email, request.password_hash, request.proveedor_social ? 1 : 0],
+      [roles[0].id_rol, request.nombre, request.apellido, request.email, request.password_hash, 0],
     );
-    if (request.proveedor_social && request.proveedor_usuario_id) {
-      await connection.execute('INSERT INTO identidades_sociales (id_usuario, proveedor, proveedor_usuario_id) VALUES (?, ?, ?)', [created.insertId, request.proveedor_social, request.proveedor_usuario_id]);
-    }
     accessToken = await storeAccessToken(connection, created.insertId);
     await connection.query("UPDATE solicitudes_registro SET estado = 'aprobada', password_hash = '', resuelta_at = NOW(), resuelta_por = ? WHERE id_solicitud = ?", [adminId, requestId]);
     await connection.commit();
-    email = request.email; nombre = request.nombre; setupPassword = Boolean(request.proveedor_social);
+    email = request.email; nombre = request.nombre;
   } catch (error) { await connection.rollback(); throw error; }
   finally { connection.release(); }
-  try { await sendAccessToken(email, nombre, accessToken, setupPassword); }
+  try { await sendAccessToken(email, nombre, accessToken); }
   catch { throw new Error('La solicitud fue aprobada, pero no se pudo enviar el token. La persona puede pedir que se lo reenviemos desde la pantalla de ingreso.'); }
 }
 // Esta función rechaza la solicitud indicada y registra la decisión administrativa; según el flujo, también comunica el resultado por correo. Recibe requestId, adminId como entrada.

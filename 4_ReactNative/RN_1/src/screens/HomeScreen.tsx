@@ -46,6 +46,8 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
   const [animalAction, setAnimalAction] = useState<{ animal: Animal; kind: 'report' | 'discharge' } | null>(null);
   const [actionText, setActionText] = useState('');
   const [actionBusy, setActionBusy] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const hasSidebarMenu = ['administrador', 'dueno', 'copropietario'].includes(user.rol);
 
   const loadSection = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true); else setLoading(true);
@@ -120,7 +122,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
 
   return <View style={[styles.screen, wide && styles.screenWide]}>
     {wide ? <View style={styles.sidebar}>
-      <View style={styles.sidebarBrandMark}><Text style={styles.sidebarLeaf}>✦</Text></View>
+      <View style={styles.sidebarBrandMark}><MaterialCommunityIcons name="leaf" size={23} color="#a8d5a2" /></View>
       <Text style={styles.sidebarBrand}>Gestión de Campo</Text><Text style={styles.sidebarCaption}>ESTANCIA APP</Text>
       <View style={styles.sidebarUser}><View style={styles.sidebarAvatar}><Text style={styles.sidebarAvatarText}>{user.nombre.charAt(0).toUpperCase()}</Text></View><View style={styles.sidebarUserCopy}><Text numberOfLines={1} style={styles.sidebarUserName}>{user.nombre} {user.apellido}</Text><Text style={styles.sidebarUserRole}>{user.rolLabel}</Text></View></View>
       <Text style={styles.sidebarSection}>MENÚ PRINCIPAL</Text>
@@ -134,6 +136,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
       <View style={styles.headerInner}>
         <View style={styles.headerMain}><Text style={styles.brand}>{wide ? 'PANEL DE GESTIÓN' : 'ESTANCIA APP'}</Text><Text numberOfLines={1} style={[styles.greeting, !wide && width < 360 && styles.greetingCompact]}>{wide ? NAV.find((item) => item.id === section)?.title : `Hola, ${user.nombre}`}</Text><Text numberOfLines={1} style={styles.role}>{wide ? `${user.nombre} ${user.apellido} · ${user.rolLabel}` : user.rolLabel}</Text></View>
         <View style={styles.headerActions}>
+          {!wide && hasSidebarMenu ? <Pressable accessibilityRole="button" accessibilityLabel="Abrir menú" onPress={() => setDrawerOpen(true)} style={styles.bellButton}><MaterialCommunityIcons name="menu" size={25} color="#315a3c" /></Pressable> : null}
           <Pressable accessibilityRole="button" accessibilityLabel={`Ver avisos${alerts.length ? `, ${alerts.length} notificaciones` : ''}`} onPress={() => setSection('avisos')} style={styles.bellButton}>
             <MaterialCommunityIcons name="bell-outline" size={23} color="#315a3c" />
             {alerts.length > 0 ? <View style={styles.bellBadge}><Text style={styles.bellBadgeText}>{alerts.length > 99 ? '99+' : alerts.length}</Text></View> : null}
@@ -142,7 +145,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
         </View>
       </View>
     </View>
-    {!wide ? <View style={[styles.nav, { paddingHorizontal: gutter }]}>
+    {!wide && !hasSidebarMenu ? <View style={[styles.nav, { paddingHorizontal: gutter }]}>
       {navItems.map((item) => <Pressable key={item.id} onPress={() => setSection(item.id)} style={[styles.navItem, section === item.id && styles.navSelected]}><Text style={[styles.navText, section === item.id && styles.navTextSelected]}>{item.title}</Text></Pressable>)}
     </View> : null}
     <FlatList
@@ -162,6 +165,20 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
       ListEmptyComponent={!loading && !farmSection ? <Text style={styles.empty}>No hay elementos para mostrar.</Text> : null}
       renderItem={({ item }: { item: Animal | Corral | EquipoItem | SignupRequest | Notification }) => <RecordCard item={item} section={section} token={token} currentUser={user} onChanged={() => loadSection(true)} onAnimalAction={(animal, kind) => { setActionText(''); setAnimalAction({ animal, kind }); }} onRequestDecision={(request, approve) => void handleRequestDecision(request, approve)} onChooseRole={(member) => void handleRoleChange(member)} showMessage={showMessage} />}
     />
+    <Modal visible={drawerOpen} transparent animationType="fade" onRequestClose={() => setDrawerOpen(false)}>
+      <View style={styles.drawerOverlay}>
+        <View style={[styles.drawerPanel, { paddingTop: (Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 18) + 18 }]}>
+          <View style={styles.drawerBrand}><View style={styles.sidebarBrandMark}><MaterialCommunityIcons name="leaf" size={23} color="#a8d5a2" /></View><View><Text style={styles.sidebarBrand}>Gestión de Campo</Text><Text style={styles.sidebarCaption}>ESTANCIA APP</Text></View></View>
+          <View style={styles.sidebarUser}><View style={styles.sidebarAvatar}><Text style={styles.sidebarAvatarText}>{user.nombre.charAt(0).toUpperCase()}</Text></View><View style={styles.sidebarUserCopy}><Text numberOfLines={1} style={styles.sidebarUserName}>{user.nombre} {user.apellido}</Text><Text style={styles.sidebarUserRole}>{user.rolLabel}</Text></View></View>
+          <Text style={styles.sidebarSection}>MENÚ PRINCIPAL</Text>
+          <ScrollView style={styles.sidebarNav} contentContainerStyle={styles.sidebarNavContent} showsVerticalScrollIndicator={false}>
+            {navItems.map((item) => <Pressable key={item.id} onPress={() => { setSection(item.id); setDrawerOpen(false); }} style={[styles.drawerItem, section === item.id && styles.drawerItemSelected]}><MaterialCommunityIcons name={NAV_ICONS[item.id]} size={20} color={section === item.id ? '#fff' : '#d2dfd3'} /><Text style={[styles.sidebarItemText, section === item.id && styles.sidebarItemTextSelected]}>{item.title}</Text></Pressable>)}
+          </ScrollView>
+          <Pressable accessibilityRole="button" onPress={() => { setDrawerOpen(false); onLogout(); }} style={styles.sidebarLogout}><Text style={styles.sidebarLogoutIcon}>↗</Text><Text style={styles.sidebarLogoutText}>Cerrar sesión</Text></Pressable>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Cerrar menú" style={styles.drawerScrim} onPress={() => setDrawerOpen(false)} />
+      </View>
+    </Modal>
     <Modal visible={!!animalAction} transparent animationType="fade" onRequestClose={() => { if (!actionBusy) setAnimalAction(null); }}>
       <KeyboardAvoidingView style={styles.modalOverlay} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView contentContainerStyle={styles.modalScroll} keyboardShouldPersistTaps="handled">
@@ -181,6 +198,7 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
     </View>
   </View>;
 }
+const NAV_ICONS: Record<Section, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = { inicio: 'view-dashboard-outline', animales: 'cow', corrales: 'fence', equipo: 'account-group-outline', solicitudes: 'clipboard-check-outline', campo: 'sprout', veterinaria: 'medical-bag', reproduccion: 'heart-pulse', avisos: 'bell-outline' };
 // Esta función renderiza el bloque de interfaz Dashboard dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe summary como entrada.
 function Dashboard({ summary }: { summary: DashboardSummary | null }) {
   if (!summary) return <Text style={styles.empty}>No hay resumen disponible.</Text>;
@@ -229,6 +247,7 @@ function CreateUserCard({ token, onCreated }: { token: string; onCreated: () => 
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#f4f7f6' }, screenWide: { flexDirection: 'row' }, main: { flex: 1, minWidth: 0, backgroundColor: '#f4f7f6' },
+  drawerOverlay: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(17,31,21,0.45)' }, drawerScrim: { flex: 1 }, drawerPanel: { width: '82%', maxWidth: 320, backgroundColor: '#1a3020', paddingHorizontal: 18, paddingBottom: 18, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 18, elevation: 18 }, drawerBrand: { flexDirection: 'row', alignItems: 'center', gap: 12 }, drawerItem: { flexDirection: 'row', alignItems: 'center', gap: 13, minHeight: 48, paddingHorizontal: 13, borderRadius: 11 }, drawerItemSelected: { backgroundColor: 'rgba(74,222,128,0.18)' },
   sidebar: { width: 246, flexShrink: 0, backgroundColor: '#1a3020', paddingTop: 30, paddingHorizontal: 18, paddingBottom: 18 }, sidebarBrandMark: { width: 42, height: 42, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' }, sidebarLeaf: { color: '#a8d5a2', fontSize: 21, fontWeight: '900' }, sidebarBrand: { color: '#f2f8f1', fontSize: 16, fontWeight: '800', marginTop: 13 }, sidebarCaption: { color: '#adc2af', fontSize: 10, letterSpacing: 1.6, fontWeight: '800', marginTop: 4 }, sidebarUser: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 28, paddingVertical: 15, borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }, sidebarAvatar: { width: 37, height: 37, borderRadius: 19, backgroundColor: '#dce8da', alignItems: 'center', justifyContent: 'center' }, sidebarAvatarText: { color: '#315a3c', fontSize: 16, fontWeight: '800' }, sidebarUserCopy: { flex: 1, minWidth: 0 }, sidebarUserName: { color: '#fff', fontSize: 13, fontWeight: '700' }, sidebarUserRole: { color: '#b3c4b5', fontSize: 11, marginTop: 3 }, sidebarSection: { color: '#90a795', fontSize: 9, letterSpacing: 1.5, fontWeight: '800', marginTop: 25, marginBottom: 10 }, sidebarNav: { flex: 1 }, sidebarNavContent: { gap: 5 }, sidebarItem: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44, paddingHorizontal: 13, borderRadius: 10 }, sidebarItemSelected: { backgroundColor: 'rgba(74,222,128,0.16)' }, sidebarItemDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#829284' }, sidebarItemDotSelected: { backgroundColor: '#8fc794' }, sidebarItemText: { color: '#d2dfd3', fontSize: 13, fontWeight: '600' }, sidebarItemTextSelected: { color: '#fff', fontWeight: '800' }, sidebarLogout: { flexDirection: 'row', alignItems: 'center', gap: 11, minHeight: 46, paddingHorizontal: 12, borderTopWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }, sidebarLogoutIcon: { color: '#c9d7ca', fontSize: 18 }, sidebarLogoutText: { color: '#d2dfd3', fontSize: 13, fontWeight: '600' },
   header: { paddingBottom: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e7ece7' }, headerInner: { width: '100%', maxWidth: 1240, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }, headerMain: { flex: 1, minWidth: 0 }, headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }, brand: { color: '#4a704d', fontWeight: '800', fontSize: 10, letterSpacing: 1.7 }, greeting: { color: '#1a3020', fontSize: 25, fontWeight: '800', marginTop: 5, flexShrink: 1 }, greetingCompact: { fontSize: 21 }, role: { color: '#6b756b', fontSize: 13, marginTop: 3 }, bellButton: { width: 44, height: 44, borderRadius: 13, backgroundColor: '#edf4eb', alignItems: 'center', justifyContent: 'center', position: 'relative' }, bellBadge: { position: 'absolute', top: -4, right: -4, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: '#b43d35', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: '#fff' }, bellBadgeText: { color: '#fff', fontSize: 9, lineHeight: 12, fontWeight: '800' }, logout: { paddingVertical: 10, paddingHorizontal: 16, backgroundColor: '#edf2eb', borderRadius: 11 }, logoutText: { color: '#315a3c', fontWeight: '700' },
   headerMobile: { marginTop: 10, marginHorizontal: 14, paddingBottom: 14, borderWidth: 1, borderColor: '#e5e9e4', borderRadius: 16, shadowColor: '#1a3020', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } },

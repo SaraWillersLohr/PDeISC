@@ -26,5 +26,21 @@ export function signToken(payload: JwtPayload): string {
 
 // verifico y decodifico el token � lanza error si es inv�lido
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, JWT_SECRET) as unknown as JwtPayload;
+  const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & { purpose?: string };
+  if (payload.purpose) throw new Error('el token no es una sesión de acceso');
+  return payload as JwtPayload;
+}
+
+// Firma un permiso temporal de recuperación distinto del JWT de acceso y con una vigencia máxima de cinco minutos.
+export function signPasswordRecoveryToken(payload: JwtPayload): string {
+  return jwt.sign({ ...payload, purpose: 'password_reset' }, JWT_SECRET, { expiresIn: '5m' });
+}
+
+// Verifica firma, vencimiento y propósito para impedir que un JWT de sesión se use como permiso para cambiar la contraseña.
+export function verifyPasswordRecoveryToken(token: string): JwtPayload {
+  const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & Partial<JwtPayload> & { purpose?: string };
+  if (payload.purpose !== 'password_reset' || !payload.id_usuario || !payload.email || !payload.rol) {
+    throw new Error('permiso de recuperación inválido');
+  }
+  return payload as JwtPayload;
 }

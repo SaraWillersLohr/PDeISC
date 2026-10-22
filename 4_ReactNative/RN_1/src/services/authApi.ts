@@ -1,4 +1,4 @@
-// Archivo src/services/authApi.ts: las solicitudes de autenticación, registro, verificación y acceso social. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
+// Archivo src/services/authApi.ts: las solicitudes de autenticación, registro, verificación y recuperación por correo. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
 import { API_BASE_URL } from '../config/api';
 import type { ApiResponse, LoginResult, PublicUser } from '../types/auth';
 
@@ -72,14 +72,30 @@ export async function changeInitialPasswordApi(token: string, password: string):
   return readResponse<PublicUser>(response);
 }
 
-// Esta función pide un código de recuperación con una respuesta genérica para no revelar si existe una cuenta con ese correo.
+// Esta función pide un código de recuperación por correo con una respuesta genérica para no revelar si existe una cuenta.
 export async function requestPasswordRecoveryApi(email: string): Promise<string> {
   return postMessage('password-recovery/request', { email });
 }
 
-// Esta función canjea el código de seis dígitos para guardar una contraseña nueva e invalidar las sesiones anteriores.
-export async function resetPasswordApi(email: string, code: string, password: string): Promise<string> {
-  return postMessage('password-recovery/reset', { email, code, password });
+// Esta función valida el código de recuperación y obtiene un permiso temporal para establecer la contraseña nueva.
+export async function redeemPasswordRecoveryCodeApi(email: string, code: string): Promise<string> {
+  const response = await fetch(`${API_BASE_URL}/auth/password-recovery/redeem`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, code }),
+  });
+  const result = await readResponse<{ resetToken: string }>(response);
+  return result.resetToken;
+}
+
+// Esta función guarda la contraseña nueva con el permiso temporal y recibe la sesión para entrar al portal.
+export async function resetPasswordApi(resetToken: string, password: string): Promise<LoginResult> {
+  const response = await fetch(`${API_BASE_URL}/auth/password-recovery/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ resetToken, password }),
+  });
+  return readResponse<LoginResult>(response);
 }
 
 // Esta función revoca la sesión en el backend antes de que la app borre el JWT local.
@@ -90,22 +106,3 @@ export async function logoutApi(token: string): Promise<void> {
   await readResponse<unknown>(response);
 }
 
-// Contrato de datos SocialProviderId: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
-export type SocialProviderId = 'google' | 'facebook' | 'github' | 'discord' | 'twitch' | 'twitter';
-// Contrato de datos SocialLoginResult: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
-export interface SocialLoginResult extends LoginResult { rememberMe: boolean; }
-
-// Lista solo proveedores OAuth cuyas dos credenciales están configuradas en el backend.
-export async function listSocialProvidersApi(): Promise<SocialProviderId[]> {
-  const response = await fetch(`${API_BASE_URL}/auth/social/providers`);
-  const result = await readResponse<{ providers: SocialProviderId[] }>(response);
-  return result.providers;
-}
-
-// Canjea el código efímero recibido al volver del proveedor por la sesión normal.
-export async function exchangeSocialCodeApi(code: string): Promise<SocialLoginResult> {
-  const response = await fetch(`${API_BASE_URL}/auth/social/exchange`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }),
-  });
-  return readResponse<SocialLoginResult>(response);
-}

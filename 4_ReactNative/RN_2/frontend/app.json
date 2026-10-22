@@ -1,45 +1,83 @@
 {
   "expo": {
-    "name": "ScanStock",
-    "slug": "scanstock",
-    "version": "1.0.0",
+    "name": "Catálogo de funciones",
+    "slug": "catalogo-funciones",
+    "version": "1.0.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
-    "scheme": "scanstock",
-    "userInterfaceStyle": "automatic",
+    "scheme": "catalogofunciones",
+    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.scanstock.inventario",
-      "permissions": ["CAMERA"],
+      "package": "com.sarawillers.catalogofunciones",
+      "versionCode": 2,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.ACTIVITY_RECOGNITION"
+      ],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#E7F3EE",
+        "foregroundImage": "./assets/images/icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "bundler": "metro",
       "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
-      ["expo-camera", { "cameraPermission": "ScanStock necesita la cámara para leer códigos de barras y QR.", "barcodeScannerEnabled": true }],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Catálogo de funciones necesita la cámara para probar la cámara y leer códigos.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Catálogo de funciones usa tu ubicación para mostrar las coordenadas del dispositivo."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Catálogo de funciones usa Face ID para probar la autenticación biométrica."
+        }
+      ],
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#F4F7F6"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "owner": "sarawillers2306",
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "0e3634af-507d-47dc-a146-8e81e23c3d20"
+      }
     }
   }
 }

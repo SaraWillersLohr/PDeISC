@@ -3,13 +3,11 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { AuthPage } from '../components/AuthPage';
-import { SocialLoginButtons } from '../components/SocialLoginButtons';
-import type { SocialProviderId } from '../services/authApi';
 
 // Contrato de datos Props: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
-interface Props { busy: boolean; error: string | null; socialProviders: SocialProviderId[]; onSocialRegister: (provider: SocialProviderId) => void; onBack: () => void; onSubmit: (data: { nombre: string; apellido: string; email: string; password: string }) => void }
-// Esta función renderiza el bloque de interfaz RegistrationScreen dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe busy, error, socialProviders, onSocialRegister, onBack, onSubmit como entrada.
-export function RegistrationScreen({ busy, error, socialProviders, onSocialRegister, onBack, onSubmit }: Props) {
+interface Props { busy: boolean; error: string | null; onBack: () => void; onSubmit: (data: { nombre: string; apellido: string; email: string; password: string }) => void }
+// Esta función renderiza el formulario de registro y conecta sus props con las acciones disponibles. Recibe busy, error, onBack y onSubmit como entrada.
+export function RegistrationScreen({ busy, error, onBack, onSubmit }: Props) {
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));
   const [nombre, setNombre] = useState(''); const [apellido, setApellido] = useState(''); const [email, setEmail] = useState('');
@@ -22,9 +20,7 @@ export function RegistrationScreen({ busy, error, socialProviders, onSocialRegis
   };
   return <AuthPage><KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}><ScrollView contentContainerStyle={[styles.page, { paddingHorizontal: gutter }]} keyboardShouldPersistTaps="handled">
     <Text style={styles.eyebrow}>ESTANCIA APP</Text><Text style={styles.title}>Crear cuenta</Text>
-    <Text style={styles.subtitle}>Podés crear una solicitud con tu correo o con una cuenta social. En ambos casos el administrador debe aprobarla; después te enviamos el token de acceso.</Text>
-    <SocialLoginButtons providers={socialProviders} rememberMe={false} intent="register" onSelect={(provider) => onSocialRegister(provider)} />
-    {socialProviders.length ? <Text style={styles.orEmail}>O registrate con correo electrónico</Text> : null}
+    <Text style={styles.subtitle}>Registrate con tu correo. El administrador debe aprobar la solicitud; después te enviamos el token de acceso.</Text>
     <View style={styles.form}>{[["Nombre", nombre, setNombre], ["Apellido", apellido, setApellido], ["Correo electrónico", email, setEmail], ["Contraseña", password, setPassword], ["Repetí la contraseña", confirm, setConfirm]].map(([label, value, setter]: any) => <View key={label}><Text style={styles.label}>{label}</Text><TextInput accessibilityLabel={label} autoCapitalize={label === 'Correo electrónico' ? 'none' : 'words'} keyboardType={label === 'Correo electrónico' ? 'email-address' : 'default'} secureTextEntry={label.includes('contraseña')} onChangeText={setter} style={styles.input} value={value} /></View>)}
       {validation || error ? <Text accessibilityRole="alert" style={styles.error}>{validation ?? error}</Text> : null}
       <PrimaryButton label="Registrarme y enviar código" onPress={submit} loading={busy} />
@@ -33,4 +29,4 @@ export function RegistrationScreen({ busy, error, socialProviders, onSocialRegis
   </ScrollView></KeyboardAvoidingView></AuthPage>;
 }
 
-const styles = StyleSheet.create({ flex: { flex: 1, backgroundColor: 'transparent' }, page: { flexGrow: 1, justifyContent: 'center', paddingVertical: 28, width: '100%', maxWidth: 520, alignSelf: 'center' }, eyebrow: { color: '#52765a', fontWeight: '800', letterSpacing: 2 }, title: { color: '#1a3020', fontSize: 32, fontWeight: '800', marginTop: 10 }, subtitle: { color: '#6b756b', fontSize: 15, lineHeight: 22, marginVertical: 12 }, orEmail: { textAlign: 'center', color: '#69746b', marginTop: 14, marginBottom: 4, fontSize: 13 }, form: { gap: 12 }, label: { color: '#2f3931', fontSize: 14, fontWeight: '700', marginTop: 7 }, input: { minHeight: 50, borderWidth: 1, borderColor: '#e1e7e1', borderRadius: 12, backgroundColor: '#f9faf8', paddingHorizontal: 15, color: '#1a3020', fontSize: 16 }, error: { color: '#a33232', lineHeight: 20, backgroundColor: '#fff0ed', padding: 11, borderRadius: 10 }, linkButton: { alignItems: 'center', padding: 10 }, link: { color: '#2d5a27', fontWeight: '700' } });
+const styles = StyleSheet.create({ flex: { flex: 1, backgroundColor: 'transparent' }, page: { flexGrow: 1, justifyContent: 'center', paddingVertical: 28, width: '100%', maxWidth: 520, alignSelf: 'center' }, eyebrow: { color: '#52765a', fontWeight: '800', letterSpacing: 2 }, title: { color: '#1a3020', fontSize: 32, fontWeight: '800', marginTop: 10 }, subtitle: { color: '#6b756b', fontSize: 15, lineHeight: 22, marginVertical: 12 }, form: { gap: 12 }, label: { color: '#2f3931', fontSize: 14, fontWeight: '700', marginTop: 7 }, input: { minHeight: 50, borderWidth: 1, borderColor: '#e1e7e1', borderRadius: 12, backgroundColor: '#f9faf8', paddingHorizontal: 15, color: '#1a3020', fontSize: 16 }, error: { color: '#a33232', lineHeight: 20, backgroundColor: '#fff0ed', padding: 11, borderRadius: 10 }, linkButton: { alignItems: 'center', padding: 10 }, link: { color: '#2d5a27', fontWeight: '700' } });

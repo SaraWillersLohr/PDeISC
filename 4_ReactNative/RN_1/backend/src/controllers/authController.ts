@@ -79,21 +79,36 @@ export async function requestPasswordRecovery(req: Request, res: Response): Prom
   res.status(202).json({ success: true, message: 'Si la cuenta puede recuperar el acceso, enviaremos un código al correo indicado.' });
 }
 
-// Esta función recibe el código de seis dígitos y la contraseña nueva; el servicio consume el código e invalida las sesiones previas.
-export async function resetPassword(req: Request, res: Response): Promise<void> {
+// Esta función verifica y consume el código de recuperación y entrega un permiso breve para establecer la contraseña nueva.
+export async function redeemPasswordRecoveryCode(req: Request, res: Response): Promise<void> {
   try {
-    const { email, code, password } = req.body as { email?: string; code?: string; password?: string };
-    if (!email?.trim() || !code || !password) {
-      res.status(400).json({ success: false, message: 'Completá correo, código y contraseña nueva.' });
+    const { email, code } = req.body as { email?: string; code?: string };
+    if (!email?.trim() || !code) {
+      res.status(400).json({ success: false, message: 'Completá el correo y el código de seis dígitos.' });
       return;
     }
-    await authService.resetPasswordWithCode(email, code, password);
-    res.json({ success: true, message: 'Contraseña actualizada. Iniciá sesión con tu nueva contraseña.' });
+    const result = await authService.redeemPasswordRecoveryCode(email, code);
+    res.json({ success: true, message: 'Código válido. Ahora elegí una contraseña nueva.', data: result });
+  } catch (error) {
+    res.status(400).json({ success: false, message: 'El correo o el código no son válidos, no corresponden a una cuenta activa o el código venció.' });
+  }
+}
+
+// Esta función guarda obligatoriamente una contraseña nueva usando el permiso temporal y devuelve la sesión autenticada.
+export async function completePasswordRecovery(req: Request, res: Response): Promise<void> {
+  try {
+    const { resetToken, password } = req.body as { resetToken?: string; password?: string };
+    if (!resetToken || !password) {
+      res.status(400).json({ success: false, message: 'Ingresá el código válido y la contraseña nueva.' });
+      return;
+    }
+    const session = await authService.completePasswordRecovery(resetToken, password);
+    res.json({ success: true, message: 'Contraseña actualizada. Iniciaste sesión.', data: session });
   } catch (error) {
     const rawMessage = error instanceof Error ? error.message : '';
     const message = rawMessage.includes('entre 10 y 72 bytes')
       ? rawMessage
-      : 'El código no es válido o venció. Revisá los datos e intentá de nuevo.';
+      : 'El código venció o ya fue usado. Solicitá uno nuevo e intentá otra vez.';
     res.status(400).json({ success: false, message });
   }
 }

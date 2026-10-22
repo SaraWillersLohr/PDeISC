@@ -51,6 +51,10 @@ export function LoginForm({ mode, onSuccess }: LoginFormProps) {
         <div>
           <h2>Gestión de Campo</h2>
           <p>Controlá tu campo, en un solo lugar</p>
+          <div className={styles.desktopWelcome} aria-hidden="true">
+            <h3>Bienvenida</h3>
+            <p>Ingresá con tu cuenta para continuar.</p>
+          </div>
         </div>
       </div>
 

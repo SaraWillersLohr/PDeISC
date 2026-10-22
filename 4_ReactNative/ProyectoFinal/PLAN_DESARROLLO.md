@@ -13,6 +13,7 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [x] conservar `estancia_app` como fuente de datos existente.
 - [ ] crear una copia de respaldo en HeidiSQL antes de aplicar una migración.
 - [ ] registrar qué migraciones se aplican a la base y en qué fecha.
+- [x] definir el alcance: una estancia por instalación/base, como RN_1; el formulario de solicitud no pide código de organización y el backend usa la base configurada.
 
 **resultado:** se puede desarrollar sin recrear ni perder la base actual.
 
@@ -22,7 +23,9 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [ ] crear un proveedor global de sesión, tema y mensajes visuales.
 - [ ] completar inicio de sesión, perfil actual, renovación de token y cierre de sesión.
 - [ ] sumar registro, verificación de correo, recuperación de contraseña y código de acceso inicial inspirados en RN_1.
-- [ ] implementar permisos para dueño, copropietario, peón y veterinario.
+- [ ] implementar permisos para administrador, dueño, peón y veterinario; reemplazar el rol copropietario después de respaldar la base.
+- [ ] implementar solicitudes pendientes de acceso, aprobación administrativa y códigos de activación de un solo uso con vencimiento.
+- [ ] provisionar la primera cuenta como administrador durante la puesta en marcha; después, asociar las solicitudes con la única estancia de la base y dejar la creación/activación de usuarios bajo control administrativo.
 - [ ] incorporar proveedores sociales solo después de configurar las credenciales en el backend.
 
 **resultado:** cada persona accede de forma segura y ve solamente lo permitido por su rol.
@@ -39,18 +42,26 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 
 ## etapa 3 - dashboard por rol
 
-- [ ] dueño y copropietario: total de animales, ocupación de corrales, alertas sanitarias, tratamientos activos y accesos rápidos.
+- [ ] administrador: solicitudes de alta, usuarios y estado general de la organización.
+- [ ] dueño: estadísticas, eventos, resultados de cría por animal, conteos anuales de crías y hembras preñadas, animales, corrales y actividad de usuarios.
 - [ ] peón: tareas de campo, animales asignados, traslados pendientes y reportes sanitarios.
-- [ ] veterinario: enfermería, tratamientos a controlar, altas pendientes e historial clínico.
+- [ ] veterinario: acceso acotado al corral de enfermería, tratamientos a controlar, altas pendientes e historial clínico de esos animales.
 - [ ] incluir métricas, gráficos simples y estados vacíos útiles.
 
 **resultado:** la primera pantalla prioriza las decisiones reales de cada rol.
 
 ## etapa 4 - operación ganadera
 
-- [ ] animales: listado, búsqueda, filtros, ficha, alta, edición y baja lógica.
-- [ ] corrales: capacidad, ocupación, enfermería y movimiento de animales.
-- [ ] equipo: administración de usuarios y permisos para dueño y copropietario.
+- [x] primera conexión de inventario: consultar animales activos y corrales con ocupación desde la API protegida, mostrar listados móviles, búsqueda y estados de carga/error; las escrituras y bajas siguen pendientes.
+- [x] movimientos: peón registra traslados desde la ficha del animal; el backend valida destino activo, capacidad y estado del animal, y guarda origen, destino, responsable y fecha en historial. La nueva tabla requiere aplicar `backend/migrations/2026-10-22-animal-movements.sql` después del respaldo.
+- [x] enfermería: el veterinario registra el alta y el sistema avisa al peón sin cambiar la ubicación; el traslado físico queda pendiente hasta que el peón lo registre. La tabla de altas y destinatario de avisos requiere aplicar `backend/migrations/2026-10-22-nursing-discharge.sql` después de las migraciones de registro y movimientos.
+- [ ] animales: listado, búsqueda, filtros, ficha, alta y edición por dueño/peón/administrador; baja lógica con motivo obligatorio (`muerte` o `venta`). La muerte requiere reporte y revisión administrativa; rechazar reactiva al animal sin borrar el reporte. La venta exige fecha y permite comprador y precio opcionales.
+- [ ] corrales: dueño configura capacidad y estructura; dueño/administrador editan y dan de baja corrales después de trasladar todos sus animales y resolver dependencias activas; peón registra ocupación operativa y movimientos, sin cambiar estructura/capacidad.
+- [ ] equipo: administrador gestiona solicitudes y cuentas, incluida edición y baja lógica; la baja bloquea el acceso y conserva autoría histórica. Dueño consulta usuarios y actividad.
+- [ ] campo: registrar servicios de monta, nacimientos con filiación, y reportes de muerte con lugar y fecha; la muerte causa baja operativa inmediata y revisión administrativa pendiente. Confirmar deja el animal fallecido; rechazar lo reactiva y conserva el reporte en la auditoría.
+- [ ] reproducción: peón y dueño pueden cargar y editar servicios de monta; el administrador tiene acceso total. Las anulaciones son lógicas y quedan auditadas.
+- [ ] catálogo: permitir solicitudes de especies y razas desde el campo, con aprobación administrativa antes de usarlas.
+- [ ] aplicar bajas lógicas a animales, corrales, usuarios y demás registros donde corresponda; exigir validaciones de dependencias, motivo cuando aplique y auditoría de cambios/bajas.
 - [ ] veterinaria: reportes, tratamientos, evolución y alta sanitaria.
 - [ ] historial: movimientos, cambios de estado y responsable de cada acción.
 
@@ -100,7 +111,7 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [ ] registrar exposiciones con categoría, institución organizadora, ubicación, fechas, animales participantes, premios y archivos asociados.
 - [ ] mostrar en la ficha de cada animal una línea de tiempo de participaciones, publicaciones, resultados y reconocimientos.
 - [ ] ofrecer el calendario como información externa de solo lectura para todos los roles.
-- [ ] mostrar al dueño y copropietario los próximos remates y exposiciones relevantes directamente en el dashboard para facilitar la decisión de asistencia.
+- [ ] mostrar al dueño y administrador los próximos remates y exposiciones relevantes directamente en el dashboard para facilitar la decisión de asistencia.
 - [ ] conservar borradores y fotos de eventos offline, enviándolos al recuperar conexión.
 - [ ] incorporar enlaces o integraciones externas solo con fuentes oficiales o autorizadas; el proceso automático omite registros incompletos y registra internamente los errores de extracción.
 - [x] conservar una lista inicial de asociaciones oficiales argentinas para futuras fuentes de eventos y registros genealógicos.
@@ -111,11 +122,12 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 
 - [ ] crear una vista `mapa del campo` con la ubicación de cada establecimiento, potrero y corral.
 - [ ] representar corrales y potreros como áreas coloreadas; el color muestra ocupación, capacidad, estado sanitario o tareas pendientes.
+- [ ] calcular la ubicación operativa por el último movimiento confirmado; guardar la geometría GPS de corrales y potreros, y permitir un punto individual de GPS solo para localizar una muerte reportada.
 - [ ] abrir cada área del mapa para consultar animales, ocupación, alertas, tratamientos y últimos movimientos.
 - [ ] usar una vista geográfica tipo google maps como única representación del campo; cada establecimiento, potrero y corral requiere coordenadas o límites geográficos reales.
 - [ ] guardar localmente las coordenadas, límites y capas operativas; el mapa base satelital o de calles requiere conexión.
 - [ ] incorporar gráficos de ocupación por corral, distribución por raza, evolución de peso, tratamientos y movimientos mensuales.
-- [ ] registrar posición individual de animales solo si existe un dispositivo GPS o si un usuario la informa explícitamente; no se inventan ubicaciones individuales.
+- [ ] no rastrear animales individualmente; el punto GPS individual solo se captura al reportar una muerte, mientras el GPS del mapa define áreas persistentes de corrales y potreros.
 
 ## etapa 8 - pruebas y entrega
 

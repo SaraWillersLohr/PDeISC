@@ -276,7 +276,7 @@ export function PeonPage() {
           <p>No se encontraron animales activos en corrales comunes.</p>
         </div>
       ) : (
-        <div>
+        <div className={styles.animalList}>
           {animalesCampo.map((animal) => (
             <div key={animal.id_animal} className={styles.animalCard}>
               <div className={styles.cardHeader}>

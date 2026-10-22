@@ -22,6 +22,16 @@ export function AuthLayout({ children, compact = false }: AuthLayoutProps) {
             alt="vaca en el campo  estanciaapp"
             className={styles.cowImage}
           />
+          <div className={styles.imageShade} />
+          <div className={styles.story}>
+            <div className={styles.storyBrand}>
+              <span aria-hidden="true">🌿</span>
+              <span>ESTANCIA APP</span>
+            </div>
+            <h1>Todo tu campo, en equilibrio.</h1>
+            <p>Cuidamos cada detalle de tu estancia para que puedas enfocarte en lo que más importa.</p>
+            <span className={styles.storyFoot}>Una estancia, todo bajo control.</span>
+          </div>
         </div>
         <div className={styles.formCol}>{children}</div>
       </div>

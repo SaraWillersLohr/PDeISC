@@ -17,7 +17,7 @@ export async function login(input: LoginInput) {
     `select u.id_usuario, u.email, u.password_hash, u.nombre, u.apellido, r.nombre as rol
      from usuarios u
      inner join roles r on r.id_rol = u.id_rol
-     where u.email = ? and u.activo = true
+     where u.email = ? and u.activo = true and u.estado_cuenta = 'activo'
      limit 1`,
     [input.email.trim().toLowerCase()],
   );

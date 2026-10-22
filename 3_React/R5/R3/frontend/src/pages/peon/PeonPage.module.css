@@ -377,3 +377,46 @@
   padding: 3rem 1rem;
   color: var(--color-text-muted);
 }
+
+@media (min-width: 769px) {
+  .container {
+    max-width: 1180px;
+    padding: 2rem 2.25rem 5rem;
+  }
+
+  .topBar {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .userInfo h1 {
+    font-size: 1.5rem;
+  }
+
+  .actionBanner {
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .searchCard {
+    max-width: 540px;
+    margin-bottom: 1.5rem;
+  }
+
+  .sectionHeader {
+    margin-top: 1.75rem;
+  }
+
+  .animalList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .animalCard {
+    margin-bottom: 0;
+    border-radius: var(--radius-lg);
+    padding: 1.35rem;
+  }
+}

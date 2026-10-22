@@ -30,4 +30,12 @@ export const env = {
     refreshSecret: requiredEnvironment('JWT_REFRESH_SECRET'),
     refreshExpiresIn: requiredEnvironment('JWT_REFRESH_EXPIRES_IN'),
   },
+  email: {
+    smtpHost: process.env.SMTP_HOST?.trim(),
+    smtpPort: Number(process.env.SMTP_PORT ?? 465),
+    smtpUser: process.env.SMTP_USER?.trim(),
+    smtpPassword: process.env.SMTP_PASS,
+    mailFrom: process.env.MAIL_FROM?.trim(),
+    verificationCodeSecret: process.env.VERIFICATION_CODE_SECRET,
+  },
 };

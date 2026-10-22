@@ -10,27 +10,31 @@ El sistema no busca reemplazar el criterio del productor. Le presenta informaci�
 
 ### dueño
 
-El dueño consulta el estado general de la estancia, indicadores, eventos próximos, resultados económicos y decisiones importantes. Administra la estructura productiva, los usuarios y los permisos. No carga ni valida manualmente los eventos externos: los recibe como información automática de solo lectura.
+El dueño consulta estadísticas, eventos, resultados de cría, corrales, usuarios y su actividad; también puede editar las fichas de animales y administrar corrales, incluida su capacidad y estructura. Puede dar de baja corrales cuando ya no tengan animales ni dependencias operativas activas. No administra cuentas ni permisos. Las estadísticas reproductivas priorizan resultados por animal y conteos del año, como crías nacidas y yeguas preñadas; no atribuyen efectividad individual al usuario que cargó el dato.
 
-### copropietario
+### administrador
 
-Tiene una visión administrativa similar a la del dueño. Puede gestionar animales, corrales, tareas y equipo, pero no realizar acciones reservadas exclusivamente para el dueño si se definen en la política de permisos.
+Reemplaza al rol anterior de copropietario y puede gestionar la organización completa. La primera cuenta se provisiona como administrador al iniciar una organización; desde allí habilita al resto del equipo. Administra solicitudes de alta, crea o activa cuentas, asigna roles, edita o da de baja usuarios y gestiona los datos productivos, incluidos corrales y catálogos.
 
 ### peón
 
-Trabaja sobre la operación diaria: consulta animales y corrales, completa tareas, informa problemas sanitarios, registra pesajes y movimientos autorizados. Puede hacerlo sin conexión.
+Trabaja sobre la operación diaria: consulta y edita animales, registra pesajes y movimientos de animales entre corrales, informa problemas sanitarios, nacimientos y muertes, registra servicios de monta y solicita especies o razas nuevas para la organización. Puede cambiar la ubicación operativa, pero no crea corrales ni modifica su capacidad o estructura. Las solicitudes de catálogo quedan pendientes hasta que el administrador las apruebe. Puede hacerlo sin conexión. Cada operación queda identificada con fecha, persona y ubicación del evento cuando la informa.
 
 ### veterinario
 
-Gestiona enfermería, tratamientos, controles y altas sanitarias. Accede al historial clínico y recibe avisos vinculados con animales en tratamiento.
+Solo accede a los animales que están en el corral de enfermería. Para esos animales puede consultar el historial clínico y registrar tratamientos, controles y altas. El alta veterinaria cambia el estado sanitario y genera un aviso al peón, pero no mueve al animal: permanece en enfermería hasta que el peón realiza y registra el traslado físico al corral de destino.
 
-El backend nunca confía únicamente en lo que muestra la app. Cada endpoint vuelve a verificar el token y el rol antes de procesar una acción.
+### solicitudes de acceso
+
+La cuenta inicial de administrador se provisiona una sola vez durante la puesta en marcha; el registro público no puede crear otro administrador ni una organización por sí solo. Como en RN_1, cada instalación/base corresponde a una única estancia, por lo que el formulario no pide un código de organización: el backend asocia la solicitud con la estancia de la base configurada. La persona solicita acceso con nombre, apellido, correo y contraseña, verifica el correo y espera aprobación. El administrador elige uno de los roles permitidos, crea o activa la cuenta y envía un código de un solo uso con vencimiento para completar el primer acceso. Las bajas de usuarios conservan la auditoría de las operaciones ya realizadas.
+
+El backend nunca confía únicamente en lo que muestra la app. Cada endpoint vuelve a verificar el token y el rol antes de procesar una acción. El alcance de la estancia queda implícito en la base configurada para esa instalación; el sistema admite una estancia por base. Alojar varias estancias en una misma base requeriría incorporar y validar `id_organizacion` en usuarios, solicitudes y datos productivos.
 
 ## navegación y diseño
 
 La aplicación toma la identidad visual de R5: paleta verde, imagen de campo en el acceso, tarjetas claras, tipografía legible y estados visuales limpios. No se usan alertas nativas.
 
-La navegación principal se organiza en un panel lateral plegable. En teléfonos se abre desde un botón de menú; en pantallas más grandes puede permanecer visible. Cada entrada tiene un icono y una etiqueta breve:
+La navegación principal se adapta al dispositivo: en teléfonos usa una barra inferior con accesos frecuentes y un menú de secciones; en pantallas más grandes puede permanecer abierto un panel lateral. Cada entrada tiene un icono y una etiqueta breve:
 
 1. inicio
 2. animales
@@ -50,25 +54,30 @@ Las secciones no autorizadas se ocultan. Las acciones avanzadas se muestran dent
 
 Inicio es la primera pantalla después del login. Resume lo importante para el rol actual con tarjetas, gráficos sencillos y accesos rápidos.
 
-Para dueño y copropietario muestra total de animales, distribución por especie y raza, ocupación de corrales, tratamientos activos, tareas pendientes, animales en enfermería, cambios recientes y próximos remates o exposiciones relacionados con las razas de la estancia.
+Para el administrador muestra solicitudes de acceso, usuarios y actividad de la organización. Para el dueño muestra existencias, ocupación, efectividad reproductiva, actividad de sus usuarios y próximos remates o exposiciones relevantes.
 
 Para peón prioriza tareas del día, tareas vencidas, animales o corrales vinculados a su trabajo y operaciones aún pendientes de sincronizar.
 
-Para veterinario prioriza enfermería, tratamientos activos, próximos controles, reportes sanitarios y altas pendientes.
+Para veterinario muestra solo enfermería, tratamientos activos, próximos controles y altas pendientes de animales en ese corral.
+
+Los resultados de reproducción se consultan en la ficha e historial de cada animal. El resumen anual puede contar crías nacidas y hembras preñadas según diagnósticos vigentes. La app distingue el autor de una carga de los eventos reproductivos del animal y no interpreta esos conteos como una calificación de desempeño del usuario.
 
 ## animales
 
 La sección permite buscar, filtrar y abrir la ficha de cada animal. Los filtros incluyen especie, raza, corral, estado sanitario y condición de actividad.
 
-La ficha muestra identificador, nombre opcional, raza, fecha de nacimiento, edad calculada, peso vigente, corral, estado sanitario, fotografías, historial y alertas. Desde allí se puede registrar un pesaje, iniciar un traslado autorizado, informar un problema sanitario, ver tratamientos, consultar reproducción y abrir el código QR del animal.
+La ficha muestra identificador, nombre opcional, raza, fecha de nacimiento, edad calculada, peso vigente, corral o potrero actual, estado sanitario, fotografías, historial y alertas. El peón registra pesajes, traslados, servicios de monta y reportes sanitarios. El veterinario solo accede a fichas de animales ubicados en enfermería.
 
-Cada cambio queda asociado al usuario, fecha y operación que lo produjo. No se elimina información operativa: se usa baja lógica cuando corresponda.
+Un nacimiento crea el registro de la cría y exige informar madre y padre. Cada progenitor se vincula con un animal de la estancia o se consigna en texto si no figura en el sistema; la madre debe ser una hembra de la misma especie y el padre puede venir de un servicio registrado o de un reproductor externo. Una muerte se registra como evento trazable con fecha, causa si se conoce y corral, potrero o coordenada del hallazgo. La baja operativa es inmediata para impedir nuevos movimientos o servicios; el reporte queda pendiente de revisión del administrador y nunca borra la ficha ni su historial. Al confirmar la muerte, el estado del animal queda como fallecido. Si el administrador rechaza el reporte, el animal se reactiva y el reporte rechazado permanece en la auditoría con responsable, fecha y motivo.
+
+Todo dato gestionado por la app se puede modificar y dar de baja cuando corresponda, respetando permisos por rol y validaciones del campo. Las bajas son lógicas: no borran físicamente registros que tengan historial, filiación, movimientos o auditoría asociada. Cada cambio y baja registra quién la hizo, cuándo y, cuando corresponda, el motivo. La baja de un animal exige motivo `muerte` o `venta`; la muerte sigue el flujo de reporte y revisión descrito arriba, y la venta la registra el dueño o administrador con fecha obligatoria y comprador y precio opcionales. Si se rechaza un reporte de muerte, el animal se reactiva y el reporte permanece en el historial. Los corrales pueden darse de baja por dueño o administrador solo después de trasladar todos sus animales y resolver dependencias activas. Los usuarios pueden ser editados o dados de baja por el administrador; las acciones históricas conservan su autor original.
+La ubicación operativa de un animal se deriva del último movimiento confirmado al corral o potrero asignado. No se guarda un punto GPS individual de cada animal. El punto GPS individual se toma únicamente al reportar una muerte, para ubicar el lugar del hallazgo; los puntos GPS del perímetro del corral se guardan como geometría fija del mapa.
 
 ## corrales y potreros
 
 Corrales muestra capacidad, ocupación actual, animales asignados, condición de enfermería y alertas. El sistema controla que un traslado no supere la capacidad definida y que un animal enfermo siga las reglas de sanidad.
 
-Cada corral puede estar vinculado con una zona geográfica del establecimiento para aparecer en el mapa. Los potreros se manejan como áreas mayores y pueden contener corrales o zonas operativas según el modelo final.
+El dueño administra la estructura de corrales y su capacidad, y puede editar o dar de baja corrales después de trasladar todos sus animales. El administrador también puede hacerlo. El peón informa movimientos y ocupación operativa, sin poder cambiar la capacidad, estructura ni dar de alta o baja corrales. El historial de movimientos mantiene el corral de origen aunque este se dé de baja. Cada corral puede estar vinculado con una zona geográfica del establecimiento para aparecer en el mapa. Los potreros se manejan como áreas mayores y pueden contener corrales o zonas operativas según el modelo final.
 
 ## tareas
 
@@ -79,22 +88,23 @@ Ejemplos: vacunar un lote, revisar un tratamiento, preparar un animal para remat
 ## sanidad
 
 Sanidad concentra reportes, enfermería y tratamientos. Un reporte sanitario puede indicar síntomas, observaciones, fotos y animal afectado. El veterinario registra el tratamiento, medicamento, fechas, dosis, evolución y alta.
+Cuando el peón informa una sospecha, el sistema registra el reporte y avisa al equipo; no inventa un diagnóstico. Un traslado hacia enfermería conserva origen, destino, hora y responsable, y el veterinario determina el tratamiento y el alta. Después del alta, el sistema notifica a los peones; el animal sigue ubicado en enfermería hasta que el peón lo mueve en el campo y registra el destino. El veterinario no realiza ese traslado en el sistema.
 
 El sistema muestra animales en enfermería, tratamientos activos, controles próximos y alertas por vencimiento. A futuro incorpora inventario de medicamentos, fechas de vencimiento y períodos de retiro.
 
 ## reproducción
 
-Reproducción conserva el historial de servicios, inseminaciones, diagnósticos, preñeces, partos, abortos y destetes. Relaciona madres, padres o semen externo sin duplicar datos.
+Reproducción conserva el historial de servicios de monta, inseminaciones, diagnósticos, preñeces, partos, abortos y destetes. Relaciona madres, padres o semen externo sin duplicar datos. Un servicio identifica la hembra, el reproductor o semen, el método, la fecha y quien lo registró; los eventos posteriores se enlazan a ese servicio cuando corresponde. Peón y dueño pueden cargar y editar servicios; el administrador puede gestionarlos por su permiso general. Las anulaciones conservan el registro y su auditoría.
 
 Las fechas probables de parto generan avisos y se reflejan en el dashboard. La aplicación valida que los vínculos genealógicos sean coherentes con especie, sexo y estado de actividad.
 
 ## mapa del campo
 
-Mapa usa una vista geográfica tipo Google Maps. Cada establecimiento se ubica sobre el terreno real; los potreros y corrales se dibujan mediante áreas definidas por coordenadas.
+Mapa usa una vista geográfica tipo Google Maps. Cada establecimiento se ubica sobre el terreno real; los potreros y corrales se dibujan mediante áreas definidas por coordenadas. Los puntos GPS que dibujan el perímetro de cada corral quedan guardados como parte de su geometría. La ubicación operativa del animal surge de su último movimiento confirmado a un corral o potrero. Solo el reporte de muerte puede guardar un punto GPS individual para localizar el hallazgo; no se registra GPS individual en los demás reportes ni se rastrea al animal continuamente.
 
 Los colores indican ocupación, capacidad, alertas sanitarias o tareas pendientes. Al tocar un área se abre su resumen con animales, tratamientos, movimientos y tareas.
 
-Los límites geográficos se pueden cargar dibujándolos sobre el mapa, recorriendo el perímetro con el teléfono o importando archivos KML/GeoJSON. La información de las áreas queda guardada localmente; el fondo satelital requiere internet.
+Los límites geográficos se pueden cargar dibujándolos sobre el mapa, recorriendo el perímetro con el teléfono o importando archivos KML/GeoJSON. La geometría de corrales y potreros queda guardada localmente. Los reportes sanitarios, nacimientos y traslados se asocian a un corral o potrero; el reporte de muerte también puede tomar un punto GPS puntual para ubicar el hallazgo. El fondo satelital requiere internet.
 
 ## eventos
 
@@ -112,9 +122,10 @@ Cada aviso indica su origen y, cuando corresponde, abre directamente el animal, 
 
 ## equipo y perfil
 
-Equipo permite a dueño y copropietario consultar y administrar usuarios, roles y estado de acceso. Perfil permite a cada persona actualizar sus datos permitidos, cambiar contraseña y cerrar sesión.
+Equipo permite al administrador revisar solicitudes, aceptar o rechazar accesos, asignar dueño, peón o veterinario, enviar códigos de activación y editar o dar de baja cuentas. Al aprobar una solicitud se crea la cuenta con el rol elegido; el rol de administrador nunca se solicita desde el registro público. Las bajas bloquean el acceso, conservan la autoría y requieren resolver las referencias activas que no puedan quedar huérfanas. El dueño consulta sus usuarios y su actividad productiva. Perfil permite a cada persona actualizar sus datos permitidos, cambiar contraseña y cerrar sesión.
+La baja de una cuenta bloquea el acceso y conserva la autoría en el historial. El código de activación se almacena como hash, vence, tiene límite de intentos y se invalida después del primer uso.
 
-El acceso contempla inicio de sesión, sesión persistente, renovación de token, recuperación de contraseña, verificación de correo, código de acceso inicial y, cuando se configuren credenciales, autenticación social.
+El acceso contempla inicio de sesión, sesión persistente, renovación de token, recuperación de contraseña, verificación de correo, código de acceso inicial y reenvío limitado de códigos. Para habilitar registro y activación hay que configurar SMTP y `VERIFICATION_CODE_SECRET` en el entorno del backend. Después de respaldar la base, se aplican una sola vez, en este orden, `backend/migrations/2026-10-22-replace-copropietario-with-administrador.sql`, `backend/migrations/2026-10-22-registration-flow.sql`, `backend/migrations/2026-10-22-animal-movements.sql` y `backend/migrations/2026-10-22-nursing-discharge.sql`. Para reiniciar los datos sin eliminar las tablas, ejecutar luego `backend/migrations/2026-10-22-clean-operational-data.sql`: conserva la cuenta activa más antigua de administrador y dueño y elimina los demás registros. La migración comprueba que ambas cuentas existan y que todas las tablas sean transaccionales antes de borrar. Las migraciones se entregan como archivos y no se ejecutan automáticamente sobre la base existente.
 
 ## funcionamiento sin conexión
 

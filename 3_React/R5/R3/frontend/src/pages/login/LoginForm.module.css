@@ -29,6 +29,10 @@
   margin-top: 0.25rem;
 }
 
+.desktopWelcome {
+  display: none;
+}
+
 .field {
   position: relative;
   margin-bottom: 1rem;
@@ -168,4 +172,73 @@
 .demoHint strong {
   color: var(--color-primary-light);
   font-weight: 600;
+}
+
+@media (min-width: 769px) {
+  .form {
+    width: min(100%, 500px);
+    max-width: 500px;
+    padding: 1rem 0;
+  }
+
+  .brand {
+    align-self: stretch;
+    margin-bottom: 2.25rem;
+  }
+
+  .leaf,
+  .brand h2,
+  .brand > div > p {
+    display: none;
+  }
+
+  .desktopWelcome {
+    display: block;
+  }
+
+  .desktopWelcome h3 {
+    color: var(--color-primary);
+    font-size: clamp(2.15rem, 3vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+
+  .desktopWelcome p {
+    margin-top: 0.65rem;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .field {
+    margin-bottom: 1.2rem;
+  }
+
+  .field input {
+    min-height: 3.4rem;
+    padding-left: 3rem;
+    border-radius: 14px;
+  }
+
+  .field input:focus-visible {
+    border-color: var(--color-primary-light);
+    box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.12);
+  }
+
+  .row {
+    margin: 0.25rem 0 1.35rem;
+  }
+
+  .submitBtn {
+    min-height: 3.5rem;
+    border-radius: 14px;
+    box-shadow: 0 8px 18px rgba(26, 48, 32, 0.12);
+  }
+
+  .divider {
+    margin-top: 1.5rem;
+  }
+
+  .demoHint {
+    margin-top: 1rem;
+  }
 }

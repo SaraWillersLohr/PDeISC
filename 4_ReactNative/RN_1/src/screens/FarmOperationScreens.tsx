@@ -6,11 +6,13 @@ import { useFeedback } from '../components/FeedbackProvider';
 import { createAnimal, createAnimalWeight, createBreed, createCorral, createSpecies, createTreatment, deactivateAnimal, deactivateCorral, dischargeAnimal, listAnimalMovements, listAnimalWeights, listAnimals, listCorrals, listSpecies, listTreatments, reportAnimalIllness, updateAnimal, updateCorral, type AnimalPayload, type CorralPayload } from '../services/farmApi';
 import { apiRequest } from '../services/api';
 import type { Animal, AnimalMovement, AnimalWeight, Corral, DashboardSummary, Especie, EstadoSalud, PublicUser, Tratamiento } from '../types/domain';
+import { useAppDarkMode } from '../components/AppTheme';
 
 // Contrato común: toda pantalla operativa recibe el token vigente para invocar la API.
 interface ScreenProps { token: string; user: PublicUser; onNavigate?: (section: 'animales' | 'corrales' | 'equipo' | 'campo' | 'veterinaria' | 'reproduccion') => void; }
 // Esta función presenta métricas del establecimiento y accesos rápidos según los permisos del rol actual.
 export function FarmDashboardScreen({ token, user, onNavigate }: ScreenProps) {
+  const styles = getOperationStyles(useAppDarkMode());
   const { showMessage } = useFeedback();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [busy, setBusy] = useState(true);
@@ -31,6 +33,7 @@ export function FarmDashboardScreen({ token, user, onNavigate }: ScreenProps) {
 
 // Esta función administra la ficha ganadera completa con búsqueda, filtros, alta, edición y baja lógica.
 export function AnimalsManagementScreen({ token, user }: ScreenProps) {
+  const styles = getOperationStyles(useAppDarkMode());
   const { showMessage, confirm } = useFeedback();
   const canEdit = user.rol === 'dueno' || user.rol === 'copropietario' || user.rol === 'peon' || user.rol === 'veterinario';
   const canDelete = user.rol === 'dueno' || user.rol === 'copropietario';
@@ -90,6 +93,7 @@ export function AnimalsManagementScreen({ token, user }: ScreenProps) {
 
 // Esta función permite que dueño y copropietario creen, ajusten y archiven corrales con su ocupación real.
 export function CorralsManagementScreen({ token }: ScreenProps) {
+  const styles = getOperationStyles(useAppDarkMode());
   const { showMessage, confirm } = useFeedback(); const [corrals, setCorrals] = useState<Corral[]>([]); const [busy, setBusy] = useState(true); const [editing, setEditing] = useState<Corral | null | false>(false); const [name, setName] = useState(''); const [capacity, setCapacity] = useState(''); const [nurse, setNurse] = useState(false);
   const load = useCallback(async () => { setBusy(true); try { setCorrals(await listCorrals(token)); } catch (error) { showMessage('No se pudieron cargar corrales', error instanceof Error ? error.message : 'Error de conexión.', 'error'); } finally { setBusy(false); } }, [token, showMessage]); useEffect(() => { void load(); }, [load]);
   const open = (item?: Corral) => { setEditing(item ?? null); setName(item?.nombre ?? ''); setCapacity(String(item?.capacidad ?? '')); setNurse(item?.es_enfermeria ?? false); };
@@ -102,6 +106,7 @@ export function CorralsManagementScreen({ token }: ScreenProps) {
 
 // Esta función concentra el trabajo cotidiano del peón y ofrece a los responsables una vista de supervisión del campo.
 export function FieldOperationsScreen({ token, user }: ScreenProps) {
+  const styles = getOperationStyles(useAppDarkMode());
   const { showMessage } = useFeedback(); const [animals, setAnimals] = useState<Animal[]>([]); const [corrals, setCorrals] = useState<Corral[]>([]); const [species, setSpecies] = useState<Especie[]>([]); const [busy, setBusy] = useState(true); const [search, setSearch] = useState(''); const [modal, setModal] = useState<'birth' | 'move' | 'illness' | null>(null); const [selected, setSelected] = useState<Animal | null>(null); const [tag, setTag] = useState(''); const [name, setName] = useState(''); const [speciesId, setSpeciesId] = useState<string | number>(''); const [breedId, setBreedId] = useState<string | number>(''); const [corralId, setCorralId] = useState<string | number>(''); const [note, setNote] = useState(''); const [birthSex, setBirthSex] = useState<string | number>('indeterminado'); const [motherId, setMotherId] = useState<string | number>(''); const [fatherId, setFatherId] = useState<string | number>('');
   const load = useCallback(async () => { setBusy(true); try { const [a, c, s] = await Promise.all([listAnimals(token), listCorrals(token), listSpecies(token)]); setAnimals(a.filter((item) => !item.corral_es_enfermeria)); setCorrals(c.filter((item) => !item.es_enfermeria)); setSpecies(s); } catch (error) { showMessage('No se pudo cargar Campo', error instanceof Error ? error.message : 'Error de conexión.', 'error'); } finally { setBusy(false); } }, [token, showMessage]); useEffect(() => { void load(); }, [load]);
   const breeds = species.find((item) => item.id_especie === Number(speciesId))?.razas ?? [];
@@ -123,6 +128,7 @@ export function FieldOperationsScreen({ token, user }: ScreenProps) {
 
 // Esta función presenta la enfermería, registra tratamientos y permite consultar historia clínica y dar altas.
 export function VeterinaryOperationsScreen({ token, user }: ScreenProps) {
+  const styles = getOperationStyles(useAppDarkMode());
   const { showMessage } = useFeedback(); const [animals, setAnimals] = useState<Animal[]>([]); const [busy, setBusy] = useState(true); const [selected, setSelected] = useState<Animal | null>(null); const [history, setHistory] = useState<Tratamiento[]>([]); const [modal, setModal] = useState<'history' | 'treatment' | 'discharge' | null>(null); const [diagnosis, setDiagnosis] = useState(''); const [medicine, setMedicine] = useState(''); const [observations, setObservations] = useState(''); const [search, setSearch] = useState('');
   const load = useCallback(async () => { setBusy(true); try { const rows = await listAnimals(token); setAnimals(rows.filter((item) => item.corral_es_enfermeria)); } catch (error) { showMessage('No se pudo cargar Veterinaria', error instanceof Error ? error.message : 'Error de conexión.', 'error'); } finally { setBusy(false); } }, [token, showMessage]); useEffect(() => { void load(); }, [load]);
   // Esta función limpia el historial previo y solicita las notas clínicas de la ficha seleccionada.
@@ -167,3 +173,8 @@ function localDateToday(): string { const today = new Date(); const month = Stri
 
 // Estilos adaptables usados en las pantallas operativas para conservar márgenes y controles táctiles cómodos.
 const styles = StyleSheet.create({ metrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }, metricValue: { color: '#2d5a27', fontSize: 27, fontWeight: '800' }, muted: { color: '#6b756b', fontSize: 13, lineHeight: 20, marginTop: 5 }, cardTitle: { color: '#263329', fontSize: 16, fontWeight: '800', flexShrink: 1 }, row: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }, badge: { color: '#315a3c', backgroundColor: '#edf4eb', paddingHorizontal: 9, paddingVertical: 5, borderRadius: 8, fontSize: 12, fontWeight: '700', overflow: 'hidden' }, actions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 7, marginTop: 5 }, filters: { marginTop: 6, marginBottom: 4 }, loader: { marginVertical: 24 }, capacityTrack: { height: 9, backgroundColor: '#edf0eb', borderRadius: 6, overflow: 'hidden', marginTop: 12 }, capacityFill: { height: '100%', backgroundColor: '#668a61', borderRadius: 6 }, switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }, chart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 3, height: 160, marginTop: 18 }, chartCol: { flex: 1, alignItems: 'center', height: '100%', justifyContent: 'flex-end' }, barTrack: { height: 128, width: '75%', justifyContent: 'flex-end', backgroundColor: '#f0f3ef', borderRadius: 5, overflow: 'hidden' }, bar: { width: '100%', minHeight: 4, backgroundColor: '#56845c', borderRadius: 5 }, chartLabel: { color: '#6b756b', fontSize: 10, marginTop: 5 } });
+
+// Esta función aplica colores con contraste suficiente al panel y a las métricas en modo oscuro.
+function getOperationStyles(dark: boolean) {
+  return dark ? { ...styles, metricValue: { ...styles.metricValue, color: '#bfe0b3' }, muted: { ...styles.muted, color: '#c5cec6' }, cardTitle: { ...styles.cardTitle, color: '#f0f4ef' }, badge: { ...styles.badge, color: '#dcebd9', backgroundColor: '#3c4a3f' }, capacityTrack: { ...styles.capacityTrack, backgroundColor: '#46534a' }, barTrack: { ...styles.barTrack, backgroundColor: '#3b483e' }, chartLabel: { ...styles.chartLabel, color: '#c5cec6' } } : styles;
+}

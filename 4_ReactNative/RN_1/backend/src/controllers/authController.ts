@@ -90,6 +90,8 @@ export async function redeemPasswordRecoveryCode(req: Request, res: Response): P
     const result = await authService.redeemPasswordRecoveryCode(email, code);
     res.json({ success: true, message: 'Código válido. Ahora elegí una contraseña nueva.', data: result });
   } catch (error) {
+    // No registrar correo ni código: se conserva el mensaje técnico para diagnosticar errores de DB/configuración.
+    console.error('[auth] No se pudo validar el código de recuperación.', error);
     res.status(400).json({ success: false, message: 'El correo o el código no son válidos, no corresponden a una cuenta activa o el código venció.' });
   }
 }

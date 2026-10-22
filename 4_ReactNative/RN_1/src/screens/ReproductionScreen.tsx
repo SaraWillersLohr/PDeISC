@@ -5,12 +5,14 @@ import { FarmButton, FarmCard, FarmEmpty, FarmModal, FarmPageHeader, FarmPicker,
 import { useFeedback } from '../components/FeedbackProvider';
 import { createReproductionEvent, listAnimals, listReproductionEvents } from '../services/farmApi';
 import type { Animal, ReproductionEvent, ReproductionEventType, ReproductionResult } from '../types/domain';
+import { useAppDarkMode } from '../components/AppTheme';
 
 // Contrato ReproductionScreenProps: el token identifica la sesión y el rol habilita las acciones de registro.
 interface ReproductionScreenProps { token: string; }
 
 // Esta función organiza el historial del rodeo y permite capturar las etapas reproductivas desde el móvil.
 export function ReproductionScreen({ token }: ReproductionScreenProps) {
+  const styles = getReproductionStyles(useAppDarkMode());
   const { showMessage } = useFeedback();
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [events, setEvents] = useState<ReproductionEvent[]>([]);
@@ -103,3 +105,8 @@ const RESULT_LABELS: Record<ReproductionResult, string> = { pendiente: 'Pendient
 
 // Estilos adaptables para la cronología, alertas de fecha probable y formularios reproductivos.
 const styles = StyleSheet.create({ loader: { marginVertical: 24 }, row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }, title: { color: '#263329', fontSize: 16, fontWeight: '800', flexShrink: 1 }, body: { color: '#59645a', fontSize: 14, lineHeight: 20, marginTop: 7 }, caption: { color: '#879087', fontSize: 12, marginTop: 8 }, badge: { color: '#315a3c', backgroundColor: '#edf4eb', paddingHorizontal: 9, paddingVertical: 5, borderRadius: 8, fontSize: 12, fontWeight: '700', overflow: 'hidden' }, notice: { color: '#5d4730', backgroundColor: '#fbf5e8', borderRadius: 9, padding: 10, marginTop: 8, lineHeight: 19 }, actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 6 } });
+
+// Esta función conserva un fondo y texto contrastantes en cronologías y avisos reproductivos.
+function getReproductionStyles(dark: boolean) {
+  return dark ? { ...styles, title: { ...styles.title, color: '#f0f4ef' }, body: { ...styles.body, color: '#c5cec6' }, caption: { ...styles.caption, color: '#b0bbb2' }, badge: { ...styles.badge, color: '#dcebd9', backgroundColor: '#3c4a3f' }, notice: { ...styles.notice, color: '#f0dfbf', backgroundColor: '#4b4435' } } : styles;
+}

@@ -31,6 +31,9 @@ La app respeta las autorizaciones que ya aplica el backend: dueño y copropietar
 - En escritorio la navegación lateral aparece para administrador superior, dueño y copropietario. En móvil esos tres roles abren el mismo menú lateral desde el botón de menú; peón y veterinario conservan sus accesos directos adaptables.
 - El login móvil usa la fotografía de la vaca como fondo y presenta el formulario en una tarjeta clara desplazable. Al abrir el teclado, los campos y acciones se pueden recorrer sin que el título quede superpuesto al formulario.
 - El icono de la app, el icono adaptativo de Android y la imagen de inicio de Expo usan la marca de la hoja ubicada en `assets/leaf-icon.png`. Para que el icono/splash cambie en un dispositivo ya instalado hay que generar e instalar nuevamente el cliente nativo; recargar JavaScript no reemplaza esos recursos nativos.
+- Recuperación de contraseña: el código válido habilita el formulario de contraseña nueva; al guardarla, la API emite la sesión y la app abre directamente el panel inicial del rol. El token anterior se invalida, y el permiso temporal de recuperación se consume una sola vez.
+- El modo oscuro usa una paleta gris verdosa moderada, con tarjetas, campos, selectores e historial coordinados y texto claro de buen contraste en las pantallas operativas.
+- En listas largas aparece un botón flotante para volver al inicio; al cambiar de sección, la vista comienza arriba.
 
 La **Etapa 2 de gestión ganadera** está implementada en el cliente y la API: especies y razas editables por el dueño/copropietario, sexo, edad calculada desde la fecha de nacimiento, filiación, servicio/inseminación, diagnóstico de gestación, parto, aborto, destete, historial de pesajes y trazabilidad de movimientos. Los datos de sexo/parentesco y las tablas de historial requieren aplicar la migración `008_livestock_lineage_reproduction.sql` en la base existente.
 
@@ -119,6 +122,20 @@ La migración crea el primer pesaje histórico desde el peso vigente que ya exis
 9. **Sesiones:** `POST /api/auth/logout` invalida los JWT de la cuenta al aumentar `token_version`. El middleware verifica esa versión vigente en cada solicitud. También cambia al cambiar la contraseña, el rol o desactivar al usuario. Por ese diseño, cerrar sesión revoca las sesiones de todos los dispositivos de esa cuenta.
 
 El acceso de RN_1 usa correo y contraseña. No requiere credenciales de proveedores OAuth, callbacks externos ni configurar login con Google u otras aplicaciones.
+
+### Diagnóstico de recuperación de contraseña
+
+El código se valida con el mismo correo normalizado (minúsculas y sin espacios) usado para solicitarlo. Al escribir los seis dígitos, la app lo envía automáticamente; el botón **Validar código** permite volver a intentarlo si la solicitud anterior terminó con error. Mientras una validación está en curso, la app evita enviar otra solicitud simultánea. Un código correcto cambia la pantalla a **Contraseña nueva** y **Confirmar contraseña nueva**; después de guardar, la API inicia la sesión nueva.
+
+Si no se avanza después de validar:
+
+1. Confirmá que el correo mostrado es el mismo donde llegó el código y que ingresaste los seis dígitos más recientes. Pedir otro código invalida los anteriores; el último código es de un solo uso y vence a los 10 minutos.
+2. Revisá que la app apunte al backend que estás ejecutando (`EXPO_PUBLIC_API_URL` en móvil o `EXPO_PUBLIC_API_URL_WEB` en web) y que `http://localhost:3001/api/health` informe `status: "ok"` y `database: "connected"`.
+3. En la base indicada por `DB_NAME` en `backend/.env`, aplicá una sola vez `backend/database/migrations/007_password_recovery_and_revocable_sessions.sql` si todavía no existe `codigos_recuperacion_password`. No la vuelvas a ejecutar para una tabla ya creada.
+4. Confirmá que `JWT_SECRET` y `VERIFICATION_CODE_SECRET` estén definidos con al menos 32 caracteres. Reiniciá el backend después de cambiar `.env`.
+5. Si la API rechaza el canje, la pantalla presenta el mensaje devuelto por el servidor. El backend también registra el detalle técnico con el prefijo `[auth] No se pudo validar el código de recuperación.`; esos registros no contienen el correo ni el código enviado.
+
+Los códigos se guardan como HMAC, nunca en claro. La ruta de canje recibe `{ email, code }`, verifica cuenta activa, vigencia e intentos, consume el código y devuelve un permiso temporal de cinco minutos. Ese permiso solo sirve para cambiar la contraseña y no es una sesión de acceso.
 
 ## Endpoints del acceso por token
 

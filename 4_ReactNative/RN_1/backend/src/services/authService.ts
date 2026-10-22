@@ -186,25 +186,26 @@ export async function redeemPasswordRecoveryCode(emailInput: string, code: strin
       await connection.commit();
       throw new Error('El código no es válido o venció.');
     }
+    // Firma el permiso antes de consumir el código: si JWT_SECRET está mal configurado, se puede corregir y reintentar.
+    const resetToken = signPasswordRecoveryToken({
+      id_usuario: usuario.id_usuario,
+      email: usuario.email,
+      rol: usuario.rol_nombre!,
+      token_version: Number(usuario.token_version),
+    });
     await connection.execute('UPDATE codigos_recuperacion_password SET consumido_at = NOW() WHERE id_codigo = ?', [codes[0].id_codigo]);
     await connection.execute(
       'UPDATE codigos_recuperacion_password SET invalidado_at = NOW() WHERE id_usuario = ? AND id_codigo <> ? AND consumido_at IS NULL AND invalidado_at IS NULL',
       [userId, codes[0].id_codigo],
     );
     await connection.commit();
+    return { resetToken };
   } catch (error) {
     try { await connection.rollback(); } catch { /* La transacción pudo haberse confirmado al registrar un intento inválido. */ }
     throw error;
   } finally {
     connection.release();
   }
-  const resetToken = signPasswordRecoveryToken({
-    id_usuario: usuario.id_usuario,
-    email: usuario.email,
-    rol: usuario.rol_nombre!,
-    token_version: Number(usuario.token_version),
-  });
-  return { resetToken };
 }
 
 // Esta función acepta únicamente un permiso de recuperación válido, actualiza la contraseña, revoca sesiones anteriores e inicia la sesión nueva.

@@ -1,5 +1,5 @@
 // Archivo src/screens/PasswordRecoveryScreen.tsx: solicitud de código, validación de identidad y cambio obligatorio de contraseña.
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { AuthPage } from '../components/AuthPage';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -21,6 +21,7 @@ export function PasswordRecoveryScreen({ initialEmail, busy, error, notice, onBa
   const { width } = useWindowDimensions();
   const gutter = Math.max(18, Math.min(36, width * 0.07));
   const [email, setEmail] = useState(initialEmail);
+  const [requestedEmail, setRequestedEmail] = useState('');
   const [code, setCode] = useState('');
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [password, setPassword] = useState('');
@@ -28,6 +29,7 @@ export function PasswordRecoveryScreen({ initialEmail, busy, error, notice, onBa
   const [codeRequested, setCodeRequested] = useState(false);
   const [changingEmail, setChangingEmail] = useState(false);
   const [validation, setValidation] = useState<string | null>(null);
+  const redeemingCode = useRef(false);
   // Usa el acuse de la API como respaldo para conservar el paso del código si Expo vuelve a montar la pantalla.
   const showCodeStep = !changingEmail && (codeRequested || Boolean(notice));
 
@@ -42,6 +44,7 @@ export function PasswordRecoveryScreen({ initialEmail, busy, error, notice, onBa
     // Muestra el paso del código inmediatamente; el servidor mantiene genérica su respuesta aunque el correo no esté registrado.
     setChangingEmail(false);
     setCodeRequested(true);
+    setRequestedEmail(cleanEmail);
     await onRequestCode(cleanEmail);
   };
 
@@ -50,6 +53,7 @@ export function PasswordRecoveryScreen({ initialEmail, busy, error, notice, onBa
     setChangingEmail(true);
     setCodeRequested(false);
     setCode('');
+    setRequestedEmail('');
     setResetToken(null);
     setPassword('');
     setConfirmPassword('');
@@ -57,14 +61,21 @@ export function PasswordRecoveryScreen({ initialEmail, busy, error, notice, onBa
   };
 
   // Valida el código de seis dígitos y pide al backend habilitar el paso de cambio obligatorio de contraseña.
-  const redeemCode = async () => {
-    if (!/^\d{6}$/.test(code)) {
+  const redeemCode = async (value = code) => {
+    if (!/^\d{6}$/.test(value)) {
       setValidation('Ingresá el código de seis dígitos.');
       return;
     }
+    const emailToRedeem = requestedEmail || email.trim().toLowerCase();
+    if (!emailToRedeem || redeemingCode.current) return;
     setValidation(null);
-    const temporaryResetToken = await onRedeemCode(email.trim().toLowerCase(), code);
-    if (temporaryResetToken) setResetToken(temporaryResetToken);
+    redeemingCode.current = true;
+    try {
+      const temporaryResetToken = await onRedeemCode(emailToRedeem, value);
+      if (temporaryResetToken) setResetToken(temporaryResetToken);
+    } finally {
+      redeemingCode.current = false;
+    }
   };
 
   // Valida la nueva contraseña y la confirmación antes de completar el cambio e iniciar la sesión.
@@ -95,7 +106,11 @@ export function PasswordRecoveryScreen({ initialEmail, busy, error, notice, onBa
           <Text style={styles.notice}>{notice ?? 'Si el correo corresponde a una cuenta activa, te enviamos un código. Revisá también la carpeta de spam.'}</Text>
           <Pressable disabled={busy} accessibilityRole="button" onPress={changeEmail} style={styles.changeEmailButton}><Text style={styles.link}>Cambiar correo</Text></Pressable>
           <Text style={styles.label}>Código de recuperación</Text>
-          <TextInput accessibilityLabel="Código de recuperación de seis dígitos" keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus value={code} onChangeText={setCode} style={[styles.input, styles.codeInput]} placeholder="000000" />
+          <TextInput accessibilityLabel="Código de recuperación de seis dígitos" keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus value={code} onChangeText={(value) => {
+            const digits = value.replace(/\D/g, '').slice(0, 6);
+            setCode(digits);
+            if (digits.length === 6) void redeemCode(digits);
+          }} style={[styles.input, styles.codeInput]} placeholder="000000" />
           <PrimaryButton label="Validar código" onPress={() => void redeemCode()} loading={busy} />
           <Pressable disabled={busy} accessibilityRole="button" onPress={() => void requestCode()} style={styles.linkButton}><Text style={styles.link}>Reenviar código</Text></Pressable>
         </> : null}

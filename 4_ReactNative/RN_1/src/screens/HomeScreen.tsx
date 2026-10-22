@@ -1,5 +1,5 @@
 // Archivo src/screens/HomeScreen.tsx: el panel principal, las secciones por rol y sus acciones. Aquí se concentra la responsabilidad indicada; las funciones documentadas abajo explican el flujo de sus operaciones principales.
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { apiRequest } from '../services/api';
@@ -7,6 +7,7 @@ import type { Animal, Corral, DashboardSummary, Notification, PublicUser, Role }
 import { useFeedback } from '../components/FeedbackProvider';
 import { AnimalsManagementScreen, CorralsManagementScreen, FarmDashboardScreen, FieldOperationsScreen, VeterinaryOperationsScreen } from './FarmOperationScreens';
 import { ReproductionScreen } from './ReproductionScreen';
+import { AppTheme, useAppDarkMode } from '../components/AppTheme';
 
 // Contrato de datos Section: define la forma y los tipos de los valores que este módulo recibe, comparte o devuelve.
 type Section = 'inicio' | 'animales' | 'corrales' | 'equipo' | 'solicitudes' | 'campo' | 'veterinaria' | 'reproduccion' | 'avisos';
@@ -47,6 +48,9 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
   const [actionText, setActionText] = useState('');
   const [actionBusy, setActionBusy] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const listRef = useRef<FlatList<Animal | Corral | EquipoItem | SignupRequest | Notification>>(null);
   const hasSidebarMenu = ['administrador', 'dueno', 'copropietario'].includes(user.rol);
 
   const loadSection = useCallback(async (refresh = false) => {
@@ -78,6 +82,8 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
     return () => { mounted = false; clearInterval(timer); };
   }, [token]);
   const navItems = NAV.filter((item) => item.roles.includes(user.rol));
+  // Cada sección nueva arranca arriba para que el botón flotante no conserve un desplazamiento de la sección anterior.
+  useEffect(() => { listRef.current?.scrollToOffset({ offset: 0, animated: false }); setShowScrollTop(false); }, [section]);
   // Esta función valida los datos ingresados para la acción veterinaria o de campo, envía la operación a la API y actualiza la lista si se completa.
   const submitAnimalAction = async () => {
     if (!animalAction || actionBusy) return;
@@ -120,7 +126,8 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
     } catch (error) { showMessage('No se pudo cambiar el rango', error instanceof Error ? error.message : 'Error de API.', 'error'); }
   };
 
-  return <View style={[styles.screen, wide && styles.screenWide]}>
+  return <AppTheme dark={darkMode}><View style={[styles.screen, darkMode && styles.darkMain, wide && styles.screenWide]}>
+    <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
     {wide ? <View style={styles.sidebar}>
       <View style={styles.sidebarBrandMark}><MaterialCommunityIcons name="leaf" size={23} color="#a8d5a2" /></View>
       <Text style={styles.sidebarBrand}>Gestión de Campo</Text><Text style={styles.sidebarCaption}>ESTANCIA APP</Text>
@@ -131,28 +138,32 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
       </ScrollView>
       <Pressable accessibilityRole="button" onPress={onLogout} style={styles.sidebarLogout}><Text style={styles.sidebarLogoutIcon}>↗</Text><Text style={styles.sidebarLogoutText}>Cerrar sesión</Text></Pressable>
     </View> : null}
-    <View style={styles.main}>
-    <View style={[styles.header, !wide && styles.headerMobile, { paddingHorizontal: gutter, paddingTop: (Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 18) + 8 }]}>
+    <View style={[styles.main, darkMode && styles.darkMain]}>
+    <View style={[styles.header, darkMode && styles.darkHeader, !wide && styles.headerMobile, { paddingHorizontal: gutter, paddingTop: (Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 18) + 8 }]}>
       <View style={styles.headerInner}>
-        <View style={styles.headerMain}><Text style={styles.brand}>{wide ? 'PANEL DE GESTIÓN' : 'ESTANCIA APP'}</Text><Text numberOfLines={1} style={[styles.greeting, !wide && width < 360 && styles.greetingCompact]}>{wide ? NAV.find((item) => item.id === section)?.title : `Hola, ${user.nombre}`}</Text><Text numberOfLines={1} style={styles.role}>{wide ? `${user.nombre} ${user.apellido} · ${user.rolLabel}` : user.rolLabel}</Text></View>
+        <View style={styles.headerMain}><Text style={[styles.brand, darkMode && styles.darkMutedText]}>{wide ? 'PANEL DE GESTIÓN' : 'ESTANCIA APP'}</Text><Text numberOfLines={1} style={[styles.greeting, darkMode && styles.darkPrimaryText, !wide && width < 360 && styles.greetingCompact]}>{wide ? NAV.find((item) => item.id === section)?.title : `Hola, ${user.nombre}`}</Text><Text numberOfLines={1} style={[styles.role, darkMode && styles.darkMutedText]}>{wide ? `${user.nombre} ${user.apellido} · ${user.rolLabel}` : user.rolLabel}</Text></View>
         <View style={styles.headerActions}>
-          {!wide && hasSidebarMenu ? <Pressable accessibilityRole="button" accessibilityLabel="Abrir menú" onPress={() => setDrawerOpen(true)} style={styles.bellButton}><MaterialCommunityIcons name="menu" size={25} color="#315a3c" /></Pressable> : null}
-          <Pressable accessibilityRole="button" accessibilityLabel={`Ver avisos${alerts.length ? `, ${alerts.length} notificaciones` : ''}`} onPress={() => setSection('avisos')} style={styles.bellButton}>
-            <MaterialCommunityIcons name="bell-outline" size={23} color="#315a3c" />
+          <Pressable accessibilityRole="button" accessibilityLabel={darkMode ? 'Activar modo claro' : 'Activar modo oscuro'} onPress={() => setDarkMode((value) => !value)} style={[styles.bellButton, darkMode && styles.darkControl]}><MaterialCommunityIcons name={darkMode ? 'white-balance-sunny' : 'moon-waning-crescent'} size={22} color={darkMode ? '#f2d27b' : '#315a3c'} /></Pressable>
+          {!wide && hasSidebarMenu ? <Pressable accessibilityRole="button" accessibilityLabel="Abrir menú" onPress={() => setDrawerOpen(true)} style={[styles.bellButton, darkMode && styles.darkControl]}><MaterialCommunityIcons name="menu" size={25} color={darkMode ? '#d8e6d9' : '#315a3c'} /></Pressable> : null}
+          <Pressable accessibilityRole="button" accessibilityLabel={`Ver avisos${alerts.length ? `, ${alerts.length} notificaciones` : ''}`} onPress={() => setSection('avisos')} style={[styles.bellButton, darkMode && styles.darkControl]}>
+            <MaterialCommunityIcons name="bell-outline" size={23} color={darkMode ? '#d8e6d9' : '#315a3c'} />
             {alerts.length > 0 ? <View style={styles.bellBadge}><Text style={styles.bellBadgeText}>{alerts.length > 99 ? '99+' : alerts.length}</Text></View> : null}
           </Pressable>
-          {!wide ? <Pressable accessibilityRole="button" onPress={onLogout} style={styles.logout}><Text style={styles.logoutText}>Salir</Text></Pressable> : null}
+          {!wide ? <Pressable accessibilityRole="button" onPress={onLogout} style={[styles.logout, darkMode && styles.darkControl]}><Text style={[styles.logoutText, darkMode && styles.darkPrimaryText]}>Salir</Text></Pressable> : null}
         </View>
       </View>
     </View>
     {!wide && !hasSidebarMenu ? <View style={[styles.nav, { paddingHorizontal: gutter }]}>
-      {navItems.map((item) => <Pressable key={item.id} onPress={() => setSection(item.id)} style={[styles.navItem, section === item.id && styles.navSelected]}><Text style={[styles.navText, section === item.id && styles.navTextSelected]}>{item.title}</Text></Pressable>)}
+      {navItems.map((item) => <Pressable key={item.id} onPress={() => setSection(item.id)} style={[styles.navItem, darkMode && styles.darkCard, section === item.id && styles.navSelected]}><Text style={[styles.navText, darkMode && styles.darkMutedText, section === item.id && styles.navTextSelected]}>{item.title}</Text></Pressable>)}
     </View> : null}
     <FlatList
+      ref={listRef}
       style={styles.list}
       data={loading ? [] : records}
       keyExtractor={(item: any, index) => String(item.id_animal ?? item.id_corral ?? item.id_usuario ?? item.id_solicitud ?? item.id ?? index)}
-      contentContainerStyle={[styles.content, { paddingHorizontal: wide ? 42 : gutter, maxWidth: Math.max(620, Math.min(1200, width)), width: '100%', alignSelf: 'center' }]}
+      contentContainerStyle={[styles.content, darkMode && styles.darkContent, { paddingHorizontal: wide ? 42 : gutter, maxWidth: Math.max(620, Math.min(1200, width)), width: '100%', alignSelf: 'center' }]}
+      onScroll={(event) => setShowScrollTop(event.nativeEvent.contentOffset.y > 320)}
+      scrollEventThrottle={16}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadSection(true)} tintColor="#315a3c" />}
       ListHeaderComponent={loading ? <View style={styles.loading}><ActivityIndicator color="#315a3c" /><Text style={styles.muted}>Cargando…</Text></View>
         : section === 'inicio' ? <FarmDashboardScreen token={token} user={user} onNavigate={setSection} />
@@ -161,10 +172,11 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
               : section === 'campo' ? <FieldOperationsScreen token={token} user={user} />
                 : section === 'veterinaria' ? <VeterinaryOperationsScreen token={token} user={user} />
                   : section === 'reproduccion' ? <ReproductionScreen token={token} />
-          : <View><Text style={styles.sectionTitle}>{NAV.find((item) => item.id === section)?.title}</Text>{section === 'equipo' ? <CreateUserCard token={token} onCreated={() => loadSection(true)} /> : null}{['animales', 'campo', 'veterinaria'].includes(section) ? <TextInput placeholder="Buscar por caravana, nombre o estado" value={search} onChangeText={setSearch} style={styles.search} /> : null}</View>}
-      ListEmptyComponent={!loading && !farmSection ? <Text style={styles.empty}>No hay elementos para mostrar.</Text> : null}
+          : <View><Text style={[styles.sectionTitle, darkMode && styles.darkPrimaryText]}>{NAV.find((item) => item.id === section)?.title}</Text>{section === 'equipo' ? <CreateUserCard token={token} onCreated={() => loadSection(true)} /> : null}{['animales', 'campo', 'veterinaria'].includes(section) ? <TextInput placeholder="Buscar por caravana, nombre o estado" placeholderTextColor={darkMode ? '#b7c1b9' : '#8a9188'} value={search} onChangeText={setSearch} style={[styles.search, darkMode && styles.darkControl, darkMode && styles.darkPrimaryText]} /> : null}</View>}
+      ListEmptyComponent={!loading && !farmSection ? <Text style={[styles.empty, darkMode && styles.darkMutedText]}>No hay elementos para mostrar.</Text> : null}
       renderItem={({ item }: { item: Animal | Corral | EquipoItem | SignupRequest | Notification }) => <RecordCard item={item} section={section} token={token} currentUser={user} onChanged={() => loadSection(true)} onAnimalAction={(animal, kind) => { setActionText(''); setAnimalAction({ animal, kind }); }} onRequestDecision={(request, approve) => void handleRequestDecision(request, approve)} onChooseRole={(member) => void handleRoleChange(member)} showMessage={showMessage} />}
     />
+    {showScrollTop ? <Pressable accessibilityRole="button" accessibilityLabel="Volver arriba" onPress={() => listRef.current?.scrollToOffset({ offset: 0, animated: true })} style={[styles.scrollTopButton, darkMode && styles.darkScrollTopButton]}><MaterialCommunityIcons name="arrow-up" size={25} color={darkMode ? '#17251b' : '#fff'} /></Pressable> : null}
     <Modal visible={drawerOpen} transparent animationType="fade" onRequestClose={() => setDrawerOpen(false)}>
       <View style={styles.drawerOverlay}>
         <View style={[styles.drawerPanel, { paddingTop: (Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 18) + 18 }]}>
@@ -180,23 +192,23 @@ export function HomeScreen({ user, token, onLogout }: HomeScreenProps) {
       </View>
     </Modal>
     <Modal visible={!!animalAction} transparent animationType="fade" onRequestClose={() => { if (!actionBusy) setAnimalAction(null); }}>
-      <KeyboardAvoidingView style={styles.modalOverlay} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView style={[styles.modalOverlay, darkMode && styles.darkModalOverlay]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView contentContainerStyle={styles.modalScroll} keyboardShouldPersistTaps="handled">
-          <View style={[styles.modalCard, { width: Math.min(width - gutter * 2, 560) }]}>
-            <Text style={styles.sectionTitle}>{animalAction?.kind === 'report' ? 'Reportar enfermedad' : 'Registrar alta veterinaria'}</Text>
-            <Text style={styles.muted}>{animalAction?.animal.identificador}{animalAction?.animal.nombre ? ` · ${animalAction.animal.nombre}` : ''}</Text>
-            <TextInput autoFocus multiline textAlignVertical="top" value={actionText} onChangeText={setActionText} style={styles.actionInput}
+          <View style={[styles.modalCard, darkMode && styles.darkCard, { width: Math.min(width - gutter * 2, 560) }]}>
+            <Text style={[styles.sectionTitle, darkMode && styles.darkPrimaryText]}>{animalAction?.kind === 'report' ? 'Reportar enfermedad' : 'Registrar alta veterinaria'}</Text>
+            <Text style={[styles.muted, darkMode && styles.darkMutedText]}>{animalAction?.animal.identificador}{animalAction?.animal.nombre ? ` · ${animalAction.animal.nombre}` : ''}</Text>
+            <TextInput autoFocus multiline textAlignVertical="top" value={actionText} onChangeText={setActionText} placeholderTextColor={darkMode ? '#b7c1b9' : '#8a9188'} style={[styles.actionInput, darkMode && styles.darkControl, darkMode && styles.darkPrimaryText]}
               placeholder={animalAction?.kind === 'report' ? 'Describí los síntomas observados' : 'Notas clínicas del alta (opcional)'} />
             <View style={styles.adminActions}>
               <Pressable disabled={actionBusy} style={styles.approveButton} onPress={() => void submitAnimalAction()}><Text style={styles.approveText}>{actionBusy ? 'Guardando…' : 'Guardar'}</Text></Pressable>
-              <Pressable disabled={actionBusy} style={styles.rejectButton} onPress={() => setAnimalAction(null)}><Text style={styles.rejectText}>Cancelar</Text></Pressable>
+              <Pressable disabled={actionBusy} style={[styles.rejectButton, darkMode && styles.darkDanger]} onPress={() => setAnimalAction(null)}><Text style={[styles.rejectText, darkMode && styles.darkRejectText]}>Cancelar</Text></Pressable>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </Modal>
     </View>
-  </View>;
+  </View></AppTheme>;
 }
 const NAV_ICONS: Record<Section, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = { inicio: 'view-dashboard-outline', animales: 'cow', corrales: 'fence', equipo: 'account-group-outline', solicitudes: 'clipboard-check-outline', campo: 'sprout', veterinaria: 'medical-bag', reproduccion: 'heart-pulse', avisos: 'bell-outline' };
 // Esta función renderiza el bloque de interfaz Dashboard dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe summary como entrada.
@@ -207,21 +219,22 @@ function Dashboard({ summary }: { summary: DashboardSummary | null }) {
 }
 // Esta función renderiza el bloque de interfaz RecordCard dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe item, section, token, currentUser, onChanged, onAnimalAction, onRequestDecision, onChooseRole, showMessage como entrada.
 function RecordCard({ item, section, token, currentUser, onChanged, onAnimalAction, onRequestDecision, onChooseRole, showMessage }: { item: Animal | Corral | EquipoItem | SignupRequest | Notification; section: Section; token: string; currentUser: PublicUser; onChanged: () => void; onAnimalAction: (animal: Animal, kind: 'report' | 'discharge') => void; onRequestDecision: (request: SignupRequest, approve: boolean) => void; onChooseRole: (item: EquipoItem) => void; showMessage: (title: string, message: string, tone?: 'success' | 'error' | 'info') => void }) {
-  if ('id_animal' in item) return <View style={styles.card}>
-    <View style={styles.row}><Text style={styles.itemTitle}>{item.identificador}{item.nombre ? ` · ${item.nombre}` : ''}</Text><Text style={styles.status}>{item.estado_salud.replace('_', ' ')}</Text></View>
-    <Text style={styles.muted}>{item.especie_nombre} · {item.raza_nombre} · {item.corral_nombre}</Text>
-    {section === 'campo' ? <Pressable style={styles.smallButton} onPress={() => onAnimalAction(item, 'report')}><Text style={styles.smallButtonText}>Reportar enfermedad</Text></Pressable> : null}
-    {section === 'veterinaria' && item.estado_salud === 'en_tratamiento' ? <Pressable style={styles.smallButton} onPress={() => onAnimalAction(item, 'discharge')}><Text style={styles.smallButtonText}>Registrar alta</Text></Pressable> : null}
+  const dark = useAppDarkMode();
+  if ('id_animal' in item) return <View style={[styles.card, dark && styles.darkCard]}>
+    <View style={styles.row}><Text style={[styles.itemTitle, dark && styles.darkPrimaryText]}>{item.identificador}{item.nombre ? ` · ${item.nombre}` : ''}</Text><Text style={[styles.status, dark && styles.darkMutedText]}>{item.estado_salud.replace('_', ' ')}</Text></View>
+    <Text style={[styles.muted, dark && styles.darkMutedText]}>{item.especie_nombre} · {item.raza_nombre} · {item.corral_nombre}</Text>
+    {section === 'campo' ? <Pressable style={[styles.smallButton, dark && styles.darkSoftButton]} onPress={() => onAnimalAction(item, 'report')}><Text style={[styles.smallButtonText, dark && styles.darkAccentText]}>Reportar enfermedad</Text></Pressable> : null}
+    {section === 'veterinaria' && item.estado_salud === 'en_tratamiento' ? <Pressable style={[styles.smallButton, dark && styles.darkSoftButton]} onPress={() => onAnimalAction(item, 'discharge')}><Text style={[styles.smallButtonText, dark && styles.darkAccentText]}>Registrar alta</Text></Pressable> : null}
   </View>;
-  if ('id_corral' in item) return <View style={styles.card}><Text style={styles.itemTitle}>{item.nombre}</Text><Text style={styles.muted}>{item.ocupados}/{item.capacidad} ocupados{item.es_enfermeria ? ' · Enfermería' : ''}</Text></View>;
-  if ('id_usuario' in item) return <View style={styles.card}><Text style={styles.itemTitle}>{item.nombre} {item.apellido}</Text><Text style={styles.muted}>{item.email} · {item.rolLabel} · {item.activo ? 'Activo' : 'Inactivo'}</Text>
+  if ('id_corral' in item) return <View style={[styles.card, dark && styles.darkCard]}><Text style={[styles.itemTitle, dark && styles.darkPrimaryText]}>{item.nombre}</Text><Text style={[styles.muted, dark && styles.darkMutedText]}>{item.ocupados}/{item.capacidad} ocupados{item.es_enfermeria ? ' · Enfermería' : ''}</Text></View>;
+  if ('id_usuario' in item) return <View style={[styles.card, dark && styles.darkCard]}><Text style={[styles.itemTitle, dark && styles.darkPrimaryText]}>{item.nombre} {item.apellido}</Text><Text style={[styles.muted, dark && styles.darkMutedText]}>{item.email} · {item.rolLabel} · {item.activo ? 'Activo' : 'Inactivo'}</Text>
     {currentUser.rol === 'administrador' && item.rol !== 'administrador' ? <View style={styles.adminActions}>
       <Pressable style={styles.smallButton} onPress={() => onChooseRole(item)}><Text style={styles.smallButtonText}>Cambiar rango</Text></Pressable>
       <Pressable style={styles.smallButton} onPress={() => void apiRequest(`/usuarios/${item.id_usuario}`, token, { method: 'PATCH', body: JSON.stringify({ activo: !item.activo }) }).then(onChanged).catch((e: Error) => showMessage('No se pudo actualizar', e.message, 'error'))}><Text style={styles.smallButtonText}>{item.activo ? 'Desactivar' : 'Reactivar'}</Text></Pressable>
     </View> : null}</View>;
-  if ('id_solicitud' in item) return <View style={styles.card}><Text style={styles.itemTitle}>{item.nombre} {item.apellido}</Text><Text style={styles.muted}>{item.email} · Correo verificado · Solicitud {new Date(item.created_at).toLocaleDateString()}</Text>
+  if ('id_solicitud' in item) return <View style={[styles.card, dark && styles.darkCard]}><Text style={[styles.itemTitle, dark && styles.darkPrimaryText]}>{item.nombre} {item.apellido}</Text><Text style={[styles.muted, dark && styles.darkMutedText]}>{item.email} · Correo verificado · Solicitud {new Date(item.created_at).toLocaleDateString()}</Text>
     <View style={styles.adminActions}><Pressable style={styles.approveButton} onPress={() => onRequestDecision(item, true)}><Text style={styles.approveText}>Aceptar · crear como peón</Text></Pressable><Pressable style={styles.rejectButton} onPress={() => onRequestDecision(item, false)}><Text style={styles.rejectText}>Denegar</Text></Pressable></View></View>;
-  return <View style={styles.card}><Text style={styles.itemTitle}>{item.titulo ?? 'Notificación'}</Text><Text style={styles.muted}>{item.mensaje}</Text></View>;
+  return <View style={[styles.card, dark && styles.darkCard]}><Text style={[styles.itemTitle, dark && styles.darkPrimaryText]}>{item.titulo ?? 'Notificación'}</Text><Text style={[styles.muted, dark && styles.darkMutedText]}>{item.mensaje}</Text></View>;
 }
 
 const MANAGED_ROLES: { role: Exclude<Role, 'administrador' | 'empleado'>; label: string }[] = [
@@ -230,6 +243,7 @@ const MANAGED_ROLES: { role: Exclude<Role, 'administrador' | 'empleado'>; label:
 // Esta función renderiza el bloque de interfaz CreateUserCard dentro de la pantalla y conecta sus props con las acciones disponibles. Recibe token, onCreated como entrada.
 function CreateUserCard({ token, onCreated }: { token: string; onCreated: () => void }) {
   const { showMessage } = useFeedback();
+  const dark = useAppDarkMode();
   const [nombre, setNombre] = useState(''); const [apellido, setApellido] = useState(''); const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [role, setRole] = useState<Exclude<Role, 'administrador' | 'empleado'>>('peon');
   // Esta función valida los datos del formulario de creación, envía el alta al backend y notifica al componente padre para actualizar la lista.
   const create = async () => {
@@ -237,22 +251,22 @@ function CreateUserCard({ token, onCreated }: { token: string; onCreated: () => 
     try { await apiRequest('/usuarios', token, { method: 'POST', body: JSON.stringify({ nombre, apellido, email, password, rol: role }) }); setNombre(''); setApellido(''); setEmail(''); setPassword(''); showMessage('Cuenta creada', 'Se creó la cuenta. La persona deberá cambiar la contraseña inicial.', 'success'); onCreated(); }
     catch (error) { showMessage('No se pudo crear', error instanceof Error ? error.message : 'Error de API.', 'error'); }
   };
-  return <View style={styles.card}><Text style={styles.itemTitle}>Crear usuario</Text><Text style={styles.muted}>Por defecto el rol inicial es Peón; podés elegir otro rango.</Text>
-    <TextInput placeholder="Nombre" value={nombre} onChangeText={setNombre} style={styles.formInput} /><TextInput placeholder="Apellido" value={apellido} onChangeText={setApellido} style={styles.formInput} />
-    <TextInput placeholder="Correo" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} style={styles.formInput} /><TextInput placeholder="Contraseña inicial (10 caracteres mínimo)" secureTextEntry value={password} onChangeText={setPassword} style={styles.formInput} />
-    <Pressable style={styles.smallButton} onPress={() => { const index = MANAGED_ROLES.findIndex((entry) => entry.role === role); setRole(MANAGED_ROLES[(index + 1) % MANAGED_ROLES.length].role); }}><Text style={styles.smallButtonText}>Rol nuevo: {MANAGED_ROLES.find((entry) => entry.role === role)?.label} · cambiar</Text></Pressable>
+  return <View style={[styles.card, dark && styles.darkCard]}><Text style={[styles.itemTitle, dark && styles.darkPrimaryText]}>Crear usuario</Text><Text style={[styles.muted, dark && styles.darkMutedText]}>Por defecto el rol inicial es Peón; podés elegir otro rango.</Text>
+    <TextInput placeholder="Nombre" placeholderTextColor={dark ? '#b7c1b9' : '#8a9188'} value={nombre} onChangeText={setNombre} style={[styles.formInput, dark && styles.darkControl, dark && styles.darkPrimaryText]} /><TextInput placeholder="Apellido" placeholderTextColor={dark ? '#b7c1b9' : '#8a9188'} value={apellido} onChangeText={setApellido} style={[styles.formInput, dark && styles.darkControl, dark && styles.darkPrimaryText]} />
+    <TextInput placeholder="Correo" placeholderTextColor={dark ? '#b7c1b9' : '#8a9188'} autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} style={[styles.formInput, dark && styles.darkControl, dark && styles.darkPrimaryText]} /><TextInput placeholder="Contraseña inicial (10 caracteres mínimo)" placeholderTextColor={dark ? '#b7c1b9' : '#8a9188'} secureTextEntry value={password} onChangeText={setPassword} style={[styles.formInput, dark && styles.darkControl, dark && styles.darkPrimaryText]} />
+    <Pressable style={[styles.smallButton, dark && styles.darkSoftButton]} onPress={() => { const index = MANAGED_ROLES.findIndex((entry) => entry.role === role); setRole(MANAGED_ROLES[(index + 1) % MANAGED_ROLES.length].role); }}><Text style={[styles.smallButtonText, dark && styles.darkAccentText]}>Rol nuevo: {MANAGED_ROLES.find((entry) => entry.role === role)?.label} · cambiar</Text></Pressable>
     <Pressable style={styles.approveButton} onPress={() => void create()}><Text style={styles.approveText}>Crear cuenta</Text></Pressable>
   </View>;
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f4f7f6' }, screenWide: { flexDirection: 'row' }, main: { flex: 1, minWidth: 0, backgroundColor: '#f4f7f6' },
-  drawerOverlay: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(17,31,21,0.45)' }, drawerScrim: { flex: 1 }, drawerPanel: { width: '82%', maxWidth: 320, backgroundColor: '#1a3020', paddingHorizontal: 18, paddingBottom: 18, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 18, elevation: 18 }, drawerBrand: { flexDirection: 'row', alignItems: 'center', gap: 12 }, drawerItem: { flexDirection: 'row', alignItems: 'center', gap: 13, minHeight: 48, paddingHorizontal: 13, borderRadius: 11 }, drawerItemSelected: { backgroundColor: 'rgba(74,222,128,0.18)' },
+  screen: { flex: 1, backgroundColor: '#f4f7f6' }, screenWide: { flexDirection: 'row' }, main: { flex: 1, minWidth: 0, backgroundColor: '#f4f7f6' }, darkMain: { backgroundColor: '#202a23' }, darkContent: { backgroundColor: '#202a23' }, darkHeader: { backgroundColor: '#2b362e', borderBottomColor: '#46544a' }, darkControl: { backgroundColor: '#37443a', borderColor: '#536258' }, darkPrimaryText: { color: '#f0f4ef' }, darkMutedText: { color: '#c5cec6' }, darkAccentText: { color: '#b8d7b5' }, darkSoftButton: { backgroundColor: '#3a493d' }, darkDanger: { backgroundColor: '#563a35', borderColor: '#705049' }, darkRejectText: { color: '#f0c7bd' }, darkModalOverlay: { backgroundColor: 'rgba(8,14,10,0.68)' },
+  drawerOverlay: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(17,31,21,0.45)' }, drawerScrim: { flex: 1 }, drawerPanel: { width: '82%', maxWidth: 320, backgroundColor: '#1a3020', paddingHorizontal: 18, paddingBottom: 18, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 18, elevation: 18 }, drawerBrand: { flexDirection: 'row', alignItems: 'center', gap: 12 }, drawerItem: { flexDirection: 'row', alignItems: 'center', gap: 13, minHeight: 48, paddingHorizontal: 13, borderRadius: 11 }, drawerItemSelected: { backgroundColor: 'rgba(74,222,128,0.18)' }, scrollTopButton: { position: 'absolute', right: 25, bottom: 25, width: 54, height: 54, borderRadius: 27, backgroundColor: '#315a3c', alignItems: 'center', justifyContent: 'center', shadowColor: '#142418', shadowOpacity: 0.24, shadowRadius: 9, shadowOffset: { width: 0, height: 4 }, elevation: 7 }, darkScrollTopButton: { backgroundColor: '#b8d7b5' },
   sidebar: { width: 246, flexShrink: 0, backgroundColor: '#1a3020', paddingTop: 30, paddingHorizontal: 18, paddingBottom: 18 }, sidebarBrandMark: { width: 42, height: 42, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' }, sidebarLeaf: { color: '#a8d5a2', fontSize: 21, fontWeight: '900' }, sidebarBrand: { color: '#f2f8f1', fontSize: 16, fontWeight: '800', marginTop: 13 }, sidebarCaption: { color: '#adc2af', fontSize: 10, letterSpacing: 1.6, fontWeight: '800', marginTop: 4 }, sidebarUser: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 28, paddingVertical: 15, borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }, sidebarAvatar: { width: 37, height: 37, borderRadius: 19, backgroundColor: '#dce8da', alignItems: 'center', justifyContent: 'center' }, sidebarAvatarText: { color: '#315a3c', fontSize: 16, fontWeight: '800' }, sidebarUserCopy: { flex: 1, minWidth: 0 }, sidebarUserName: { color: '#fff', fontSize: 13, fontWeight: '700' }, sidebarUserRole: { color: '#b3c4b5', fontSize: 11, marginTop: 3 }, sidebarSection: { color: '#90a795', fontSize: 9, letterSpacing: 1.5, fontWeight: '800', marginTop: 25, marginBottom: 10 }, sidebarNav: { flex: 1 }, sidebarNavContent: { gap: 5 }, sidebarItem: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44, paddingHorizontal: 13, borderRadius: 10 }, sidebarItemSelected: { backgroundColor: 'rgba(74,222,128,0.16)' }, sidebarItemDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#829284' }, sidebarItemDotSelected: { backgroundColor: '#8fc794' }, sidebarItemText: { color: '#d2dfd3', fontSize: 13, fontWeight: '600' }, sidebarItemTextSelected: { color: '#fff', fontWeight: '800' }, sidebarLogout: { flexDirection: 'row', alignItems: 'center', gap: 11, minHeight: 46, paddingHorizontal: 12, borderTopWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }, sidebarLogoutIcon: { color: '#c9d7ca', fontSize: 18 }, sidebarLogoutText: { color: '#d2dfd3', fontSize: 13, fontWeight: '600' },
   header: { paddingBottom: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e7ece7' }, headerInner: { width: '100%', maxWidth: 1240, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }, headerMain: { flex: 1, minWidth: 0 }, headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }, brand: { color: '#4a704d', fontWeight: '800', fontSize: 10, letterSpacing: 1.7 }, greeting: { color: '#1a3020', fontSize: 25, fontWeight: '800', marginTop: 5, flexShrink: 1 }, greetingCompact: { fontSize: 21 }, role: { color: '#6b756b', fontSize: 13, marginTop: 3 }, bellButton: { width: 44, height: 44, borderRadius: 13, backgroundColor: '#edf4eb', alignItems: 'center', justifyContent: 'center', position: 'relative' }, bellBadge: { position: 'absolute', top: -4, right: -4, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: '#b43d35', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: '#fff' }, bellBadgeText: { color: '#fff', fontSize: 9, lineHeight: 12, fontWeight: '800' }, logout: { paddingVertical: 10, paddingHorizontal: 16, backgroundColor: '#edf2eb', borderRadius: 11 }, logoutText: { color: '#315a3c', fontWeight: '700' },
   headerMobile: { marginTop: 10, marginHorizontal: 14, paddingBottom: 14, borderWidth: 1, borderColor: '#e5e9e4', borderRadius: 16, shadowColor: '#1a3020', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } },
-  nav: { width: '100%', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, paddingVertical: 11, paddingHorizontal: 16, backgroundColor: 'transparent' }, navItem: { flexShrink: 0, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e9e4' }, navSelected: { backgroundColor: '#2d5a27', borderColor: '#2d5a27' }, navText: { color: '#59645a', fontWeight: '600' }, navTextSelected: { color: '#fff' }, list: { flex: 1, minHeight: 0 }, content: { paddingTop: 14, paddingBottom: 48, flexGrow: 1 }, sectionTitle: { fontSize: 23, color: '#1a3020', fontWeight: '800', marginBottom: 17 }, stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginBottom: 14 }, statCard: { flexBasis: '45%', flexGrow: 1, minWidth: 150, backgroundColor: '#fff', borderRadius: 14, padding: 20, borderColor: '#e5e9e4', borderWidth: 1, shadowColor: '#1a3020', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }, statValue: { color: '#2d5a27', fontSize: 27, fontWeight: '800' },
-  card: { backgroundColor: '#fff', borderRadius: 14, borderColor: '#e5e9e4', borderWidth: 1, padding: 19, marginBottom: 13, shadowColor: '#1a3020', shadowOpacity: 0.035, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }, row: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }, itemTitle: { color: '#263329', fontSize: 16, fontWeight: '700', flexShrink: 1 }, muted: { color: '#6b756b', fontSize: 13, lineHeight: 19, marginTop: 5 }, status: { color: '#52765a', fontWeight: '700', fontSize: 12, flexShrink: 1 }, search: { backgroundColor: '#fff', minHeight: 47, borderColor: '#dfe5df', borderWidth: 1, borderRadius: 11, paddingHorizontal: 14, marginBottom: 14, color: '#263329' }, smallButton: { alignSelf: 'flex-start', backgroundColor: '#edf4eb', paddingHorizontal: 13, paddingVertical: 9, marginTop: 12, borderRadius: 9 }, smallButtonText: { color: '#315a3c', fontWeight: '700' }, empty: { color: '#6b756b', textAlign: 'center', paddingVertical: 32 }, loading: { alignItems: 'center', paddingVertical: 30, gap: 8 },
+  nav: { width: '100%', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, paddingVertical: 11, paddingHorizontal: 16, backgroundColor: 'transparent' }, navItem: { flexShrink: 0, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e9e4' }, navSelected: { backgroundColor: '#2d5a27', borderColor: '#2d5a27' }, navText: { color: '#59645a', fontWeight: '600' }, navTextSelected: { color: '#fff' }, list: { flex: 1, minHeight: 0 }, content: { paddingTop: 14, paddingBottom: 48, flexGrow: 1 }, sectionTitle: { fontSize: 23, color: '#1a3020', fontWeight: '800', marginBottom: 17 }, stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginBottom: 14 }, statCard: { flexBasis: '45%', flexGrow: 1, minWidth: 150, backgroundColor: '#fff', borderRadius: 14, padding: 20, borderColor: '#e5e9e4', borderWidth: 1, shadowColor: '#1a3020', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }, statValue: { color: '#2d5a27', fontSize: 27, fontWeight: '800' }, darkStatCard: { backgroundColor: '#2b362e', borderColor: '#46544a' },
+  card: { backgroundColor: '#fff', borderRadius: 14, borderColor: '#e5e9e4', borderWidth: 1, padding: 19, marginBottom: 13, shadowColor: '#1a3020', shadowOpacity: 0.035, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }, row: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }, itemTitle: { color: '#263329', fontSize: 16, fontWeight: '700', flexShrink: 1 }, muted: { color: '#6b756b', fontSize: 13, lineHeight: 19, marginTop: 5 }, status: { color: '#52765a', fontWeight: '700', fontSize: 12, flexShrink: 1 }, search: { backgroundColor: '#fff', minHeight: 47, borderColor: '#dfe5df', borderWidth: 1, borderRadius: 11, paddingHorizontal: 14, marginBottom: 14, color: '#263329' }, smallButton: { alignSelf: 'flex-start', backgroundColor: '#edf4eb', paddingHorizontal: 13, paddingVertical: 9, marginTop: 12, borderRadius: 9 }, smallButtonText: { color: '#315a3c', fontWeight: '700' }, empty: { color: '#6b756b', textAlign: 'center', paddingVertical: 32 }, loading: { alignItems: 'center', paddingVertical: 30, gap: 8 }, darkCard: { backgroundColor: '#2b362e', borderColor: '#46544a' },
   adminActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' }, approveButton: { alignSelf: 'flex-start', backgroundColor: '#2d5a27', paddingHorizontal: 15, paddingVertical: 11, marginTop: 13, borderRadius: 10 }, approveText: { color: '#fff', fontWeight: '700' }, rejectButton: { alignSelf: 'flex-start', backgroundColor: '#fbefed', paddingHorizontal: 15, paddingVertical: 11, marginTop: 13, borderRadius: 10 }, rejectText: { color: '#a64236', fontWeight: '700' }, formInput: { minHeight: 46, borderWidth: 1, borderColor: '#dfe5df', borderRadius: 10, backgroundColor: '#fbfcfa', paddingHorizontal: 13, marginTop: 10, color: '#263329' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(20,36,25,0.48)', justifyContent: 'center' }, modalScroll: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }, modalCard: { backgroundColor: '#fff', borderRadius: 20, padding: 24 }, actionInput: { minHeight: 120, maxHeight: 240, borderWidth: 1, borderColor: '#dfe5df', borderRadius: 12, backgroundColor: '#fbfcfa', padding: 13, marginTop: 14, color: '#263329' },
 });

@@ -53,6 +53,7 @@ function AppContent() {
   const [token, setToken] = useState<string | null>(null);
   const [entered, setEntered] = useState(false);
   const [busy, setBusy] = useState(true);
+  const [restoringSession, setRestoringSession] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [authView, setAuthView] = useState<'login' | 'register' | 'verify' | 'access' | 'recover'>('login');
@@ -80,7 +81,7 @@ function AppContent() {
           setError('No se pudo validar la sesión guardada porque la API no está disponible. Se conserva la sesión para reintentar; conectate a la red de la estancia e ingresá de nuevo si hace falta.');
         }
       } finally {
-        if (mounted) setBusy(false);
+        if (mounted) { setBusy(false); setRestoringSession(false); }
       }
     })();
     return () => { mounted = false; };
@@ -180,10 +181,12 @@ function AppContent() {
     setBusy(true); setError(null); setNotice(null);
     try {
       const result = await resetPasswordApi(resetToken, password);
-      await clearSavedSession();
+      try { await clearSavedSession(); } catch { /* La sesión anterior ya quedó revocada en el servidor; se continúa con el token recién emitido. */ }
       setToken(result.token);
       setUser(result.usuario);
-      setEntered(false);
+      // La recuperación termina con una sesión ya autenticada; lleva directo al panel del rol.
+      setEntered(true);
+      setAuthView('login');
       return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo cambiar la contraseña.');
@@ -218,7 +221,7 @@ function AppContent() {
     }
   };
 
-  if (busy && !user) {
+  if (restoringSession && !user) {
     return <View style={styles.loading}><ActivityIndicator size="large" color="#315a3c" /><Text style={styles.loadingText}>Conectando con tu sesión…</Text></View>;
   }
 

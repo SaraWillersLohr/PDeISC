@@ -5,10 +5,10 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "estanciaapp",
-    "icon": "./assets/branding/dark/logo.png",
+    "icon": "./assets/branding/app-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/branding/dark/logo.png",
+      "image": "./assets/branding/app-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#123824"
     },
@@ -18,9 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#123824",
-        "foregroundImage": "./assets/branding/dark/logo.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/branding/app-icon.png"
       },
       "predictiveBackGestureEnabled": false
     },

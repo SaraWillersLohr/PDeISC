@@ -1,14 +1,41 @@
 // valido credenciales contra mariadb y preparo una sesión segura.
 import bcrypt from 'bcryptjs';
+import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import type { RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
+import { env } from '../config/env.js';
 import type { AuthenticatedUser, LoginInput } from '../types/auth.js';
-import { createAccessToken, createRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
+import { createAccessToken, createPasswordRecoveryToken, createRefreshToken, verifyPasswordRecoveryToken, verifyRefreshToken } from '../utils/jwt.js';
+import { sendPasswordRecoveryCode } from './emailService.js';
+
+const recoveryTtlMinutes = 10;
+const recoveryMaxAttempts = 5;
+const recoveryResendCooldownSeconds = 60;
+const recoveryMaxDailyEmails = 5;
 
 interface UserRow extends RowDataPacket, AuthenticatedUser {
   password_hash: string;
   nombre: string;
   apellido: string;
+}
+
+interface RecoveryUserRow extends RowDataPacket, AuthenticatedUser {
+  nombre: string;
+  apellido: string;
+  token_version: number;
+}
+
+// guardo códigos como HMAC y no como texto para que una filtración de la tabla no los revele.
+function recoveryDigest(userId: number, code: string): string {
+  const secret = env.email.verificationCodeSecret;
+  if (!secret || secret.length < 32) throw new Error('configurá verification_code_secret con al menos 32 caracteres');
+  return createHmac('sha256', secret).update(`${userId}:password-recovery:${code}`).digest('hex');
+}
+
+function digestMatches(expectedHex: string, receivedHex: string): boolean {
+  const expected = Buffer.from(expectedHex, 'hex');
+  const received = Buffer.from(receivedHex, 'hex');
+  return expected.length === received.length && timingSafeEqual(expected, received);
 }
 
 // inicio sesión después de comprobar la contraseña hasheada.
@@ -47,5 +74,131 @@ export function refresh(refreshToken: string) {
   return {
     accessToken: createAccessToken(user),
     refreshToken: createRefreshToken(user),
+  };
+}
+
+// envío códigos de recuperación con límite de reenvíos y respuesta neutra para correos desconocidos.
+export async function requestPasswordRecovery(emailInput: string): Promise<void> {
+  const email = emailInput.trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(email) || email.length > 150) return;
+  const [users] = await database.query<RecoveryUserRow[]>(
+    "SELECT id_usuario, email, nombre, apellido, token_version, '' AS rol FROM usuarios WHERE email = ? AND activo = 1 AND estado_cuenta = 'activo' LIMIT 1",
+    [email],
+  );
+  if (!users.length) return;
+  const userId = Number(users[0].id_usuario);
+  const [stats] = await database.query<RowDataPacket[]>(
+    `SELECT COUNT(*) AS total, MAX(creado_at) AS ultimo FROM codigos_recuperacion_password
+     WHERE id_usuario = ? AND creado_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)`, [userId],
+  );
+  const total = Number(stats[0]?.total ?? 0);
+  const lastSent = stats[0]?.ultimo ? new Date(stats[0].ultimo as string | Date).getTime() : 0;
+  if (total >= recoveryMaxDailyEmails || (lastSent && Date.now() - lastSent < recoveryResendCooldownSeconds * 1000)) return;
+
+  const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [lockedUsers] = await connection.query<RowDataPacket[]>(
+      "SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND activo = 1 AND estado_cuenta = 'activo' FOR UPDATE", [userId],
+    );
+    if (!lockedUsers.length) { await connection.commit(); return; }
+    await connection.execute(
+      'UPDATE codigos_recuperacion_password SET invalidado_at = NOW() WHERE id_usuario = ? AND consumido_at IS NULL AND invalidado_at IS NULL', [userId],
+    );
+    await connection.execute(
+      `INSERT INTO codigos_recuperacion_password (id_usuario, codigo_hash, expira_at)
+       VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ${recoveryTtlMinutes} MINUTE))`, [userId, recoveryDigest(userId, code)],
+    );
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally { connection.release(); }
+  await sendPasswordRecoveryCode(email, users[0].nombre, code);
+}
+
+// valido el código con intentos limitados y lo canjeo por un permiso de 15 minutos.
+export async function redeemPasswordRecoveryCode(emailInput: string, code: string): Promise<{ resetToken: string }> {
+  const email = emailInput.trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(email) || !/^\d{6}$/.test(code)) throw new Error('El correo o el código no son válidos.');
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [users] = await connection.query<RecoveryUserRow[]>(
+      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.token_version, r.nombre AS rol
+       FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
+       WHERE u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1 FOR UPDATE`, [email],
+    );
+    if (!users.length) throw new Error('El código no es válido o venció.');
+    const user = users[0];
+    const userId = Number(user.id_usuario);
+    const [codes] = await connection.query<RowDataPacket[]>(
+      `SELECT id_codigo, codigo_hash, intentos FROM codigos_recuperacion_password
+       WHERE id_usuario = ? AND consumido_at IS NULL AND invalidado_at IS NULL AND expira_at > NOW()
+       ORDER BY creado_at DESC LIMIT 1 FOR UPDATE`, [userId],
+    );
+    if (!codes.length || Number(codes[0].intentos) >= recoveryMaxAttempts) throw new Error('El código no es válido o venció.');
+    if (!digestMatches(String(codes[0].codigo_hash), recoveryDigest(userId, code))) {
+      await connection.execute('UPDATE codigos_recuperacion_password SET intentos = intentos + 1 WHERE id_codigo = ?', [codes[0].id_codigo]);
+      await connection.commit();
+      throw new Error('El código no es válido o venció.');
+    }
+    const resetToken = createPasswordRecoveryToken({
+      id_usuario: userId,
+      email: user.email,
+      rol: user.rol,
+      token_version: Number(user.token_version),
+    });
+    await connection.execute('UPDATE codigos_recuperacion_password SET consumido_at = NOW() WHERE id_codigo = ?', [codes[0].id_codigo]);
+    await connection.execute(
+      'UPDATE codigos_recuperacion_password SET invalidado_at = NOW() WHERE id_usuario = ? AND id_codigo <> ? AND consumido_at IS NULL AND invalidado_at IS NULL',
+      [userId, codes[0].id_codigo],
+    );
+    await connection.commit();
+    return { resetToken };
+  } catch (error) {
+    try { await connection.rollback(); } catch { /* El intento inválido pudo haberse confirmado antes del error. */ }
+    throw error;
+  } finally { connection.release(); }
+}
+
+// actualizo la contraseña una sola vez y devuelvo una sesión para continuar en la app.
+export async function completePasswordRecovery(resetToken: string, newPassword: string) {
+  if (typeof newPassword !== 'string' || newPassword.length < 10 || Buffer.byteLength(newPassword, 'utf8') > 72) {
+    throw new Error('La contraseña debe tener entre 10 y 72 bytes.');
+  }
+  const recovery = verifyPasswordRecoveryToken(resetToken);
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  const connection = await database.getConnection();
+  let user: RecoveryUserRow;
+  let tokenVersion = 0;
+  try {
+    await connection.beginTransaction();
+    const [users] = await connection.query<RecoveryUserRow[]>(
+      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.token_version, r.nombre AS rol
+       FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
+       WHERE u.id_usuario = ? AND u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1 FOR UPDATE`,
+      [recovery.id_usuario, recovery.email],
+    );
+    if (!users.length || Number(users[0].token_version) !== Number(recovery.token_version)) {
+      throw new Error('El permiso de recuperación venció o ya fue utilizado.');
+    }
+    user = users[0];
+    tokenVersion = Number(user.token_version) + 1;
+    await connection.execute('UPDATE usuarios SET password_hash = ?, token_version = ? WHERE id_usuario = ?', [passwordHash, tokenVersion, user.id_usuario]);
+    await connection.execute(
+      'UPDATE codigos_recuperacion_password SET invalidado_at = NOW() WHERE id_usuario = ? AND consumido_at IS NULL AND invalidado_at IS NULL', [user.id_usuario],
+    );
+    await connection.commit();
+  } catch (error) {
+    try { await connection.rollback(); } catch { /* La transacción pudo haberse confirmado antes del error. */ }
+    throw error;
+  } finally { connection.release(); }
+  const sessionUser: AuthenticatedUser = { id_usuario: user.id_usuario, email: user.email, rol: user.rol };
+  return {
+    accessToken: createAccessToken(sessionUser),
+    refreshToken: createRefreshToken(sessionUser),
+    usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido },
   };
 }

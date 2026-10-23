@@ -82,3 +82,34 @@ export async function redeemAccountCode(email: string, code: string): Promise<Se
 export async function resendAccessCode(email: string): Promise<string> {
   return postMessage('resend-access-code', { email });
 }
+
+// solicito un código por correo sin revelar si la cuenta existe.
+export async function requestPasswordRecovery(email: string): Promise<string> {
+  return postMessage('password-recovery/request', { email });
+}
+
+// canjeo el código de seis dígitos por un permiso temporal de cambio de contraseña.
+export async function redeemPasswordRecoveryCode(email: string, code: string): Promise<string> {
+  if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');
+  const response = await fetch(`${apiUrl}/auth/password-recovery/redeem`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, code }),
+  });
+  const body = await response.json() as { message?: string; data?: { resetToken?: string } };
+  if (!response.ok || !body.data?.resetToken) throw new Error(body.message ?? 'No se pudo validar el código.');
+  return body.data.resetToken;
+}
+
+// guardo la nueva contraseña y recibo una sesión autenticada.
+export async function completePasswordRecovery(resetToken: string, password: string): Promise<Session> {
+  if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');
+  const response = await fetch(`${apiUrl}/auth/password-recovery/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ resetToken, password }),
+  });
+  const body = await response.json() as { message?: string; data?: Session };
+  if (!response.ok || !body.data?.accessToken) throw new Error(body.message ?? 'No se pudo cambiar la contraseña.');
+  return body.data;
+}

@@ -12,4 +12,7 @@ authRouter.post('/verify-email', authController.verifyRegistrationEmail);
 authRouter.post('/resend-verification', authController.resendRegistrationCode);
 authRouter.post('/access-code', authController.redeemAccessCode);
 authRouter.post('/resend-access-code', authController.resendAccessCode);
+authRouter.post('/password-recovery/request', authController.requestPasswordRecovery);
+authRouter.post('/password-recovery/redeem', authController.redeemPasswordRecoveryCode);
+authRouter.post('/password-recovery/reset', authController.completePasswordRecovery);
 authRouter.get('/me', requireAuthentication, authController.me);

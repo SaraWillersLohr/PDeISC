@@ -40,6 +40,17 @@ export async function sendAccessCode(email: string, name: string, code: string):
     text: `Hola ${name}. El administrador aprobó tu acceso. Ingresá con tu correo y este código de un solo uso: ${code}. Vence en 10 minutos.`,
   });
 }
+
+// envío un código temporal para recuperar la contraseña de una cuenta activa.
+export async function sendPasswordRecoveryCode(email: string, name: string, code: string): Promise<void> {
+  const mailer = createMailer();
+  await mailer.transporter.sendMail({
+    from: mailer.from,
+    to: email,
+    subject: 'Recuperá tu contraseña de EstanciaApp',
+    text: `Hola ${name}. Tu código para recuperar la contraseña es ${code}. Vence en 10 minutos. Si no lo pediste, ignorá este mensaje.`,
+  });
+}
 // envío una notificación al administrador cuando una solicitud confirma su correo.
 export async function sendNewRequestNotice(email: string, name: string, applicantEmail: string): Promise<void> {
   const mailer = createMailer();

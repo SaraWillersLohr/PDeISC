@@ -14,6 +14,7 @@ export default function RootLayout() {
         <Stack.Screen name="register" />
         <Stack.Screen name="verify" />
         <Stack.Screen name="access" />
+        <Stack.Screen name="recover" />
         <Stack.Screen name="(app)" />
       </Stack>
     </SessionProvider>

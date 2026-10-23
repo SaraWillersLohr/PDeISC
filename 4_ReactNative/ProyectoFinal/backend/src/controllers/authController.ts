@@ -51,6 +51,40 @@ export async function resendAccessCode(req: Request, res: Response): Promise<voi
   await handleRegistrationAction(() => registrationService.resendAccessCode(email), res, 'si el acceso fue aprobado y sigue pendiente, enviaremos un nuevo código');
 }
 
+// solicito un código sin revelar si el correo corresponde a una cuenta activa.
+export async function requestPasswordRecovery(req: Request, res: Response): Promise<void> {
+  const email = typeof req.body?.email === 'string' ? req.body.email : '';
+  try { await authService.requestPasswordRecovery(email); }
+  catch { console.error('[auth] No se pudo completar una solicitud de recuperación.'); }
+  res.status(202).json({ message: 'Si la cuenta puede recuperar el acceso, enviaremos un código al correo indicado.' });
+}
+
+// verifico el código enviado por correo y entrego un permiso de cambio de contraseña.
+export async function redeemPasswordRecoveryCode(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, code } = req.body as { email?: string; code?: string };
+    if (!email?.trim() || !code) { res.status(400).json({ message: 'Completá el correo y el código de seis dígitos.' }); return; }
+    const data = await authService.redeemPasswordRecoveryCode(email, code);
+    res.json({ message: 'Código válido. Ahora elegí una contraseña nueva.', data });
+  } catch {
+    res.status(400).json({ message: 'El correo o el código no son válidos, no corresponden a una cuenta activa o el código venció.' });
+  }
+}
+
+// cambio la contraseña con el permiso temporal y devuelvo la sesión iniciada.
+export async function completePasswordRecovery(req: Request, res: Response): Promise<void> {
+  try {
+    const { resetToken, password } = req.body as { resetToken?: string; password?: string };
+    if (!resetToken || !password) { res.status(400).json({ message: 'Ingresá el código válido y la contraseña nueva.' }); return; }
+    const data = await authService.completePasswordRecovery(resetToken, password);
+    res.json({ message: 'Contraseña actualizada. Iniciaste sesión.', data });
+  } catch (error) {
+    const raw = error instanceof Error ? error.message : '';
+    const message = raw.includes('entre 10 y 72 bytes') ? raw : 'El código venció o ya fue usado. Solicitá uno nuevo e intentá otra vez.';
+    res.status(400).json({ message });
+  }
+}
+
 // proceso el inicio de sesión y devuelvo tokens jwt al cliente móvil.
 export async function login(req: Request, res: Response): Promise<void> {
   const { email, password } = req.body as { email?: string; password?: string };

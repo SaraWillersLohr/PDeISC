@@ -2,11 +2,13 @@
 import NetInfo from '@react-native-community/netinfo';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
 import { removeSession } from '../../services/sessionStorage';
 import { approveRegistrationRequest, listRegistrationRequests, rejectRegistrationRequest, type RegistrationRequest, type RequestedRole } from '../../services/adminApi';
 import { CorralsInventoryScreen, NotificationsScreen, NursingScreen } from './LivestockScreens';
+import { BrandWordmark } from '../BrandWordmark';
 
 const c = { green: '#214d35', greenDark: '#173d2a', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', gold: '#c29343' };
 type ModuleKey = 'inicio' | 'animales' | 'corrales' | 'tareas' | 'sanidad' | 'reproduccion' | 'mapa' | 'eventos' | 'avisos' | 'equipo' | 'catalogo' | 'perfil';
@@ -39,7 +41,7 @@ function Header({ title, subtitle }: { title: string; subtitle: string }) {
   useEffect(() => { const unsubscribe = NetInfo.addEventListener((state) => setOnline(Boolean(state.isConnected))); return unsubscribe; }, []);
   const initials = `${session?.usuario.nombre?.[0] ?? 'E'}${session?.usuario.apellido?.[0] ?? ''}`.toUpperCase();
   return <View style={s.header}>
-    <View style={s.brandLine}><View style={s.brandBadge}><Text style={s.brandBadgeText}>✳</Text></View><Text style={s.brand}>estancia<Text style={s.brandSoft}>app</Text></Text><View style={[s.connection, !online && s.connectionOff]}><View style={[s.connectionDot, !online && s.connectionDotOff]} /><Text style={s.connectionText}>{online ? 'En línea' : 'Sin señal'}</Text></View></View>
+    <View style={s.brandLine}><BrandWordmark /><View style={[s.connection, !online && s.connectionOff]}><View style={[s.connectionDot, !online && s.connectionDotOff]} /><Text style={s.connectionText}>{online ? 'En línea' : 'Sin señal'}</Text></View></View>
     <View style={s.titleRow}><View style={{ flex: 1 }}><Text style={s.pageTitle}>{title}</Text><Text style={s.pageSubtitle}>{subtitle}</Text></View><View style={s.avatar}><Text style={s.avatarText}>{initials}</Text></View></View>
   </View>;
 }

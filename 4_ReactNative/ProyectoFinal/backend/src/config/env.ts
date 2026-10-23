@@ -12,10 +12,20 @@ function requiredEnvironment(name: string): string {
   return value;
 }
 
+// acepto temporalmente los nombres previos para no invalidar instalaciones existentes.
+function requiredEnvironmentAlias(...names: string[]): string {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+
+  throw new Error(`falta una de las variables de entorno: ${names.join(', ')}`);
+}
+
 // centralizo la configuración externa para evitar valores hardcodeados.
 export const env = {
   port: Number(requiredEnvironment('PORT')),
-  frontendOrigin: requiredEnvironment('FRONTEND_ORIGIN'),
+  frontendOrigin: requiredEnvironmentAlias('FRONTEND_ORIGIN', 'CORS_ORIGIN'),
   database: {
     host: requiredEnvironment('DB_HOST'),
     port: Number(requiredEnvironment('DB_PORT')),
@@ -25,10 +35,10 @@ export const env = {
     ssl: process.env.DB_SSL === 'true',
   },
   jwt: {
-    accessSecret: requiredEnvironment('JWT_ACCESS_SECRET'),
-    accessExpiresIn: requiredEnvironment('JWT_ACCESS_EXPIRES_IN'),
-    refreshSecret: requiredEnvironment('JWT_REFRESH_SECRET'),
-    refreshExpiresIn: requiredEnvironment('JWT_REFRESH_EXPIRES_IN'),
+    accessSecret: requiredEnvironmentAlias('JWT_ACCESS_SECRET', 'JWT_SECRET'),
+    accessExpiresIn: requiredEnvironmentAlias('JWT_ACCESS_EXPIRES_IN', 'JWT_EXPIRES_IN'),
+    refreshSecret: requiredEnvironmentAlias('JWT_REFRESH_SECRET', 'JWT_SECRET'),
+    refreshExpiresIn: requiredEnvironmentAlias('JWT_REFRESH_EXPIRES_IN', 'JWT_EXPIRES_IN'),
   },
   email: {
     smtpHost: process.env.SMTP_HOST?.trim(),

@@ -1,7 +1,8 @@
 // canjeo el código de acceso que envía el administrador tras aprobar una solicitud.
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../context/SessionContext';
 import { redeemAccountCode, resendAccessCode } from '../services/authApi';
 import { saveSession } from '../services/sessionStorage';

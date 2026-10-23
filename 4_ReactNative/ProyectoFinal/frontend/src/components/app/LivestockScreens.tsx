@@ -1,9 +1,11 @@
 // muestro los inventarios de animales y corrales con datos del backend.
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, Modal, Pressable, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
 import { dischargeAnimal, listAnimals, listCorrals, listNursingAnimals, listNotifications, moveAnimal, type AnimalRecord, type CorralRecord, type NursingAnimalRecord, type NotificationRecord } from '../../services/livestockApi';
+import { BrandWordmark } from '../BrandWordmark';
 
 const color = { green: '#214d35', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', red: '#a34b43' };
 
@@ -145,7 +147,7 @@ export function NotificationsScreen() {
 
 // presento estados de carga, error y contenido con refresco manual.
 function InventoryPage({ title, subtitle, count, search, onSearch, loading, error, onRetry, onRefresh, refreshing, children }: { title: string; subtitle: string; count: number; search: string; onSearch: (value: string) => void; loading: boolean; error: string; onRetry: () => void; onRefresh: () => void; refreshing: boolean; children: React.ReactNode }) {
-  return <SafeAreaView style={style.safe}><ScrollView contentContainerStyle={style.page} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={color.green} />}><Text style={style.brand}>✳ estanciaapp</Text><Text style={style.heading}>{title}</Text><Text style={style.subtitle}>{subtitle}</Text><View style={style.top}><Text style={style.count}>{count} registros</Text></View><TextInput accessibilityLabel={`Buscar ${title.toLowerCase()}`} onChangeText={onSearch} placeholder={`Buscar ${title.toLowerCase()}…`} placeholderTextColor={color.muted} style={style.search} value={search} />{loading ? <View style={style.message}><ActivityIndicator color={color.green} /><Text style={style.detail}>Cargando datos…</Text></View> : error ? <View style={style.empty}><Text style={style.title}>No se pudo cargar</Text><Text style={style.detail}>{error}</Text><Pressable accessibilityRole="button" onPress={onRetry} style={style.retry}><Text style={style.retryText}>Reintentar</Text></Pressable></View> : children}</ScrollView></SafeAreaView>;
+  return <SafeAreaView style={style.safe}><ScrollView contentContainerStyle={style.page} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={color.green} />}><BrandWordmark /><Text style={style.heading}>{title}</Text><Text style={style.subtitle}>{subtitle}</Text><View style={style.top}><Text style={style.count}>{count} registros</Text></View><TextInput accessibilityLabel={`Buscar ${title.toLowerCase()}`} onChangeText={onSearch} placeholder={`Buscar ${title.toLowerCase()}…`} placeholderTextColor={color.muted} style={style.search} value={search} />{loading ? <View style={style.message}><ActivityIndicator color={color.green} /><Text style={style.detail}>Cargando datos…</Text></View> : error ? <View style={style.empty}><Text style={style.title}>No se pudo cargar</Text><Text style={style.detail}>{error}</Text><Pressable accessibilityRole="button" onPress={onRetry} style={style.retry}><Text style={style.retryText}>Reintentar</Text></Pressable></View> : children}</ScrollView></SafeAreaView>;
 }
 
 // explico por qué la lista no muestra registros.

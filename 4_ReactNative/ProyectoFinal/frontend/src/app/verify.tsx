@@ -1,7 +1,8 @@
 // confirmo el correo de una solicitud y explico el paso de aprobación.
 import { useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { resendAccountCode, verifyAccountEmail } from '../services/authApi';
 
 // valido el código enviado al correo y dejo visible el estado de la solicitud.

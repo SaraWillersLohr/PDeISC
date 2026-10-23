@@ -1,8 +1,10 @@
 // permito solicitar acceso a la estancia instalada y verificar el correo.
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { requestAccount } from '../services/authApi';
+import { BrandWordmark } from '../components/BrandWordmark';
 
 // reuno y valido los datos antes de crear una solicitud de acceso.
 export default function RegisterScreen() {
@@ -33,7 +35,7 @@ export default function RegisterScreen() {
   }
 
   return <SafeAreaView style={s.safe}><KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.flex}><ScrollView contentContainerStyle={s.page} keyboardShouldPersistTaps="handled">
-    <View style={s.brand}><Text style={s.brandIcon}>✳</Text><Text style={s.brandName}>estanciaapp</Text></View>
+    <View style={s.brand}><BrandWordmark /></View>
     <Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text>
     <Text style={s.copy}>Esta solicitud es para la estancia conectada a esta app. Completá tus datos, verificá el correo y el administrador revisará la solicitud y asignará tu rol.</Text>
     <Text style={s.label}>NOMBRE</Text><TextInput autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} />

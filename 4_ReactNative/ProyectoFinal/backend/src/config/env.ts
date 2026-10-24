@@ -24,6 +24,7 @@ function requiredEnvironmentAlias(...names: string[]): string {
 
 // centralizo la configuración externa para evitar valores hardcodeados.
 export const env = {
+  nodeEnv: process.env.NODE_ENV?.trim() ?? 'development',
   port: Number(requiredEnvironment('PORT')),
   frontendOrigin: requiredEnvironmentAlias('FRONTEND_ORIGIN', 'CORS_ORIGIN'),
   database: {

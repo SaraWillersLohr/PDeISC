@@ -4,14 +4,20 @@ import { router } from 'expo-router';
 import { ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
-import { dischargeAnimal, listAnimals, listCorrals, listNursingAnimals, listNotifications, moveAnimal, type AnimalRecord, type CorralRecord, type NursingAnimalRecord, type NotificationRecord } from '../../services/livestockApi';
+import { deleteCorral, dischargeAnimal, listAnimals, listCorrals, listNursingAnimals, listNotifications, moveAnimal, saveCorral, updateAnimal, type AnimalRecord, type CorralRecord, type NursingAnimalRecord, type NotificationRecord } from '../../services/livestockApi';
 import { BrandWordmark } from '../BrandWordmark';
+import { AnimalCreateModal } from './AnimalCreateModal';
+import { AnimalWeightModal } from './AnimalWeightModal';
 
 const color = { green: '#214d35', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', red: '#a34b43' };
 
 // consulto animales y aplico búsqueda local sobre la respuesta vigente.
 export function AnimalsInventoryScreen() {
   const { session } = useSession();
+  const role = session?.usuario.rol.toLowerCase();
+  const canMove = role === 'administrador' || role === 'peon';
+  const canWeigh = role === 'administrador' || role === 'peon';
+  const canEdit = role === 'administrador' || role === 'dueno' || role === 'peon';
   const [rows, setRows] = useState<AnimalRecord[]>([]);
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
@@ -22,6 +28,13 @@ export function AnimalsInventoryScreen() {
   const [destination, setDestination] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [moveError, setMoveError] = useState('');
+  const [editing, setEditing] = useState<AnimalRecord | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [weighing, setWeighing] = useState<AnimalRecord | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editIdentifier, setEditIdentifier] = useState('');
+  const [editBirth, setEditBirth] = useState('');
+  const [editError, setEditError] = useState('');
   const load = useCallback(async () => {
     if (!session) return;
     try { const [animals, currentCorrals] = await Promise.all([listAnimals(session), listCorrals(session)]); setRows(animals); setCorrals(currentCorrals); }
@@ -38,9 +51,13 @@ export function AnimalsInventoryScreen() {
   }, [session]);
   const filtered = useMemo(() => rows.filter((animal) => `${animal.identificador} ${animal.nombre ?? ''} ${animal.raza} ${animal.corral}`.toLowerCase().includes(query.trim().toLowerCase())), [query, rows]);
   return <InventoryPage title="Animales" subtitle="INVENTARIO DE LA ESTANCIA" count={filtered.length} search={query} onSearch={setQuery} loading={loading} error={error} onRetry={() => { setLoading(true); void load(); }} onRefresh={() => { setRefreshing(true); void load(); }} refreshing={refreshing}>
-    {filtered.map((animal) => <View key={animal.id_animal} style={style.card}><View style={style.row}><View style={style.badge}><Text style={style.badgeText}>◉</Text></View><View style={{ flex: 1 }}><Text style={style.title}>{animal.nombre || animal.identificador}</Text><Text style={style.detail}>{animal.identificador} · {animal.especie} {animal.raza}</Text></View><Text style={[style.state, animal.estado_salud !== 'sano' && style.stateAlert]}>{animal.estado_salud.replaceAll('_', ' ')}</Text></View><View style={style.divider} /><View style={style.row}><Text style={[style.detail, { flex: 1 }]}>⌖  {animal.corral}  ·  {animal.peso_kg == null ? 'Sin peso registrado' : `${animal.peso_kg} kg`}</Text>{['administrador', 'copropietario', 'peon'].includes(session?.usuario.rol.toLowerCase() ?? '') ? <Pressable onPress={() => { setMoving(animal); setDestination(null); setMoveError(''); }} style={style.moveButton}><Text style={style.moveButtonText}>Mover</Text></Pressable> : null}</View>{animal.alta_pendiente_traslado ? <Text style={style.notice}>Alta veterinaria registrada · falta el traslado físico</Text> : null}</View>)}
+    {canEdit ? <Pressable onPress={() => setCreating(true)} style={style.confirmButton}><Text style={style.confirmText}>＋ Agregar animal</Text></Pressable> : null}
+    {filtered.map((animal) => <View key={animal.id_animal} style={style.card}><View style={style.row}><View style={style.badge}><Text style={style.badgeText}>◉</Text></View><View style={{ flex: 1 }}><Text style={style.title}>{animal.nombre || animal.identificador}</Text><Text style={style.detail}>{animal.identificador} · {animal.especie} {animal.raza}</Text></View><Text style={[style.state, animal.estado_salud !== 'sano' && style.stateAlert]}>{animal.estado_salud.replaceAll('_', ' ')}</Text></View><View style={style.divider} /><View style={style.row}><Text style={[style.detail, { flex: 1 }]}>⌖  {animal.corral}  ·  {animal.peso_kg == null ? 'Sin peso registrado' : `${animal.peso_kg} kg`}</Text>{canEdit ? <Pressable onPress={() => { setEditing(animal); setEditName(animal.nombre ?? ''); setEditIdentifier(animal.identificador); setEditBirth(animal.fecha_nacimiento?.slice(0, 10) ?? ''); setEditError(''); }} style={style.moveButton}><Text style={style.moveButtonText}>Editar</Text></Pressable> : null}{canWeigh ? <Pressable onPress={() => setWeighing(animal)} style={style.moveButton}><Text style={style.moveButtonText}>Pesar</Text></Pressable> : null}{canMove ? <Pressable onPress={() => { setMoving(animal); setDestination(null); setMoveError(''); }} style={style.moveButton}><Text style={style.moveButtonText}>Mover</Text></Pressable> : null}</View>{animal.alta_pendiente_traslado ? <Text style={style.notice}>Alta veterinaria registrada · falta el traslado físico</Text> : null}</View>)}
     {!loading && !error && filtered.length === 0 ? <Empty title={query ? 'No encontramos animales' : 'Todavía no hay animales'} text={query ? 'Probá buscar por identificador, nombre, raza o corral.' : 'Los animales activos de la estancia aparecerán acá.'} /> : null}
+    <Modal animationType="fade" onRequestClose={() => setEditing(null)} transparent visible={Boolean(editing)}><View style={style.backdrop}><View style={style.modal}><Text style={style.title}>Editar ficha del animal</Text><TextInput accessibilityLabel="Nombre" onChangeText={setEditName} placeholder="Nombre" style={style.notesInput} value={editName} /><TextInput accessibilityLabel="Identificador" onChangeText={setEditIdentifier} placeholder="Identificador" style={style.notesInput} value={editIdentifier} /><TextInput accessibilityLabel="Fecha de nacimiento" onChangeText={setEditBirth} placeholder="AAAA-MM-DD" style={style.notesInput} value={editBirth} />{editError ? <Text style={style.error}>{editError}</Text> : null}<View style={style.modalActions}><Pressable onPress={() => setEditing(null)} style={style.cancelButton}><Text style={style.cancelText}>Cancelar</Text></Pressable><Pressable onPress={() => void persistAnimal()} style={style.confirmButton}><Text style={style.confirmText}>Guardar cambios</Text></Pressable></View></View></View></Modal>
     <Modal animationType="fade" onRequestClose={() => setMoving(null)} transparent visible={Boolean(moving)}><View style={style.backdrop}><View style={style.modal}><Text style={style.title}>Mover animal</Text><Text style={style.detail}>{moving?.nombre || moving?.identificador} · ubicación actual: {moving?.corral}</Text><Text style={style.selectLabel}>SELECCIONÁ EL CORRAL DE DESTINO</Text>{corrals.filter((corral) => corral.id_corral !== moving?.id_corral && (session?.usuario.rol.toLowerCase() !== 'peon' || !corrals.find((source) => source.id_corral === moving?.id_corral)?.es_enfermeria || Boolean(corral.es_enfermeria))).map((corral) => <Pressable key={corral.id_corral} onPress={() => setDestination(corral.id_corral)} style={[style.destination, destination === corral.id_corral && style.destinationSelected]}><Text style={[style.destinationText, destination === corral.id_corral && style.destinationTextSelected]}>{corral.nombre}</Text><Text style={[style.detail, destination === corral.id_corral && style.destinationTextSelected]}>{corral.ocupacion}/{corral.capacidad} animales</Text></Pressable>)}{moveError ? <Text style={style.error}>{moveError}</Text> : null}<View style={style.modalActions}><Pressable onPress={() => setMoving(null)} style={style.cancelButton}><Text style={style.cancelText}>Cancelar</Text></Pressable><Pressable disabled={!destination || saving} onPress={() => void saveMovement()} style={[style.confirmButton, (!destination || saving) && style.disabledButton]}><Text style={style.confirmText}>{saving ? 'Guardando…' : 'Confirmar traslado'}</Text></Pressable></View></View></View></Modal>
+    <AnimalCreateModal visible={creating} corrals={corrals} onClose={() => setCreating(false)} onCreated={() => { setLoading(true); void load(); }} />
+    <AnimalWeightModal animal={weighing} onClose={() => setWeighing(null)} onSaved={() => { setLoading(true); void load(); }} />
   </InventoryPage>;
 
   async function saveMovement(): Promise<void> {
@@ -49,6 +66,12 @@ export function AnimalsInventoryScreen() {
     try { await moveAnimal(session, moving.id_animal, destination); setMoving(null); setLoading(true); await load(); }
     catch (cause) { setMoveError(cause instanceof Error ? cause.message : 'No se pudo registrar el traslado.'); }
     finally { setSaving(false); }
+  }
+
+  async function persistAnimal(): Promise<void> {
+    if (!session || !editing || !editIdentifier.trim()) { setEditError('El identificador es obligatorio.'); return; }
+    try { await updateAnimal(session, editing, { nombre: editName.trim(), identificador: editIdentifier.trim(), fecha_nacimiento: editBirth.trim() }); setEditing(null); setLoading(true); await load(); }
+    catch (cause) { setEditError(cause instanceof Error ? cause.message : 'No se pudo guardar la ficha.'); }
   }
 }
 
@@ -60,6 +83,14 @@ export function CorralsInventoryScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const role = session?.usuario.rol.toLowerCase();
+  const canManage = role === 'dueno' || role === 'administrador' || role === 'copropietario';
+  const [editing, setEditing] = useState<CorralRecord | null | false>(false);
+  const [deleting, setDeleting] = useState<CorralRecord | null>(null);
+  const [corralName, setCorralName] = useState('');
+  const [capacity, setCapacity] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [savingCorral, setSavingCorral] = useState(false);
   const load = useCallback(async () => {
     if (!session) return;
     try { setRows(await listCorrals(session)); }
@@ -76,9 +107,31 @@ export function CorralsInventoryScreen() {
   }, [session]);
   const filtered = useMemo(() => rows.filter((corral) => corral.nombre.toLowerCase().includes(query.trim().toLowerCase())), [query, rows]);
   return <InventoryPage title="Corrales" subtitle="OCUPACIÓN Y CAPACIDAD" count={filtered.length} search={query} onSearch={setQuery} loading={loading} error={error} onRetry={() => { setLoading(true); void load(); }} onRefresh={() => { setRefreshing(true); void load(); }} refreshing={refreshing}>
-    {filtered.map((corral) => { const occupancy = Number(corral.ocupacion); const capacity = Number(corral.capacidad); const ratio = capacity ? Math.min(occupancy / capacity, 1) : 0; return <View key={corral.id_corral} style={style.card}><View style={style.row}><View style={style.badge}><Text style={style.badgeText}>{corral.es_enfermeria ? '✚' : '▦'}</Text></View><View style={{ flex: 1 }}><Text style={style.title}>{corral.nombre}</Text><Text style={style.detail}>{corral.es_enfermeria ? 'Corral de enfermería' : 'Corral operativo'}</Text></View><Text style={style.occupancy}>{occupancy}<Text style={style.detail}> / {capacity}</Text></Text></View><View style={style.track}><View style={[style.progress, ratio >= 0.9 && style.progressHigh, { width: `${ratio * 100}%` }]} /></View><Text style={style.detail}>Ocupación · {Math.round(ratio * 100)}%</Text></View>; })}
+    {canManage ? <Pressable onPress={() => { setEditing(null); setCorralName(''); setCapacity(''); setActionError(''); }} style={style.confirmButton}><Text style={style.confirmText}>＋ Crear corral</Text></Pressable> : null}
+    {actionError ? <Text style={style.error}>{actionError}</Text> : null}
+    {filtered.map((corral) => { const occupancy = Number(corral.ocupacion); const maxCapacity = Number(corral.capacidad); const ratio = maxCapacity ? Math.min(occupancy / maxCapacity, 1) : 0; return <View key={corral.id_corral} style={style.card}><View style={style.row}><View style={style.badge}><Text style={style.badgeText}>{corral.es_enfermeria ? '✚' : '▦'}</Text></View><View style={{ flex: 1 }}><Text style={style.title}>{corral.nombre}</Text><Text style={style.detail}>{corral.es_enfermeria ? 'Corral de enfermería' : 'Corral operativo'}</Text></View><Text style={style.occupancy}>{occupancy}<Text style={style.detail}> / {maxCapacity}</Text></Text></View><View style={style.track}><View style={[style.progress, ratio >= 0.9 && style.progressHigh, { width: `${ratio * 100}%` }]} /></View><Text style={style.detail}>Ocupación · {Math.round(ratio * 100)}%</Text>{canManage && !corral.es_enfermeria ? <View style={style.modalActions}><Pressable onPress={() => { setEditing(corral); setCorralName(corral.nombre); setCapacity(String(corral.capacidad)); setActionError(''); }} style={style.moveButton}><Text style={style.moveButtonText}>Editar</Text></Pressable><Pressable onPress={() => { setDeleting(corral); setActionError(''); }} style={style.cancelButton}><Text style={style.cancelText}>Dar de baja</Text></Pressable></View> : null}</View>; })}
     {!loading && !error && filtered.length === 0 ? <Empty title={query ? 'No encontramos corrales' : 'Todavía no hay corrales'} text={query ? 'Probá con otro nombre.' : 'Los corrales activos de la estancia aparecerán acá.'} /> : null}
+    <Modal animationType="fade" onRequestClose={() => setEditing(false)} transparent visible={editing !== false}><View style={style.backdrop}><View style={style.modal}><Text style={style.title}>{editing ? 'Editar corral' : 'Nuevo corral'}</Text><Text style={style.selectLabel}>NOMBRE</Text><TextInput onChangeText={setCorralName} placeholder="Ej. Potrero norte" style={style.notesInput} value={corralName} /><Text style={style.selectLabel}>CAPACIDAD</Text><TextInput keyboardType="number-pad" onChangeText={setCapacity} placeholder="Cantidad de animales" style={style.notesInput} value={capacity} />{actionError ? <Text style={style.error}>{actionError}</Text> : null}<View style={style.modalActions}><Pressable onPress={() => setEditing(false)} style={style.cancelButton}><Text style={style.cancelText}>Cancelar</Text></Pressable><Pressable disabled={savingCorral} onPress={() => void persist()} style={style.confirmButton}><Text style={style.confirmText}>{savingCorral ? 'Guardando…' : 'Guardar corral'}</Text></Pressable></View></View></View></Modal>
+    <Modal animationType="fade" onRequestClose={() => setDeleting(null)} transparent visible={Boolean(deleting)}><View style={style.backdrop}><View style={style.modal}><Text style={style.title}>Dar de baja {deleting?.nombre}</Text><Text style={style.detail}>{Number(deleting?.ocupacion ?? 0) > 0 ? `Primero trasladá los ${deleting?.ocupacion} animales asignados a otro corral.` : 'El corral quedará inactivo y se conservará el historial.'}</Text>{actionError ? <Text style={style.error}>{actionError}</Text> : null}<View style={style.modalActions}><Pressable onPress={() => setDeleting(null)} style={style.cancelButton}><Text style={style.cancelText}>Cancelar</Text></Pressable><Pressable disabled={savingCorral || Number(deleting?.ocupacion ?? 0) > 0} onPress={() => deleting && void remove(deleting)} style={[style.confirmButton, Number(deleting?.ocupacion ?? 0) > 0 && style.disabledButton]}><Text style={style.confirmText}>{savingCorral ? 'Procesando…' : 'Confirmar baja'}</Text></Pressable></View></View></View></Modal>
   </InventoryPage>;
+
+  async function persist(): Promise<void> {
+    if (!session || !corralName.trim() || !Number.isInteger(Number(capacity)) || Number(capacity) < 1) { setActionError('Ingresá un nombre y una capacidad válida.'); return; }
+    setSavingCorral(true); setActionError('');
+    try { await saveCorral(session, { ...(editing ? { id_corral: editing.id_corral } : {}), nombre: corralName.trim(), capacidad: Number(capacity) }); setEditing(false); await load(); }
+    catch (cause) { setActionError(cause instanceof Error ? cause.message : 'No se pudo guardar el corral.'); }
+    finally { setSavingCorral(false); }
+  }
+
+  async function remove(corral: CorralRecord): Promise<void> {
+    if (!session) return;
+    setActionError('');
+    setSavingCorral(true);
+    try { await deleteCorral(session, corral.id_corral); setDeleting(null); await load(); }
+    catch (cause) { setActionError(cause instanceof Error ? cause.message : 'No se pudo dar de baja el corral.'); }
+    finally { setSavingCorral(false); }
+  }
+  
 }
 
 // permito al veterinario registrar el alta sin alterar la ubicación física.
@@ -112,7 +165,7 @@ export function NursingScreen() {
     finally { setSaving(false); }
   }
   return <InventoryPage title="Enfermería" subtitle="SEGUIMIENTO VETERINARIO" count={rows.length} search="" onSearch={() => undefined} loading={loading} error={error} onRetry={() => { setLoading(true); void load(); }} onRefresh={() => { setLoading(true); void load(); }} refreshing={false}>
-    {rows.map((animal) => <View key={animal.id_animal} style={style.card}><View style={style.row}><View style={style.badge}><Text style={style.badgeText}>✚</Text></View><View style={{ flex: 1 }}><Text style={style.title}>{animal.nombre || animal.identificador}</Text><Text style={style.detail}>{animal.identificador} · {animal.especie} {animal.raza}</Text></View><Text style={[style.state, animal.estado_salud !== 'sano' && style.stateAlert]}>{animal.estado_salud.replaceAll('_', ' ')}</Text></View><Text style={style.detail}>Ubicación: {animal.corral} · {animal.peso_kg == null ? 'Sin peso registrado' : `${animal.peso_kg} kg`}</Text>{animal.alta_pendiente_traslado ? <Text style={style.notice}>Alta registrada · esperando traslado del peón</Text> : <Pressable onPress={() => { setSelected(animal); setNotes(''); setError(''); }} style={style.dischargeButton}><Text style={style.dischargeText}>Registrar alta y avisar al peón</Text></Pressable>}</View>)}
+    {rows.map((animal) => <View key={animal.id_animal} style={style.card}><View style={style.row}><View style={style.badge}><Text style={style.badgeText}>✚</Text></View><View style={{ flex: 1 }}><Text style={style.title}>{animal.nombre || animal.identificador}</Text><Text style={style.detail}>{animal.identificador} · {animal.especie} {animal.raza}</Text></View><Text style={[style.state, animal.estado_salud !== 'sano' && style.stateAlert]}>{animal.estado_salud.replaceAll('_', ' ')}</Text></View><Text style={style.detail}>Ubicación: {animal.corral} · {animal.peso_kg == null ? 'Sin peso registrado' : `${animal.peso_kg} kg`}</Text>{animal.reporte_sanitario ? <Text style={style.notice}>Reporte del peón: {animal.reporte_sanitario}</Text> : null}{animal.alta_pendiente_traslado ? <Text style={style.notice}>Alta registrada · esperando traslado del peón</Text> : <Pressable onPress={() => { setSelected(animal); setNotes(''); setError(''); }} style={style.dischargeButton}><Text style={style.dischargeText}>Registrar alta y avisar al peón</Text></Pressable>}</View>)}
     {!loading && !error && rows.length === 0 ? <Empty title="Enfermería está vacía" text="Los animales trasladados a enfermería aparecerán acá." /> : null}
     <Modal animationType="fade" onRequestClose={() => setSelected(null)} transparent visible={Boolean(selected)}><View style={style.backdrop}><View style={style.modal}><Text style={style.title}>Registrar alta veterinaria</Text><Text style={style.detail}>{selected?.nombre || selected?.identificador} sigue en enfermería hasta que el peón haga el traslado físico.</Text><TextInput accessibilityLabel="Observaciones del alta" multiline onChangeText={setNotes} placeholder="Indicaciones para el equipo de campo (opcional)" placeholderTextColor={color.muted} style={style.notesInput} value={notes} /><View style={style.modalActions}><Pressable onPress={() => setSelected(null)} style={style.cancelButton}><Text style={style.cancelText}>Cancelar</Text></Pressable><Pressable disabled={saving} onPress={() => void confirmDischarge()} style={style.confirmButton}><Text style={style.confirmText}>{saving ? 'Guardando…' : 'Dar el alta y avisar'}</Text></Pressable></View></View></View></Modal>
   </InventoryPage>;
@@ -140,7 +193,7 @@ export function NotificationsScreen() {
     finally { setLoading(false); }
   }
   return <InventoryPage title="Avisos" subtitle="NOVEDADES DE LA ESTANCIA" count={rows.length} search="" onSearch={() => undefined} loading={loading} error={error} onRetry={() => void reload()} onRefresh={() => void reload()} refreshing={false}>
-    {rows.map((notice) => <Pressable key={notice.id_notificacion} onPress={() => { if (notice.tipo === 'alta_enfermeria') router.navigate('/(app)/animals'); }} style={style.card}><Text style={style.title}>{notice.titulo}</Text><Text style={style.detail}>{notice.mensaje}</Text><Text style={style.noticeDate}>{new Date(notice.created_at).toLocaleString('es-AR')}</Text>{notice.tipo === 'alta_enfermeria' ? <Text style={style.notice}>Abrir animales y registrar el traslado</Text> : null}</Pressable>)}
+    {rows.map((notice) => <Pressable key={notice.id_notificacion} onPress={() => { if (notice.tipo === 'alta_enfermeria') router.navigate('/(app)/animals'); if (notice.tipo === 'reporte_sanitario') router.navigate('/(app)/health'); }} style={style.card}><Text style={style.title}>{notice.titulo}</Text><Text style={style.detail}>{notice.mensaje}</Text><Text style={style.noticeDate}>{new Date(notice.created_at).toLocaleString('es-AR')}</Text>{notice.tipo === 'alta_enfermeria' ? <Text style={style.notice}>Abrir animales y registrar el traslado</Text> : notice.tipo === 'reporte_sanitario' ? <Text style={style.notice}>Abrir reporte del campo</Text> : null}</Pressable>)}
     {!loading && !error && rows.length === 0 ? <Empty title="Sin avisos nuevos" text="Las novedades de la estancia aparecerán acá." /> : null}
   </InventoryPage>;
 }

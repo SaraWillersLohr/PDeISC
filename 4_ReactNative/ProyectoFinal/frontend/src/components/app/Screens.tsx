@@ -1,14 +1,17 @@
 // presento los resúmenes y accesos principales según el perfil activo.
 import NetInfo from '@react-native-community/netinfo';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
 import { removeSession } from '../../services/sessionStorage';
 import { approveRegistrationRequest, listRegistrationRequests, rejectRegistrationRequest, type RegistrationRequest, type RequestedRole } from '../../services/adminApi';
-import { CorralsInventoryScreen, NotificationsScreen, NursingScreen } from './LivestockScreens';
+import { AnimalsInventoryScreen, CorralsInventoryScreen, NotificationsScreen, NursingScreen } from './LivestockScreens';
 import { BrandWordmark } from '../BrandWordmark';
+import { EventsScreen, MapAreasScreen, ReproductionScreen, TasksManagerScreen } from './FieldModuleScreens';
+import { CatalogScreen, TeamScreen } from './OrganizationScreens';
+import { getDashboard, listPendingDeaths, reportAnimal, reviewDeath, type DashboardMetrics, type DeathReport } from '../../services/productionApi';
 
 const c = { green: '#214d35', greenDark: '#173d2a', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', gold: '#c29343' };
 type ModuleKey = 'inicio' | 'animales' | 'corrales' | 'tareas' | 'sanidad' | 'reproduccion' | 'mapa' | 'eventos' | 'avisos' | 'equipo' | 'catalogo' | 'perfil';
@@ -50,21 +53,30 @@ function Page({ children }: { children: React.ReactNode }) { return <SafeAreaVie
 
 export function HomeScreen() {
   const { session } = useSession();
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [metricsError, setMetricsError] = useState('');
   const role = normalizeRole(session?.usuario.rol.toLowerCase() ?? 'dueno');
   const name = session?.usuario.nombre?.trim() || 'equipo';
   const isVet = role === 'veterinario';
   const isField = role === 'peon';
   const roleModules = modules.filter((item) => item.roles.includes(role));
   const shortcuts = isField ? ['tareas', 'animales', 'corrales'] : ['animales', 'corrales', 'equipo'];
-  if (isVet) return <HealthScreen />;
   const dashboardTitle = isVet ? 'Panel sanitario' : isField ? 'Tu jornada' : 'Resumen de estancia';
   const dashboardCopy = isVet ? 'Controles y seguimiento de animales.' : isField ? 'Lo importante para el trabajo de hoy.' : 'Una mirada rápida a la actividad del campo.';
   const today = new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  useEffect(() => {
+    if (!session || isField || isVet) return;
+    let active = true;
+    getDashboard(session).then((data) => { if (active) setMetrics(data); }).catch((cause: unknown) => { if (active) setMetricsError(cause instanceof Error ? cause.message : 'No se pudieron cargar las métricas.'); });
+    return () => { active = false; };
+  }, [session, isField, isVet]);
+  if (isVet) return <HealthScreen />;
   return <Page><Header title="Inicio" subtitle={`GESTIÓN DE ESTANCIA · ${today}`} />
     <View style={s.welcome}><View><Text style={s.welcomeEyebrow}>{roleLabel[role] ?? 'Equipo de estancia'}</Text><Text style={s.welcomeTitle}>Buen día, {name}</Text><Text style={s.welcomeCopy}>{dashboardCopy}</Text></View><Text style={s.welcomeIcon}>☀</Text></View>
     <View style={s.sectionHead}><View><Text style={s.sectionTitle}>{dashboardTitle}</Text><Text style={s.sectionCopy}>Estado actual de la estancia</Text></View><Text style={s.dateChip}>HOY</Text></View>
-    <View style={s.metricGrid}><Metric label={isField ? 'Mis tareas' : role === 'administrador' ? 'Solicitudes' : 'Animales'} value="—" caption="Se conecta al backend" icon={isField ? '✓' : role === 'administrador' ? '♙' : '◉'} /><Metric label={isField ? 'Pendientes' : role === 'administrador' ? 'Usuarios' : 'Efectividad de cría'} value="—" caption="Se conecta al backend" icon={isField ? '↻' : role === 'administrador' ? '♙' : '⌁'} /></View>
-    <View style={s.note}><View style={s.noteIcon}><Text style={{ color: c.green, fontSize: 15 }}>↻</Text></View><View style={{ flex: 1 }}><Text style={s.noteTitle}>Preparando tus datos</Text><Text style={s.noteCopy}>El acceso ya está conectado. Estamos sumando los datos de animales, corrales y tareas.</Text></View></View>
+    <View style={s.metricGrid}><Metric label="Crías este año" value={metrics ? String(metrics.crias_ano) : '—'} caption="Nacimientos registrados" icon="◉" /><Metric label="Hembras preñadas" value={metrics ? String(metrics.hembras_prenadas) : '—'} caption="Inventario activo" icon="⌁" /></View>
+    <View style={s.metricGrid}><Metric label="Servicios · 90 días" value={metrics ? String(metrics.servicios_90_dias) : '—'} caption="Monta realizada" icon="↻" /><Metric label={role === 'administrador' ? 'Muertes pendientes' : 'Alertas sanitarias'} value={metrics ? String(role === 'administrador' ? metrics.muertes_pendientes : metrics.alertas_sanitarias) : '—'} caption={role === 'administrador' ? 'Requieren revisión' : 'Animales activos'} icon="✚" /></View>
+    {metricsError ? <Text style={s.requestError}>{metricsError}</Text> : null}
     <View style={s.sectionHead}><View><Text style={s.sectionTitle}>Accesos rápidos</Text><Text style={s.sectionCopy}>Entrá a lo que necesitás</Text></View></View>
     <View style={s.quickGrid}>{shortcuts.map((key) => { const item = modules.find((module) => module.key === key); if (!item) return null; return <Pressable key={key} onPress={() => goTo(item.key)} style={s.quickCard}><View style={s.quickIcon}><Text style={s.quickIconText}>{item.icon}</Text></View><Text style={s.quickTitle}>{item.label}</Text><Text style={s.quickArrow}>↗</Text></Pressable>; })}</View>
     <View style={s.sectionHead}><View><Text style={s.sectionTitle}>Tus secciones</Text><Text style={s.sectionCopy}>Según tu perfil de acceso</Text></View></View>
@@ -76,13 +88,29 @@ function Metric({ label, value, caption, icon }: { label: string; value: string;
 function ModuleRow({ item, onPress }: { item: (typeof modules)[number]; onPress: () => void }) { return <Pressable onPress={onPress} style={s.moduleRow}><View style={s.moduleIcon}><Text style={s.moduleIconText}>{item.icon}</Text></View><View style={{ flex: 1 }}><Text style={s.moduleTitle}>{item.label}</Text><Text style={s.moduleDescription}>{item.description}</Text></View><Text style={s.chevron}>›</Text></Pressable>; }
 
 function useMyRole(): string { const { session } = useSession(); return normalizeRole(session?.usuario.rol.toLowerCase() ?? 'dueno'); }
-export function AnimalsScreen() { const role = useMyRole(); if (role === 'veterinario') return <HealthScreen />; const text = role === 'dueno' ? 'Consultá y editá las fichas. La ubicación operativa muestra el corral o potrero del último movimiento; el GPS individual se guarda solo al reportar una muerte.' : role === 'peon' ? 'Buscá por identificador, raza o corral y editá la ficha. La ubicación operativa refleja el último movimiento; el GPS individual se registra solo para ubicar una muerte.' : 'Administrá las fichas y el ciclo completo de los animales de la organización.'; const action = role === 'dueno' ? 'Editar ficha' : role === 'peon' ? 'Editar animal' : 'Gestionar animales'; return <CollectionScreen title="Animales" subtitle="Inventario y fichas de la estancia" icon="◉" text={text} action={action} />; }
-export function TasksScreen() { const role = useMyRole(); if (role === 'veterinario') return <HealthScreen />; return <CollectionScreen title="Tareas" subtitle="Organización del trabajo diario" icon="✓" text="Acá vas a encontrar las tareas asignadas, sus fechas, responsables y el estado de sincronización." action={role === 'dueno' ? 'Consultar actividad' : 'Crear tarea'} />; }
-export function HealthScreen() { const role = useMyRole(); if (role === 'veterinario') return <NursingScreen />; const fieldWorker = role === 'peon'; const admin = role === 'administrador'; return <CollectionScreen title={fieldWorker ? 'Reportes del campo' : admin ? 'Sanidad y revisiones' : 'Sanidad'} subtitle={fieldWorker ? 'Enfermedades, nacimientos y muertes' : admin ? 'Reportes y revisión de bajas' : 'Enfermería, tratamientos y controles'} icon="✚" text={fieldWorker ? 'Informá enfermedad, nacimiento o muerte con fecha y corral. En una muerte podés guardar un punto GPS para ubicar el hallazgo. Para un nacimiento, indicá madre y padre; si no están registrados, escribí sus nombres. La muerte da de baja al animal de inmediato y queda pendiente de revisión.' : admin ? 'Revisá reportes de muerte. Al confirmar, el animal queda dado de baja; al rechazar, se reactiva y el reporte permanece en el historial.' : 'Consultá reportes y animales alojados en enfermería; registrá controles, tratamientos y altas.'} action={fieldWorker ? 'Nuevo reporte' : admin ? 'Revisar reportes' : 'Nuevo control'} />; }
+export function AnimalsScreen() { const role = useMyRole(); if (role === 'veterinario') return <HealthScreen />; return <AnimalsInventoryScreen />; }
+export function TasksScreen() { const role = useMyRole(); if (role === 'veterinario') return <HealthScreen />; return <TasksManagerScreen />; }
+export function HealthScreen() { const role = useMyRole(); if (role === 'veterinario') return <NursingScreen />; if (role === 'peon') return <FieldReportScreen />; if (role === 'administrador') return <DeathReviewScreen />; return <AnimalsInventoryScreen />; }
 
-function CollectionScreen({ title, subtitle, icon, text, action }: { title: string; subtitle: string; icon: string; text: string; action: string }) {
-  const [query, setQuery] = useState('');
-  return <Page><Header title={title} subtitle={subtitle.toUpperCase()} /><View style={s.collectionTop}><View style={s.countPill}><Text style={s.count}>—</Text><Text style={s.countLabel}> registros</Text></View><Pressable style={s.createButton}><Text style={s.createButtonText}>＋ {action}</Text></Pressable></View><View style={s.search}><Text style={s.searchIcon}>⌕</Text><TextInput onChangeText={setQuery} placeholder={`Buscar ${title.toLowerCase()}...`} placeholderTextColor="#929b93" style={s.searchInput} value={query} /></View><View style={s.filterRow}><Pressable style={s.filterChip}><Text style={s.filterText}>Todos⌄</Text></Pressable><Pressable style={s.filterChip}><Text style={s.filterText}>Estado⌄</Text></Pressable><Pressable style={s.filterChip}><Text style={s.filterText}>Filtros +</Text></Pressable></View><View style={s.emptyCard}><View style={s.emptyIcon}><Text style={s.emptyIconText}>{icon}</Text></View><Text style={s.emptyTitle}>{query ? 'Sin resultados todavía' : `Todavía no hay ${title.toLowerCase()}`}</Text><Text style={s.emptyCopy}>{text}</Text><Text style={s.emptyFoot}>La conexión con la API de gestión sigue pendiente.</Text></View></Page>;
+// registro reportes sanitarios y muertes desde el trabajo de campo.
+function FieldReportScreen() {
+  const { session } = useSession(); const [animalId, setAnimalId] = useState(''); const [reason, setReason] = useState(''); const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); const [kind, setKind] = useState<'sanitario'|'muerte'>('sanitario'); const [latitude, setLatitude] = useState(''); const [longitude, setLongitude] = useState(''); const [message, setMessage] = useState('');
+  async function submit(): Promise<void> { const lat = latitude.trim() ? Number(latitude) : undefined; const lon = longitude.trim() ? Number(longitude) : undefined; if (!session || !Number(animalId) || !reason.trim()) { setMessage('Indicá el número del animal y el motivo.'); return; } if (kind === 'muerte' && ((lat === undefined) !== (lon === undefined) || (lat !== undefined && (!Number.isFinite(lat) || Math.abs(lat) > 90 || lon === undefined || !Number.isFinite(lon) || Math.abs(lon) > 180)))) { setMessage('Si informás ubicación, completá latitud y longitud GPS válidas.'); return; } try { await reportAnimal(session, kind, { id_animal: Number(animalId), fecha: date, motivo: reason.trim(), ...(kind === 'muerte' && lat !== undefined && lon !== undefined ? { latitud: lat, longitud: lon } : {}) }); setMessage(kind === 'muerte' ? 'Baja operativa registrada. Falta revisión administrativa.' : 'Reporte sanitario registrado; trasladá físicamente el animal a enfermería.'); setAnimalId(''); setReason(''); setLatitude(''); setLongitude(''); } catch (cause) { setMessage(cause instanceof Error ? cause.message : 'No se pudo guardar el reporte.'); } }
+  return <Page><Header title="Reportes del campo" subtitle="ENFERMEDAD Y MUERTE" /><View style={s.requestCard}><Text style={s.sectionTitle}>Nuevo reporte</Text><View style={s.roleOptions}>{(['sanitario','muerte'] as const).map((value) => <Pressable key={value} onPress={() => setKind(value)} style={[s.roleOption, kind === value && s.roleOptionSelected]}><Text style={[s.roleOptionText, kind === value && s.roleOptionTextSelected]}>{value === 'muerte' ? 'Muerte' : 'Sanidad'}</Text></Pressable>)}</View><Text style={s.roleLabel}>ID DEL ANIMAL</Text><TextInput keyboardType="number-pad" onChangeText={setAnimalId} placeholder="Ej. 120" style={s.searchInput} value={animalId} /><Text style={s.roleLabel}>FECHA</Text><TextInput onChangeText={setDate} placeholder="AAAA-MM-DD" style={s.searchInput} value={date} /><Text style={s.roleLabel}>MOTIVO / OBSERVACIONES</Text><TextInput multiline onChangeText={setReason} placeholder="Describí lo que observaste" style={s.searchInput} value={reason} />{kind === 'muerte' ? <><Text style={s.roleLabel}>UBICACIÓN GPS (OPCIONAL)</Text><TextInput keyboardType="decimal-pad" onChangeText={setLatitude} placeholder="Latitud" style={s.searchInput} value={latitude} /><TextInput keyboardType="decimal-pad" onChangeText={setLongitude} placeholder="Longitud" style={s.searchInput} value={longitude} /></> : null}<Pressable onPress={() => void submit()} style={s.createButton}><Text style={s.createButtonText}>Guardar reporte</Text></Pressable>{message ? <Text style={s.requestNotice}>{message}</Text> : null}</View></Page>;
+}
+
+// permito al administrador confirmar o rechazar bajas pendientes.
+function DeathReviewScreen() {
+  const { session } = useSession(); const [rows, setRows] = useState<DeathReport[]>([]); const [message, setMessage] = useState('');
+  async function load(): Promise<void> { if (!session) return; try { setRows(await listPendingDeaths(session)); } catch (cause) { setMessage(cause instanceof Error ? cause.message : 'No se pudieron cargar los reportes.'); } }
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    listPendingDeaths(session).then((data) => { if (active) setRows(data); }).catch((cause: unknown) => { if (active) setMessage(cause instanceof Error ? cause.message : 'No se pudieron cargar los reportes.'); });
+    return () => { active = false; };
+  }, [session]);
+  async function decide(row: DeathReport, decision: 'confirmar'|'rechazar'): Promise<void> { if (!session) return; try { await reviewDeath(session, row.id_reporte, decision, decision === 'rechazar' ? 'Reporte rechazado por el administrador' : undefined); setMessage(decision === 'confirmar' ? 'Muerte confirmada.' : 'Animal reactivado; reporte conservado.'); await load(); } catch (cause) { setMessage(cause instanceof Error ? cause.message : 'No se pudo revisar el reporte.'); } }
+  return <Page><Header title="Revisión de muertes" subtitle="BAJAS PENDIENTES" />{message ? <Text style={s.requestNotice}>{message}</Text> : null}{rows.length ? rows.map((row) => <View key={row.id_reporte} style={s.requestCard}><Text style={s.requestName}>{row.nombre || row.identificador} · {row.corral}</Text><Text style={s.requestEmail}>{row.fecha} · {row.motivo}</Text><View style={s.requestActions}><Pressable onPress={() => void decide(row, 'rechazar')} style={s.rejectButton}><Text style={s.rejectText}>Rechazar y reactivar</Text></Pressable><Pressable onPress={() => void decide(row, 'confirmar')} style={s.approveButton}><Text style={s.approveText}>Confirmar muerte</Text></Pressable></View></View>) : <View style={s.emptyCard}><Text style={s.emptyTitle}>Sin reportes pendientes</Text><Text style={s.emptyCopy}>Las bajas operativas aparecen acá para su revisión.</Text></View>}</Page>;
 }
 
 export function MoreScreen() {
@@ -97,16 +125,17 @@ export function GenericModuleScreen() {
   const { module } = useLocalSearchParams<{ module: string }>();
   const role = useMyRole();
   const item = modules.find((entry) => entry.key === module && entry.roles.includes(role));
-  if (!item) return <CollectionScreen title="Sección no disponible" subtitle="Acceso por perfil" icon="⌑" text="Este módulo no está habilitado para tu perfil." action="Volver" />;
+  if (!item) return <Redirect href="/(app)/more" />;
   if (role === 'administrador' && item.key === 'equipo') return <AdminRequestsScreen />;
+  if (item.key === 'equipo') return <TeamScreen />;
+  if (item.key === 'catalogo') return <CatalogScreen />;
+  if (item.key === 'perfil') return <MoreScreen />;
   if (item.key === 'corrales') return <CorralsInventoryScreen />;
   if (item.key === 'avisos') return <NotificationsScreen />;
-  const ownerReadOnly = role === 'dueno' && !['animales', 'mapa'].includes(item.key);
-  const fieldAction: Record<string, string> = { corrales: 'Registrar movimiento', catalogo: 'Solicitar especie o raza', reproduccion: 'Registrar servicio de monta', mapa: 'Consultar mapa' };
-  const ownerAction: Record<string, string> = { corrales: 'Editar corrales y capacidad', mapa: 'Editar mapa del campo' };
-  const action = ownerReadOnly ? `Consultar ${item.label.toLowerCase()}` : role === 'dueno' ? item.key === 'animales' ? 'Editar animales' : ownerAction[item.key] ?? `Gestionar ${item.label.toLowerCase()}` : role === 'peon' ? fieldAction[item.key] ?? `Registrar ${item.label.toLowerCase()}` : role === 'administrador' && item.key === 'catalogo' ? 'Revisar solicitudes' : item.key === 'equipo' ? 'Revisar solicitudes' : item.key === 'eventos' ? 'Configurar fuentes' : `Gestionar ${item.label.toLowerCase()}`;
-  const copy = role === 'dueno' && item.key === 'animales' ? 'Consultá y editá fichas; los cambios quedan registrados en el historial.' : role === 'dueno' && item.key === 'mapa' ? 'Consultá y actualizá las áreas del campo. Los puntos GPS guardados definen el perímetro de cada corral.' : ownerReadOnly ? `Consultá ${item.label.toLowerCase()} y los resultados de la organización.` : role === 'peon' && item.key === 'catalogo' ? 'Solicitá nuevas especies o razas. El administrador las revisa antes de que se puedan usar.' : role === 'peon' && item.key === 'mapa' ? 'Consultá los corrales y potreros guardados en el mapa. Para ubicar una muerte se puede registrar un punto GPS puntual.' : role === 'administrador' && item.key === 'eventos' ? 'Configurá las fuentes oficiales; los eventos importados son de consulta.' : role === 'peon' ? 'Registrá operaciones del campo; cada cambio guarda quién lo hizo, cuándo y dónde.' : `Gestioná ${item.label.toLowerCase()} dentro de la organización.`;
-  return <CollectionScreen title={item.label} subtitle={item.description} icon={item.icon} text={copy} action={action} />;
+  if (item.key === 'reproduccion') return <ReproductionScreen />;
+  if (item.key === 'eventos') return <EventsScreen />;
+  if (item.key === 'mapa') return <MapAreasScreen />;
+  return <Redirect href="/(app)" />;
 }
 
 // muestro solicitudes verificadas y permito al administrador asignar un rol antes de aprobar.
@@ -119,6 +148,7 @@ function AdminRequestsScreen() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [decision, setDecision] = useState<{ request: RegistrationRequest; action: 'approve' | 'reject' } | null>(null);
+  const [showTeam, setShowTeam] = useState(false);
 
   // cargo la cola de la organización cuando hay una sesión administrativa.
   useEffect(() => {
@@ -145,7 +175,9 @@ function AdminRequestsScreen() {
   }
 
   const roleOptions: { role: RequestedRole; label: string }[] = [{ role: 'dueno', label: 'Dueño' }, { role: 'peon', label: 'Peón' }, { role: 'veterinario', label: 'Veterinario' }];
+  if (showTeam) return <View style={{ flex: 1 }}><Pressable onPress={() => setShowTeam(false)} style={{ alignSelf: 'flex-start', backgroundColor: c.pale, borderRadius: 9, margin: 12, padding: 10 }}><Text style={{ color: c.green, fontSize: 11, fontWeight: '700' }}>‹ Volver a solicitudes</Text></Pressable><TeamScreen /></View>;
   return <Page><Header title="Solicitudes" subtitle="ALTAS DE LA ORGANIZACIÓN" />
+    <Pressable onPress={() => setShowTeam(true)} style={s.approveButton}><Text style={s.approveText}>Administrar usuarios</Text></Pressable>
     {notice ? <Text style={s.requestNotice}>{notice}</Text> : null}{error ? <Text style={s.requestError}>{error}</Text> : null}
     {requests.length ? requests.map((request) => <View key={request.id_solicitud} style={s.requestCard}>
       <Text style={s.requestName}>{request.nombre} {request.apellido}</Text><Text style={s.requestEmail}>{request.email}</Text>

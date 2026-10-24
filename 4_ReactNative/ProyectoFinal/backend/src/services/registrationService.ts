@@ -1,19 +1,12 @@
 // gestiono solicitudes de acceso, verificación por correo y aprobación administrativa.
-import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { PoolConnection } from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
 import { database } from '../config/database.js';
-import { env } from '../config/env.js';
 import { sendAccessCode, sendNewRequestNotice, sendRegistrationRejection, sendVerificationCode } from './emailService.js';
 import { createAccessToken, createRefreshToken } from '../utils/jwt.js';
+import { assertMailConfiguration, digest, issueCode, matchesDigest, maxCodeAttempts, isRequestedRole, type RequestedRole } from './registrationCodeService.js';
 
-const codeTtlMinutes = 10;
-const maxCodeAttempts = 5;
-const resendCooldownSeconds = 60;
-const maxDailyEmails = 5;
-const allowedRoles = ['dueno', 'peon', 'veterinario'] as const;
-export type RequestedRole = (typeof allowedRoles)[number];
+export type { RequestedRole } from './registrationCodeService.js';
 
 export interface RegistrationInput {
   nombre: string;
@@ -37,54 +30,6 @@ interface UserRow extends RowDataPacket {
   email: string;
   rol: string;
   token_version: number;
-}
-
-// convierto una cadena a hmac y detengo el flujo si no hay un secreto robusto.
-function digest(subject: string, purpose: string, code: string): string {
-  const secret = env.email.verificationCodeSecret;
-  if (!secret || secret.length < 32) throw new Error('configurá verification_code_secret con al menos 32 caracteres');
-  return createHmac('sha256', secret).update(`${subject}:${purpose}:${code}`).digest('hex');
-}
-
-// genero un código numérico aleatorio de seis dígitos.
-function createCode(): string {
-  return String(randomInt(0, 1_000_000)).padStart(6, '0');
-}
-
-// comparo hashes en tiempo constante para no filtrar información por duración de respuesta.
-function matchesDigest(expectedHex: string, receivedHex: string): boolean {
-  const expected = Buffer.from(expectedHex, 'hex');
-  const received = Buffer.from(receivedHex, 'hex');
-  return expected.length === received.length && timingSafeEqual(expected, received);
-}
-
-// valido que el smtp esté listo antes de crear una solicitud que requiera correo.
-function assertMailConfiguration(): void {
-  const { smtpHost, smtpUser, smtpPassword, mailFrom, verificationCodeSecret } = env.email;
-  if (!smtpHost || !smtpUser || !smtpPassword || !mailFrom) throw new Error('el registro todavía no está habilitado: falta configurar smtp');
-  if (!verificationCodeSecret || verificationCodeSecret.length < 32) throw new Error('el registro requiere verification_code_secret de al menos 32 caracteres');
-}
-
-// invalido códigos anteriores, limita reenvíos y persiste solo el hash del código nuevo.
-async function issueCode(connection: PoolConnection, table: 'codigos_verificacion_solicitud' | 'codigos_acceso_usuario', idColumn: 'id_solicitud' | 'id_usuario', id: number, purpose: 'verificacion' | 'acceso'): Promise<string> {
-  const [stats] = await connection.query<RowDataPacket[]>(
-    `SELECT COUNT(*) AS total, MAX(creado_at) AS ultimo FROM ${table}
-     WHERE ${idColumn} = ? AND creado_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)`, [id],
-  );
-  const total = Number(stats[0]?.total ?? 0);
-  const lastSent = stats[0]?.ultimo ? new Date(stats[0].ultimo).getTime() : 0;
-  if (total >= maxDailyEmails) throw new Error('alcanzaste el límite diario de códigos; intentá mañana');
-  if (lastSent && Date.now() - lastSent < resendCooldownSeconds * 1000) throw new Error('esperá un minuto antes de pedir otro código');
-  await connection.execute(
-    `UPDATE ${table} SET invalidado_at = NOW() WHERE ${idColumn} = ? AND consumido_at IS NULL AND invalidado_at IS NULL`, [id],
-  );
-  const code = createCode();
-  const codeHash = digest(String(id), purpose, code);
-  await connection.execute(
-    `INSERT INTO ${table} (${idColumn}, ${table === 'codigos_verificacion_solicitud' ? 'codigo_hash' : 'token_hash'}, expira_at)
-     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ${codeTtlMinutes} MINUTE))`, [id, codeHash],
-  );
-  return code;
 }
 
 // crea la solicitud pendiente y envía el primer código para verificar el correo.
@@ -215,7 +160,7 @@ export async function listPendingRegistrationRequests(): Promise<PendingRequest[
 
 // aprueba la solicitud, asigna el rol y envía el código temporal de primer acceso.
 export async function approveRegistrationRequest(id: number, adminId: number, role: RequestedRole): Promise<void> {
-  if (!allowedRoles.includes(role)) throw new Error('elegí un rol permitido para la cuenta');
+  if (!isRequestedRole(role)) throw new Error('elegí un rol permitido para la cuenta');
   const connection = await database.getConnection();
   let email = '';
   let name = '';

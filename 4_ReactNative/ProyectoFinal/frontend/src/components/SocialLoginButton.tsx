@@ -19,8 +19,8 @@ const config = {
   github: { label: 'GitHub', icon: 'github' as const, clientId: socialIds?.githubClientId, endpoint: 'https://github.com/login/oauth/authorize', scopes: ['read:user', 'user:email'] },
 };
 
-export function SocialLoginButton({ provider, disabled, onSuccess, onError }: {
-  provider: Provider; disabled: boolean; onSuccess: (session: Session) => Promise<void>; onError: (message: string) => void;
+export function SocialLoginButton({ provider, disabled, compact = false, onSuccess, onError }: {
+  provider: Provider; disabled: boolean; compact?: boolean; onSuccess: (session: Session) => Promise<void>; onError: (message: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
   const item = config[provider];
@@ -56,13 +56,14 @@ export function SocialLoginButton({ provider, disabled, onSuccess, onError }: {
   }
 
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`Continuar con ${item.label}`} disabled={disabled || busy} onPress={() => void start()} style={[styles.button, (disabled || busy) && styles.disabled]}>
-      {busy ? <ActivityIndicator color="#334239" size="small" /> : <MaterialCommunityIcons color={provider === 'facebook' ? '#1877f2' : provider === 'google' ? '#4285f4' : '#26332b'} name={item.icon} size={25} />}
+    <Pressable accessibilityRole="button" accessibilityLabel={`Continuar con ${item.label}`} disabled={disabled || busy} onPress={() => void start()} style={[styles.button, compact && styles.compactButton, (disabled || busy) && styles.disabled]}>
+      {busy ? <ActivityIndicator color="#334239" size="small" /> : <MaterialCommunityIcons color={provider === 'facebook' ? '#1877f2' : provider === 'google' ? '#4285f4' : '#26332b'} name={item.icon} size={compact ? 21 : 25} />}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: { alignItems: 'center', backgroundColor: '#fff', borderColor: '#dce3db', borderRadius: 30, borderWidth: 1, height: 58, justifyContent: 'center', width: 58 },
+  compactButton: { borderRadius: 22, height: 44, width: 44 },
   disabled: { opacity: 0.55 },
 });

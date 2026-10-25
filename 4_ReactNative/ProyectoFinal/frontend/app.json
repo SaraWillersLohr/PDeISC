@@ -17,8 +17,18 @@
       },
       "predictiveBackGestureEnabled": false
     },
+    "splash": {
+      "image": "./assets/branding/dark/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#123824"
+    },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "splash": {
+        "image": "./assets/branding/dark/logo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#123824"
+      }
     },
     "plugins": [
       [
@@ -37,8 +47,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/branding/app-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/branding/dark/logo.png",
+          "imageWidth": 220,
           "resizeMode": "contain",
           "backgroundColor": "#123824"
         }

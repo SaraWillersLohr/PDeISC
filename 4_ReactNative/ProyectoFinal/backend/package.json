@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "db:migrate": "tsx src/scripts/migrate.ts",
     "dev": "tsx watch src/server.ts",
     "build": "tsc --noEmit",
     "start": "node dist/server.js"

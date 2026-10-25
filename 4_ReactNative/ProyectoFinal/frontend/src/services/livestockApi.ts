@@ -11,6 +11,7 @@ export interface AnimalRecord {
   fecha_nacimiento: string | null;
   peso_kg: number | string | null;
   estado_salud: string;
+  activo: number;
   id_corral: number;
   corral: string;
   raza: string;
@@ -58,7 +59,9 @@ async function getData<T>(path: string, session: Session): Promise<T[]> {
   return payload.data ?? [];
 }
 
-export function listAnimals(session: Session): Promise<AnimalRecord[]> { return getData<AnimalRecord>('/animals', session); }
+export function listAnimals(session: Session, includeInactive = false): Promise<AnimalRecord[]> {
+  return getData<AnimalRecord>(includeInactive ? '/animals?incluir_inactivos=true' : '/animals', session);
+}
 export function listCorrals(session: Session): Promise<CorralRecord[]> { return getData<CorralRecord>('/corrals', session); }
 
 export async function createAnimal(session: Session, input: { identificador: string; nombre?: string; id_raza: number; id_corral: number; fecha_nacimiento?: string; peso_kg?: number }): Promise<void> {

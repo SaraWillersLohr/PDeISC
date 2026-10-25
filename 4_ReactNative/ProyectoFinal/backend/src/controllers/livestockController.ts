@@ -15,18 +15,28 @@ function validBirthDate(value: string): boolean {
 }
 
 // devuelvo animales activos con su ubicación operativa actual.
-export async function listAnimals(_req: Request, res: Response): Promise<void> {
+export async function listAnimals(req: Request, res: Response): Promise<void> {
+  const includeInactive = req.query.incluir_inactivos;
+  if (includeInactive !== undefined && includeInactive !== 'true' && includeInactive !== 'false') {
+    res.status(400).json({ message: 'el filtro de animales inactivos no es válido' }); return;
+  }
   try {
     const [rows] = await database.execute<RowDataPacket[]>(
       `SELECT a.id_animal, a.id_raza, a.identificador, a.nombre, a.fecha_nacimiento, a.peso_kg, a.version_dato,
-              a.estado_salud, c.id_corral, c.nombre AS corral, r.nombre AS raza, e.nombre AS especie,
+              a.estado_salud, a.activo, c.id_corral, c.nombre AS corral, r.nombre AS raza, e.nombre AS especie,
               EXISTS (SELECT 1 FROM altas_enfermeria h WHERE h.id_animal = a.id_animal AND h.id_movimiento IS NULL) AS alta_pendiente_traslado
        FROM animales a JOIN corrales c ON c.id_corral = a.id_corral
        JOIN razas r ON r.id_raza = a.id_raza JOIN especies e ON e.id_especie = r.id_especie
-       WHERE a.activo = 1 AND c.activo = 1 ORDER BY a.identificador`,
+       WHERE (a.activo = 1 AND c.activo = 1) OR ? = 1 ORDER BY a.identificador`,
+      [includeInactive === 'true' ? 1 : 0],
     );
     res.status(200).json({ data: rows });
-  } catch {
+  } catch (error) {
+    const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : 'UNKNOWN';
+    console.error(`Error al consultar el inventario de animales (${code}).`);
+    if (code === 'ER_NO_SUCH_TABLE' || code === 'ER_BAD_FIELD_ERROR') {
+      console.error('Revisá las migraciones pendientes con npm run db:migrate.');
+    }
     res.status(500).json({ message: 'no se pudo cargar el inventario de animales' });
   }
 }

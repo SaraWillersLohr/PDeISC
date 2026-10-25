@@ -24,6 +24,7 @@ export function AnimalsInventoryScreen() {
   const canEdit = role === 'administrador' || role === 'dueno' || role === 'peon';
 
   const [rows, setRows] = useState<AnimalRecord[]>([]);
+  const [includeInactive, setIncludeInactive] = useState(false);
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -46,26 +47,27 @@ export function AnimalsInventoryScreen() {
   const load = useCallback(async () => {
     if (!session) return;
     setError(''); setCorralError('');
-    const [animalsResult, corralsResult] = await Promise.allSettled([listAnimals(session), listCorrals(session)]);
+    const [animalsResult, corralsResult] = await Promise.allSettled([listAnimals(session, includeInactive), listCorrals(session)]);
     if (animalsResult.status === 'fulfilled') setRows(animalsResult.value);
     else { setRows([]); setError(animalsResult.reason instanceof Error ? animalsResult.reason.message : 'No se pudo cargar el inventario de animales.'); }
     if (corralsResult.status === 'fulfilled') setCorrals(corralsResult.value);
     else { setCorrals([]); setCorralError(corralsResult.reason instanceof Error ? corralsResult.reason.message : 'No se pudieron cargar los corrales.'); }
     setLoading(false); setRefreshing(false);
-  }, [session]);
+  }, [includeInactive, session]);
 
   useEffect(() => {
     if (!session) return;
     let active = true;
-    Promise.allSettled([listAnimals(session), listCorrals(session)]).then(([animalsResult, corralsResult]) => {
+    Promise.allSettled([listAnimals(session, includeInactive), listCorrals(session)]).then(([animalsResult, corralsResult]) => {
       if (!active) return;
+      setError(''); setCorralError('');
       if (animalsResult.status === 'fulfilled') setRows(animalsResult.value);
       else { setRows([]); setError(animalsResult.reason instanceof Error ? animalsResult.reason.message : 'No se pudo cargar el inventario de animales.'); }
       if (corralsResult.status === 'fulfilled') setCorrals(corralsResult.value);
       else { setCorrals([]); setCorralError(corralsResult.reason instanceof Error ? corralsResult.reason.message : 'No se pudieron cargar los corrales.'); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [load, session]);
+  }, [includeInactive, load, session]);
 
   const filtered = useMemo(() => rows.filter((animal) => `${animal.identificador} ${animal.nombre ?? ''} ${animal.especie} ${animal.raza} ${animal.corral}`.toLowerCase().includes(query.trim().toLowerCase())), [query, rows]);
 
@@ -81,12 +83,20 @@ export function AnimalsInventoryScreen() {
       onRetry={() => { setLoading(true); void load(); }}
       onRefresh={() => { setRefreshing(true); void load(); }}
       refreshing={refreshing}
-      headerAction={canEdit ? (
-        <Pressable onPress={() => setCreating(true)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
-          <Ionicons color="#ffffff" name="add" size={17} style={{ marginRight: 4 }} />
-          <Text style={style.confirmText}>Agregar animal</Text>
-        </Pressable>
-      ) : null}
+      headerAction={(
+        <View style={style.inventoryActions}>
+          <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: includeInactive }} onPress={() => { setLoading(true); setError(''); setCorralError(''); setIncludeInactive((value) => !value); }} style={[style.cancelButton, { borderColor: colors.border, flexDirection: 'row', gap: 6 }]}>
+            <Ionicons color={colors.primary} name={includeInactive ? 'checkbox-outline' : 'square-outline'} size={18} />
+            <Text style={[style.cancelText, { color: colors.textSecondary }]}>Incluir inactivos</Text>
+          </Pressable>
+          {canEdit ? (
+            <Pressable onPress={() => setCreating(true)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
+              <Ionicons color="#ffffff" name="add" size={17} style={{ marginRight: 4 }} />
+              <Text style={style.confirmText}>Agregar animal</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      )}
     >
       {corralError ? <Text style={style.errorText}>No se pudieron cargar los corrales para traslados: {corralError}</Text> : null}
 
@@ -113,9 +123,9 @@ export function AnimalsInventoryScreen() {
                 <Text style={[style.title, { color: colors.textMain }]}>{animal.nombre || animal.identificador}</Text>
                 <Text style={[style.detail, { color: colors.textMuted }]}>{animal.identificador} · {animal.especie} {animal.raza}</Text>
               </Pressable>
-              <View style={[style.statePill, animal.estado_salud === 'sano' ? style.stateHealthy : style.stateAlert]}>
-                <Text style={[style.stateText, animal.estado_salud === 'sano' ? style.stateTextHealthy : style.stateTextAlert]}>
-                  {animal.estado_salud.replaceAll('_', ' ')}
+              <View style={[style.statePill, !animal.activo ? { backgroundColor: colors.bgCardMuted } : animal.estado_salud === 'sano' ? style.stateHealthy : style.stateAlert]}>
+                <Text style={[style.stateText, !animal.activo ? { color: colors.textMuted } : animal.estado_salud === 'sano' ? style.stateTextHealthy : style.stateTextAlert]}>
+                  {animal.activo ? animal.estado_salud.replaceAll('_', ' ') : 'Inactivo'}
                 </Text>
               </View>
             </View>
@@ -129,17 +139,17 @@ export function AnimalsInventoryScreen() {
                   {animal.corral}  ·  {animal.peso_kg == null ? 'Sin peso' : `${animal.peso_kg} kg`}
                 </Text>
               </View>
-              {canEdit ? (
+              {canEdit && Boolean(animal.activo) ? (
                 <Pressable onPress={() => { setEditing(animal); setEditName(animal.nombre ?? ''); setEditIdentifier(animal.identificador); setEditBirth(animal.fecha_nacimiento?.slice(0, 10) ?? ''); setEditError(''); }} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
                   <Text style={[style.moveButtonText, { color: colors.primary }]}>Editar</Text>
                 </Pressable>
               ) : null}
-              {canWeigh ? (
+              {canWeigh && Boolean(animal.activo) ? (
                 <Pressable onPress={() => setWeighing(animal)} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
                   <Text style={[style.moveButtonText, { color: colors.primary }]}>Pesar</Text>
                 </Pressable>
               ) : null}
-              {canMove ? (
+              {canMove && Boolean(animal.activo) ? (
                 <Pressable onPress={() => { setMoving(animal); setDestination(null); setMoveError(''); }} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
                   <Text style={[style.moveButtonText, { color: colors.primary }]}>Mover</Text>
                 </Pressable>
@@ -149,7 +159,7 @@ export function AnimalsInventoryScreen() {
             <Text style={[style.detail, { color: colors.textMuted, marginTop: 6 }]}>
               {animal.fecha_nacimiento ? `Edad · ${formatAnimalAge(animal.fecha_nacimiento)}` : 'Edad no registrada'}
             </Text>
-            {animal.alta_pendiente_traslado ? (
+            {animal.activo && animal.alta_pendiente_traslado ? (
               <View style={style.noticeBanner}>
                 <Ionicons color="#b45309" name="alert-circle" size={14} style={{ marginRight: 6 }} />
                 <Text style={style.noticeText}>Alta veterinaria lista · pendiente de traslado por el peón</Text>
@@ -161,8 +171,8 @@ export function AnimalsInventoryScreen() {
 
       {!loading && !error && filtered.length === 0 ? (
         <Empty
-          title={query ? 'No encontramos animales' : 'Todavía no hay animales registrados'}
-          text={query ? 'Probá buscar por identificador, nombre, raza o corral.' : 'Los animales activos del establecimiento aparecerán acá.'}
+          title={query ? 'No encontramos animales' : includeInactive ? 'Todavía no hay animales registrados' : 'No hay animales activos'}
+          text={query ? 'Probá buscar por identificador, nombre, raza o corral.' : includeInactive ? 'Los animales registrados del establecimiento aparecerán acá.' : 'Activá «Incluir inactivos» para consultar las fichas de animales dados de baja.'}
         />
       ) : null}
 
@@ -216,12 +226,13 @@ export function AnimalsInventoryScreen() {
             <Text style={[style.detail, { color: colors.textMuted }]}>Identificador · {viewing?.identificador}</Text>
             <View style={[style.divider, { backgroundColor: colors.borderLight }]} />
             <Text style={[style.detail, { color: colors.textSecondary }]}>Especie y raza · {viewing?.especie} · {viewing?.raza}</Text>
-            <Text style={[style.detail, { color: colors.textSecondary }]}>Ubicación actual · {viewing?.corral}</Text>
+            <Text style={[style.detail, { color: colors.textSecondary }]}>Registro · {viewing?.activo ? 'Activo' : 'Inactivo'}</Text>
+            <Text style={[style.detail, { color: colors.textSecondary }]}>{viewing?.activo ? 'Ubicación actual' : 'Última ubicación'} · {viewing?.corral}</Text>
             <Text style={[style.detail, { color: colors.textSecondary }]}>Estado sanitario · {viewing?.estado_salud.replaceAll('_', ' ')}</Text>
             <Text style={[style.detail, { color: colors.textSecondary }]}>Edad calculada · {viewing?.fecha_nacimiento ? formatAnimalAge(viewing.fecha_nacimiento) : 'No registrada'}</Text>
             <Text style={[style.detail, { color: colors.textSecondary }]}>Fecha de nacimiento · {viewing?.fecha_nacimiento?.slice(0, 10) ?? 'No registrada'}</Text>
             <Text style={[style.detail, { color: colors.textSecondary }]}>Último peso registrado · {viewing?.peso_kg == null ? 'No registrado' : `${viewing.peso_kg} kg`}</Text>
-            {viewing?.alta_pendiente_traslado ? (
+            {viewing?.activo && viewing.alta_pendiente_traslado ? (
               <View style={style.noticeBanner}>
                 <Text style={style.noticeText}>Alta veterinaria registrada · pendiente de traslado físico por el peón.</Text>
               </View>
@@ -939,6 +950,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  inventoryActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   searchBox: {
     alignItems: 'center',
     borderRadius: 12,

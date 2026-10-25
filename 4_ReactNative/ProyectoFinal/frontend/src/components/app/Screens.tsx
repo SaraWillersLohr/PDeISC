@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
+import { useTheme } from '../../context/ThemeContext';
 import { removeSession, saveSession } from '../../services/sessionStorage';
 import { changeMyPassword, updateMyProfile } from '../../services/authApi';
 import { approveRegistrationRequest, listRegistrationRequests, rejectRegistrationRequest, type RegistrationRequest, type RequestedRole } from '../../services/adminApi';
@@ -27,7 +28,7 @@ const modules: { key: ModuleKey; label: string; icon: string; description: strin
   { key: 'eventos', label: 'Eventos', icon: '▤', description: 'Remates y exposiciones nacionales', roles: ['administrador', 'dueno'] },
   { key: 'avisos', label: 'Avisos', icon: '◌', description: 'Alertas y novedades de la estancia', roles: ['administrador', 'dueno', 'peon'] },
   { key: 'equipo', label: 'Equipo', icon: '♙', description: 'Personas, roles y acceso', roles: ['administrador', 'dueno'] },
-  { key: 'catalogo', label: 'Especies y razas', icon: '⌘', description: 'Catálogo productivo de la organización', roles: ['administrador', 'peon'] },
+  { key: 'catalogo', label: 'Especies y razas', icon: '⌘', description: 'Catálogo productivo de la organización', roles: ['administrador', 'dueno', 'peon'] },
   { key: 'perfil', label: 'Mi perfil', icon: '◎', description: 'Datos personales y sesión', roles: ['administrador', 'dueno', 'peon', 'veterinario'] },
 ];
 const roleLabel: Record<string, string> = { administrador: 'Administrador', dueno: 'Dueño', copropietario: 'Administrador', peon: 'Peón', veterinario: 'Veterinario' };
@@ -46,16 +47,17 @@ function goTo(key: ModuleKey): void {
 
 function Header({ title, subtitle }: { title: string; subtitle: string }) {
   const { session } = useSession();
+  const { isDark } = useTheme();
   const [online, setOnline] = useState(true);
   useEffect(() => { const unsubscribe = NetInfo.addEventListener((state) => setOnline(Boolean(state.isConnected))); return unsubscribe; }, []);
   const initials = `${session?.usuario.nombre?.[0] ?? 'E'}${session?.usuario.apellido?.[0] ?? ''}`.toUpperCase();
   return <View style={s.header}>
     <View style={s.brandLine}><View style={[s.connection, !online && s.connectionOff]}><View style={[s.connectionDot, !online && s.connectionDotOff]} /><Text style={s.connectionText}>{online ? 'En línea' : 'Sin señal'}</Text></View></View>
-    <View style={s.titleRow}><View style={{ flex: 1 }}><Text style={s.pageTitle}>{title}</Text><Text style={s.pageSubtitle}>{subtitle}</Text></View>{session?.usuario.foto_perfil ? <Image source={{ uri: session.usuario.foto_perfil }} style={{ borderRadius: 21, height: 42, width: 42 }} /> : <View style={s.avatar}><Text style={s.avatarText}>{initials}</Text></View>}</View>
+    <View style={s.titleRow}><View style={{ flex: 1 }}><Text style={[s.pageTitle, isDark && { color: '#f0fdf4' }]}>{title}</Text><Text style={[s.pageSubtitle, isDark && { color: '#b5c5b8' }]}>{subtitle}</Text></View>{session?.usuario.foto_perfil ? <Image source={{ uri: session.usuario.foto_perfil }} style={{ borderRadius: 21, height: 42, width: 42 }} /> : <View style={s.avatar}><Text style={s.avatarText}>{initials}</Text></View>}</View>
   </View>;
 }
 
-function Page({ children }: { children: React.ReactNode }) { return <SafeAreaView edges={['bottom','left','right']} style={s.safe}><ScrollView contentContainerStyle={s.page} showsVerticalScrollIndicator={false}>{children}</ScrollView></SafeAreaView>; }
+function Page({ children }: { children: React.ReactNode }) { const { isDark } = useTheme(); return <SafeAreaView edges={['bottom','left','right']} style={[s.safe, isDark && { backgroundColor: '#101b14' }]}><ScrollView contentContainerStyle={s.page} showsVerticalScrollIndicator={false}>{children}</ScrollView></SafeAreaView>; }
 
 export function HomeScreen() {
   const { session } = useSession();

@@ -10,7 +10,7 @@ El sistema no busca reemplazar el criterio del productor. Le presenta informaci�
 
 ### dueño
 
-El dueño consulta estadísticas, eventos, resultados de cría, corrales, usuarios y su actividad; también puede editar las fichas de animales y administrar corrales, incluida su capacidad y estructura. Puede dar de baja corrales cuando ya no tengan animales ni dependencias operativas activas. No administra cuentas ni permisos. Las estadísticas reproductivas priorizan resultados por animal y conteos del año, como crías nacidas y yeguas preñadas; no atribuyen efectividad individual al usuario que cargó el dato.
+El dueño consulta estadísticas, eventos, resultados de cría, corrales, usuarios y su actividad; también puede editar las fichas de animales, administrar corrales y agregar especies y razas al catálogo de su estancia. Puede dar de baja corrales cuando ya no tengan animales ni dependencias operativas activas. No administra cuentas ni permisos. Las estadísticas reproductivas priorizan resultados por animal y conteos del año, como crías nacidas y yeguas preñadas; no atribuyen efectividad individual al usuario que cargó el dato.
 
 ### administrador
 
@@ -66,7 +66,7 @@ Los resultados de reproducción se consultan en la ficha e historial de cada ani
 
 La sección permite buscar, filtrar y abrir la ficha de cada animal. Los filtros incluyen especie, raza, corral, estado sanitario y condición de actividad.
 
-La ficha muestra identificador, nombre opcional, raza, fecha de nacimiento, edad calculada, peso vigente, corral o potrero actual, estado sanitario, fotografías, historial y alertas. El peón registra pesajes, traslados, servicios de monta y reportes sanitarios. El veterinario solo accede a fichas de animales ubicados en enfermería.
+La ficha muestra identificador, nombre opcional, raza, fecha de nacimiento, edad calculada, peso vigente, corral o potrero actual, estado sanitario, fotografías, historial y alertas. La caravana/identificador se ingresa manualmente y es obligatoria; la fecha de nacimiento y el peso inicial son opcionales. El peón registra pesajes, traslados, servicios de monta y reportes sanitarios. El veterinario solo accede a fichas de animales ubicados en enfermería.
 
 Un nacimiento crea el registro de la cría y exige informar madre y padre. Cada progenitor se vincula con un animal de la estancia o se consigna en texto si no figura en el sistema; la madre debe ser una hembra de la misma especie y el padre puede venir de un servicio registrado o de un reproductor externo. Una muerte se registra como evento trazable con fecha, causa si se conoce y corral, potrero o coordenada del hallazgo. La baja operativa es inmediata para impedir nuevos movimientos o servicios; el reporte queda pendiente de revisión del administrador y nunca borra la ficha ni su historial. Al confirmar la muerte, el estado del animal queda como fallecido. Si el administrador rechaza el reporte, el animal se reactiva y el reporte rechazado permanece en la auditoría con responsable, fecha y motivo.
 

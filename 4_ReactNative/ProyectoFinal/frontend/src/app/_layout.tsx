@@ -3,13 +3,25 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SessionProvider } from '../context/SessionContext';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
     <SessionProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#f4f6f1' } }}>
+      <ThemeProvider>
+      <AppNavigation />
+      </ThemeProvider>
+    </SessionProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function AppNavigation() {
+  const { isDark } = useTheme();
+  return <>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: isDark ? '#101b14' : '#f4f6f1' } }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="register" />
         <Stack.Screen name="verify" />
@@ -17,7 +29,5 @@ export default function RootLayout() {
         <Stack.Screen name="recover" />
         <Stack.Screen name="(app)" />
       </Stack>
-    </SessionProvider>
-    </SafeAreaProvider>
-  );
+  </>;
 }

@@ -7,11 +7,6 @@
     "scheme": "estanciaapp",
     "icon": "./assets/branding/app-icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/branding/app-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#123824"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -47,7 +42,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#123824"
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-font",
+      "expo-sqlite",
+      "expo-status-bar",
+      "expo-web-browser"
     ]
   }
 }

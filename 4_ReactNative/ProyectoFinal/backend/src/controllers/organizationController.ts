@@ -53,6 +53,43 @@ export async function listCatalog(_req: Request, res: Response): Promise<void> {
   } catch { res.status(500).json({ message: 'no se pudo cargar el catálogo; aplicá la migración productiva' }); }
 }
 
+// agrego una especie aprobada al catálogo de la estancia para dueño o administrador.
+export async function createSpecies(req: Request, res: Response): Promise<void> {
+  const nombre = String(req.body.nombre ?? '').trim();
+  const userId = req.usuario?.id_usuario;
+  if (!userId || !nombre || nombre.length > 80) { res.status(400).json({ message: 'ingresá un nombre de especie de hasta 80 caracteres' }); return; }
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [result] = await connection.execute<ResultSetHeader>('INSERT INTO especies (nombre) VALUES (?)', [nombre]);
+    await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['especie', result.insertId, 'alta', userId, JSON.stringify({ nombre })]);
+    await connection.commit();
+    res.status(201).json({ data: { id_especie: result.insertId, nombre } });
+  } catch { await connection.rollback(); res.status(409).json({ message: 'esa especie ya existe o no se pudo guardar' }); }
+  finally { connection.release(); }
+}
+
+// agrego una raza aprobada dentro de una especie existente.
+export async function createBreed(req: Request, res: Response): Promise<void> {
+  const idEspecie = Number(req.params.id);
+  const nombre = String(req.body.nombre ?? '').trim();
+  const userId = req.usuario?.id_usuario;
+  if (!userId || !Number.isInteger(idEspecie) || idEspecie < 1 || !nombre || nombre.length > 80) {
+    res.status(400).json({ message: 'seleccioná una especie e ingresá un nombre de raza de hasta 80 caracteres' }); return;
+  }
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [species] = await connection.execute<RowDataPacket[]>('SELECT id_especie FROM especies WHERE id_especie = ? FOR UPDATE', [idEspecie]);
+    if (!species.length) { await connection.rollback(); res.status(404).json({ message: 'la especie seleccionada ya no existe' }); return; }
+    const [result] = await connection.execute<ResultSetHeader>('INSERT INTO razas (id_especie,nombre) VALUES (?,?)', [idEspecie, nombre]);
+    await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['raza', result.insertId, 'alta', userId, JSON.stringify({ nombre, id_especie: idEspecie })]);
+    await connection.commit();
+    res.status(201).json({ data: { id_raza: result.insertId, id_especie: idEspecie, nombre } });
+  } catch { await connection.rollback(); res.status(409).json({ message: 'esa raza ya existe dentro de la especie o no se pudo guardar' }); }
+  finally { connection.release(); }
+}
+
 // creo una solicitud del peón o agrego directamente una entrada aprobada.
 export async function requestCatalog(req: Request, res: Response): Promise<void> {
   const tipo = String(req.body.tipo); const nombre = String(req.body.nombre ?? '').trim(); const especie = req.body.id_especie ? Number(req.body.id_especie) : null; const user = req.usuario?.id_usuario;

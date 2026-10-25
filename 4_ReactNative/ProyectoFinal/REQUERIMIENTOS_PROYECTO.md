@@ -27,8 +27,9 @@
 - los roles principales son administrador, dueño, peón y veterinario; administrador reemplaza al rol anterior de copropietario.
 - cada rol tiene permisos y vistas acordes a su trabajo; el backend verifica los permisos y no confía solo en la interfaz.
 - administrador administra la organización: solicitudes y datos de usuarios, roles, altas, ediciones y bajas, además de todos los módulos productivos.
-- dueño consulta estadísticas, eventos, resultados de cría, corrales, usuarios y su actividad; puede editar animales y administrar corrales, incluida su estructura y capacidad, pero no administra cuentas.
+- dueño consulta estadísticas, eventos, resultados de cría, corrales, usuarios y su actividad; puede editar animales, administrar corrales y su capacidad, y agregar especies y razas al catálogo de su estancia, pero no administra cuentas.
 - peón edita animales, registra movimientos y cambios de ubicación entre corrales, pesajes, servicios de monta, nacimientos con ambos progenitores, muertes y reportes sanitarios. No modifica la estructura ni capacidad de corrales; las nuevas especies y razas quedan pendientes de aprobación administrativa.
+- al dar de alta un animal, la caravana/identificador es obligatoria y se ingresa manualmente; la fecha de nacimiento y el peso inicial son opcionales, y la edad se calcula cuando hay fecha registrada.
 - peón y dueño pueden cargar y editar servicios de monta; el administrador puede gestionarlos como parte del acceso total a la organización. Las anulaciones conservan el dato y la trazabilidad.
 - cada progenitor de un nacimiento debe quedar vinculado a un animal existente o identificado con un nombre de texto si no está registrado.
 - el reporte de muerte causa una baja operativa inmediata para impedir movimientos y servicios; queda pendiente de revisión del administrador y conserva la ficha e historial del animal. Al confirmar, el estado queda como fallecido; al rechazar, se reactiva el animal y se conserva el reporte con responsable, fecha y motivo de revisión.

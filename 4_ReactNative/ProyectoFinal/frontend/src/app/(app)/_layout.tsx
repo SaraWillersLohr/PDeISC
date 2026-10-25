@@ -24,21 +24,21 @@ export default function AppTabs() {
     tabBarItemStyle: styles.tabItem,
     tabBarLabelStyle: styles.tabLabel,
   }}>
-    <Tabs.Screen name="home" options={{ title: isVet ? 'Enfermería' : 'Inicio', tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name={isVet ? 'medkit-outline' : 'home-outline'} activeName={isVet ? 'medkit' : 'home'} /> }} />
-    <Tabs.Screen name="animals" options={{ title: 'Animales', href: isVet ? null : undefined, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="paw-outline" activeName="paw" /> }} />
-    <Tabs.Screen name="corrals" options={{ title: 'Corrales', href: isOwner || role === 'administrador' ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="grid-outline" activeName="grid" /> }} />
-    <Tabs.Screen name="events" options={{ title: 'Eventos', href: isOwner ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="calendar-outline" activeName="calendar" /> }} />
-    <Tabs.Screen name="team" options={{ title: 'Equipo', href: role === 'administrador' ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="people-outline" activeName="people" /> }} />
-    <Tabs.Screen name="tasks" options={{ title: 'Tareas', href: isField ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="checkbox-outline" activeName="checkbox" /> }} />
-    <Tabs.Screen name="health" options={{ title: 'Reportes', href: isField ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="medkit-outline" activeName="medkit" /> }} />
-    <Tabs.Screen name="more" options={{ title: 'Mi perfil', tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="person-circle-outline" activeName="person-circle" /> }} />
+    <Tabs.Screen name="home" options={{ title: isVet ? 'Enfermería' : 'Inicio', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name={isVet ? 'medkit-outline' : 'home-outline'} activeName={isVet ? 'medkit' : 'home'} /> }} />
+    <Tabs.Screen name="animals" options={{ title: 'Animales', href: isVet ? null : undefined, tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="paw-outline" activeName="paw" /> }} />
+    <Tabs.Screen name="corrals" options={{ title: 'Corrales', href: isOwner || role === 'administrador' ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="grid-outline" activeName="grid" /> }} />
+    <Tabs.Screen name="events" options={{ title: 'Eventos', href: isOwner ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="calendar-outline" activeName="calendar" /> }} />
+    <Tabs.Screen name="team" options={{ title: 'Equipo', href: role === 'administrador' ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="people-outline" activeName="people" /> }} />
+    <Tabs.Screen name="tasks" options={{ title: 'Tareas', href: isField ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="checkbox-outline" activeName="checkbox" /> }} />
+    <Tabs.Screen name="health" options={{ title: 'Reportes', href: isField ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="medkit-outline" activeName="medkit" /> }} />
+    <Tabs.Screen name="more" options={{ title: 'Mi perfil', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="person-circle-outline" activeName="person-circle" /> }} />
     <Tabs.Screen name="[module]" options={{ href: null }} />
   </Tabs></OwnerDesktopShell>;
 }
 
 function TabIcon({ color, focused, name, activeName }: { color: ColorValue; focused: boolean; name: IconName; activeName: IconName }) {
   return <View style={[styles.iconBadge, focused && styles.iconBadgeActive]}>
-    <Ionicons color={color} name={focused ? activeName : name} size={20} />
+    <Ionicons color={typeof color === 'number' ? String(color) : color ?? '#214d35'} name={focused ? activeName : name} size={20} />
   </View>;
 }
 

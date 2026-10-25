@@ -2,7 +2,7 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-const apiPort = process.env.EXPO_PUBLIC_API_PORT?.trim() || '3001';
+const apiPort = process.env.EXPO_PUBLIC_API_PORT?.trim() || '3010';
 const configuredUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
 
 // reutilizo el host del navegador o el hostUri de Expo Go para no fijar la ip del wifi.

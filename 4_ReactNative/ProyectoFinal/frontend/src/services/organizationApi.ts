@@ -20,5 +20,7 @@ export function listOrganizationUsers(session: Session): Promise<OrganizationUse
 export function updateOrganizationUser(session: Session, user: OrganizationUser, role: string): Promise<void> { return request(session, `/users/${user.id_usuario}`, 'PUT', { nombre: user.nombre, apellido: user.apellido || '-', rol: role }); }
 export function deactivateOrganizationUser(session: Session, id: number): Promise<void> { return request(session, `/users/${id}`, 'DELETE'); }
 export function listCatalog(session: Session): Promise<CatalogData> { return request(session, '/catalog'); }
+export function createSpecies(session: Session, nombre: string): Promise<Species> { return request(session, '/catalog/species', 'POST', { nombre }); }
+export function createBreed(session: Session, id_especie: number, nombre: string): Promise<Breed> { return request(session, `/catalog/species/${id_especie}/breeds`, 'POST', { nombre }); }
 export function requestCatalog(session: Session, tipo: 'especie'|'raza', nombre: string, id_especie?: number): Promise<void> { return request(session, '/catalog/requests', 'POST', { tipo, nombre, ...(id_especie ? { id_especie } : {}) }); }
 export function reviewCatalog(session: Session, id: number, decision: 'aprobar'|'rechazar'): Promise<void> { return request(session, `/catalog/requests/${id}`, 'PATCH', { decision }); }

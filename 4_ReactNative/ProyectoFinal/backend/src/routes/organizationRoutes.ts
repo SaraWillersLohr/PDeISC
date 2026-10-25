@@ -11,5 +11,7 @@ organizationRouter.get('/users', requireRoles('administrador','dueno'), organiza
 organizationRouter.put('/users/:id', requireAdministrator, organization.updateUser);
 organizationRouter.delete('/users/:id', requireAdministrator, organization.deactivateUser);
 organizationRouter.get('/catalog', requireRoles('administrador','dueno','peon'), organization.listCatalog);
+organizationRouter.post('/catalog/species', requireRoles('administrador','dueno'), organization.createSpecies);
+organizationRouter.post('/catalog/species/:id/breeds', requireRoles('administrador','dueno'), organization.createBreed);
 organizationRouter.post('/catalog/requests', requireRoles('administrador','peon'), organization.requestCatalog);
 organizationRouter.patch('/catalog/requests/:id', requireAdministrator, organization.reviewCatalog);

@@ -1,3 +1,3 @@
-// muestro el acceso inicial al inventario animal.
-import { AnimalsInventoryScreen } from '../../components/app/LivestockScreens';
-export default AnimalsInventoryScreen;
+// derivo veterinaria a su vista acotada de enfermería.
+import { AnimalsScreen } from '../../components/app/Screens';
+export default AnimalsScreen;

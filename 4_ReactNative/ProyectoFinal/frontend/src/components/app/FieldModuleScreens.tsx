@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
+import { useTheme } from '../../context/ThemeContext';
 import { createMatingService, createTask, listFieldEvents, listReproduction, listTasks, updateTask, type FieldEvent, type ReproductionData, type TaskRecord } from '../../services/modulesApi';
 import { listMapAreas, saveMapArea, type MapArea, type MapPoint } from '../../services/productionApi';
 import { BirthForm } from './BirthForm';
@@ -11,7 +12,8 @@ import { listOrganizationUsers, type OrganizationUser } from '../../services/org
 const palette = { green: '#214d35', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', red: '#a34b43' };
 
 function Frame({ title, subtitle, children }: React.PropsWithChildren<{ title: string; subtitle: string }>) {
-  return <SafeAreaView edges={['bottom','left','right']} style={s.safe}><ScrollView contentContainerStyle={s.page}><Text style={s.heading}>{title}</Text><Text style={s.subtitle}>{subtitle.toUpperCase()}</Text>{children}</ScrollView></SafeAreaView>;
+  const { isDark } = useTheme();
+  return <SafeAreaView edges={['bottom','left','right']} style={[s.safe, isDark && { backgroundColor: '#101b14' }]}><ScrollView contentContainerStyle={s.page}><Text style={[s.heading, isDark && { color: '#f0fdf4' }]}>{title}</Text><Text style={[s.subtitle, isDark && { color: '#b5c5b8' }]}>{subtitle.toUpperCase()}</Text>{children}</ScrollView></SafeAreaView>;
 }
 
 export function TasksManagerScreen() {

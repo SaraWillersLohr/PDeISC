@@ -7,6 +7,13 @@ import { database } from '../config/database.js';
 interface MovementRow extends RowDataPacket { id_animal: number; id_corral: number; activo: number; origen_enfermeria: number; estado_salud: string; identificador: string; }
 interface CorralRow extends RowDataPacket { capacidad: number; nombre: string; activo: number; es_enfermeria: number; }
 
+// valido fechas reales y evito nacimientos posteriores al día actual.
+function validBirthDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value && date <= new Date(new Date().toISOString().slice(0, 10));
+}
+
 // devuelvo animales activos con su ubicación operativa actual.
 export async function listAnimals(_req: Request, res: Response): Promise<void> {
   try {
@@ -48,7 +55,7 @@ export async function createAnimal(req: Request, res: Response): Promise<void> {
   const birth = req.body.fecha_nacimiento ? String(req.body.fecha_nacimiento) : null;
   const weight = req.body.peso_kg == null || req.body.peso_kg === '' ? null : Number(req.body.peso_kg);
   const userId = req.usuario?.id_usuario;
-  if (!userId || !identifier || identifier.length > 50 || !Number.isInteger(corralId) || !Number.isInteger(breedId) || (birth && !/^\d{4}-\d{2}-\d{2}$/.test(birth)) || (weight !== null && (!Number.isFinite(weight) || weight <= 0))) {
+  if (!userId || !identifier || identifier.length > 50 || !Number.isInteger(corralId) || !Number.isInteger(breedId) || (birth && !validBirthDate(birth)) || (weight !== null && (!Number.isFinite(weight) || weight <= 0))) {
     res.status(400).json({ message: 'completá identificador, especie/raza, corral y datos válidos' }); return;
   }
   const connection = await database.getConnection();
@@ -57,6 +64,7 @@ export async function createAnimal(req: Request, res: Response): Promise<void> {
     const [corrals] = await connection.execute<CorralRow[]>('SELECT capacidad, nombre, activo, es_enfermeria FROM corrales WHERE id_corral=? FOR UPDATE', [corralId]);
     const corral = corrals[0];
     if (!corral || !corral.activo) throw new Error('el corral seleccionado no está activo');
+    if (corral.es_enfermeria) throw new Error('los animales ingresan a enfermería mediante un traslado sanitario');
     const [counts] = await connection.execute<RowDataPacket[]>('SELECT COUNT(*) AS ocupacion FROM animales WHERE id_corral=? AND activo=1', [corralId]);
     if (Number(counts[0]?.ocupacion ?? 0) >= corral.capacidad) throw new Error('el corral alcanzó su capacidad');
     const [created] = await connection.execute<ResultSetHeader>(
@@ -66,7 +74,8 @@ export async function createAnimal(req: Request, res: Response): Promise<void> {
     await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['animal', created.insertId, 'alta', userId, JSON.stringify({ identificador: identifier, id_corral: corralId })]);
     await connection.commit(); res.status(201).json({ data: { id_animal: created.insertId, identificador: identifier } });
   } catch (error) {
-    await connection.rollback(); const message = error instanceof Error ? error.message : 'no se pudo registrar el animal';
+    await connection.rollback(); const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+    const message = code === 'ER_DUP_ENTRY' ? 'ya existe un animal con ese identificador; revisá la caravana ingresada' : error instanceof Error ? error.message : 'no se pudo registrar el animal';
     res.status(409).json({ message });
   } finally { connection.release(); }
 }
@@ -75,15 +84,20 @@ export async function createAnimal(req: Request, res: Response): Promise<void> {
 export async function updateAnimal(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id); const version = Number(req.body.version_dato);
   const { nombre, identificador, id_raza, fecha_nacimiento } = req.body as Record<string, unknown>;
-  if (!Number.isInteger(id) || !Number.isInteger(version) || !String(identificador ?? '').trim() || !Number(id_raza)) { res.status(400).json({ message: 'faltan datos del animal o versión' }); return; }
+  const cleanIdentifier = String(identificador ?? '').trim();
+  const cleanBirth = typeof fecha_nacimiento === 'string' ? fecha_nacimiento.trim() : '';
+  if (!Number.isInteger(id) || !Number.isInteger(version) || !cleanIdentifier || cleanIdentifier.length > 50 || !Number(id_raza) || (cleanBirth && !validBirthDate(cleanBirth))) { res.status(400).json({ message: 'completá identificador y raza, y revisá la fecha de nacimiento' }); return; }
   try {
     const [result] = await database.execute<ResultSetHeader>(
       'UPDATE animales SET nombre=?, identificador=?, id_raza=?, fecha_nacimiento=?, version_dato=version_dato+1 WHERE id_animal=? AND activo=1 AND version_dato=?',
-      [String(nombre ?? '').trim() || null, String(identificador).trim(), Number(id_raza), typeof fecha_nacimiento === 'string' && fecha_nacimiento ? fecha_nacimiento : null, id, version],
+      [String(nombre ?? '').trim() || null, cleanIdentifier, Number(id_raza), cleanBirth || null, id, version],
     );
     if (!result.affectedRows) { res.status(409).json({ message: 'el animal cambió o ya no está activo; recargá sus datos' }); return; }
     res.json({ message: 'ficha actualizada' });
-  } catch { res.status(500).json({ message: 'no se pudo editar el animal' }); }
+  } catch (error) {
+    const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+    res.status(code === 'ER_DUP_ENTRY' ? 409 : 500).json({ message: code === 'ER_DUP_ENTRY' ? 'ya existe un animal con ese identificador; revisá la caravana ingresada' : 'no se pudo editar el animal' });
+  }
 }
 
 // creo un corral operativo o un potrero según el indicador enviado.

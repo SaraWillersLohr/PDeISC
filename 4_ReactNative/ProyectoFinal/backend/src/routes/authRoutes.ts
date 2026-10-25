@@ -16,3 +16,5 @@ authRouter.post('/password-recovery/request', authController.requestPasswordReco
 authRouter.post('/password-recovery/redeem', authController.redeemPasswordRecoveryCode);
 authRouter.post('/password-recovery/reset', authController.completePasswordRecovery);
 authRouter.get('/me', requireAuthentication, authController.me);
+authRouter.put('/profile', requireAuthentication, authController.updateProfile);
+authRouter.put('/password', requireAuthentication, authController.changePassword);

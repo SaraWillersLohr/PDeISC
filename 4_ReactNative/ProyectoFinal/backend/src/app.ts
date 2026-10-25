@@ -16,7 +16,7 @@ app.use(cors({ origin: (origin, callback) => {
   if (!origin || allowedOrigins.includes(origin) || (env.nodeEnv !== 'production' && isDevelopmentOrigin(origin))) callback(null, true);
   else callback(new Error('origen no permitido por CORS'));
 } }));
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.get('/api/health', (_request, response) => response.status(200).json({ status: 'ok' }));
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);

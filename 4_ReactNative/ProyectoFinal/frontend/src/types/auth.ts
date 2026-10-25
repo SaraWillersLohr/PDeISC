@@ -5,6 +5,7 @@ export interface Usuario {
   rol: string;
   nombre: string;
   apellido: string;
+  foto_perfil?: string | null;
 }
 
 // describo los tokens y el perfil que persisto en el dispositivo.

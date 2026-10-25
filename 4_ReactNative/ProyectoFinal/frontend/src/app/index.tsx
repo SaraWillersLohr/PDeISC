@@ -18,6 +18,7 @@ export default function LoginScreen() {
   const { session, setSession, restoring } = useSession();
   const { width, height } = useWindowDimensions();
   const desktop = Platform.OS === 'web' && width >= 900;
+  const compact = width < 430;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
@@ -57,7 +58,7 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={s.safe}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.flex}>
-        <ScrollView contentContainerStyle={[s.page, desktop ? s.desktopPage : s.mobilePage]} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={[s.page, desktop ? s.desktopPage : s.mobilePage, compact && s.compactPage]} keyboardShouldPersistTaps="handled">
           {desktop ? (
             <View style={s.intro}>
               <BrandWordmark mode="dark" style={s.desktopLogo} />
@@ -85,12 +86,12 @@ export default function LoginScreen() {
                 </Pressable>
               </View>
 
-              <View style={s.options}>
+              <View style={[s.options, compact && s.optionsCompact]}>
                 <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: remember }} onPress={() => setRemember(!remember)} style={s.rememberRow}>
                   <View style={[s.checkbox, remember && s.checkboxChecked]}>{remember ? <MaterialCommunityIcons color="#fff" name="check" size={13} /> : null}</View>
                   <Text style={s.rememberText}>Mantener sesión iniciada</Text>
                 </Pressable>
-                <Pressable accessibilityRole="link" onPress={() => router.push({ pathname: '/recover', params: { email: email.trim() } })}>
+                <Pressable accessibilityRole="link" onPress={() => router.push({ pathname: '/recover', params: { email: email.trim() } })} style={s.forgotLink}>
                   <Text style={s.forgot}>¿Olvidaste tu contraseña?</Text>
                 </Pressable>
               </View>
@@ -118,7 +119,7 @@ const s = StyleSheet.create({
   safe: { backgroundColor: forest, flex: 1 }, flex: { flex: 1 },
   page: { backgroundColor: forest, flexGrow: 1, minHeight: '100%' },
   desktopPage: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '6%', paddingVertical: 20 },
-  mobilePage: { alignItems: 'center', justifyContent: 'center', padding: 18, paddingVertical: 26 },
+  mobilePage: { alignItems: 'center', justifyContent: 'center', padding: 18, paddingVertical: 26 }, compactPage: { paddingHorizontal: 10, paddingVertical: 14 },
   intro: { flex: 1, maxWidth: 430, paddingHorizontal: 16, paddingRight: 40 }, desktopLogo: { height: 54, marginBottom: 70, width: 190 },
   introEyebrow: { color: '#dcebc6', fontSize: 11, fontWeight: '800', letterSpacing: 1.8, marginBottom: 12 },
   introTitle: { color: '#fff', fontSize: 42, fontWeight: '800', lineHeight: 49 }, introCopy: { color: '#d3dfd4', fontSize: 15, lineHeight: 23, marginTop: 14, maxWidth: 340 },
@@ -131,12 +132,12 @@ const s = StyleSheet.create({
   input: { backgroundColor: '#fff', borderColor: '#dce3db', borderRadius: 15, borderWidth: 1, color: '#223027', fontSize: 15, height: 56, paddingHorizontal: 17, width: '100%' },
   passwordWrap: { alignItems: 'center', borderColor: '#dce3db', borderRadius: 15, borderWidth: 1, flexDirection: 'row', height: 56, paddingRight: 14 },
   passwordInput: { color: '#223027', flex: 1, fontSize: 15, height: '100%', paddingHorizontal: 17 }, eye: { alignItems: 'center', justifyContent: 'center', minHeight: 44, width: 36 },
-  options: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginTop: 17 }, rememberRow: { alignItems: 'center', flexDirection: 'row', gap: 9, minHeight: 40 },
+  options: { alignItems: 'center', flexDirection: 'row', gap: 12, justifyContent: 'space-between', marginTop: 17 }, optionsCompact: { alignItems: 'flex-start', flexDirection: 'column', gap: 2 }, rememberRow: { alignItems: 'center', flexDirection: 'row', gap: 9, minHeight: 40 },
   checkbox: { alignItems: 'center', borderColor: '#9baa9d', borderRadius: 5, borderWidth: 1, height: 19, justifyContent: 'center', width: 19 }, checkboxChecked: { backgroundColor: '#214d35', borderColor: '#214d35' },
-  rememberText: { color: '#59665d', fontSize: 12 }, forgot: { color: '#214d35', fontSize: 12, fontWeight: '700' },
+  rememberText: { color: '#59665d', fontSize: 12 }, forgotLink: { justifyContent: 'center', minHeight: 40 }, forgot: { color: '#214d35', fontSize: 12, fontWeight: '700' },
   offline: { backgroundColor: '#fff3d9', borderRadius: 10, color: '#765918', fontSize: 12, lineHeight: 17, marginTop: 18, padding: 11 },
   error: { backgroundColor: '#fff0ed', borderRadius: 10, color: '#9b3d36', fontSize: 12, lineHeight: 18, marginTop: 15, padding: 11 },
-  primary: { alignItems: 'center', backgroundColor: '#dcefc2', borderRadius: 999, height: 58, justifyContent: 'center', marginTop: 27, maxWidth: 270, width: '100%' }, disabled: { opacity: 0.7 },
+  primary: { alignItems: 'center', alignSelf: 'stretch', backgroundColor: '#dcefc2', borderRadius: 999, height: 56, justifyContent: 'center', marginTop: 24, width: '100%' }, disabled: { opacity: 0.7 },
   primaryText: { color: '#214d35', fontSize: 15, fontWeight: '800' }, arrow: { fontSize: 18 },
   links: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 5, justifyContent: 'center', marginTop: 27 }, joinText: { color: '#778179', fontSize: 12 }, link: { color: '#214d35', fontSize: 12, fontWeight: '800' },
   accessLink: { alignSelf: 'center', paddingHorizontal: 8, paddingVertical: 14 }, accessText: { color: '#627068', fontSize: 11, textAlign: 'center' },

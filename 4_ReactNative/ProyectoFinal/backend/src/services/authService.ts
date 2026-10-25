@@ -17,11 +17,13 @@ interface UserRow extends RowDataPacket, AuthenticatedUser {
   password_hash: string;
   nombre: string;
   apellido: string;
+  foto_perfil: string | null;
 }
 
 interface RecoveryUserRow extends RowDataPacket, AuthenticatedUser {
   nombre: string;
   apellido: string;
+  foto_perfil: string | null;
   token_version: number;
 }
 
@@ -41,7 +43,7 @@ function digestMatches(expectedHex: string, receivedHex: string): boolean {
 // inicio sesión después de comprobar la contraseña hasheada.
 export async function login(input: LoginInput) {
   const [rows] = await database.execute<UserRow[]>(
-    `select u.id_usuario, u.email, u.password_hash, u.nombre, u.apellido, r.nombre as rol
+    `select u.id_usuario, u.email, u.password_hash, u.nombre, u.apellido, u.foto_perfil, r.nombre as rol
      from usuarios u
      inner join roles r on r.id_rol = u.id_rol
      where u.email = ? and u.activo = true and u.estado_cuenta = 'activo'
@@ -63,8 +65,33 @@ export async function login(input: LoginInput) {
   return {
     accessToken: createAccessToken(sessionUser),
     refreshToken: createRefreshToken(sessionUser),
-    usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido },
+    usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido, foto_perfil: user.foto_perfil },
   };
+}
+
+// actualizo únicamente el perfil de la persona autenticada.
+export async function updateProfile(userId: number, input: { nombre?: unknown; apellido?: unknown; foto_perfil?: unknown }) {
+  const nombre = typeof input.nombre === 'string' ? input.nombre.trim() : '';
+  const apellido = typeof input.apellido === 'string' ? input.apellido.trim() : '';
+  const photo = input.foto_perfil == null || input.foto_perfil === '' ? null : String(input.foto_perfil);
+  if (!nombre || nombre.length > 100 || !apellido || apellido.length > 100) throw new Error('Completá nombre y apellido válidos.');
+  if (photo && (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photo) || Buffer.byteLength(photo, 'utf8') > 1_500_000)) {
+    throw new Error('La foto debe ser una imagen válida de hasta 1,5 MB.');
+  }
+  await database.execute('UPDATE usuarios SET nombre = ?, apellido = ?, foto_perfil = ? WHERE id_usuario = ? AND activo = 1', [nombre, apellido, photo, userId]);
+  const [rows] = await database.execute<RowDataPacket[]>(`SELECT u.id_usuario,u.email,u.nombre,u.apellido,u.foto_perfil,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 LIMIT 1`, [userId]);
+  if (!rows.length) throw new Error('No se encontró el perfil activo.');
+  return rows[0];
+}
+
+// verifico la contraseña actual antes de reemplazarla por una nueva.
+export async function changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+  if (!currentPassword) throw new Error('Ingresá tu contraseña actual.');
+  if (newPassword.length < 10 || Buffer.byteLength(newPassword, 'utf8') > 72) throw new Error('La contraseña nueva debe tener entre 10 y 72 bytes.');
+  const [rows] = await database.execute<UserRow[]>('SELECT password_hash FROM usuarios WHERE id_usuario=? AND activo=1 LIMIT 1', [userId]);
+  if (!rows.length || !(await bcrypt.compare(currentPassword, rows[0].password_hash))) throw new Error('La contraseña actual no es correcta.');
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await database.execute('UPDATE usuarios SET password_hash=?, token_version=token_version+1 WHERE id_usuario=?', [passwordHash, userId]);
 }
 
 // renuevo los tokens usando un refresh token que ya fue validado.
@@ -126,7 +153,7 @@ export async function redeemPasswordRecoveryCode(emailInput: string, code: strin
   try {
     await connection.beginTransaction();
     const [users] = await connection.query<RecoveryUserRow[]>(
-      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.token_version, r.nombre AS rol
+      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.foto_perfil, u.token_version, r.nombre AS rol
        FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
        WHERE u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1 FOR UPDATE`, [email],
     );
@@ -176,7 +203,7 @@ export async function completePasswordRecovery(resetToken: string, newPassword: 
   try {
     await connection.beginTransaction();
     const [users] = await connection.query<RecoveryUserRow[]>(
-      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.token_version, r.nombre AS rol
+      `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.foto_perfil, u.token_version, r.nombre AS rol
        FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
        WHERE u.id_usuario = ? AND u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1 FOR UPDATE`,
       [recovery.id_usuario, recovery.email],
@@ -199,6 +226,6 @@ export async function completePasswordRecovery(resetToken: string, newPassword: 
   return {
     accessToken: createAccessToken(sessionUser),
     refreshToken: createRefreshToken(sessionUser),
-    usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido },
+    usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido, foto_perfil: user.foto_perfil },
   };
 }

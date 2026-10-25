@@ -33,6 +33,18 @@ export async function login(credentials: LoginCredentials): Promise<Session> {
   return (await response.json()) as Session;
 }
 
+// renuevo los tokens al restaurar la sesión desde el dispositivo.
+export async function refreshSession(session: Session): Promise<Session> {
+  if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');
+  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(`${apiUrl}/auth/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken: session.refreshToken }), signal: controller.signal });
+    const body = await response.json().catch(() => ({})) as { accessToken?: string; refreshToken?: string; message?: string };
+    if (!response.ok || !body.accessToken) throw new Error(body.message ?? 'No se pudo renovar la sesión.');
+    return { ...session, accessToken: body.accessToken, refreshToken: body.refreshToken ?? session.refreshToken };
+  } finally { clearTimeout(timeout); }
+}
+
 interface ApiMessage {
   message?: string;
 }
@@ -112,4 +124,22 @@ export async function completePasswordRecovery(resetToken: string, password: str
   const body = await response.json() as { message?: string; data?: Session };
   if (!response.ok || !body.data?.accessToken) throw new Error(body.message ?? 'No se pudo cambiar la contraseña.');
   return body.data;
+}
+
+// actualizo los datos personales del usuario autenticado.
+export async function updateMyProfile(session: Session, payload: { nombre: string; apellido: string; foto_perfil: string | null }): Promise<Session['usuario']> {
+  if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');
+  const response = await fetch(`${apiUrl}/auth/profile`, { method: 'PUT', headers: { Authorization: `Bearer ${session.accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const body = await response.json().catch(() => ({})) as { message?: string; data?: Session['usuario'] };
+  if (!response.ok || !body.data) throw new Error(body.message ?? 'No se pudo actualizar el perfil.');
+  return body.data;
+}
+
+// cambio la contraseña desde una sesión activa después de comprobar la actual.
+export async function changeMyPassword(session: Session, currentPassword: string, newPassword: string): Promise<string> {
+  if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');
+  const response = await fetch(`${apiUrl}/auth/password`, { method: 'PUT', headers: { Authorization: `Bearer ${session.accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword, newPassword }) });
+  const body = await response.json().catch(() => ({})) as { message?: string };
+  if (!response.ok) throw new Error(body.message ?? 'No se pudo cambiar la contraseña.');
+  return body.message ?? 'Contraseña actualizada.';
 }

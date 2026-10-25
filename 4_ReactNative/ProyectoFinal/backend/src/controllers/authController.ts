@@ -55,7 +55,10 @@ export async function resendAccessCode(req: Request, res: Response): Promise<voi
 export async function requestPasswordRecovery(req: Request, res: Response): Promise<void> {
   const email = typeof req.body?.email === 'string' ? req.body.email : '';
   try { await authService.requestPasswordRecovery(email); }
-  catch { console.error('[auth] No se pudo completar una solicitud de recuperación.'); }
+  catch (error) {
+    const detail = error instanceof Error ? error.message : 'error desconocido';
+    console.error(`[auth] No se pudo completar una solicitud de recuperación: ${detail}`);
+  }
   res.status(202).json({ message: 'Si la cuenta puede recuperar el acceso, enviaremos un código al correo indicado.' });
 }
 
@@ -122,4 +125,27 @@ export function refresh(req: Request, res: Response): void {
 // devuelvo el usuario autenticado para restaurar la sesión en la app.
 export function me(req: Request, res: Response): void {
   res.status(200).json({ usuario: req.usuario });
+}
+
+// permito que cualquier usuario autenticado actualice sus propios datos visibles.
+export async function updateProfile(req: Request, res: Response): Promise<void> {
+  try {
+    if (!req.usuario) { res.status(401).json({ message: 'se requiere autenticación' }); return; }
+    const data = await authService.updateProfile(req.usuario.id_usuario, req.body);
+    res.json({ message: 'Perfil actualizado.', data });
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'No se pudo actualizar el perfil.' });
+  }
+}
+
+// cambio la contraseña solo después de validar la contraseña vigente.
+export async function changePassword(req: Request, res: Response): Promise<void> {
+  try {
+    if (!req.usuario) { res.status(401).json({ message: 'se requiere autenticación' }); return; }
+    const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };
+    await authService.changePassword(req.usuario.id_usuario, currentPassword ?? '', newPassword ?? '');
+    res.json({ message: 'Contraseña actualizada.' });
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'No se pudo cambiar la contraseña.' });
+  }
 }

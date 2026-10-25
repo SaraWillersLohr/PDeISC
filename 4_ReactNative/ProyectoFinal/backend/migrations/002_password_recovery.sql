@@ -1,5 +1,8 @@
 -- Ejecutar una vez en la base indicada por DB_NAME antes de usar la recuperación de contraseña.
 -- Los códigos se guardan como HMAC, vencen a los 10 minutos y permiten intentos limitados.
+ALTER TABLE usuarios
+  ADD COLUMN IF NOT EXISTS token_version INT UNSIGNED NOT NULL DEFAULT 0;
+
 CREATE TABLE IF NOT EXISTS codigos_recuperacion_password (
   id_codigo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   id_usuario INT(10) UNSIGNED NOT NULL,

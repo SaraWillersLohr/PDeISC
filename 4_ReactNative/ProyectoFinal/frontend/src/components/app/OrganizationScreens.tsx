@@ -6,7 +6,7 @@ import { useSession } from '../../context/SessionContext';
 import { deactivateOrganizationUser, listCatalog, listOrganizationUsers, requestCatalog, reviewCatalog, updateOrganizationUser, type CatalogData, type OrganizationUser } from '../../services/organizationApi';
 
 const p = { green: '#214d35', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', red: '#a34b43' };
-function Screen({ title, children }: React.PropsWithChildren<{ title: string }>) { return <SafeAreaView style={st.safe}><ScrollView contentContainerStyle={st.page}><Text style={st.brand}>EstanciaApp</Text><Text style={st.heading}>{title}</Text>{children}</ScrollView></SafeAreaView>; }
+function Screen({ title, children }: React.PropsWithChildren<{ title: string }>) { return <SafeAreaView edges={['bottom','left','right']} style={st.safe}><ScrollView contentContainerStyle={st.page}><Text style={st.heading}>{title}</Text>{children}</ScrollView></SafeAreaView>; }
 
 export function TeamScreen() {
   const { session } = useSession(); const admin = session?.usuario.rol.toLowerCase() === 'administrador';

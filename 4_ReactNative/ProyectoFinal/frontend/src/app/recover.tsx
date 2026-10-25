@@ -46,7 +46,7 @@ export default function RecoverScreen() {
       const session = await completePasswordRecovery(resetToken, password);
       await saveSession(session);
       setSession(session);
-      router.replace('/(app)');
+      router.replace('/(app)/home');
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo cambiar la contraseña.'); }
     finally { setBusy(false); }
   }

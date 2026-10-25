@@ -1,21 +1,17 @@
 // protejo las secciones y ordeno la navegación móvil por perfil.
 import { Ionicons } from '@expo/vector-icons';
-import { router, Tabs } from 'expo-router';
-import { useEffect } from 'react';
+import { Redirect, Tabs } from 'expo-router';
 import { StyleSheet, View, type ColorValue } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { OwnerDesktopShell } from '../../components/app/OwnerDesktopShell';
 import { BrandLoadingScreen } from '../../components/BrandLoadingScreen';
 
-const green = '#214d35';
 type IconName = keyof typeof Ionicons.glyphMap;
 
 export default function AppTabs() {
   const { session, restoring } = useSession();
-  useEffect(() => {
-    if (!restoring && !session) router.replace('/');
-  }, [restoring, session]);
-  if (restoring || !session) return <BrandLoadingScreen />;
+  if (restoring) return <BrandLoadingScreen />;
+  if (!session) return <Redirect href="/" />;
 
   const role = session.usuario.rol.toLowerCase() === 'copropietario' ? 'administrador' : session.usuario.rol.toLowerCase();
   const isVet = role === 'veterinario';
@@ -28,7 +24,7 @@ export default function AppTabs() {
     tabBarItemStyle: styles.tabItem,
     tabBarLabelStyle: styles.tabLabel,
   }}>
-    <Tabs.Screen name="index" options={{ title: isVet ? 'Enfermería' : 'Inicio', tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name={isVet ? 'medkit-outline' : 'home-outline'} activeName={isVet ? 'medkit' : 'home'} /> }} />
+    <Tabs.Screen name="home" options={{ title: isVet ? 'Enfermería' : 'Inicio', tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name={isVet ? 'medkit-outline' : 'home-outline'} activeName={isVet ? 'medkit' : 'home'} /> }} />
     <Tabs.Screen name="animals" options={{ title: 'Animales', href: isVet ? null : undefined, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="paw-outline" activeName="paw" /> }} />
     <Tabs.Screen name="corrals" options={{ title: 'Corrales', href: isOwner || role === 'administrador' ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="grid-outline" activeName="grid" /> }} />
     <Tabs.Screen name="events" options={{ title: 'Eventos', href: isOwner ? undefined : null, tabBarIcon: ({ color, focused }) => <TabIcon color={color} focused={focused} name="calendar-outline" activeName="calendar" /> }} />

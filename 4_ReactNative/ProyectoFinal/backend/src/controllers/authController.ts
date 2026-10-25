@@ -106,6 +106,22 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
+// verifico credenciales OAuth con el proveedor y solo habilito cuentas ya aprobadas.
+export async function socialLogin(req: Request, res: Response): Promise<void> {
+  const provider = Array.isArray(req.params.provider) ? req.params.provider[0] : req.params.provider;
+  const { code, redirectUri, codeVerifier, clientId } = req.body as { code?: string; redirectUri?: string; codeVerifier?: string; clientId?: string };
+  if (!['google', 'facebook', 'github'].includes(provider) || typeof code !== 'string' || !code.trim()) {
+    res.status(400).json({ message: 'El proveedor o la credencial no son válidos.' }); return;
+  }
+  try {
+    const session = await authService.loginWithSocial(provider as 'google' | 'facebook' | 'github', code, redirectUri, codeVerifier, clientId);
+    res.status(200).json(session);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión con el proveedor.';
+    res.status(401).json({ message });
+  }
+}
+
 // renuevo la sesión cuando el token de acceso dejó de ser válido.
 export function refresh(req: Request, res: Response): void {
   const { refreshToken } = req.body as { refreshToken?: string };

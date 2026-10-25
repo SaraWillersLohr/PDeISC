@@ -34,7 +34,7 @@ const roleLabel: Record<string, string> = { administrador: 'Administrador', duen
 function normalizeRole(role: string): string { return role === 'copropietario' ? 'administrador' : role; }
 
 function goTo(key: ModuleKey): void {
-  if (key === 'inicio') { router.navigate('/(app)'); return; }
+  if (key === 'inicio') { router.navigate('/(app)/home'); return; }
   if (key === 'animales' || key === 'tareas') { router.navigate(`/(app)/${key}`); return; }
   if (key === 'corrales') { router.navigate('/(app)/corrals'); return; }
   if (key === 'eventos') { router.navigate('/(app)/events'); return; }
@@ -202,7 +202,7 @@ export function GenericModuleScreen() {
   if (item.key === 'reproduccion') return <ReproductionScreen />;
   if (item.key === 'eventos') return <EventsScreen />;
   if (item.key === 'mapa') return <MapAreasScreen />;
-  return <Redirect href="/(app)" />;
+  return <Redirect href="/(app)/home" />;
 }
 
 export function TeamModuleScreen() { return useMyRole() === 'administrador' ? <AdminRequestsScreen /> : <TeamScreen />; }

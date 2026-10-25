@@ -25,7 +25,7 @@ export default function AccessScreen() {
       const session = await redeemAccountCode(cleanEmail, code);
       await saveSession(session);
       setSession(session);
-      router.replace('/(app)');
+      router.replace('/(app)/home');
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo activar el acceso.'); }
     finally { setBusy(false); }
   }

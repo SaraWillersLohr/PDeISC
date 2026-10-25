@@ -33,6 +33,17 @@ export async function login(credentials: LoginCredentials): Promise<Session> {
   return (await response.json()) as Session;
 }
 
+// intercambio una credencial OAuth por la sesión propia de EstanciaApp.
+export async function socialLogin(provider: 'google' | 'facebook' | 'github', code: string, options: { redirectUri: string; clientId: string; codeVerifier?: string }): Promise<Session> {
+  if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');
+  const response = await fetch(`${apiUrl}/auth/social/${provider}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, ...options }),
+  });
+  if (!response.ok) throw new Error(await getErrorMessage(response));
+  return (await response.json()) as Session;
+}
+
 // renuevo los tokens al restaurar la sesión desde el dispositivo.
 export async function refreshSession(session: Session): Promise<Session> {
   if (!apiUrl) throw new Error('Falta configurar EXPO_PUBLIC_API_URL.');

@@ -1,5 +1,6 @@
 // valido credenciales contra mariadb y preparo una sesión segura.
 import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import type { RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
@@ -12,6 +13,7 @@ const recoveryTtlMinutes = 10;
 const recoveryMaxAttempts = 5;
 const recoveryResendCooldownSeconds = 60;
 const recoveryMaxDailyEmails = 5;
+const googleVerifier = new OAuth2Client();
 
 interface UserRow extends RowDataPacket, AuthenticatedUser {
   password_hash: string;
@@ -66,6 +68,94 @@ export async function login(input: LoginInput) {
     accessToken: createAccessToken(sessionUser),
     refreshToken: createRefreshToken(sessionUser),
     usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido, foto_perfil: user.foto_perfil },
+  };
+}
+
+type SocialProvider = 'google' | 'facebook' | 'github';
+
+// verifico la identidad directamente con el proveedor antes de asociarla a una cuenta ya aprobada.
+export async function loginWithSocial(provider: SocialProvider, code: string, redirectUri?: string, codeVerifier?: string, clientId?: string) {
+  if (!code || code.length > 4096 || !redirectUri || redirectUri.length > 500) throw new Error('La credencial social no es válida.');
+  let providerClientId = clientId ?? '';
+  let tokenEndpoint = '';
+  let tokenBody: Record<string, string> = {};
+  if (provider === 'google') {
+    const { googleClientIds, googleClientSecret } = env.socialAuth;
+    if (!googleClientIds.includes(providerClientId)) throw new Error('El acceso con Google todavía no está configurado.');
+    tokenEndpoint = 'https://oauth2.googleapis.com/token';
+    tokenBody = { client_id: providerClientId, ...(googleClientSecret ? { client_secret: googleClientSecret } : {}), code, redirect_uri: redirectUri, grant_type: 'authorization_code', ...(codeVerifier ? { code_verifier: codeVerifier } : {}) };
+  } else if (provider === 'facebook') {
+    const { facebookAppId, facebookAppSecret } = env.socialAuth;
+    if (!facebookAppId || !facebookAppSecret || providerClientId !== facebookAppId) throw new Error('El acceso con Facebook todavía no está configurado.');
+    tokenEndpoint = 'https://graph.facebook.com/oauth/access_token';
+    tokenBody = { client_id: facebookAppId, client_secret: facebookAppSecret, code, redirect_uri: redirectUri };
+  } else {
+    const { githubClientId, githubClientSecret } = env.socialAuth;
+    if (!githubClientId || !githubClientSecret || providerClientId !== githubClientId) throw new Error('El acceso con GitHub todavía no está configurado.');
+    tokenEndpoint = 'https://github.com/login/oauth/access_token';
+    tokenBody = { client_id: githubClientId, client_secret: githubClientSecret, code, redirect_uri: redirectUri, ...(codeVerifier ? { code_verifier: codeVerifier } : {}) };
+  }
+  const tokenUrl = new URL(tokenEndpoint);
+  if (provider === 'facebook') for (const [key, value] of Object.entries(tokenBody)) tokenUrl.searchParams.set(key, value);
+  const tokenResponse = await fetch(tokenUrl, {
+    method: provider === 'facebook' ? 'GET' : 'POST',
+    headers: { Accept: 'application/json', ...(provider === 'facebook' ? {} : { 'Content-Type': 'application/json' }) },
+    ...(provider === 'facebook' ? { } : { body: JSON.stringify(tokenBody) }),
+  });
+  if (!tokenResponse.ok) throw new Error('El proveedor no pudo validar el inicio de sesión.');
+  const tokenData = await tokenResponse.json() as { access_token?: string; id_token?: string };
+  const accessToken = tokenData.access_token;
+  if (!accessToken) throw new Error('El proveedor no pudo validar el inicio de sesión.');
+  let email = '';
+  let fullName = '';
+
+  if (provider === 'google') {
+    if (!tokenData.id_token) throw new Error('Google no pudo verificar la cuenta.');
+    const ticket = await googleVerifier.verifyIdToken({ idToken: tokenData.id_token, audience: providerClientId });
+    const identity = ticket.getPayload();
+    if (!identity?.email_verified) throw new Error('Google no pudo verificar el correo.');
+    email = identity.email ?? '';
+    fullName = identity.name ?? '';
+  } else if (provider === 'facebook') {
+    const { facebookAppId, facebookAppSecret } = env.socialAuth;
+    if (!facebookAppId || !facebookAppSecret) throw new Error('El acceso con Facebook todavía no está configurado.');
+    const debugUrl = new URL('https://graph.facebook.com/debug_token');
+    debugUrl.searchParams.set('input_token', accessToken);
+    debugUrl.searchParams.set('access_token', `${facebookAppId}|${facebookAppSecret}`);
+    const debugResponse = await fetch(debugUrl);
+    const debug = await debugResponse.json() as { data?: { app_id?: string; user_id?: string; is_valid?: boolean } };
+    if (!debugResponse.ok || !debug.data?.is_valid || debug.data.app_id !== facebookAppId || !debug.data.user_id) throw new Error('Facebook no pudo verificar la cuenta.');
+    const profileResponse = await fetch(`https://graph.facebook.com/me?fields=id,name,email&access_token=${encodeURIComponent(accessToken)}`);
+    const profile = await profileResponse.json() as { id?: string; name?: string; email?: string };
+    if (!profileResponse.ok || profile.id !== debug.data.user_id) throw new Error('Facebook no pudo verificar la cuenta.');
+    email = profile.email ?? '';
+    fullName = profile.name ?? '';
+  } else {
+    const headers = { Authorization: `Bearer ${accessToken}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+    const [profileResponse, emailsResponse] = await Promise.all([
+      fetch('https://api.github.com/user', { headers }), fetch('https://api.github.com/user/emails', { headers }),
+    ]);
+    const profile = await profileResponse.json() as { name?: string; login?: string };
+    const emails = await emailsResponse.json() as Array<{ email?: string; primary?: boolean; verified?: boolean }>;
+    if (!profileResponse.ok || !emailsResponse.ok) throw new Error('GitHub no pudo verificar la cuenta.');
+    email = emails.find((item) => item.primary && item.verified)?.email ?? '';
+    fullName = profile.name || profile.login || '';
+  }
+
+  email = email.trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('El proveedor no devolvió un correo verificado.');
+  const [users] = await database.execute<UserRow[]>(
+    `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.foto_perfil, r.nombre AS rol
+     FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
+     WHERE u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1`, [email],
+  );
+  const user = users[0];
+  if (!user) throw new Error('No hay una cuenta activa con ese correo. Solicitá acceso primero.');
+  const sessionUser: AuthenticatedUser = { id_usuario: user.id_usuario, email: user.email, rol: user.rol };
+  return {
+    accessToken: createAccessToken(sessionUser),
+    refreshToken: createRefreshToken(sessionUser),
+    usuario: { ...sessionUser, nombre: user.nombre || fullName, apellido: user.apellido, foto_perfil: user.foto_perfil },
   };
 }
 

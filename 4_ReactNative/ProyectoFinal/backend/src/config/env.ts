@@ -49,4 +49,12 @@ export const env = {
     mailFrom: process.env.MAIL_FROM?.trim(),
     verificationCodeSecret: process.env.VERIFICATION_CODE_SECRET,
   },
+  socialAuth: {
+    googleClientIds: (process.env.GOOGLE_CLIENT_IDS || process.env.GOOGLE_CLIENT_ID || '').split(',').map((value) => value.trim()).filter(Boolean),
+    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET?.trim(),
+    facebookAppId: process.env.FACEBOOK_APP_ID?.trim(),
+    facebookAppSecret: (process.env.FACEBOOK_APP_SECRET || process.env.FACEBOOK_CLIENT_SECRET)?.trim(),
+    githubClientId: process.env.GITHUB_CLIENT_ID?.trim(),
+    githubClientSecret: process.env.GITHUB_CLIENT_SECRET?.trim(),
+  },
 };

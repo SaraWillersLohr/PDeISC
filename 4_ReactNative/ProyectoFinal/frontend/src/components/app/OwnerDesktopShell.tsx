@@ -32,7 +32,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
   const initials = useMemo(() => `${session?.usuario.nombre?.[0] ?? ''}${session?.usuario.apellido?.[0] ?? ''}`.toUpperCase(), [session]);
   function navigate(key: string): void {
     setMenuOpen(false);
-    if (key === 'inicio') router.navigate('/(app)');
+    if (key === 'inicio') router.navigate('/(app)/home');
     else if (key === 'animales') router.navigate('/(app)/animals');
     else if (key === 'corrales') router.navigate('/(app)/corrals');
     else if (key === 'eventos') router.navigate('/(app)/events');
@@ -53,7 +53,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
       <Text style={style.caption}>GESTIÓN DE CAMPO</Text>
       <ScrollView style={style.navScroll} contentContainerStyle={style.nav}>{visibleSections.map((item) => {
         const routeKey = item.key === 'animales' ? 'animals' : item.key === 'corrales' ? 'corrals' : item.key === 'eventos' ? 'events' : item.key === 'equipo' ? 'team' : item.key === 'perfil' ? 'more' : item.key;
-        const active = item.key === 'inicio' ? pathname === '/' || pathname === '/(app)' : pathname.includes(routeKey);
+        const active = item.key === 'inicio' ? pathname === '/home' || pathname === '/(app)/home' : pathname.includes(routeKey);
         return <Pressable key={item.key} accessibilityRole="button" onPress={() => navigate(item.key)} style={[style.link, active && style.linkActive]}>
           <Ionicons color={active ? '#86efac' : '#d1dfd4'} name={item.icon as keyof typeof Ionicons.glyphMap} size={19} />
           <Text style={[style.linkText, active && style.linkTextActive]}>{item.label}</Text>

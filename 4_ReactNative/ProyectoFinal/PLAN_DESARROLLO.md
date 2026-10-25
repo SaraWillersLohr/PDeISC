@@ -26,7 +26,7 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [ ] implementar permisos para administrador, dueño, peón y veterinario; reemplazar el rol copropietario después de respaldar la base.
 - [ ] implementar solicitudes pendientes de acceso, aprobación administrativa y códigos de activación de un solo uso con vencimiento.
 - [ ] provisionar la primera cuenta como administrador durante la puesta en marcha; después, asociar las solicitudes con la única estancia de la base y dejar la creación/activación de usuarios bajo control administrativo.
-- [ ] incorporar proveedores sociales solo después de configurar las credenciales en el backend.
+- [x] incorporar acceso social con Google, Facebook y GitHub; validar el correo verificado en el backend y permitir solo cuentas activas ya aprobadas.
 
 **resultado:** cada persona accede de forma segura y ve solamente lo permitido por su rol.
 

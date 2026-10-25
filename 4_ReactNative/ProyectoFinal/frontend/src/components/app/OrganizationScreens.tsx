@@ -14,7 +14,15 @@ export function TeamScreen() {
   const [selected, setSelected] = useState<OrganizationUser | null>(null); const [confirmDelete, setConfirmDelete] = useState<OrganizationUser | null>(null); const [busy, setBusy] = useState(false);
   const [name, setName] = useState(''); const [surname, setSurname] = useState(''); const [roleDraft, setRoleDraft] = useState('peon');
   const load = useCallback(async () => { if (!session) return; try { setUsers(await listOrganizationUsers(session)); setError(''); } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo cargar el equipo.'); } finally { setLoading(false); } }, [session]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    listOrganizationUsers(session)
+      .then((result) => { if (active) { setUsers(result); setError(''); } })
+      .catch((e: unknown) => { if (active) setError(e instanceof Error ? e.message : 'No se pudo cargar el equipo.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [session]);
   async function saveUser(): Promise<void> { if (!session || !selected || !name.trim() || !surname.trim()) { setError('Completá nombre y apellido.'); return; } setBusy(true); try { await updateOrganizationUser(session, { ...selected, nombre: name.trim(), apellido: surname.trim() }, roleDraft); setSelected(null); await load(); } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo editar el usuario.'); } finally { setBusy(false); } }
   async function remove(): Promise<void> { if (!session || !confirmDelete) return; setBusy(true); try { await deactivateOrganizationUser(session, confirmDelete.id_usuario); setConfirmDelete(null); await load(); } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo dar de baja el usuario.'); } finally { setBusy(false); } }
   return <Screen title="Equipo de la estancia">{error ? <Text style={st.error}>{error}</Text> : null}{loading ? <ActivityIndicator color={p.green} /> : users.map((user) => <View key={user.id_usuario} style={st.card}><View style={st.row}><View style={{ flex: 1 }}><Text style={st.title}>{user.nombre} {user.apellido}</Text><Text style={st.copy}>{user.email}</Text></View><Text style={st.badge}>{user.activo ? user.rol : 'inactivo'}</Text></View>{admin ? <View style={st.row}><Pressable onPress={() => { setSelected(user); setName(user.nombre); setSurname(user.apellido); setRoleDraft(user.rol); }} style={st.secondary}><Text style={st.secondaryText}>Editar usuario</Text></Pressable>{user.id_usuario !== session?.usuario.id_usuario ? <Pressable onPress={() => setConfirmDelete(user)} style={st.danger}><Text style={st.dangerText}>Dar de baja</Text></Pressable> : null}</View> : null}</View>)}
@@ -28,7 +36,15 @@ export function CatalogScreen() {
   const [data, setData] = useState<CatalogData>({ especies: [], razas: [], pendientes: [] }); const [kind, setKind] = useState<'especie'|'raza'>('especie');
   const [name, setName] = useState(''); const [speciesId, setSpeciesId] = useState(''); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
   const load = useCallback(async () => { if (!session) return; try { setData(await listCatalog(session)); setError(''); } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo cargar el catálogo.'); } finally { setLoading(false); } }, [session]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    listCatalog(session)
+      .then((result) => { if (active) { setData(result); setError(''); } })
+      .catch((e: unknown) => { if (active) setError(e instanceof Error ? e.message : 'No se pudo cargar el catálogo.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [session]);
   async function submit(): Promise<void> { if (!session || !name.trim() || (kind === 'raza' && !Number(speciesId))) { setError('Completá el nombre y, para una raza, el ID de especie.'); return; } try { await requestCatalog(session, kind, name.trim(), kind === 'raza' ? Number(speciesId) : undefined); setName(''); setSpeciesId(''); await load(); setError('Solicitud enviada para aprobación.'); } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo enviar.'); } }
   async function decide(id: number, decision: 'aprobar'|'rechazar'): Promise<void> { if (!session) return; try { await reviewCatalog(session, id, decision); await load(); } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo revisar la solicitud.'); } }
   return <Screen title="Especies y razas">{error ? <Text style={st.error}>{error}</Text> : null}{loading ? <ActivityIndicator color={p.green} /> : <><View style={st.card}><Text style={st.title}>Catálogo aprobado</Text>{data.especies.map((species) => <View key={species.id_especie} style={st.catalogRow}><Text style={st.copy}>{species.nombre}</Text><Text style={st.copy}>{data.razas.filter((breed) => breed.id_especie === species.id_especie).map((breed) => breed.nombre).join(', ') || 'Sin razas'}</Text></View>)}</View>

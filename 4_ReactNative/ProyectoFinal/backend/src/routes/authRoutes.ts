@@ -6,6 +6,7 @@ import { requireAuthentication } from '../middleware/authMiddleware.js';
 export const authRouter = Router();
 
 authRouter.post('/login', authController.login);
+authRouter.post('/social/:provider', authController.socialLogin);
 authRouter.post('/refresh', authController.refresh);
 authRouter.post('/register', authController.register);
 authRouter.post('/verify-email', authController.verifyRegistrationEmail);

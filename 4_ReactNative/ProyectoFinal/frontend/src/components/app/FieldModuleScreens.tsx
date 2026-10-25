@@ -20,7 +20,22 @@ export function TasksManagerScreen() {
   const [rows, setRows] = useState<TaskRecord[]>([]); const [users, setUsers] = useState<OrganizationUser[]>([]); const [responsible, setResponsible] = useState<number | null>(null); const [title, setTitle] = useState(''); const [notes, setNotes] = useState('');
   const [due, setDue] = useState(''); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
   const load = useCallback(async () => { if (!session) return; try { const [tasks, members] = await Promise.all([listTasks(session), admin ? listOrganizationUsers(session) : Promise.resolve([])]); setRows(tasks); setUsers(members); const fieldUsers = members.filter((user) => user.rol === 'peon' && user.activo); setResponsible((current) => current ?? fieldUsers[0]?.id_usuario ?? null); setMessage(''); } catch (e) { setMessage(e instanceof Error ? e.message : 'No se pudieron cargar las tareas.'); } finally { setLoading(false); } }, [session, admin]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    Promise.all([listTasks(session), admin ? listOrganizationUsers(session) : Promise.resolve([])])
+      .then(([tasks, members]) => {
+        if (!active) return;
+        setRows(tasks);
+        setUsers(members);
+        const fieldUsers = members.filter((user) => user.rol === 'peon' && user.activo);
+        setResponsible((current) => current ?? fieldUsers[0]?.id_usuario ?? null);
+        setMessage('');
+      })
+      .catch((e: unknown) => { if (active) setMessage(e instanceof Error ? e.message : 'No se pudieron cargar las tareas.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [session, admin]);
   async function add(): Promise<void> { if (!session || !title.trim() || !responsible) { setMessage('Escribí un título y asigná la tarea a un peón activo.'); return; } setSaving(true); try { await createTask(session, { titulo: title.trim(), descripcion: notes.trim(), id_responsable: responsible, ...(due ? { fecha_vencimiento: due } : {}) }); setTitle(''); setNotes(''); setDue(''); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : 'No se pudo crear la tarea.'); } finally { setSaving(false); } }
   async function change(row: TaskRecord): Promise<void> { if (!session) return; const next = row.estado === 'pendiente' ? 'en_progreso' : row.estado === 'en_progreso' ? 'completada' : 'pendiente'; try { await updateTask(session, row.id_tarea, next); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : 'No se pudo actualizar la tarea.'); } }
   return <Frame title="Tareas" subtitle="Trabajo del equipo">
@@ -35,7 +50,15 @@ export function ReproductionScreen() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); const [method, setMethod] = useState('Monta natural'); const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true); const [message, setMessage] = useState(''); const [saving, setSaving] = useState(false);
   const load = useCallback(async () => { if (!session) return; try { setData(await listReproduction(session)); setMessage(''); } catch (e) { setMessage(e instanceof Error ? e.message : 'No se pudo cargar reproducción.'); } finally { setLoading(false); } }, [session]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    listReproduction(session)
+      .then((result) => { if (active) { setData(result); setMessage(''); } })
+      .catch((e: unknown) => { if (active) setMessage(e instanceof Error ? e.message : 'No se pudo cargar reproducción.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [session]);
   async function addService(): Promise<void> { if (!session || !Number(mother) || (!Number(father) && !fatherName.trim())) { setMessage('Indicá la madre y el padre, por ID o nombre informado.'); return; } setSaving(true); try { await createMatingService(session, { id_madre: Number(mother), ...(Number(father) ? { id_padre: Number(father) } : { padre_texto: fatherName.trim() }), fecha: date, metodo: method, observaciones: notes }); setMother(''); setFather(''); setFatherName(''); setNotes(''); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : 'No se pudo registrar el servicio.'); } finally { setSaving(false); } }
   return <Frame title="Reproducción" subtitle="Servicios y nacimientos">
     <View style={s.card}><Text style={s.cardTitle}>Registrar servicio de monta</Text><TextInput keyboardType="number-pad" onChangeText={setMother} placeholder="ID de la madre" style={s.input} value={mother} /><TextInput keyboardType="number-pad" onChangeText={setFather} placeholder="ID del padre (si está registrado)" style={s.input} value={father} /><TextInput onChangeText={setFatherName} placeholder="Nombre del padre si no está registrado" style={s.input} value={fatherName} /><TextInput onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" style={s.input} value={date} /><TextInput onChangeText={setMethod} placeholder="Método" style={s.input} value={method} /><TextInput onChangeText={setNotes} placeholder="Observaciones" style={s.input} value={notes} /><Pressable disabled={saving} onPress={() => void addService()} style={s.primary}><Text style={s.primaryText}>{saving ? 'Guardando…' : 'Guardar servicio'}</Text></Pressable></View>
@@ -55,7 +78,15 @@ export function MapAreasScreen() {
   const [areas, setAreas] = useState<MapArea[]>([]); const [selected, setSelected] = useState<MapArea | null>(null); const [pointsText, setPointsText] = useState('');
   const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
   const load = useCallback(async () => { if (!session) return; try { setAreas(await listMapAreas(session)); setMessage(''); } catch (e) { setMessage(e instanceof Error ? e.message : 'No se pudo cargar el mapa.'); } finally { setLoading(false); } }, [session]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    listMapAreas(session)
+      .then((result) => { if (active) { setAreas(result); setMessage(''); } })
+      .catch((e: unknown) => { if (active) setMessage(e instanceof Error ? e.message : 'No se pudo cargar el mapa.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [session]);
   function select(area: MapArea): void { setSelected(area); const points = typeof area.puntos_mapa === 'string' ? JSON.parse(area.puntos_mapa) as MapPoint[] : area.puntos_mapa ?? []; setPointsText(points.map((p) => `${p.lat}, ${p.lon}`).join('\n')); }
   async function save(): Promise<void> {
     if (!session || !selected) return;

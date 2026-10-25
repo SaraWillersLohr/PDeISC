@@ -12,17 +12,23 @@ export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { vi
   const [species, setSpecies] = useState<Species[]>([]); const [breeds, setBreeds] = useState<Breed[]>([]);
   const [speciesId, setSpeciesId] = useState<number | null>(null); const [breedId, setBreedId] = useState<number | null>(null); const [corralId, setCorralId] = useState<number | null>(null);
   const [identifier, setIdentifier] = useState(''); const [name, setName] = useState(''); const [birth, setBirth] = useState(''); const [weight, setWeight] = useState('');
-  const [loading, setLoading] = useState(false); const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
   const availableBreeds = useMemo(() => breeds.filter((breed) => breed.id_especie === speciesId), [breeds, speciesId]);
 
   useEffect(() => {
     if (!visible || !session) return;
-    let active = true; setLoading(true); setMessage('');
+    let active = true;
     listCatalog(session).then((catalog) => { if (active) { setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId(catalog.especies[0]?.id_especie ?? null); setBreedId(null); setCorralId(corrals[0]?.id_corral ?? null); } })
       .catch((cause: unknown) => { if (active) setMessage(cause instanceof Error ? cause.message : 'No se pudo cargar el catálogo.'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [visible, session, corrals]);
+
+  function close(): void {
+    setLoading(true);
+    setMessage('');
+    onClose();
+  }
 
   async function save(): Promise<void> {
     if (!session || !identifier.trim() || !breedId || !corralId || (birth && !/^\d{4}-\d{2}-\d{2}$/.test(birth)) || (weight && (!Number.isFinite(Number(weight)) || Number(weight) <= 0))) {
@@ -31,12 +37,12 @@ export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { vi
     setSaving(true); setMessage('');
     try {
       await createAnimal(session, { identificador: identifier.trim(), nombre: name.trim() || undefined, id_raza: breedId, id_corral: corralId, fecha_nacimiento: birth || undefined, peso_kg: weight ? Number(weight) : undefined });
-      setIdentifier(''); setName(''); setBirth(''); setWeight(''); onCreated(); onClose();
+      setIdentifier(''); setName(''); setBirth(''); setWeight(''); onCreated(); close();
     } catch (cause) { setMessage(cause instanceof Error ? cause.message : 'No se pudo registrar el animal.'); }
     finally { setSaving(false); }
   }
 
-  return <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
+  return <Modal animationType="fade" onRequestClose={close} transparent visible={visible}>
     <View style={s.backdrop}><View style={s.modal}><ScrollView keyboardShouldPersistTaps="handled"><Text style={s.title}>Agregar animal</Text>
       {loading ? <ActivityIndicator color={colors.green} /> : <>
         <Text style={s.label}>ESPECIE</Text><View style={s.options}>{species.map((item) => <Pressable key={item.id_especie} onPress={() => { setSpeciesId(item.id_especie); setBreedId(null); }} style={[s.option, speciesId === item.id_especie && s.selected]}><Text style={[s.optionText, speciesId === item.id_especie && s.selectedText]}>{item.nombre}</Text></Pressable>)}</View>
@@ -48,7 +54,7 @@ export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { vi
         <Text style={s.label}>CORRAL ASIGNADO</Text><View style={s.options}>{corrals.filter((item) => !item.es_enfermeria).map((item) => <Pressable key={item.id_corral} onPress={() => setCorralId(item.id_corral)} style={[s.option, corralId === item.id_corral && s.selected]}><Text style={[s.optionText, corralId === item.id_corral && s.selectedText]}>{item.nombre} · {item.ocupacion}/{item.capacidad}</Text></Pressable>)}</View>
       </>}
       {message ? <Text style={s.error}>{message}</Text> : null}
-      <View style={s.actions}><Pressable onPress={onClose} style={s.cancel}><Text style={s.cancelText}>Cancelar</Text></Pressable><Pressable disabled={saving || loading} onPress={() => void save()} style={[s.save, (saving || loading) && s.disabled]}><Text style={s.saveText}>{saving ? 'Guardando…' : 'Guardar animal'}</Text></Pressable></View>
+      <View style={s.actions}><Pressable onPress={close} style={s.cancel}><Text style={s.cancelText}>Cancelar</Text></Pressable><Pressable disabled={saving || loading} onPress={() => void save()} style={[s.save, (saving || loading) && s.disabled]}><Text style={s.saveText}>{saving ? 'Guardando…' : 'Guardar animal'}</Text></Pressable></View>
     </ScrollView></View></View>
   </Modal>;
 }

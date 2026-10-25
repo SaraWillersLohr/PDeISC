@@ -1,12 +1,13 @@
 // ingreso principal; el fondo verde ocupa toda la pantalla y la tarjeta mantiene el formulario legible.
 import NetInfo from '@react-native-community/netinfo';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BrandWordmark } from '../components/BrandWordmark';
 import { BrandLoadingScreen } from '../components/BrandLoadingScreen';
+import { SocialLoginButton } from '../components/SocialLoginButton';
 import { useSession } from '../context/SessionContext';
 import { initializeOfflineDatabase } from '../services/offlineDatabase';
 import { login } from '../services/authApi';
@@ -33,10 +34,6 @@ export default function LoginScreen() {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    if (!restoring && session) router.replace('/(app)');
-  }, [restoring, session]);
-
   async function submit(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) { setError('Ingresá un correo electrónico válido.'); return; }
@@ -47,13 +44,18 @@ export default function LoginScreen() {
       if (remember) await saveSession(nextSession); else await removeSession();
       setSession(nextSession);
       setPassword('');
-      router.replace('/(app)');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo iniciar sesión. Revisá tus datos e intentá de nuevo.');
     } finally { setBusy(false); }
   }
 
-  if (restoring || session) return <BrandLoadingScreen />;
+  async function acceptSocialSession(nextSession: import('../types/auth').Session): Promise<void> {
+    if (remember) await saveSession(nextSession); else await removeSession();
+    setSession(nextSession);
+  }
+
+  if (restoring) return <BrandLoadingScreen />;
+  if (session) return <Redirect href="/(app)/home" />;
 
   return (
     <SafeAreaView style={s.safe}>
@@ -101,6 +103,13 @@ export default function LoginScreen() {
                 {busy ? <ActivityIndicator color={forest} /> : <Text style={s.primaryText}>Ingresar <Text style={s.arrow}>→</Text></Text>}
               </Pressable>
 
+              <View style={s.socialDivider}><View style={s.dividerLine} /><Text style={s.dividerText}>O CONTINUÁ CON</Text><View style={s.dividerLine} /></View>
+              <View style={s.socialButtons}>
+                <SocialLoginButton provider="google" disabled={busy || !online} onError={setError} onSuccess={acceptSocialSession} />
+                <SocialLoginButton provider="facebook" disabled={busy || !online} onError={setError} onSuccess={acceptSocialSession} />
+                <SocialLoginButton provider="github" disabled={busy || !online} onError={setError} onSuccess={acceptSocialSession} />
+              </View>
+
               <View style={s.links}>
                 <Text style={s.joinText}>¿Todavía no tenés cuenta?</Text>
                 <Pressable accessibilityRole="link" onPress={() => router.push('/register')}><Text style={s.link}>Solicitar acceso</Text></Pressable>
@@ -139,6 +148,8 @@ const s = StyleSheet.create({
   error: { backgroundColor: '#fff0ed', borderRadius: 10, color: '#9b3d36', fontSize: 12, lineHeight: 18, marginTop: 15, padding: 11 },
   primary: { alignItems: 'center', alignSelf: 'stretch', backgroundColor: '#dcefc2', borderRadius: 999, height: 56, justifyContent: 'center', marginTop: 24, width: '100%' }, disabled: { opacity: 0.7 },
   primaryText: { color: '#214d35', fontSize: 15, fontWeight: '800' }, arrow: { fontSize: 18 },
+  socialDivider: { alignItems: 'center', flexDirection: 'row', gap: 11, marginTop: 22 }, dividerLine: { backgroundColor: '#e7ebe6', flex: 1, height: 1 }, dividerText: { color: '#89938b', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  socialButtons: { alignItems: 'center', flexDirection: 'row', gap: 16, justifyContent: 'center', marginTop: 16 },
   links: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 5, justifyContent: 'center', marginTop: 27 }, joinText: { color: '#778179', fontSize: 12 }, link: { color: '#214d35', fontSize: 12, fontWeight: '800' },
   accessLink: { alignSelf: 'center', paddingHorizontal: 8, paddingVertical: 14 }, accessText: { color: '#627068', fontSize: 11, textAlign: 'center' },
   footer: { color: '#839087', fontSize: 11, marginTop: 43, textAlign: 'center' },

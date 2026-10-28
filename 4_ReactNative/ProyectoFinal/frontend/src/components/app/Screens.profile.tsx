@@ -10,6 +10,7 @@ import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
 import { removeSession, saveSession } from '../../services/sessionStorage';
 import { changeMyPassword, updateMyProfile } from '../../services/authApi';
+import { PasswordInput } from '../PasswordInput';
 import { normalizeRole , Page , Header , roleLabel } from './Screens.shared';
 import { s } from './ScreensStyles';
 
@@ -139,31 +140,34 @@ export function MoreScreen() {
           <Text style={[s.formHelp, { color: colors.textMuted }]}>Para proteger tu acceso, primero ingresá tu contraseña actual.</Text>
 
           <Text style={[s.formLabel, { color: colors.textMuted }]}>CONTRASEÑA ACTUAL</Text>
-          <TextInput
+          <PasswordInput
+            accessibilityLabel="Contraseña actual"
             autoCapitalize="none"
             onChangeText={setCurrentPassword}
-            secureTextEntry
-            style={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
+            containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
+            inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
             value={currentPassword}
           />
 
           <Text style={[s.formLabel, { color: colors.textMuted }]}>CONTRASEÑA NUEVA</Text>
-          <TextInput
+          <PasswordInput
+            accessibilityLabel="Contraseña nueva"
             autoCapitalize="none"
             onChangeText={setNewPassword}
             placeholder="Al menos 10 caracteres"
+            containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
+            inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
             placeholderTextColor={colors.textMuted}
-            secureTextEntry
-            style={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
             value={newPassword}
           />
 
           <Text style={[s.formLabel, { color: colors.textMuted }]}>REPETIR CONTRASEÑA</Text>
-          <TextInput
+          <PasswordInput
+            accessibilityLabel="Repetir contraseña nueva"
             autoCapitalize="none"
             onChangeText={setConfirmPassword}
-            secureTextEntry
-            style={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
+            containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
+            inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
             value={confirmPassword}
           />
 

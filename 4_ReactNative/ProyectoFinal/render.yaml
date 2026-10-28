@@ -5,7 +5,8 @@ services:
     runtime: node
     plan: free
     region: ohio
-    rootDir: backend
+    # Ruta relativa a la raíz del repositorio monorepo PDeISC.
+    rootDir: 4_ReactNative/ProyectoFinal/backend
     buildCommand: npm ci --include=dev && npm run build && npm run db:migrate
     startCommand: npm start
     healthCheckPath: /api/health

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { router } from 'expo-router';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { requestAccount } from '../services/authApi';
+import { PasswordInput } from './PasswordInput';
 
 type Props = { visible: boolean; onClose: () => void };
 
@@ -48,8 +49,8 @@ export function AccountRequestModal({ visible, onClose }: Props) {
           <Text style={s.label}>CORREO ELECTRÓNICO</Text>
           <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
           <View style={s.row}>
-            <View style={s.half}><Text style={s.label}>CONTRASEÑA</Text><TextInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" secureTextEntry style={s.input} value={password} /></View>
-            <View style={s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><TextInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" secureTextEntry style={s.input} value={confirm} /></View>
+            <View style={s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /></View>
+            <View style={s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></View>
           </View>
           {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Enviar solicitud</Text>}</Pressable>
@@ -74,6 +75,7 @@ const s = StyleSheet.create({
   half: { flex: 1, minWidth: 0 },
   label: { color: '#626e63', fontSize: 8, fontWeight: '800', letterSpacing: 0.7, marginBottom: 4, marginTop: 8 },
   input: { backgroundColor: '#fff', borderColor: '#e3e8e1', borderRadius: 9, borderWidth: 1, color: '#202c23', fontSize: 13, height: 42, paddingHorizontal: 10, width: '100%' },
+  passwordText: { color: '#202c23', fontSize: 13, height: 42, paddingLeft: 10 },
   error: { backgroundColor: '#fff0ed', borderRadius: 8, color: '#9b3d36', fontSize: 10, lineHeight: 14, marginTop: 8, padding: 8 },
   primary: { alignItems: 'center', backgroundColor: '#214d35', borderRadius: 10, height: 44, justifyContent: 'center', marginTop: 14 },
   disabled: { opacity: 0.7 },

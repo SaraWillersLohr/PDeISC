@@ -12,5 +12,6 @@ export interface Usuario {
 export interface Session {
   accessToken: string;
   refreshToken: string;
+  accessTokenExpiresAt?: number;
   usuario: Usuario;
 }

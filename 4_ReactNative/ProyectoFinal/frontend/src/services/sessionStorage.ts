@@ -14,6 +14,14 @@ export async function saveSession(session: Session): Promise<void> {
   await SecureStore.setItemAsync(sessionKey, JSON.stringify(session));
 }
 
+// actualizo tokens renovados solo si la persona eligió persistir su sesión.
+export async function updateStoredSessionIfPresent(session: Session): Promise<void> {
+  const stored = Platform.OS === 'web'
+    ? globalThis.localStorage.getItem(sessionKey)
+    : await SecureStore.getItemAsync(sessionKey);
+  if (stored) await saveSession(session);
+}
+
 // recupero la sesión previamente guardada cuando se vuelve a abrir la app.
 export async function getSession(): Promise<Session | null> {
   const serializedSession = Platform.OS === 'web'

@@ -1,3 +1,4 @@
+// muestro el logotipo correspondiente al fondo claro u oscuro de la pantalla.
 import { Image, type ImageStyle, StyleSheet, type StyleProp, View, type ViewStyle } from 'react-native';
 
 const logos = {

@@ -1,3 +1,4 @@
+// presento el cambio entre tema claro y oscuro en los formatos que usa la navegación.
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../context/ThemeContext';

@@ -1,0 +1,218 @@
+import * as authService from '../services/authService.js';
+import * as registrationService from '../services/registrationService.js';
+// distingo una falla de mysql de un error causado por los datos enviados.
+function isDatabaseFailure(error) {
+    const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : '';
+    return /^(ER_|ECONN|ETIMEDOUT|PROTOCOL|EHOST|ENET|QUEUE_LIMIT)/.test(code);
+}
+// convierto las operaciones del registro en respuestas http consistentes.
+async function handleRegistrationAction(action, res, successMessage) {
+    try {
+        const data = await action();
+        res.status(200).json({ message: successMessage, data });
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        const message = error instanceof Error ? error.message : 'no se pudo completar la solicitud';
+        res.status(400).json({ message });
+    }
+}
+// recibo una solicitud de acceso para la estancia asociada a esta instalación.
+export async function register(req, res) {
+    await handleRegistrationAction(() => registrationService.createRegistrationRequest(req.body), res, 'solicitud creada; revisá tu correo para verificarlo');
+}
+// verifico el correo y dejo la solicitud disponible para la aprobación del administrador.
+export async function verifyRegistrationEmail(req, res) {
+    const { email, code } = req.body;
+    if (!email?.trim() || !code) {
+        res.status(400).json({ message: 'completá el correo y el código de seis dígitos' });
+        return;
+    }
+    await handleRegistrationAction(() => registrationService.verifyRegistrationEmail(email, code), res, 'correo verificado; la solicitud espera aprobación administrativa');
+}
+// reenvío el código para solicitudes que todavía no verificaron el correo.
+export async function resendRegistrationCode(req, res) {
+    const { email } = req.body;
+    if (!email?.trim()) {
+        res.status(400).json({ message: 'el correo es obligatorio' });
+        return;
+    }
+    await handleRegistrationAction(() => registrationService.resendRegistrationCode(email), res, 'si hay una solicitud pendiente, enviaremos otro código');
+}
+// canjeo el código aprobado y devuelvo una sesión de usuario activa.
+export async function redeemAccessCode(req, res) {
+    const { email, code } = req.body;
+    if (!email?.trim() || !code) {
+        res.status(400).json({ message: 'completá el correo y el código de seis dígitos' });
+        return;
+    }
+    await handleRegistrationAction(() => registrationService.redeemAccessCode(email, code), res, 'acceso activado');
+}
+// solicito el reenvío del código sin revelar si el correo tiene una cuenta pendiente.
+export async function resendAccessCode(req, res) {
+    const { email } = req.body;
+    if (!email?.trim()) {
+        res.status(400).json({ message: 'el correo es obligatorio' });
+        return;
+    }
+    await handleRegistrationAction(() => registrationService.resendAccessCode(email), res, 'si el acceso fue aprobado y sigue pendiente, enviaremos un nuevo código');
+}
+// solicito un código sin revelar si el correo corresponde a una cuenta activa.
+export async function requestPasswordRecovery(req, res) {
+    const email = typeof req.body?.email === 'string' ? req.body.email : '';
+    try {
+        await authService.requestPasswordRecovery(email);
+    }
+    catch (error) {
+        const detail = error instanceof Error ? error.message : 'error desconocido';
+        console.error(`[auth] No se pudo completar una solicitud de recuperación: ${detail}`);
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'no se pudo consultar la base de datos; intentá nuevamente en unos segundos' });
+            return;
+        }
+    }
+    res.status(202).json({ message: 'Si la cuenta puede recuperar el acceso, enviaremos un código al correo indicado.' });
+}
+// verifico el código enviado por correo y entrego un permiso de cambio de contraseña.
+export async function redeemPasswordRecoveryCode(req, res) {
+    try {
+        const { email, code } = req.body;
+        if (!email?.trim() || !code) {
+            res.status(400).json({ message: 'Completá el correo y el código de seis dígitos.' });
+            return;
+        }
+        const data = await authService.redeemPasswordRecoveryCode(email, code);
+        res.json({ message: 'Código válido. Ahora elegí una contraseña nueva.', data });
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        res.status(400).json({ message: 'El correo o el código no son válidos, no corresponden a una cuenta activa o el código venció.' });
+    }
+}
+// cambio la contraseña con el permiso temporal y devuelvo la sesión iniciada.
+export async function completePasswordRecovery(req, res) {
+    try {
+        const { resetToken, password } = req.body;
+        if (!resetToken || !password) {
+            res.status(400).json({ message: 'Ingresá el código válido y la contraseña nueva.' });
+            return;
+        }
+        const data = await authService.completePasswordRecovery(resetToken, password);
+        res.json({ message: 'Contraseña actualizada. Iniciaste sesión.', data });
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        const raw = error instanceof Error ? error.message : '';
+        const message = raw.includes('entre 10 y 72 bytes') ? raw : 'El código venció o ya fue usado. Solicitá uno nuevo e intentá otra vez.';
+        res.status(400).json({ message });
+    }
+}
+// proceso el inicio de sesión y devuelvo tokens jwt al cliente móvil.
+export async function login(req, res) {
+    const { email, password } = req.body;
+    if (!email?.trim() || !password) {
+        res.status(400).json({ message: 'el correo y la contraseña son obligatorios' });
+        return;
+    }
+    try {
+        const session = await authService.login({ email, password });
+        res.status(200).json(session);
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        const message = error instanceof Error ? error.message : 'no se pudo iniciar sesión';
+        res.status(401).json({ message });
+    }
+}
+// verifico credenciales OAuth con el proveedor y solo habilito cuentas ya aprobadas.
+export async function socialLogin(req, res) {
+    const provider = Array.isArray(req.params.provider) ? req.params.provider[0] : req.params.provider;
+    const { code, redirectUri, codeVerifier, clientId } = req.body;
+    if (!['google', 'facebook', 'github'].includes(provider) || typeof code !== 'string' || !code.trim()) {
+        res.status(400).json({ message: 'El proveedor o la credencial no son válidos.' });
+        return;
+    }
+    try {
+        const session = await authService.loginWithSocial(provider, code, redirectUri, codeVerifier, clientId);
+        res.status(200).json(session);
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión con el proveedor.';
+        res.status(401).json({ message });
+    }
+}
+// renuevo la sesión cuando el token de acceso dejó de ser válido.
+export async function refresh(req, res) {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        res.status(400).json({ message: 'se requiere el token de renovación' });
+        return;
+    }
+    try {
+        res.status(200).json(await authService.refresh(refreshToken));
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        res.status(401).json({ message: 'la sesión no puede renovarse' });
+    }
+}
+// devuelvo el usuario autenticado para restaurar la sesión en la app.
+export function me(req, res) {
+    res.status(200).json({ usuario: req.usuario });
+}
+// permito que cualquier usuario autenticado actualice sus propios datos visibles.
+export async function updateProfile(req, res) {
+    try {
+        if (!req.usuario) {
+            res.status(401).json({ message: 'se requiere autenticación' });
+            return;
+        }
+        const data = await authService.updateProfile(req.usuario.id_usuario, req.body);
+        res.json({ message: 'Perfil actualizado.', data });
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        res.status(400).json({ message: error instanceof Error ? error.message : 'No se pudo actualizar el perfil.' });
+    }
+}
+// cambio la contraseña solo después de validar la contraseña vigente.
+export async function changePassword(req, res) {
+    try {
+        if (!req.usuario) {
+            res.status(401).json({ message: 'se requiere autenticación' });
+            return;
+        }
+        const { currentPassword, newPassword } = req.body;
+        await authService.changePassword(req.usuario.id_usuario, currentPassword ?? '', newPassword ?? '');
+        res.json({ message: 'Contraseña actualizada.' });
+    }
+    catch (error) {
+        if (isDatabaseFailure(error)) {
+            res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+            return;
+        }
+        res.status(400).json({ message: error instanceof Error ? error.message : 'No se pudo cambiar la contraseña.' });
+    }
+}

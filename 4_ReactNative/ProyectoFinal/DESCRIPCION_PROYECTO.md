@@ -22,7 +22,7 @@ Trabaja sobre la operación diaria: consulta y edita animales, registra pesajes 
 
 ### veterinario
 
-Solo accede a los animales que están en el corral de enfermería. Para esos animales puede consultar el historial clínico y registrar tratamientos, controles y altas. El alta veterinaria cambia el estado sanitario y genera un aviso al peón, pero no mueve al animal: permanece en enfermería hasta que el peón realiza y registra el traslado físico al corral de destino.
+Solo accede a los animales que están en el corral de enfermería. Para esos animales puede consultar el historial clínico y registrar tratamientos, controles y altas. El alta veterinaria cambia inmediatamente el estado sanitario a sano y genera un aviso al peón, pero no mueve al animal: permanece en enfermería hasta que el peón realiza y registra el traslado físico al corral de destino.
 
 ### solicitudes de acceso
 
@@ -42,11 +42,10 @@ La navegación principal se adapta al dispositivo: en teléfonos usa una barra i
 4. tareas
 5. sanidad
 6. reproducción
-7. mapa
-8. eventos
-9. avisos
-10. equipo
-11. perfil
+7. eventos
+8. avisos
+9. equipo
+10. perfil
 
 Las secciones no autorizadas se ocultan. Las acciones avanzadas se muestran dentro del contexto correcto, en vez de llenar el panel con botones.
 
@@ -66,18 +65,18 @@ Los resultados de reproducción se consultan en la ficha e historial de cada ani
 
 La sección permite buscar, filtrar y abrir la ficha de cada animal. Los filtros incluyen especie, raza, corral, estado sanitario y condición de actividad.
 
-La ficha muestra identificador, nombre opcional, raza, fecha de nacimiento, edad calculada, peso vigente, corral o potrero actual, estado sanitario, fotografías, historial y alertas. La caravana/identificador se ingresa manualmente y es obligatoria; la fecha de nacimiento y el peso inicial son opcionales. El peón registra pesajes, traslados, servicios de monta y reportes sanitarios. El veterinario solo accede a fichas de animales ubicados en enfermería.
+La ficha muestra identificador, nombre opcional, raza, fecha de nacimiento, edad calculada, peso vigente, corral o potrero actual, estado sanitario, fotografías, historial y alertas. La caravana/identificador se ingresa manualmente y es obligatoria; la fecha de nacimiento y el peso inicial son opcionales. Desde la ficha, el peón puede reportar una enfermedad e ingresar al animal a enfermería en una sola operación, o notificar una muerte con ubicación GPS obligatoria y foto y observaciones opcionales. El veterinario solo accede a fichas de animales ubicados en enfermería.
 
-Un nacimiento crea el registro de la cría y exige informar madre y padre. Cada progenitor se vincula con un animal de la estancia o se consigna en texto si no figura en el sistema; la madre debe ser una hembra de la misma especie y el padre puede venir de un servicio registrado o de un reproductor externo. Una muerte se registra como evento trazable con fecha, causa si se conoce y corral, potrero o coordenada del hallazgo. La baja operativa es inmediata para impedir nuevos movimientos o servicios; el reporte queda pendiente de revisión del administrador y nunca borra la ficha ni su historial. Al confirmar la muerte, el estado del animal queda como fallecido. Si el administrador rechaza el reporte, el animal se reactiva y el reporte rechazado permanece en la auditoría con responsable, fecha y motivo.
+Un nacimiento crea el registro de la cría y exige informar madre y padre. Cada progenitor se vincula con un animal de la estancia o se consigna en texto si no figura en el sistema; la madre debe ser una hembra de la misma especie y el padre puede venir de un servicio registrado o de un reproductor externo. Una muerte se registra como evento trazable con fecha, coordenadas GPS obligatorias y causa y foto opcionales. La baja operativa es inmediata para impedir nuevos movimientos o servicios y nunca borra la ficha ni su historial. La muerte informada por el peón queda pendiente de revisión administrativa; si se rechaza el reporte, el animal se reactiva y el reporte rechazado permanece en la auditoría. La muerte registrada por el dueño desde la ficha queda confirmada directamente.
 
-Todo dato gestionado por la app se puede modificar y dar de baja cuando corresponda, respetando permisos por rol y validaciones del campo. Las bajas son lógicas: no borran físicamente registros que tengan historial, filiación, movimientos o auditoría asociada. Cada cambio y baja registra quién la hizo, cuándo y, cuando corresponda, el motivo. La baja de un animal exige motivo `muerte` o `venta`; la muerte sigue el flujo de reporte y revisión descrito arriba, y la venta la registra el dueño o administrador con fecha obligatoria y comprador y precio opcionales. Si se rechaza un reporte de muerte, el animal se reactiva y el reporte permanece en el historial. Los corrales pueden darse de baja por dueño o administrador solo después de trasladar todos sus animales y resolver dependencias activas. Los usuarios pueden ser editados o dados de baja por el administrador; las acciones históricas conservan su autor original.
-La ubicación operativa de un animal se deriva del último movimiento confirmado al corral o potrero asignado. No se guarda un punto GPS individual de cada animal. El punto GPS individual se toma únicamente al reportar una muerte, para ubicar el lugar del hallazgo; los puntos GPS del perímetro del corral se guardan como geometría fija del mapa.
+Todo dato gestionado por la app se puede modificar y dar de baja cuando corresponda, respetando permisos por rol y validaciones del campo. El dueño puede dar de baja un animal desde su ficha por venta, muerte u otro motivo, con detalle opcional; la ficha y el historial se conservan y el animal deja el inventario activo. La muerte registrada por el dueño queda confirmada en el registro de muertes, mientras que los reportes del peón siguen sujetos a revisión administrativa. El tablero muestra ventas y muertes confirmadas del año. El dueño también puede borrar permanentemente registros de reproducción, razas y especies después de confirmar en un modal; las razas o especies asociadas a animales no se pueden borrar. Cada cambio y baja registra quién la hizo, cuándo y, cuando corresponda, el motivo. Los corrales pueden darse de baja por dueño o administrador solo después de trasladar todos sus animales y resolver dependencias activas. Los usuarios pueden ser editados o dados de baja por el administrador; las acciones históricas conservan su autor original.
+La ubicación operativa de un animal se deriva del último movimiento confirmado al corral asignado. No se rastrea al animal. Al notificar una muerte se captura obligatoriamente un punto GPS para ubicar el hallazgo; la app no guarda perímetros ni muestra mapas.
 
 ## corrales y potreros
 
 Corrales muestra capacidad, ocupación actual, animales asignados, condición de enfermería y alertas. El sistema controla que un traslado no supere la capacidad definida y que un animal enfermo siga las reglas de sanidad.
 
-El dueño administra la estructura de corrales y su capacidad, y puede editar o dar de baja corrales después de trasladar todos sus animales. El administrador también puede hacerlo. El peón informa movimientos y ocupación operativa, sin poder cambiar la capacidad, estructura ni dar de alta o baja corrales. El historial de movimientos mantiene el corral de origen aunque este se dé de baja. Cada corral puede estar vinculado con una zona geográfica del establecimiento para aparecer en el mapa. Los potreros se manejan como áreas mayores y pueden contener corrales o zonas operativas según el modelo final.
+El dueño administra la estructura de corrales y su capacidad, y puede editar o dar de baja corrales después de trasladar todos sus animales. El administrador también puede hacerlo. El peón informa movimientos y ocupación operativa, sin poder cambiar la capacidad, estructura ni dar de alta o baja corrales. El historial de movimientos mantiene el corral de origen aunque este se dé de baja. Los corrales se consultan como registros operativos, sin vista de mapas.
 
 ## tareas
 
@@ -88,7 +87,7 @@ Ejemplos: vacunar un lote, revisar un tratamiento, preparar un animal para remat
 ## sanidad
 
 Sanidad concentra reportes, enfermería y tratamientos. Un reporte sanitario puede indicar síntomas, observaciones, fotos y animal afectado. El veterinario registra el tratamiento, medicamento, fechas, dosis, evolución y alta.
-Cuando el peón informa una sospecha, el sistema registra el reporte y avisa al equipo; no inventa un diagnóstico. Un traslado hacia enfermería conserva origen, destino, hora y responsable, y el veterinario determina el tratamiento y el alta. Después del alta, el sistema notifica a los peones; el animal sigue ubicado en enfermería hasta que el peón lo mueve en el campo y registra el destino. El veterinario no realiza ese traslado en el sistema.
+Cuando el peón informa una sospecha, el sistema registra el reporte y avisa al equipo; no inventa un diagnóstico. Un traslado hacia enfermería conserva origen, destino, hora y responsable, y el veterinario determina el tratamiento y el alta. Al dar el alta, el animal queda sano aunque siga ubicado en enfermería; el sistema notifica a los peones y el peón registra luego el traslado físico al corral de destino. El veterinario no realiza ese traslado en el sistema.
 
 El sistema muestra animales en enfermería, tratamientos activos, controles próximos y alertas por vencimiento. A futuro incorpora inventario de medicamentos, fechas de vencimiento y períodos de retiro.
 
@@ -98,21 +97,17 @@ Reproducción conserva el historial de servicios de monta, inseminaciones, diagn
 
 Las fechas probables de parto generan avisos y se reflejan en el dashboard. La aplicación valida que los vínculos genealógicos sean coherentes con especie, sexo y estado de actividad.
 
-## mapa del campo
+## ubicación de reportes
 
-Mapa usa una vista geográfica tipo Google Maps. Cada establecimiento se ubica sobre el terreno real; los potreros y corrales se dibujan mediante áreas definidas por coordenadas. Los puntos GPS que dibujan el perímetro de cada corral quedan guardados como parte de su geometría. La ubicación operativa del animal surge de su último movimiento confirmado a un corral o potrero. Solo el reporte de muerte puede guardar un punto GPS individual para localizar el hallazgo; no se registra GPS individual en los demás reportes ni se rastrea al animal continuamente.
-
-Los colores indican ocupación, capacidad, alertas sanitarias o tareas pendientes. Al tocar un área se abre su resumen con animales, tratamientos, movimientos y tareas.
-
-Los límites geográficos se pueden cargar dibujándolos sobre el mapa, recorriendo el perímetro con el teléfono o importando archivos KML/GeoJSON. La geometría de corrales y potreros queda guardada localmente. Los reportes sanitarios, nacimientos y traslados se asocian a un corral o potrero; el reporte de muerte también puede tomar un punto GPS puntual para ubicar el hallazgo. El fondo satelital requiere internet.
+No se muestra un mapa ni se guardan perímetros geográficos de corrales. El peón puede adjuntar el punto GPS del hallazgo únicamente al informar una muerte; no hay seguimiento continuo de animales ni personas. Los corrales siguen funcionando con capacidad, ocupación e historial de movimientos.
 
 ## eventos
 
-Eventos es un calendario nacional de solo lectura. Muestra remates y exposiciones obtenidos de asociaciones oficiales de criadores. Se puede filtrar por especie, raza, provincia, tipo de evento y fecha.
+Eventos es un calendario de solo lectura. Prioriza remates, exposiciones y jornadas vinculados con especies y razas de animales activos de la estancia. El usuario puede filtrar por especie, raza, provincia y fecha, y ver todos los eventos publicados para las especies que tiene activas. Las especies ovina y porcina quedan preparadas como fuentes, pero sus eventos no aparecen hasta que el dueño las incorpore a la estancia.
 
 Cada ficha incluye título, tipo, fechas, provincia, localidad, organizador, enlace oficial, fuente, razas involucradas y, cuando exista, información sobre lotes, animales o resultados.
 
-El sistema consulta las fuentes configuradas semanalmente. Cada extractor se adapta al formato de su asociación, normaliza el dato y evita duplicados usando la fuente y el enlace oficial. Si no puede obtener datos esenciales, el evento no se publica y el error queda registrado internamente. El dueño recibe en Inicio los próximos eventos relevantes para sus razas, sin tener que cargarlos o validarlos.
+El sistema consulta semanalmente las páginas de eventos, remates, calendarios y novedades de las asociaciones configuradas. Reconoce datos estructurados, tablas, tarjetas/listas y fechas en títulos; conserva el enlace y asociación de origen, normaliza fechas y evita duplicados por asociación, título y fecha. La pantalla muestra los próximos eventos desde hoy y el estado de lectura de cada fuente. Los errores de lectura quedan registrados; cada asociación puede requerir ajustar su extractor si cambia el formato de la página. El calendario no inventa provincia o localidad cuando la publicación no las informa.
 
 ## avisos
 
@@ -160,6 +155,6 @@ La auditoría conserva quién hizo una operación, cuándo y sobre qué entidad.
 3. construir inicio, animales y corrales.
 4. agregar tareas, sanidad, avisos e historial.
 5. incorporar funcionamiento offline y sincronización real.
-6. integrar mapa geográfico.
-7. incorporar reproducción, eventos automáticos y mejoras avanzadas.
+6. incorporar eventos automáticos y mejoras avanzadas.
+7. completar reproducción y operación sin conexión.
 8. probar, documentar, desplegar y generar el APK.

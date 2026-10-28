@@ -10,11 +10,16 @@ export async function dashboard(_req: Request, res: Response): Promise<void> {
       `SELECT (SELECT COUNT(*) FROM nacimientos WHERE YEAR(fecha) = YEAR(CURRENT_DATE())) AS crias_ano,
        (SELECT COUNT(*) FROM servicios_monta WHERE estado = 'realizado' AND fecha >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)) AS servicios_90_dias,
        (SELECT COUNT(*) FROM reportes_muerte WHERE estado = 'pendiente') AS muertes_pendientes,
+       (SELECT COUNT(*) FROM reportes_muerte WHERE estado = 'confirmado' AND YEAR(fecha) = YEAR(CURRENT_DATE())) AS muertes_ano,
+       (SELECT COUNT(*) FROM bajas_animales WHERE motivo = 'venta' AND YEAR(fecha) = YEAR(CURRENT_DATE())) AS ventas_ano,
        (SELECT COUNT(*) FROM animales WHERE activo = 1 AND estado_salud <> 'sano') AS alertas_sanitarias,
-       (SELECT COUNT(*) FROM animales WHERE activo = 1 AND estado_salud IN ('preñada','prenada')) AS hembras_prenadas`,
+       (SELECT COUNT(DISTINCT s.id_madre)
+        FROM servicios_monta s JOIN animales a ON a.id_animal = s.id_madre
+        WHERE a.activo = 1 AND a.genero = 'hembra' AND s.prenez_confirmada_en IS NOT NULL
+          AND s.fecha_estimada_nacimiento >= CURRENT_DATE()) AS hembras_prenadas`,
     );
     res.json({ data: rows[0] });
-  } catch { res.status(500).json({ message: 'no se pudieron cargar las estadísticas; aplicá la migración productiva' }); }
+  } catch { res.status(500).json({ message: 'No se pudieron cargar las estadísticas. Intentá de nuevo más tarde.' }); }
 }
 
 // guardo un pesaje y actualizo el peso actual dentro de una transacción.
@@ -35,28 +40,41 @@ export async function createWeight(req: Request, res: Response): Promise<void> {
   finally { connection.release(); }
 }
 
-// registro reporte sanitario o de muerte; una muerte desactiva al animal de inmediato.
+// registro un reporte desde la ficha; la enfermedad y el ingreso a enfermería son una sola operación.
 export async function createReport(req: Request, res: Response): Promise<void> {
   const kind = String(req.params.kind); const animalId = Number(req.body.id_animal); const userId = req.usuario?.id_usuario;
   const fecha = String(req.body.fecha ?? ''); const motivo = String(req.body.motivo ?? '').trim().slice(0, 500);
-  if (!['sanitario', 'muerte'].includes(kind) || !Number.isInteger(animalId) || !userId || !motivo || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) { res.status(400).json({ message: 'completá animal, fecha y motivo' }); return; }
+  const destinationId = Number(req.body.id_corral_destino); const photoValue = req.body.foto;
+  const photo = photoValue == null || photoValue === '' ? null : typeof photoValue === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photoValue) && Buffer.byteLength(photoValue, 'utf8') <= 1_500_000 ? photoValue : false;
+  if (!['sanitario', 'muerte'].includes(kind) || !Number.isInteger(animalId) || !userId || !/^\d{4}-\d{2}-\d{2}$/.test(fecha) || photo === false || (kind === 'sanitario' && (!Number.isInteger(destinationId) || destinationId < 1))) { res.status(400).json({ message: 'completá los datos del reporte y elegí enfermería como destino' }); return; }
   const connection = await database.getConnection();
   try {
     await connection.beginTransaction();
-    const [animals] = await connection.execute<RowDataPacket[]>('SELECT id_animal, identificador FROM animales WHERE id_animal = ? AND activo = 1 FOR UPDATE', [animalId]);
+    const [animals] = await connection.execute<RowDataPacket[]>('SELECT a.id_animal,a.id_corral,a.estado_salud,a.identificador,c.es_enfermeria AS origen_enfermeria FROM animales a JOIN corrales c ON c.id_corral=a.id_corral WHERE a.id_animal = ? AND a.activo = 1 FOR UPDATE', [animalId]);
     if (!animals.length) throw new Error('el animal ya no está activo');
     if (kind === 'muerte') {
       const lat = req.body.latitud == null ? null : Number(req.body.latitud); const lon = req.body.longitud == null ? null : Number(req.body.longitud);
-      if ((lat === null) !== (lon === null) || (lat !== null && (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon! < -180 || lon! > 180))) throw new Error('coordenadas GPS inválidas');
-      await connection.execute('INSERT INTO reportes_muerte (id_animal, id_usuario, fecha, motivo, latitud, longitud) VALUES (?, ?, ?, ?, ?, ?)', [animalId, userId, fecha, motivo, lat, lon]);
+      if (lat === null || lon === null || !Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) throw new Error('la ubicación GPS es obligatoria y debe ser válida');
+      await connection.execute('INSERT INTO reportes_muerte (id_animal, id_usuario, fecha, motivo, latitud, longitud, foto) VALUES (?, ?, ?, ?, ?, ?, ?)', [animalId, userId, fecha, motivo || 'Muerte notificada desde la ficha', lat, lon, photo]);
       await connection.execute('UPDATE animales SET activo = 0, version_dato = version_dato + 1 WHERE id_animal = ?', [animalId]);
     } else {
-      await connection.execute('INSERT INTO reportes_sanitarios (id_animal, id_usuario, fecha, motivo) VALUES (?, ?, ?, ?)', [animalId, userId, fecha, motivo]);
-      await connection.execute("UPDATE animales SET estado_salud = 'enfermo', version_dato = version_dato + 1 WHERE id_animal = ?", [animalId]);
-      await connection.execute(`INSERT INTO notificaciones (id_animal, titulo, mensaje, tipo, rol_destino) VALUES (?, ?, ?, 'reporte_sanitario', 'peon')`, [animalId, 'Reporte sanitario guardado', `${animals[0].identificador}: el animal quedó marcado como enfermo. Trasladalo al corral de enfermería para que lo revise el veterinario.`]);
+      const [destinations] = await connection.execute<RowDataPacket[]>('SELECT id_corral,nombre,capacidad,activo,es_enfermeria FROM corrales WHERE id_corral=? FOR UPDATE', [destinationId]);
+      const destination = destinations[0];
+      if (!destination?.activo || !destination.es_enfermeria) throw new Error('elegí un corral de enfermería activo');
+      if (Number(animals[0].id_corral) !== destinationId) {
+        const [counts] = await connection.execute<RowDataPacket[]>('SELECT COUNT(*) AS ocupacion FROM animales WHERE id_corral=? AND activo=1', [destinationId]);
+        if (Number(counts[0]?.ocupacion ?? 0) >= Number(destination.capacidad)) throw new Error('enfermería alcanzó su capacidad');
+        await connection.execute('INSERT INTO movimientos_animales (id_animal,id_corral_origen,id_corral_destino,id_usuario,observaciones) VALUES (?,?,?,?,?)', [animalId, animals[0].id_corral, destinationId, userId, motivo || 'Ingreso a enfermería por reporte sanitario']);
+      }
+      await connection.execute('INSERT INTO reportes_sanitarios (id_animal, id_usuario, fecha, motivo) VALUES (?, ?, ?, ?)', [animalId, userId, fecha, motivo || 'Reporte de enfermedad desde la ficha']);
+      await connection.execute("UPDATE animales SET id_corral=?,estado_salud='enfermo',version_dato=version_dato+1 WHERE id_animal = ?", [destinationId, animalId]);
+      if (animals[0].estado_salud !== 'enfermo') await connection.execute('INSERT INTO historial_estado_salud (id_animal,id_usuario,estado_anterior,estado_nuevo,observaciones) VALUES (?,?,?,?,?)', [animalId, userId, animals[0].estado_salud, 'enfermo', motivo || 'Ingreso a enfermería por reporte sanitario']);
+      for (const role of ['veterinario', 'dueno', 'administrador']) {
+        await connection.execute('INSERT INTO notificaciones (id_animal,titulo,mensaje,tipo,rol_destino) VALUES (?,?,?,\'reporte_sanitario\',?)', [animalId, 'Animal ingresó a enfermería', `${animals[0].identificador}: ingreso por enfermedad a ${destination.nombre}.${motivo ? ` ${motivo}` : ''}`, role]);
+      }
     }
     await connection.execute('INSERT INTO auditoria_cambios (entidad, id_entidad, accion, id_usuario, detalle) VALUES (?, ?, ?, ?, ?)', ['animal', animalId, `reporte_${kind}`, userId, JSON.stringify({ fecha, motivo })]);
-    await connection.commit(); res.status(201).json({ message: kind === 'muerte' ? 'baja operativa inmediata; revisión pendiente' : 'reporte sanitario registrado' });
+    await connection.commit(); res.status(201).json({ message: kind === 'muerte' ? 'muerte notificada; baja operativa registrada y revisión pendiente' : 'enfermedad registrada y animal trasladado a enfermería' });
   } catch (error) { await connection.rollback(); res.status(409).json({ message: error instanceof Error ? error.message : 'no se pudo guardar el reporte' }); }
   finally { connection.release(); }
 }
@@ -84,16 +102,3 @@ export async function reviewDeaths(req: Request, res: Response): Promise<void> {
   finally { connection.release(); }
 }
 
-// leo la geometría fija de los corrales para representarla en el mapa.
-export async function mapAreas(_req: Request, res: Response): Promise<void> {
-  try { const [rows] = await database.execute<RowDataPacket[]>('SELECT id_corral, nombre, capacidad, puntos_mapa FROM corrales WHERE activo=1 ORDER BY nombre'); res.json({ data: rows }); }
-  catch { res.status(500).json({ message: 'no se pudieron cargar los puntos del mapa' }); }
-}
-
-// guardo puntos gps de perímetro; el veterinario no tiene permiso para editar el mapa.
-export async function saveMapArea(req: Request, res: Response): Promise<void> {
-  const id = Number(req.params.id); const points = req.body.puntos; const userId = req.usuario?.id_usuario;
-  if (!Number.isInteger(id) || !userId || !Array.isArray(points) || points.length < 3 || points.some((p: { lat?: number; lon?: number }) => !Number.isFinite(p.lat) || !Number.isFinite(p.lon) || p.lat! < -90 || p.lat! > 90 || p.lon! < -180 || p.lon! > 180)) { res.status(400).json({ message: 'el perímetro requiere al menos tres puntos gps válidos' }); return; }
-  try { await database.execute('UPDATE corrales SET puntos_mapa = ? WHERE id_corral = ? AND activo = 1', [JSON.stringify(points), id]); await database.execute('INSERT INTO auditoria_cambios (entidad, id_entidad, accion, id_usuario, detalle) VALUES (?, ?, ?, ?, ?)', ['corral', id, 'mapa_actualizado', userId, JSON.stringify({ puntos: points })]); res.json({ message: 'perímetro guardado' }); }
-  catch { res.status(500).json({ message: 'no se pudo guardar el perímetro' }); }
-}

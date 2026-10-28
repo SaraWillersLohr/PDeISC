@@ -1,5 +1,6 @@
 // conecto las solicitudes de acceso a las acciones administrativas de la api.
 import { apiUrl } from '../config/api';
+import { apiConfigurationMessage, apiFetch, friendlyApiMessage } from './apiErrors';
 
 export type RequestedRole = 'dueno' | 'peon' | 'veterinario';
 export interface RegistrationRequest {
@@ -12,14 +13,14 @@ export interface RegistrationRequest {
 
 // envío una petición autenticada y convierto respuestas de error en mensajes legibles.
 async function adminRequest<T>(token: string, path: string, method = 'GET', payload?: unknown): Promise<T> {
-  if (!apiUrl) throw new Error('falta configurar expo_public_api_url');
-  const response = await fetch(`${apiUrl}/admin/${path}`, {
+  if (!apiUrl) throw new Error(apiConfigurationMessage);
+  const response = await apiFetch(`${apiUrl}/admin/${path}`, {
     method,
     headers: { Authorization: `Bearer ${token}`, ...(payload ? { 'Content-Type': 'application/json' } : {}) },
     body: payload ? JSON.stringify(payload) : undefined,
   });
   const body = await response.json().catch(() => null) as { message?: string; data?: T } | null;
-  if (!response.ok) throw new Error(body?.message ?? 'no se pudo completar la acción administrativa');
+  if (!response.ok) throw new Error(friendlyApiMessage(body?.message, response.status, 'No se pudo completar esta acción.'));
   return body?.data as T;
 }
 

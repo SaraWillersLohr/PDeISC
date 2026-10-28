@@ -20,7 +20,7 @@ export function requireRoles(...allowedRoles: string[]) {
       req.rolVigente = role;
       next();
     } catch {
-      res.status(500).json({ message: 'no se pudieron verificar los permisos' });
+      res.status(503).json({ message: 'no se pudieron verificar los permisos porque la base de datos no está disponible' });
     }
   };
 }

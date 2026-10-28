@@ -8,6 +8,8 @@ import { livestockRouter } from './routes/livestockRoutes.js';
 import { fieldRouter } from './routes/fieldRoutes.js';
 import { organizationRouter } from './routes/organizationRoutes.js';
 import { modulesRouter } from './routes/modulesRoutes.js';
+import { syncRouter } from './routes/syncRoutes.js';
+import type { NextFunction, Request, Response } from 'express';
 
 export const app = express();
 
@@ -24,6 +26,20 @@ app.use('/api', livestockRouter);
 app.use('/api', fieldRouter);
 app.use('/api/organization', organizationRouter);
 app.use('/api', modulesRouter);
+app.use('/api/sync', syncRouter);
+
+// respondo de forma consistente incluso ante fallas de conexión no capturadas por un controlador.
+app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  if (res.headersSent) return;
+  const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : '';
+  const unavailable = /^(ER_|ECONN|ETIMEDOUT|PROTOCOL|EHOST|ENET|QUEUE_LIMIT)/.test(code);
+  if (unavailable) {
+    res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' });
+    return;
+  }
+  console.error('Error no controlado en una solicitud de API.');
+  res.status(500).json({ message: 'no se pudo completar la solicitud' });
+});
 
 // acepto orígenes localhost y redes privadas solo durante desarrollo.
 function isDevelopmentOrigin(origin: string): boolean {

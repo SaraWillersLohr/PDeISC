@@ -1,9 +1,11 @@
+// inicio el flujo oauth del proveedor y entrego el código al backend para validarlo.
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet } from 'react-native';
+import { friendlyErrorMessage } from '../services/apiErrors';
 import { socialLogin } from '../services/authApi';
 import type { Session } from '../types/auth';
 
@@ -51,7 +53,7 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
       const session = await socialLogin(provider, code, { redirectUri, clientId: item.clientId!, codeVerifier: request.codeVerifier });
       await onSuccess(session);
     } catch (cause) {
-      onError(cause instanceof Error ? cause.message : `No se pudo iniciar sesión con ${item.label}.`);
+      onError(friendlyErrorMessage(cause, `No se pudo iniciar sesión con ${item.label}.`));
     } finally { setBusy(false); }
   }
 

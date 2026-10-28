@@ -1,10 +1,12 @@
 # plan de desarrollo de estanciaapp móvil
 
+> **Estado revisado el 26/10/2026:** varias casillas de las etapas siguientes quedaron desactualizadas frente a la implementación. La revisión más reciente está en `REVISION_PROYECTO_2026-10-26.md`; ese documento distingue código implementado, tareas de instalación y funciones aún faltantes. No considerar una casilla abierta como prueba de que la función no existe, ni una casilla marcada como prueba de que fue validada en una base real.
+
 ## criterio de diseño
 
 La app conserva la identidad visual de R5: imagen de campo en acceso, paleta verde, superficies claras, tarjetas, métricas y navegación ordenada. En móvil, la barra lateral se convierte en una navegación inferior y los módulos usan pantallas táctiles simples. Los modales, avisos y confirmaciones siguen el estilo visual de R5 y reemplazan por completo a `alert`.
 
-La complejidad vive en el backend, las reglas por rol, la sincronización y los servicios automáticos; no en la interfaz. La navegación se organiza en un panel lateral plegable, similar al de R5, con iconos, etiquetas breves y grupos discretos. Las secciones previstas son inicio, animales, corrales, tareas, sanidad, reproducción, mapa, eventos, avisos, equipo y perfil. Las opciones avanzadas solo aparecen para el rol que las necesita.
+La complejidad vive en el backend, las reglas por rol, la sincronización y los servicios automáticos; no en la interfaz. La navegación se organiza en un panel lateral plegable, similar al de R5, con iconos, etiquetas breves y grupos discretos. Las secciones previstas son inicio, animales, corrales, tareas, sanidad, reproducción, eventos, avisos, equipo y perfil. Las opciones avanzadas solo aparecen para el rol que las necesita.
 
 ## etapa 0 - preparación y protección de datos
 
@@ -55,13 +57,14 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [x] primera conexión de inventario: consultar animales activos y corrales con ocupación desde la API protegida, mostrar listados móviles, búsqueda y estados de carga/error; las escrituras y bajas siguen pendientes.
 - [x] movimientos: peón registra traslados desde la ficha del animal; el backend valida destino activo, capacidad y estado del animal, y guarda origen, destino, responsable y fecha en historial. La nueva tabla requiere aplicar `backend/migrations/2026-10-22-animal-movements.sql` después del respaldo.
 - [x] enfermería: el veterinario registra el alta y el sistema avisa al peón sin cambiar la ubicación; el traslado físico queda pendiente hasta que el peón lo registre. La tabla de altas y destinatario de avisos requiere aplicar `backend/migrations/2026-10-22-nursing-discharge.sql` después de las migraciones de registro y movimientos.
-- [ ] animales: se implementaron listado, búsqueda, ficha básica, alta y edición por dueño/peón/administrador; la caravana es manual y obligatoria, la fecha de nacimiento es opcional y la edad se calcula desde ella. Siguen pendientes filtros avanzados y bajas con motivo obligatorio (`muerte` o `venta`). La muerte requiere reporte y revisión administrativa; rechazar reactiva al animal sin borrar el reporte. La venta exige fecha y permite comprador y precio opcionales.
+- [x] animales: listado, búsqueda, ficha, alta y edición; el dueño puede dar de baja desde la ficha por venta, muerte u otro motivo, con detalle opcional. La baja conserva ficha e historial y retira al animal del inventario activo. Las muertes dadas de baja por el dueño quedan confirmadas en el registro; las informadas por el peón mantienen la revisión administrativa. El tablero cuenta ventas y muertes confirmadas del año.
+- [x] borrados del dueño: los registros de servicios reproductivos y nacimientos, las razas y las especies tienen confirmación explícita antes de borrarse permanentemente. Se conserva auditoría del borrado. No se permiten bajas de catálogo con animales asociados; al borrar una especie se borran sus razas sin animales y se desvinculan las propuestas históricas.
 - [ ] corrales: dueño configura capacidad y estructura; dueño/administrador editan y dan de baja corrales después de trasladar todos sus animales y resolver dependencias activas; peón registra ocupación operativa y movimientos, sin cambiar estructura/capacidad.
 - [ ] equipo: administrador gestiona solicitudes y cuentas, incluida edición y baja lógica; la baja bloquea el acceso y conserva autoría histórica. Dueño consulta usuarios y actividad.
 - [ ] campo: registrar servicios de monta, nacimientos con filiación, y reportes de muerte con lugar y fecha; la muerte causa baja operativa inmediata y revisión administrativa pendiente. Confirmar deja el animal fallecido; rechazar lo reactiva y conserva el reporte en la auditoría.
 - [ ] reproducción: peón y dueño pueden cargar y editar servicios de monta; el administrador tiene acceso total. Las anulaciones son lógicas y quedan auditadas.
 - [x] catálogo: dueño y administrador agregan especies y razas directamente al catálogo de la estancia; el peón propone nuevas entradas y el administrador las aprueba antes de usarlas.
-- [ ] aplicar bajas lógicas a animales, corrales, usuarios y demás registros donde corresponda; exigir validaciones de dependencias, motivo cuando aplique y auditoría de cambios/bajas.
+- [ ] completar validaciones de dependencias y auditoría en los demás registros operativos.
 - [ ] veterinaria: reportes, tratamientos, evolución y alta sanitaria.
 - [ ] historial: movimientos, cambios de estado y responsable de cada acción.
 
@@ -100,13 +103,34 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [ ] auditoría administrativa: quién cambió un dato, cuándo y desde qué operación.
 - [ ] tablero de tareas programadas: vacunación, desparasitación, revisiones y vencimientos.
 
+## prioridades de implementación pendientes
+
+Las casillas abiertas de las etapas siguientes se priorizan así. **Must have** define el producto operativo: la gestión confiable de animales y las funciones necesarias para que cada rol pueda trabajar. **Good to have** agrega consulta y visualización complementaria; se aborda después de cerrar el núcleo.
+
+### Must have — núcleo operativo
+
+- Corregir los problemas de autenticación, renovación e invalidación de sesiones, manejo de errores y arranque del backend señalados en `REVISION_PROYECTO_2026-10-26.md`.
+- Completar animales: filtros, historial consultable, pesajes y bajas trazables por muerte o venta, con sus validaciones y auditoría.
+- Completar las operaciones relacionadas con animales: movimientos y corrales con dependencias validadas; sanidad y tratamientos; servicios reproductivos, nacimientos y resultados por animal.
+- Completar roles, cuentas, tareas y avisos operativos para asignar y seguir el trabajo de campo.
+- Hacer confiable la operación sin conexión: caché de datos relevantes, cola conectada a las operaciones, sincronización y resolución de errores/conflictos.
+- Completar instalación, migraciones, documentación, validaciones y entrega instalable.
+
+### Good to have — complementos
+
+- **Eventos y remates:** calendario nacional, filtros, importación de fuentes oficiales y fichas ampliadas con animales, lotes y resultados.
+- **Mapas:** retirados por decisión de la usuaria; el GPS puntual en reportes de muerte se mantiene.
+- Mejoras adicionales de consulta y productividad: QR, fotos, exportaciones, gráficos avanzados, auditoría administrativa ampliada y notificaciones push.
+
+Se prioriza cerrar primero el **Must have**. La usuaria decidió retirar la visualización de mapas y dejar los corrales como registros operativos.
+
 ## etapa 7.1 - eventos, remates y exposiciones
 
-- [ ] crear una sección `eventos` con calendario nacional, listado y filtros por fecha, tipo, especie, raza, provincia y ubicación.
-- [ ] organizar el calendario en vistas por especie y raza: bovinos, equinos y las razas que correspondan a cada una.
-- [ ] diferenciar visualmente remates y exposiciones, con una ficha completa para cada evento nacional.
-- [ ] incluir provincia y localidad en cada evento para filtrar el calendario y facilitar la planificación de traslados.
-- [ ] importar automáticamente remates y exposiciones desde fuentes oficiales configuradas, sin carga ni validación manual por parte de los usuarios.
+- [x] crear una sección `eventos` con calendario mensual, navegación por fechas y filtros por especie, raza y provincia.
+- [x] priorizar en la agenda las especies y razas activas de la estancia, con opción para ver todos los eventos de las especies activas del dueño.
+- [x] diferenciar visualmente remates y exposiciones; la tarjeta inicial muestra fuente, fecha, especie/raza y ubicación cuando están publicadas.
+- [x] incluir provincia y localidad cuando la asociación las publica, para filtrar calendario y planificar traslados.
+- [x] programar la lectura semanal de rutas específicas de eventos, calendarios, remates y noticias, y guardar eventos de forma idempotente con bitácora por asociación.
 - [ ] vincular cada publicación de remate con uno o más animales de la estancia; incluir fotos, lote, precio base, precio final y resultado de venta.
 - [ ] registrar exposiciones con categoría, institución organizadora, ubicación, fechas, animales participantes, premios y archivos asociados.
 - [ ] mostrar en la ficha de cada animal una línea de tiempo de participaciones, publicaciones, resultados y reconocimientos.
@@ -116,18 +140,13 @@ La complejidad vive en el backend, las reglas por rol, la sincronización y los 
 - [ ] incorporar enlaces o integraciones externas solo con fuentes oficiales o autorizadas; el proceso automático omite registros incompletos y registra internamente los errores de extracción.
 - [x] conservar una lista inicial de asociaciones oficiales argentinas para futuras fuentes de eventos y registros genealógicos.
 
+La agenda requiere ejecutar `backend/migrations/2026-10-26-events-calendar.sql` y `backend/migrations/2026-10-26-event-source-expansion.sql` después del respaldo. El importador reconoce datos estructurados, tablas, tarjetas/listas, fechas en títulos y agendas etiquetadas. Ovinos (Merino, Hampshire Down y Corriedale) y porcinos quedan configurados en espera: solo se muestran cuando el dueño tiene esa especie activa. Hay que verificar la primera sincronización de cada asociación desde el estado que publica la app y adaptar las fuentes si cambian sus páginas.
+
 **resultado:** la app evoluciona de registro de datos a una herramienta diaria de gestión de campo.
 
-## etapa 7.2 - mapa y visualización del campo
+## etapa 7.2 - mapas del campo (retirados)
 
-- [ ] crear una vista `mapa del campo` con la ubicación de cada establecimiento, potrero y corral.
-- [ ] representar corrales y potreros como áreas coloreadas; el color muestra ocupación, capacidad, estado sanitario o tareas pendientes.
-- [ ] calcular la ubicación operativa por el último movimiento confirmado; guardar la geometría GPS de corrales y potreros, y permitir un punto individual de GPS solo para localizar una muerte reportada.
-- [ ] abrir cada área del mapa para consultar animales, ocupación, alertas, tratamientos y últimos movimientos.
-- [ ] usar una vista geográfica tipo google maps como única representación del campo; cada establecimiento, potrero y corral requiere coordenadas o límites geográficos reales.
-- [ ] guardar localmente las coordenadas, límites y capas operativas; el mapa base satelital o de calles requiere conexión.
-- [ ] incorporar gráficos de ocupación por corral, distribución por raza, evolución de peso, tratamientos y movimientos mensuales.
-- [ ] no rastrear animales individualmente; el punto GPS individual solo se captura al reportar una muerte, mientras el GPS del mapa define áreas persistentes de corrales y potreros.
+La usuaria decidió retirar los mapas y dejar los corrales como registros sin representación geográfica. Se quitaron la pantalla y los endpoints de mapas. Las columnas de coordenadas que pudieran existir por migraciones anteriores se conservan sin uso para no borrar datos existentes. Se mantiene el punto GPS puntual obligatorio en los reportes de muerte; no se rastrean animales ni personas.
 
 ## etapa 8 - pruebas y entrega
 

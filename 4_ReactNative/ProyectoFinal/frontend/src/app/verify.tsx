@@ -1,4 +1,5 @@
 // confirmo el correo de una solicitud y explico el paso de aprobación.
+import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -19,7 +20,7 @@ export default function VerifyScreen() {
     if (!/^\d{6}$/.test(code)) { setError('Ingresá el código de seis dígitos.'); return; }
     setBusy(true); setError(''); setMessage('');
     try { setMessage(await verifyAccountEmail(email, code)); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo verificar el correo.'); }
+    catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo verificar el correo.')); }
     finally { setBusy(false); }
   }
 
@@ -27,7 +28,7 @@ export default function VerifyScreen() {
   async function resend(): Promise<void> {
     setBusy(true); setError(''); setMessage('');
     try { setMessage(await resendAccountCode(email)); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo reenviar el código.'); }
+    catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo reenviar el código.')); }
     finally { setBusy(false); }
   }
 

@@ -6,7 +6,7 @@ import type { RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
 import { env } from '../config/env.js';
 import type { AuthenticatedUser, LoginInput } from '../types/auth.js';
-import { createAccessToken, createPasswordRecoveryToken, createRefreshToken, verifyPasswordRecoveryToken, verifyRefreshToken } from '../utils/jwt.js';
+import { createAccessToken, createPasswordRecoveryToken, createRefreshToken, getTokenExpirationTimestamp, verifyPasswordRecoveryToken, verifyRefreshToken } from '../utils/jwt.js';
 import { sendPasswordRecoveryCode } from './emailService.js';
 
 const recoveryTtlMinutes = 10;
@@ -14,6 +14,16 @@ const recoveryMaxAttempts = 5;
 const recoveryResendCooldownSeconds = 60;
 const recoveryMaxDailyEmails = 5;
 const googleVerifier = new OAuth2Client();
+
+// genero ambas credenciales y expongo el vencimiento para renovar antes de que falle una petición.
+function createSessionTokens(user: AuthenticatedUser) {
+  const accessToken = createAccessToken(user);
+  return {
+    accessToken,
+    refreshToken: createRefreshToken(user),
+    accessTokenExpiresAt: getTokenExpirationTimestamp(accessToken),
+  };
+}
 
 interface UserRow extends RowDataPacket, AuthenticatedUser {
   password_hash: string;
@@ -45,7 +55,7 @@ function digestMatches(expectedHex: string, receivedHex: string): boolean {
 // inicio sesión después de comprobar la contraseña hasheada.
 export async function login(input: LoginInput) {
   const [rows] = await database.execute<UserRow[]>(
-    `select u.id_usuario, u.email, u.password_hash, u.nombre, u.apellido, u.foto_perfil, r.nombre as rol
+    `select u.id_usuario, u.email, u.password_hash, u.nombre, u.apellido, u.foto_perfil, u.token_version, r.nombre as rol
      from usuarios u
      inner join roles r on r.id_rol = u.id_rol
      where u.email = ? and u.activo = true and u.estado_cuenta = 'activo'
@@ -62,11 +72,11 @@ export async function login(input: LoginInput) {
     id_usuario: user.id_usuario,
     email: user.email,
     rol: user.rol,
+    token_version: Number(user.token_version),
   };
 
   return {
-    accessToken: createAccessToken(sessionUser),
-    refreshToken: createRefreshToken(sessionUser),
+    ...createSessionTokens(sessionUser),
     usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido, foto_perfil: user.foto_perfil },
   };
 }
@@ -145,16 +155,15 @@ export async function loginWithSocial(provider: SocialProvider, code: string, re
   email = email.trim().toLowerCase();
   if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('El proveedor no devolvió un correo verificado.');
   const [users] = await database.execute<UserRow[]>(
-    `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.foto_perfil, r.nombre AS rol
+    `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.foto_perfil, u.token_version, r.nombre AS rol
      FROM usuarios u INNER JOIN roles r ON r.id_rol = u.id_rol
      WHERE u.email = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1`, [email],
   );
   const user = users[0];
   if (!user) throw new Error('No hay una cuenta activa con ese correo. Solicitá acceso primero.');
-  const sessionUser: AuthenticatedUser = { id_usuario: user.id_usuario, email: user.email, rol: user.rol };
+  const sessionUser: AuthenticatedUser = { id_usuario: user.id_usuario, email: user.email, rol: user.rol, token_version: Number(user.token_version) };
   return {
-    accessToken: createAccessToken(sessionUser),
-    refreshToken: createRefreshToken(sessionUser),
+    ...createSessionTokens(sessionUser),
     usuario: { ...sessionUser, nombre: user.nombre || fullName, apellido: user.apellido, foto_perfil: user.foto_perfil },
   };
 }
@@ -185,13 +194,17 @@ export async function changePassword(userId: number, currentPassword: string, ne
 }
 
 // renuevo los tokens usando un refresh token que ya fue validado.
-export function refresh(refreshToken: string) {
-  const user = verifyRefreshToken(refreshToken);
+export async function refresh(refreshToken: string) {
+  const tokenUser = verifyRefreshToken(refreshToken);
+  const [rows] = await database.execute<UserRow[]>(
+    `SELECT u.id_usuario, u.email, u.nombre, u.apellido, u.foto_perfil, u.token_version, r.nombre AS rol
+     FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol
+     WHERE u.id_usuario=? AND u.activo=1 AND u.estado_cuenta='activo' LIMIT 1`, [tokenUser.id_usuario],
+  );
+  const user = rows[0];
+  if (!user || Number(user.token_version) !== Number(tokenUser.token_version)) throw new Error('la sesión no puede renovarse');
 
-  return {
-    accessToken: createAccessToken(user),
-    refreshToken: createRefreshToken(user),
-  };
+  return createSessionTokens({ id_usuario: user.id_usuario, email: user.email, rol: user.rol, token_version: Number(user.token_version) });
 }
 
 // envío códigos de recuperación con límite de reenvíos y respuesta neutra para correos desconocidos.
@@ -312,10 +325,9 @@ export async function completePasswordRecovery(resetToken: string, newPassword: 
     try { await connection.rollback(); } catch { /* La transacción pudo haberse confirmado antes del error. */ }
     throw error;
   } finally { connection.release(); }
-  const sessionUser: AuthenticatedUser = { id_usuario: user.id_usuario, email: user.email, rol: user.rol };
+  const sessionUser: AuthenticatedUser = { id_usuario: user.id_usuario, email: user.email, rol: user.rol, token_version: tokenVersion };
   return {
-    accessToken: createAccessToken(sessionUser),
-    refreshToken: createRefreshToken(sessionUser),
+    ...createSessionTokens(sessionUser),
     usuario: { ...sessionUser, nombre: user.nombre, apellido: user.apellido, foto_perfil: user.foto_perfil },
   };
 }

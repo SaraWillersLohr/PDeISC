@@ -20,6 +20,9 @@
 - Un acceso directo a Animales del veterinario abre enfermería, que solo consulta animales ubicados allí.
 - Los errores al cargar animales y corrales se muestran por separado; un fallo al cargar corrales ya no oculta una lista de animales que sí pudo cargar.
 - El peón puede seleccionar como destino corrales generales o de enfermería con lugar disponible. El backend sigue exigiendo el alta veterinaria para sacar un animal de enfermería.
+- El dueño puede dar de baja un animal desde su ficha por venta, muerte u otro motivo; el detalle es opcional y la ficha e historial quedan conservados. Las muertes quedan confirmadas en el registro, y el tablero cuenta ventas y muertes confirmadas del año.
+- El dueño puede borrar permanentemente servicios reproductivos, registros de nacimiento, razas y especies mediante un modal de confirmación. El backend conserva auditoría y bloquea borrar razas o especies que tengan animales asociados; borrar una especie también elimina sus razas sin uso.
+- Se quitó el formulario global de “Reportes del campo” para el peón. Desde la ficha se puede informar una enfermedad y trasladar al animal a enfermería en una sola acción, o notificar una muerte con GPS obligatorio y foto y observaciones opcionales; el administrador ve la foto al revisar el reporte.
 
 La caravana/identificador es obligatoria y siempre la ingresa la persona; no se genera automáticamente. Para la edad, esta implementación usa la fecha de nacimiento si está disponible.
 
@@ -34,7 +37,8 @@ La caravana/identificador es obligatoria y siempre la ingresa la persona; no se 
 - Se eliminaron los indicadores que repetían la información de las estadísticas.
 - Se mantienen las estadísticas mediante gráficos de diferentes colores.
 - Se agregaron accesos directos adecuados para cada rol.
-- La sección anteriormente llamada "Mapa del campo" ahora se llama "Mi campo".
+- Se retiró la vista de mapas y la pestaña de perímetros GPS; los corrales permanecen como registros operativos. Se mantiene la ubicación GPS puntual obligatoria del reporte de muerte.
+- Eventos ahora parte de hoy, lista próximos eventos desde hoy y muestra ficha, asociación y enlace de origen. El importador consulta rutas específicas de eventos, calendarios, remates y noticias para 16 asociaciones; ovinos y porcinos quedan fuera de la agenda hasta que el dueño active esas especies. La base registra el resultado de cada consulta semanal.
 
 ## Mi perfil
 
@@ -91,3 +95,17 @@ Los códigos:
 - Estructura de recuperación en la base de datos: correcta.
 
 Para el flujo de animales y catálogo se verificaron el lint completo del frontend y las compilaciones TypeScript del frontend y backend. No se ejecutaron operaciones contra la base de datos ni una prueba visual del flujo conectado al servidor.
+
+Para las bajas y borrados permanentes de esta actualización se compilaron correctamente el backend y el TypeScript del frontend. No se aplicó la migración a la base ni se hizo una prueba visual.
+
+## Correcciones de revisión — 26 de octubre de 2026
+
+- Se corrigió el indicador de preñez para leer servicios confirmados y vigentes.
+- Se reforzaron las reglas de progenitores en montas y nacimientos.
+- Se agregó auditoría transaccional a la edición/baja de corrales y a la baja de usuarios; las tareas abiertas se reasignan a otro peón activo.
+- El rechazo de un reporte de muerte solicita un motivo; administración puede alternar entre revisión de muertes y enfermería.
+- El migrador registra las migraciones y suma registro, perfil, recuperación y la tabla de idempotencia offline. No se ejecutaron cambios contra la base conectada.
+- Se agregó caché local de lecturas y sincronización idempotente de pesajes, traslados, reportes sanitarios, reportes de muerte y notas veterinarias. La baja offline se registra como operativa inmediata y el reporte conserva la revisión administrativa pendiente.
+- Se incorporaron manual de usuario, referencia de API, guía de instalación Android y perfil EAS para APK de prueba.
+
+Verificaciones de TypeScript y build se ejecutaron después de las correcciones. Las escrituras y migraciones requieren validación con una base de pruebas; no se deben aplicar en producción sin respaldo.

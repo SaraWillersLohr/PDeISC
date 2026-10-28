@@ -5,6 +5,8 @@ export interface PendingOperation {
   entidad: string;
   payload: string;
   created_at: string;
+  id_usuario?: number | null;
+  ultimo_error?: string | null;
 }
 
 // describo una copia local de un recurso que puede leerse sin conexión.

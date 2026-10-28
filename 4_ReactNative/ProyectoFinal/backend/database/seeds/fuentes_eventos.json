@@ -97,5 +97,50 @@
     "raza": "criollo",
     "pais": "argentina",
     "habilitada": true
+  },
+  {
+    "codigo_fuente": "braford_argentina",
+    "nombre": "asociación braford argentina",
+    "url": "https://www.braford.org.ar/",
+    "especie": "bovino",
+    "raza": "braford",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "merino_argentina",
+    "nombre": "asociación argentina criadores de merino",
+    "url": "https://www.merino.org.ar/",
+    "especie": "ovino",
+    "raza": "merino",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "hampshire_down_argentina",
+    "nombre": "asociación criadores de hampshire down",
+    "url": "https://hampshiredown.org.ar/",
+    "especie": "ovino",
+    "raza": "hampshire down",
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "porcinos_argentina",
+    "nombre": "asociación argentina productores de porcinos",
+    "url": "https://porcinos.org.ar/",
+    "especie": "porcino",
+    "raza": null,
+    "pais": "argentina",
+    "habilitada": true
+  },
+  {
+    "codigo_fuente": "corriedale_argentina",
+    "nombre": "asociación argentina criadores de corriedale",
+    "url": "https://www.corriedale.org.ar/",
+    "especie": "ovino",
+    "raza": "corriedale",
+    "pais": "argentina",
+    "habilitada": true
   }
 ]

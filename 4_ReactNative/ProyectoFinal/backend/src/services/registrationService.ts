@@ -3,7 +3,7 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 import { database } from '../config/database.js';
 import { sendAccessCode, sendNewRequestNotice, sendRegistrationRejection, sendVerificationCode } from './emailService.js';
-import { createAccessToken, createRefreshToken } from '../utils/jwt.js';
+import { createAccessToken, createRefreshToken, getTokenExpirationTimestamp } from '../utils/jwt.js';
 import { assertMailConfiguration, digest, issueCode, matchesDigest, maxCodeAttempts, isRequestedRole, type RequestedRole } from './registrationCodeService.js';
 
 export type { RequestedRole } from './registrationCodeService.js';
@@ -175,7 +175,7 @@ export async function approveRegistrationRequest(id: number, adminId: number, ro
     if (!requests.length) throw new Error('la solicitud no existe o ya fue resuelta');
     const request = requests[0] as PendingRequest & { password_hash: string };
     const [roles] = await connection.query<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1', [role]);
-    if (!roles.length) throw new Error(`no existe el rol ${role}; aplicá primero la migración de roles`);
+    if (!roles.length) throw new Error('El perfil solicitado no está disponible. Consultá al administrador.');
     const [created] = await connection.execute<ResultSetHeader>(
       `INSERT INTO usuarios (id_rol, nombre, apellido, email, password_hash, activo, debe_cambiar_password, estado_cuenta, email_verificado_at)
        VALUES (?, ?, ?, ?, ?, 1, 0, 'pendiente_acceso', NOW())`,
@@ -259,10 +259,12 @@ export async function redeemAccessCode(emailInput: string, code: string) {
     throw error;
   } finally { connection.release(); }
   if (wrongCode || !user) throw new Error('el código ingresado no es correcto');
-  const authenticated = { id_usuario: user.id_usuario, email: user.email, rol: user.rol };
+  const authenticated = { id_usuario: user.id_usuario, email: user.email, rol: user.rol, token_version: Number(user.token_version) };
+  const accessToken = createAccessToken(authenticated);
   return {
-    accessToken: createAccessToken(authenticated),
+    accessToken,
     refreshToken: createRefreshToken(authenticated),
+    accessTokenExpiresAt: getTokenExpirationTimestamp(accessToken),
     usuario: { ...authenticated, nombre: user.nombre, apellido: user.apellido },
   };
 }

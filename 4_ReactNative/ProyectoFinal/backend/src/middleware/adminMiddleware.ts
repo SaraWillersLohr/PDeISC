@@ -16,6 +16,6 @@ export async function requireAdministrator(req: Request, res: Response, next: Ne
     if (!rows.length) { res.status(403).json({ message: 'solo el administrador puede revisar solicitudes' }); return; }
     next();
   } catch {
-    res.status(500).json({ message: 'no se pudieron verificar los permisos administrativos' });
+    res.status(503).json({ message: 'no se pudieron verificar los permisos porque la base de datos no está disponible' });
   }
 }

@@ -1,3 +1,4 @@
+// comparto la paleta visual y guardo la preferencia de tema entre sesiones.
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
@@ -81,6 +82,7 @@ const storageKey = 'estancia_app_theme';
 export function ThemeProvider({ children }: React.PropsWithChildren) {
   const [isDark, setIsDark] = useState(false);
 
+  // restauro la preferencia sin actualizar el estado si el componente ya se desmontó.
   useEffect(() => {
     let active = true;
     const restore = Platform.OS === 'web'
@@ -90,6 +92,7 @@ export function ThemeProvider({ children }: React.PropsWithChildren) {
     return () => { active = false; };
   }, []);
 
+  // cambio el tema de inmediato y persisto la opción según la plataforma.
   const toggleTheme = useCallback(() => {
     setIsDark((current) => {
       const next = !current;

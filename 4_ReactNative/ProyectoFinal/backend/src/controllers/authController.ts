@@ -3,12 +3,19 @@ import type { Request, Response } from 'express';
 import * as authService from '../services/authService.js';
 import * as registrationService from '../services/registrationService.js';
 
+// distingo una falla de mysql de un error causado por los datos enviados.
+function isDatabaseFailure(error: unknown): boolean {
+  const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : '';
+  return /^(ER_|ECONN|ETIMEDOUT|PROTOCOL|EHOST|ENET|QUEUE_LIMIT)/.test(code);
+}
+
 // convierto las operaciones del registro en respuestas http consistentes.
 async function handleRegistrationAction(action: () => Promise<unknown>, res: Response, successMessage: string): Promise<void> {
   try {
     const data = await action();
     res.status(200).json({ message: successMessage, data });
   } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     const message = error instanceof Error ? error.message : 'no se pudo completar la solicitud';
     res.status(400).json({ message });
   }
@@ -58,6 +65,7 @@ export async function requestPasswordRecovery(req: Request, res: Response): Prom
   catch (error) {
     const detail = error instanceof Error ? error.message : 'error desconocido';
     console.error(`[auth] No se pudo completar una solicitud de recuperación: ${detail}`);
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'no se pudo consultar la base de datos; intentá nuevamente en unos segundos' }); return; }
   }
   res.status(202).json({ message: 'Si la cuenta puede recuperar el acceso, enviaremos un código al correo indicado.' });
 }
@@ -69,7 +77,8 @@ export async function redeemPasswordRecoveryCode(req: Request, res: Response): P
     if (!email?.trim() || !code) { res.status(400).json({ message: 'Completá el correo y el código de seis dígitos.' }); return; }
     const data = await authService.redeemPasswordRecoveryCode(email, code);
     res.json({ message: 'Código válido. Ahora elegí una contraseña nueva.', data });
-  } catch {
+  } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     res.status(400).json({ message: 'El correo o el código no son válidos, no corresponden a una cuenta activa o el código venció.' });
   }
 }
@@ -82,6 +91,7 @@ export async function completePasswordRecovery(req: Request, res: Response): Pro
     const data = await authService.completePasswordRecovery(resetToken, password);
     res.json({ message: 'Contraseña actualizada. Iniciaste sesión.', data });
   } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     const raw = error instanceof Error ? error.message : '';
     const message = raw.includes('entre 10 y 72 bytes') ? raw : 'El código venció o ya fue usado. Solicitá uno nuevo e intentá otra vez.';
     res.status(400).json({ message });
@@ -101,6 +111,7 @@ export async function login(req: Request, res: Response): Promise<void> {
     const session = await authService.login({ email, password });
     res.status(200).json(session);
   } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     const message = error instanceof Error ? error.message : 'no se pudo iniciar sesión';
     res.status(401).json({ message });
   }
@@ -117,13 +128,14 @@ export async function socialLogin(req: Request, res: Response): Promise<void> {
     const session = await authService.loginWithSocial(provider as 'google' | 'facebook' | 'github', code, redirectUri, codeVerifier, clientId);
     res.status(200).json(session);
   } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión con el proveedor.';
     res.status(401).json({ message });
   }
 }
 
 // renuevo la sesión cuando el token de acceso dejó de ser válido.
-export function refresh(req: Request, res: Response): void {
+export async function refresh(req: Request, res: Response): Promise<void> {
   const { refreshToken } = req.body as { refreshToken?: string };
 
   if (!refreshToken) {
@@ -132,8 +144,9 @@ export function refresh(req: Request, res: Response): void {
   }
 
   try {
-    res.status(200).json(authService.refresh(refreshToken));
-  } catch {
+    res.status(200).json(await authService.refresh(refreshToken));
+  } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     res.status(401).json({ message: 'la sesión no puede renovarse' });
   }
 }
@@ -150,6 +163,7 @@ export async function updateProfile(req: Request, res: Response): Promise<void> 
     const data = await authService.updateProfile(req.usuario.id_usuario, req.body);
     res.json({ message: 'Perfil actualizado.', data });
   } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     res.status(400).json({ message: error instanceof Error ? error.message : 'No se pudo actualizar el perfil.' });
   }
 }
@@ -162,6 +176,7 @@ export async function changePassword(req: Request, res: Response): Promise<void>
     await authService.changePassword(req.usuario.id_usuario, currentPassword ?? '', newPassword ?? '');
     res.json({ message: 'Contraseña actualizada.' });
   } catch (error) {
+    if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     res.status(400).json({ message: error instanceof Error ? error.message : 'No se pudo cambiar la contraseña.' });
   }
 }

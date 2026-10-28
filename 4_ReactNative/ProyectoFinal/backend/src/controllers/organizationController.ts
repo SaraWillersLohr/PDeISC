@@ -15,14 +15,14 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
   if (!Number.isInteger(id) || !nombre?.trim() || !apellido?.trim() || !['dueno','peon','veterinario','administrador'].includes(rol ?? '')) { res.status(400).json({ message: 'completá nombre, apellido y un rol permitido' }); return; }
   try {
     const [rows] = await database.execute<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre=?', [rol]);
-    if (!rows.length) { res.status(409).json({ message: 'el rol no está configurado en la base; aplicá la migración de roles' }); return; }
+    if (!rows.length) { res.status(409).json({ message: 'Ese perfil no está disponible. Consultá al administrador.' }); return; }
     const [current] = await database.execute<RowDataPacket[]>(`SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1`, [id]);
     if (!current.length) { res.status(404).json({ message: 'usuario activo no encontrado' }); return; }
     if (current[0].rol === 'administrador' && rol !== 'administrador') {
       const [admins] = await database.execute<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
       if (Number(admins[0]?.total ?? 0) <= 1) { res.status(409).json({ message: 'la organización debe conservar al menos un administrador' }); return; }
     }
-    const [result] = await database.execute<ResultSetHeader>('UPDATE usuarios SET nombre=?,apellido=?,id_rol=? WHERE id_usuario=? AND activo=1', [nombre.trim(), apellido.trim(), rows[0].id_rol, id]);
+    const [result] = await database.execute<ResultSetHeader>('UPDATE usuarios SET nombre=?,apellido=?,id_rol=?,token_version=token_version+1 WHERE id_usuario=? AND activo=1', [nombre.trim(), apellido.trim(), rows[0].id_rol, id]);
     if (!result.affectedRows) { res.status(404).json({ message: 'usuario activo no encontrado' }); return; } res.json({ message: 'usuario actualizado' });
   } catch { res.status(500).json({ message: 'no se pudo editar el usuario' }); }
 }
@@ -30,17 +30,33 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
 // bloqueo la cuenta sin borrar su autoría histórica.
 export async function deactivateUser(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id); const actor = req.usuario?.id_usuario;
-  if (!Number.isInteger(id) || id === actor) { res.status(400).json({ message: 'no podés dar de baja tu propia cuenta' }); return; }
+  const reassignmentId = req.body.id_responsable_reasignacion == null ? null : Number(req.body.id_responsable_reasignacion);
+  if (!actor || !Number.isInteger(id) || id < 1 || id === actor || (reassignmentId !== null && (!Number.isInteger(reassignmentId) || reassignmentId < 1 || reassignmentId === id))) { res.status(400).json({ message: 'usuario o responsable de reemplazo inválido' }); return; }
+  const connection = await database.getConnection();
   try {
-    const [rows] = await database.execute<RowDataPacket[]>(`SELECT u.id_usuario,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1`, [id]);
-    if (!rows.length) { res.status(404).json({ message: 'usuario activo no encontrado' }); return; }
+    await connection.beginTransaction();
+    const [rows] = await connection.execute<RowDataPacket[]>(`SELECT u.id_usuario,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 FOR UPDATE`, [id]);
+    if (!rows.length) { await connection.rollback(); res.status(404).json({ message: 'usuario activo no encontrado' }); return; }
     if (rows[0].rol === 'administrador') {
-      const [admins] = await database.execute<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
-      if (Number(admins[0]?.total) <= 1) { res.status(409).json({ message: 'la organización debe conservar al menos un administrador' }); return; }
+      const [admins] = await connection.execute<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
+      if (Number(admins[0]?.total) <= 1) { await connection.rollback(); res.status(409).json({ message: 'la organización debe conservar al menos un administrador' }); return; }
     }
-    await database.execute('UPDATE usuarios SET activo=0, estado_cuenta=\'inactivo\' WHERE id_usuario=?', [id]);
+    const [tasks] = await connection.execute<RowDataPacket[]>(`SELECT id_tarea FROM tareas WHERE id_responsable=? AND estado IN ('pendiente','en_progreso') FOR UPDATE`, [id]);
+    if (tasks.length && reassignmentId === null) {
+      await connection.rollback(); res.status(409).json({ message: 'reasigná las tareas pendientes antes de dar de baja esta cuenta', data: { tareas_pendientes: tasks.length } }); return;
+    }
+    if (tasks.length && reassignmentId !== null) {
+      const [replacement] = await connection.execute<RowDataPacket[]>(`SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 AND u.estado_cuenta='activo' AND r.nombre='peon' FOR UPDATE`, [reassignmentId]);
+      if (!replacement.length) { await connection.rollback(); res.status(409).json({ message: 'el responsable de reemplazo debe ser un peón activo' }); return; }
+      await connection.execute(`UPDATE tareas SET id_responsable=? WHERE id_responsable=? AND estado IN ('pendiente','en_progreso')`, [reassignmentId, id]);
+      await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['usuario', id, 'tareas_reasignadas_por_baja', actor, JSON.stringify({ id_responsable_anterior: id, id_responsable_nuevo: reassignmentId, cantidad: tasks.length })]);
+    }
+    await connection.execute('UPDATE usuarios SET activo=0, estado_cuenta=\'inactivo\', token_version=token_version+1 WHERE id_usuario=?', [id]);
+    await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['usuario', id, 'baja_logica', actor, JSON.stringify({ id_responsable_reasignacion: tasks.length ? reassignmentId : null })]);
+    await connection.commit();
     res.json({ message: 'acceso bloqueado; se conserva la autoría histórica' });
-  } catch { res.status(500).json({ message: 'no se pudo dar de baja al usuario' }); }
+  } catch { await connection.rollback(); res.status(500).json({ message: 'no se pudo dar de baja al usuario' }); }
+  finally { connection.release(); }
 }
 
 // listo especies y razas existentes con solicitudes pendientes.
@@ -50,7 +66,7 @@ export async function listCatalog(_req: Request, res: Response): Promise<void> {
     const [breeds] = await database.execute<RowDataPacket[]>('SELECT id_raza,id_especie,nombre FROM razas ORDER BY nombre');
     const [pending] = await database.execute<RowDataPacket[]>(`SELECT p.*,e.nombre AS especie FROM especies_razas_pendientes p LEFT JOIN especies e ON e.id_especie=p.id_especie WHERE p.estado='pendiente' ORDER BY p.created_at`);
     res.json({ data: { especies: species, razas: breeds, pendientes: pending } });
-  } catch { res.status(500).json({ message: 'no se pudo cargar el catálogo; aplicá la migración productiva' }); }
+  } catch { res.status(500).json({ message: 'No se pudo cargar el catálogo. Intentá de nuevo más tarde.' }); }
 }
 
 // agrego una especie aprobada al catálogo de la estancia para dueño o administrador.
@@ -87,6 +103,48 @@ export async function createBreed(req: Request, res: Response): Promise<void> {
     await connection.commit();
     res.status(201).json({ data: { id_raza: result.insertId, id_especie: idEspecie, nombre } });
   } catch { await connection.rollback(); res.status(409).json({ message: 'esa raza ya existe dentro de la especie o no se pudo guardar' }); }
+  finally { connection.release(); }
+}
+
+// elimino una raza solo si ningún animal depende de ella.
+export async function deleteBreed(req: Request, res: Response): Promise<void> {
+  const id = Number(req.params.id); const userId = req.usuario?.id_usuario;
+  if (!Number.isInteger(id) || id < 1 || !userId) { res.status(400).json({ message: 'raza inválida' }); return; }
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [breeds] = await connection.execute<RowDataPacket[]>('SELECT id_raza,nombre,id_especie FROM razas WHERE id_raza=? FOR UPDATE', [id]);
+    if (!breeds.length) { await connection.rollback(); res.status(404).json({ message: 'la raza no existe' }); return; }
+    const [animals] = await connection.execute<RowDataPacket[]>('SELECT COUNT(*) AS total FROM animales WHERE id_raza=?', [id]);
+    if (Number(animals[0]?.total ?? 0) > 0) { await connection.rollback(); res.status(409).json({ message: 'no se puede borrar esta raza porque hay animales asociados' }); return; }
+    await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['raza', id, 'borrado_permanente', userId, JSON.stringify({ nombre: breeds[0].nombre, id_especie: breeds[0].id_especie })]);
+    await connection.execute('DELETE FROM razas WHERE id_raza=?', [id]);
+    await connection.commit(); res.json({ message: 'raza borrada permanentemente' });
+  } catch { await connection.rollback(); res.status(409).json({ message: 'no se pudo borrar la raza; puede tener registros asociados' }); }
+  finally { connection.release(); }
+}
+
+// elimino la especie y sus razas solo si no existen animales ni propuestas pendientes asociadas.
+export async function deleteSpecies(req: Request, res: Response): Promise<void> {
+  const id = Number(req.params.id); const userId = req.usuario?.id_usuario;
+  if (!Number.isInteger(id) || id < 1 || !userId) { res.status(400).json({ message: 'especie inválida' }); return; }
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [species] = await connection.execute<RowDataPacket[]>('SELECT id_especie,nombre FROM especies WHERE id_especie=? FOR UPDATE', [id]);
+    if (!species.length) { await connection.rollback(); res.status(404).json({ message: 'la especie no existe' }); return; }
+    const [animals] = await connection.execute<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM animales a JOIN razas r ON r.id_raza=a.id_raza WHERE r.id_especie=?`, [id]);
+    if (Number(animals[0]?.total ?? 0) > 0) { await connection.rollback(); res.status(409).json({ message: 'no se puede borrar esta especie porque hay animales asociados a sus razas' }); return; }
+    const [breeds] = await connection.execute<RowDataPacket[]>('SELECT id_raza,nombre FROM razas WHERE id_especie=? FOR UPDATE', [id]);
+    for (const breed of breeds) {
+      await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['raza', breed.id_raza, 'borrado_permanente', userId, JSON.stringify({ nombre: breed.nombre, id_especie: id })]);
+    }
+    await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['especie', id, 'borrado_permanente', userId, JSON.stringify({ nombre: species[0].nombre, razas: breeds.map((breed) => breed.nombre) })]);
+    await connection.execute('UPDATE especies_razas_pendientes SET id_especie=NULL WHERE id_especie=?', [id]);
+    await connection.execute('DELETE FROM razas WHERE id_especie=?', [id]);
+    await connection.execute('DELETE FROM especies WHERE id_especie=?', [id]);
+    await connection.commit(); res.json({ message: 'especie y sus razas borradas permanentemente' });
+  } catch { await connection.rollback(); res.status(409).json({ message: 'no se pudo borrar la especie; puede tener registros asociados' }); }
   finally { connection.release(); }
 }
 

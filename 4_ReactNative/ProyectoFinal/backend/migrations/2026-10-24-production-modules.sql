@@ -136,17 +136,6 @@ CREATE TABLE IF NOT EXISTS eventos_campo (
   CONSTRAINT fk_evento_creador FOREIGN KEY (id_creador) REFERENCES usuarios (id_usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS areas_mapa (
-  id_area INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  id_corral INT UNSIGNED NOT NULL,
-  puntos JSON NOT NULL,
-  updated_by INT UNSIGNED NOT NULL,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_area_corral (id_corral),
-  CONSTRAINT fk_area_corral FOREIGN KEY (id_corral) REFERENCES corrales (id_corral),
-  CONSTRAINT fk_area_usuario FOREIGN KEY (updated_by) REFERENCES usuarios (id_usuario)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS auditoria_cambios (
   id_cambio BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   entidad VARCHAR(80) NOT NULL,
@@ -171,5 +160,4 @@ CREATE TABLE IF NOT EXISTS operaciones_sincronizacion (
   CONSTRAINT fk_sincronizacion_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE corrales ADD COLUMN IF NOT EXISTS puntos_mapa JSON NULL;
 ALTER TABLE animales ADD COLUMN IF NOT EXISTS version_dato INT UNSIGNED NOT NULL DEFAULT 1;

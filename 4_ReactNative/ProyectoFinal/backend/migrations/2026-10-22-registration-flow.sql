@@ -1,11 +1,10 @@
 -- ejecutar una sola vez sobre la base existente, después de hacer un respaldo.
 -- una base representa una estancia; por eso las solicitudes quedan asociadas a esta base.
 
-ALTER TABLE usuarios
-  ADD COLUMN estado_cuenta ENUM('activo', 'pendiente_acceso', 'inactivo') NOT NULL DEFAULT 'activo',
-  ADD COLUMN email_verificado_at DATETIME NULL;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS estado_cuenta ENUM('activo', 'pendiente_acceso', 'inactivo') NOT NULL DEFAULT 'activo';
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS email_verificado_at DATETIME NULL;
 
-CREATE TABLE solicitudes_registro (
+CREATE TABLE IF NOT EXISTS solicitudes_registro (
   id_solicitud INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(100) NOT NULL,
   apellido VARCHAR(100) NOT NULL,
@@ -23,7 +22,7 @@ CREATE TABLE solicitudes_registro (
     REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE codigos_verificacion_solicitud (
+CREATE TABLE IF NOT EXISTS codigos_verificacion_solicitud (
   id_codigo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   id_solicitud INT UNSIGNED NOT NULL,
   codigo_hash CHAR(64) NOT NULL,
@@ -37,7 +36,7 @@ CREATE TABLE codigos_verificacion_solicitud (
     REFERENCES solicitudes_registro(id_solicitud) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE codigos_acceso_usuario (
+CREATE TABLE IF NOT EXISTS codigos_acceso_usuario (
   id_codigo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   id_usuario INT UNSIGNED NOT NULL,
   token_hash CHAR(64) NOT NULL,

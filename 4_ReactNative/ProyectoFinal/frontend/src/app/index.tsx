@@ -1,7 +1,9 @@
 // ingreso principal; el fondo verde ocupa toda la pantalla y la tarjeta mantiene el formulario legible.
+import { friendlyErrorMessage } from '../services/apiErrors';
+import { forest, s } from './LoginStyles';
 import NetInfo from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Redirect, router } from "expo-router";
+import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,7 +12,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   useWindowDimensions,
@@ -19,13 +20,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { BrandLoadingScreen } from "../components/BrandLoadingScreen";
+import { PasswordRecoveryModal } from "../components/PasswordRecoveryModal";
+import { AccountRequestModal } from "../components/AccountRequestModal";
+import { AccountActivationModal } from "../components/AccountActivationModal";
 import { SocialLoginButton } from "../components/SocialLoginButton";
 import { useSession } from "../context/SessionContext";
 import { initializeOfflineDatabase } from "../services/offlineDatabase";
 import { login } from "../services/authApi";
 import { removeSession, saveSession } from "../services/sessionStorage";
-
-const forest = "#123824";
 
 export default function LoginScreen() {
   const { session, setSession, restoring } = useSession();
@@ -39,6 +41,9 @@ export default function LoginScreen() {
   const [busy, setBusy] = useState(false);
   const [online, setOnline] = useState(true);
   const [error, setError] = useState("");
+  const [recoveryVisible, setRecoveryVisible] = useState(false);
+  const [accountRequestVisible, setAccountRequestVisible] = useState(false);
+  const [accountActivationVisible, setAccountActivationVisible] = useState(false);
 
   useEffect(() => {
     void initializeOfflineDatabase().catch(() => undefined);
@@ -69,7 +74,7 @@ export default function LoginScreen() {
     } catch (cause) {
       setError(
         cause instanceof Error
-          ? cause.message
+          ? friendlyErrorMessage(cause, 'No se pudo iniciar sesión. Revisá tus datos e intentá de nuevo.')
           : "No se pudo iniciar sesión. Revisá tus datos e intentá de nuevo.",
       );
     } finally {
@@ -247,12 +252,7 @@ export default function LoginScreen() {
                   </Pressable>
                   <Pressable
                     accessibilityRole="link"
-                    onPress={() =>
-                      router.push({
-                        pathname: "/recover",
-                        params: { email: email.trim() },
-                      })
-                    }
+                    onPress={() => setRecoveryVisible(true)}
                     style={s.forgotLink}
                   >
                     <Text style={[s.forgot, desktop && s.desktopSecondaryText]}>
@@ -329,7 +329,7 @@ export default function LoginScreen() {
                   </Text>
                   <Pressable
                     accessibilityRole="link"
-                    onPress={() => router.push("/register")}
+                    onPress={() => setAccountRequestVisible(true)}
                   >
                     <Text style={[s.link, desktop && s.desktopSecondaryText]}>
                       Solicitar acceso
@@ -338,7 +338,7 @@ export default function LoginScreen() {
                 </View>
                 <Pressable
                   accessibilityRole="link"
-                  onPress={() => router.push("/access")}
+                  onPress={() => setAccountActivationVisible(true)}
                   style={[s.accessLink, desktop && s.desktopCompactAccess]}
                 >
                   <Text style={s.accessText}>
@@ -350,243 +350,20 @@ export default function LoginScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
       </ImageBackground>
+      <PasswordRecoveryModal
+        initialEmail={email.trim()}
+        onClose={() => setRecoveryVisible(false)}
+        visible={recoveryVisible}
+      />
+      <AccountRequestModal
+        onClose={() => setAccountRequestVisible(false)}
+        visible={accountRequestVisible}
+      />
+      <AccountActivationModal
+        onClose={() => setAccountActivationVisible(false)}
+        visible={accountActivationVisible}
+      />
     </SafeAreaView>
   );
 }
 
-const s = StyleSheet.create({
-  safe: { backgroundColor: forest, flex: 1 },
-  flex: { flex: 1 },
-  background: { flex: 1 },
-  backgroundImage: { opacity: 0.92 },
-  page: {
-    backgroundColor: "rgba(18, 56, 36, 0.38)",
-    flexGrow: 1,
-    minHeight: "100%",
-  },
-  desktopPage: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: "6%",
-    paddingVertical: 20,
-  },
-  mobilePage: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 18,
-    paddingVertical: 26,
-  },
-  compactPage: { paddingHorizontal: 10, paddingVertical: 14 },
-  intro: { flex: 1, maxWidth: 430, paddingHorizontal: 16, paddingRight: 40 },
-  desktopIntroRaised: { transform: [{ translateY: -120 }] },
-  desktopLogoWrap: { alignItems: "flex-start" },
-  desktopLogo: { height: 100, marginBottom: 26, width: 100 },
-  introEyebrow: {
-    color: "#dcebc6",
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1.8,
-    marginBottom: 12,
-  },
-  introTitle: {
-    color: "#fff",
-    fontSize: 38,
-    fontWeight: "800",
-    lineHeight: 45,
-  },
-  introCopy: {
-    color: "#d3dfd4",
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 12,
-    maxWidth: 340,
-  },
-  card: { backgroundColor: "#fff", overflow: "hidden" },
-  desktopCard: {
-    borderBottomLeftRadius: 48,
-    borderBottomRightRadius: 24,
-    borderTopLeftRadius: 48,
-    borderTopRightRadius: 24,
-    maxWidth: 620,
-    paddingHorizontal: 44,
-    paddingVertical: 32,
-    width: "54%",
-  },
-  mobileCard: {
-    borderRadius: 28,
-    maxWidth: 520,
-    paddingHorizontal: 28,
-    paddingBottom: 28,
-    paddingTop: 28,
-    width: "100%",
-  },
-  mobileBrand: { alignItems: "center", marginBottom: 28 },
-  form: { alignSelf: "center", maxWidth: 480, width: "100%" },
-  title: {
-    color: "#1e2b22",
-    fontSize: 25,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-  },
-  subtitle: { color: "#788279", fontSize: 12, marginTop: 6 },
-  label: {
-    color: "#58665c",
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 1,
-    marginBottom: 8,
-    marginTop: 26,
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderColor: "#dce3db",
-    borderRadius: 15,
-    borderWidth: 1,
-    color: "#223027",
-    fontSize: 14,
-    height: 56,
-    paddingHorizontal: 17,
-    width: "100%",
-  },
-  passwordWrap: {
-    alignItems: "center",
-    borderColor: "#dce3db",
-    borderRadius: 15,
-    borderWidth: 1,
-    flexDirection: "row",
-    height: 56,
-    paddingRight: 14,
-  },
-  passwordInput: {
-    color: "#223027",
-    flex: 1,
-    fontSize: 14,
-    height: "100%",
-    paddingHorizontal: 17,
-  },
-  eye: {
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 44,
-    width: 36,
-  },
-  options: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-    justifyContent: "space-between",
-    marginTop: 17,
-  },
-  optionsCompact: { alignItems: "flex-start", flexDirection: "column", gap: 2 },
-  rememberRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 9,
-    minHeight: 40,
-  },
-  checkbox: {
-    alignItems: "center",
-    borderColor: "#9baa9d",
-    borderRadius: 5,
-    borderWidth: 1,
-    height: 19,
-    justifyContent: "center",
-    width: 19,
-  },
-  checkboxChecked: { backgroundColor: "#214d35", borderColor: "#214d35" },
-  rememberText: { color: "#59665d", fontSize: 12 },
-  forgotLink: { justifyContent: "center", minHeight: 40 },
-  forgot: { color: "#214d35", fontSize: 12, fontWeight: "700" },
-  offline: {
-    backgroundColor: "#fff3d9",
-    borderRadius: 10,
-    color: "#765918",
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 18,
-    padding: 11,
-  },
-  error: {
-    backgroundColor: "#fff0ed",
-    borderRadius: 10,
-    color: "#9b3d36",
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 15,
-    padding: 11,
-  },
-  primary: {
-    alignItems: "center",
-    alignSelf: "stretch",
-    backgroundColor: "#dcefc2",
-    borderRadius: 999,
-    height: 56,
-    justifyContent: "center",
-    marginTop: 24,
-    width: "100%",
-  },
-  disabled: { opacity: 0.7 },
-  primaryText: { color: "#214d35", fontSize: 14, fontWeight: "800" },
-  arrow: { fontSize: 16 },
-  socialDivider: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 11,
-    marginTop: 22,
-  },
-  dividerLine: { backgroundColor: "#e7ebe6", flex: 1, height: 1 },
-  dividerText: {
-    color: "#89938b",
-    fontSize: 9,
-    fontWeight: "800",
-    letterSpacing: 1,
-  },
-  socialButtons: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 16,
-    justifyContent: "center",
-    marginTop: 16,
-  },
-  links: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 5,
-    justifyContent: "center",
-    marginTop: 27,
-  },
-  joinText: { color: "#778179", fontSize: 12 },
-  link: { color: "#214d35", fontSize: 12, fontWeight: "800" },
-  accessLink: {
-    alignSelf: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 14,
-  },
-  accessText: { color: "#627068", fontSize: 11, textAlign: "center" },
-  footer: {
-    color: "#839087",
-    fontSize: 11,
-    marginTop: 43,
-    textAlign: "center",
-  },
-  desktopCompactTitle: { fontSize: 22, lineHeight: 28 },
-  desktopCompactSubtitle: { fontSize: 12, marginTop: 5 },
-  desktopInputText: { fontSize: 13 },
-  desktopSecondaryText: { fontSize: 11 },
-  desktopCompactLabel: { marginBottom: 6, marginTop: 12 },
-  desktopCompactInput: { borderRadius: 12, height: 44 },
-  desktopCompactOptions: {
-    flexWrap: "wrap",
-    columnGap: 10,
-    rowGap: 0,
-    marginTop: 6,
-  },
-  desktopCompactPrimary: { height: 44, marginTop: 12 },
-  desktopCompactSocial: { marginTop: 12 },
-  desktopCompactSocialButtons: { gap: 12, marginTop: 8 },
-  desktopCompactLinks: { marginTop: 14 },
-  desktopCompactAccess: { paddingVertical: 8 },
-  desktopCompactFooter: { fontSize: 10, marginTop: 12 },
-});

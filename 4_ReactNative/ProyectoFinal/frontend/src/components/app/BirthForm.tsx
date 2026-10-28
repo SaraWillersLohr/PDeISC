@@ -1,35 +1,41 @@
 // registro el nacimiento junto con la ficha de la cría y sus progenitores.
+import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { listCatalog, type Breed, type Species } from '../../services/organizationApi';
-import { listAnimals, listCorrals, type AnimalRecord, type CorralRecord } from '../../services/livestockApi';
+import { listAnimals, listCorrals, type AnimalGender, type AnimalRecord, type CorralRecord } from '../../services/livestockApi';
 import { createBirth } from '../../services/modulesApi';
+import { PhotoAttachment } from './PhotoAttachment';
 
 const g = '#214d35';
-export function BirthForm({ onSaved }: { onSaved: () => void }) {
+const genderOptions: { value: AnimalGender; label: string }[] = [{ value: 'hembra', label: 'Hembra' }, { value: 'macho', label: 'Macho' }, { value: 'no_especificado', label: 'No especificado' }];
+export function BirthForm({ onSaved, initialMother }: { onSaved: () => void; initialMother?: AnimalRecord }) {
   const { session } = useSession(); const [animals, setAnimals] = useState<AnimalRecord[]>([]); const [corrals, setCorrals] = useState<CorralRecord[]>([]); const [species, setSpecies] = useState<Species[]>([]); const [breeds, setBreeds] = useState<Breed[]>([]);
   const [motherSearch, setMotherSearch] = useState(''); const [fatherSearch, setFatherSearch] = useState(''); const [mother, setMother] = useState<AnimalRecord | null>(null); const [father, setFather] = useState<AnimalRecord | null>(null); const [motherText, setMotherText] = useState(''); const [fatherText, setFatherText] = useState('');
   const [speciesId, setSpeciesId] = useState<number | null>(null); const [breedId, setBreedId] = useState<number | null>(null); const [corralId, setCorralId] = useState<number | null>(null);
+  const [gender, setGender] = useState<AnimalGender>('no_especificado');
+  const [photo, setPhoto] = useState<string | null>(null);
   const [identifier, setIdentifier] = useState(''); const [name, setName] = useState(''); const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); const [notes, setNotes] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
   const filteredBreeds = useMemo(() => breeds.filter((item) => item.id_especie === speciesId), [breeds, speciesId]);
   const motherMatches = useMemo(() => animals.filter((item) => `${item.identificador} ${item.nombre ?? ''}`.toLowerCase().includes(motherSearch.toLowerCase())).slice(0, 5), [animals, motherSearch]);
   const fatherMatches = useMemo(() => animals.filter((item) => `${item.identificador} ${item.nombre ?? ''}`.toLowerCase().includes(fatherSearch.toLowerCase())).slice(0, 5), [animals, fatherSearch]);
   useEffect(() => {
     let active = true; if (!session) return () => { active = false; };
-    Promise.all([listAnimals(session), listCorrals(session), listCatalog(session)]).then(([animalRows, corralRows, catalog]) => { if (active) { setAnimals(animalRows); setCorrals(corralRows.filter((row) => !row.es_enfermeria)); setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId(catalog.especies[0]?.id_especie ?? null); setCorralId(corralRows.find((row) => !row.es_enfermeria)?.id_corral ?? null); } })
-      .catch((cause: unknown) => { if (active) setError(cause instanceof Error ? cause.message : 'No se pudieron cargar animales y catálogo.'); }).finally(() => { if (active) setLoading(false); });
+    Promise.all([listAnimals(session), listCorrals(session), listCatalog(session)]).then(([animalRows, corralRows, catalog]) => { if (active) { setAnimals(animalRows); setMother(initialMother ?? null); setCorrals(corralRows.filter((row) => !row.es_enfermeria)); setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId(catalog.especies[0]?.id_especie ?? null); setCorralId(corralRows.find((row) => !row.es_enfermeria)?.id_corral ?? null); } })
+      .catch((cause: unknown) => { if (active) setError(friendlyErrorMessage(cause, 'No se pudieron cargar animales y catálogo.')); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session]);
+  }, [initialMother, session]);
   async function save(): Promise<void> {
     if (!session || !identifier.trim() || !breedId || !corralId || (!mother && !motherText.trim()) || (!father && !fatherText.trim()) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) { setError('Completá ficha, fecha y los dos progenitores, por animal registrado o por nombre.'); return; }
     setSaving(true); setError('');
-    try { await createBirth(session, { identificador: identifier.trim(), nombre: name.trim() || undefined, id_raza: breedId, id_corral: corralId, fecha: date, ...(mother ? { id_madre: mother.id_animal } : { madre_texto: motherText.trim() }), ...(father ? { id_padre: father.id_animal } : { padre_texto: fatherText.trim() }), observaciones: notes.trim() || undefined }); setIdentifier(''); setName(''); setNotes(''); setMother(null); setFather(null); setMotherText(''); setFatherText(''); setError('Nacimiento registrado.'); onSaved(); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo guardar el nacimiento.'); }
+    try { await createBirth(session, { identificador: identifier.trim(), nombre: name.trim() || undefined, foto: photo, genero: gender, id_raza: breedId, id_corral: corralId, fecha: date, ...(mother ? { id_madre: mother.id_animal } : { madre_texto: motherText.trim() }), ...(father ? { id_padre: father.id_animal } : { padre_texto: fatherText.trim() }), observaciones: notes.trim() || undefined }); setIdentifier(''); setName(''); setNotes(''); setPhoto(null); setMother(null); setFather(null); setMotherText(''); setFatherText(''); setGender('no_especificado'); setError('Nacimiento registrado.'); onSaved(); }
+    catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo guardar el nacimiento.')); }
     finally { setSaving(false); }
   }
   return <View style={s.card}><Text style={s.title}>Registrar nacimiento</Text>{loading ? <ActivityIndicator color={g} /> : <>
-    <TextInput onChangeText={setIdentifier} placeholder="Identificador de la cría" style={s.input} value={identifier} /><TextInput onChangeText={setName} placeholder="Nombre (opcional)" style={s.input} value={name} /><TextInput onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" style={s.input} value={date} />
+    <TextInput onChangeText={setIdentifier} placeholder="Identificador de la cría" style={s.input} value={identifier} /><TextInput onChangeText={setName} placeholder="Nombre (opcional)" style={s.input} value={name} /><PhotoAttachment compact value={photo} onChange={setPhoto} /><TextInput onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" style={s.input} value={date} />
+    <Text style={s.label}>GÉNERO DE LA CRÍA</Text><View style={s.options}>{genderOptions.map((item) => <Pressable accessibilityRole="radio" accessibilityState={{ selected: gender === item.value }} key={item.value} onPress={() => setGender(item.value)} style={[s.option, gender === item.value && s.active]}><Text style={[s.optionText, gender === item.value && s.activeText]}>{item.label}</Text></Pressable>)}</View>
     <Text style={s.label}>ESPECIE Y RAZA</Text><View style={s.options}>{species.map((item) => <Pressable key={item.id_especie} onPress={() => { setSpeciesId(item.id_especie); setBreedId(null); }} style={[s.option, speciesId === item.id_especie && s.active]}><Text style={[s.optionText, speciesId === item.id_especie && s.activeText]}>{item.nombre}</Text></Pressable>)}</View><View style={s.options}>{filteredBreeds.map((item) => <Pressable key={item.id_raza} onPress={() => setBreedId(item.id_raza)} style={[s.option, breedId === item.id_raza && s.active]}><Text style={[s.optionText, breedId === item.id_raza && s.activeText]}>{item.nombre}</Text></Pressable>)}</View>
     <Text style={s.label}>CORRAL DE LA CRÍA</Text><View style={s.options}>{corrals.map((item) => <Pressable key={item.id_corral} disabled={item.ocupacion >= item.capacidad} onPress={() => setCorralId(item.id_corral)} style={[s.option, corralId === item.id_corral && s.active, item.ocupacion >= item.capacidad && s.disabled]}><Text style={[s.optionText, corralId === item.id_corral && s.activeText]}>{item.nombre} · {item.ocupacion}/{item.capacidad}</Text></Pressable>)}</View>
     <ParentInput label="MADRE" search={motherSearch} onSearch={setMotherSearch} selected={mother} matches={motherMatches} onSelect={(item) => { setMother(item); setMotherSearch(''); setMotherText(''); }} textValue={motherText} onText={setMotherText} onUnknown={() => { setMother(null); setMotherSearch(''); }} />

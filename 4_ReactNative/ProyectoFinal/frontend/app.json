@@ -11,6 +11,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.sarawillers.estanciaapp",
       "adaptiveIcon": {
         "backgroundColor": "#123824",
         "foregroundImage": "./assets/branding/app-icon.png"
@@ -45,6 +46,12 @@
         }
       ],
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "EstanciaApp necesita tu ubicación para registrar dónde se notificó la muerte de un animal."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/branding/dark/logo.png",
@@ -58,6 +65,19 @@
       "expo-sqlite",
       "expo-status-bar",
       "expo-web-browser"
-    ]
+    ],
+    "extra": {
+      "socialAuth": {},
+      "router": {
+        "root": "src/app",
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "37aed64e-f252-4547-93b7-477d0b6d9284"
+      }
+    },
+    "owner": "sarawillers2306"
   }
 }

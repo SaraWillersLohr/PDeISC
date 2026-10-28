@@ -41,6 +41,11 @@ async function applyStatement(connection: PoolConnection, statement: string): Pr
     await connection.query(normalizedStatement);
     return;
   }
+  // Las dos migraciones de agenda cargan fuentes por clave y pueden repetirse.
+  if (/^INSERT INTO\s+fuentes_eventos\s*\(/i.test(statement) && /\bON DUPLICATE KEY UPDATE\b/i.test(statement)) {
+    await connection.query(statement);
+    return;
+  }
   if (!/^CREATE TABLE IF NOT EXISTS\s/i.test(statement)) {
     throw new Error('la migración contiene una operación no aditiva');
   }

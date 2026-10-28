@@ -29,6 +29,7 @@ export const env = {
         password: requiredEnvironment('DB_PASSWORD'),
         name: requiredEnvironment('DB_NAME'),
         ssl: process.env.DB_SSL === 'true',
+        caCertificate: process.env.DB_CA_CERT?.trim().replace(/\\n/g, '\n'),
     },
     jwt: {
         accessSecret: requiredEnvironmentAlias('JWT_ACCESS_SECRET', 'JWT_SECRET'),

@@ -5,6 +5,7 @@ import { requireAuthentication } from '../middleware/authMiddleware.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 export const authRouter = Router();
 authRouter.post('/login', asyncHandler(authController.login));
+authRouter.get('/social/config', authController.socialAuthConfig);
 authRouter.get('/:provider/callback', authController.socialOAuthCallback);
 authRouter.post('/social/:provider', asyncHandler(authController.socialLogin));
 authRouter.post('/refresh', asyncHandler(authController.refresh));

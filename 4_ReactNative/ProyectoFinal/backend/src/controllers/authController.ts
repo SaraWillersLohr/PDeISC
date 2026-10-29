@@ -118,6 +118,11 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
+// expongo únicamente los identificadores OAuth públicos que el cliente necesita para iniciar el flujo.
+export function socialAuthConfig(_req: Request, res: Response): void {
+  res.status(200).json({ facebookAppId: env.socialAuth.facebookAppId || null });
+}
+
 // verifico credenciales OAuth con el proveedor y solo habilito cuentas ya aprobadas.
 export async function socialLogin(req: Request, res: Response): Promise<void> {
   const provider = Array.isArray(req.params.provider) ? req.params.provider[0] : req.params.provider;

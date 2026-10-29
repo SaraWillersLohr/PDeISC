@@ -137,6 +137,10 @@ export async function login(req, res) {
         res.status(401).json({ message });
     }
 }
+// expongo únicamente los identificadores OAuth públicos que el cliente necesita para iniciar el flujo.
+export function socialAuthConfig(_req, res) {
+    res.status(200).json({ facebookAppId: env.socialAuth.facebookAppId || null });
+}
 // verifico credenciales OAuth con el proveedor y solo habilito cuentas ya aprobadas.
 export async function socialLogin(req, res) {
     const provider = Array.isArray(req.params.provider) ? req.params.provider[0] : req.params.provider;

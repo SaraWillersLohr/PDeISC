@@ -45,6 +45,15 @@ export async function socialLogin(provider: 'google' | 'facebook' | 'github', co
   catch { throw new Error('El servicio de acceso respondió de forma inesperada. Intentá de nuevo.'); }
 }
 
+// obtengo el App ID público desde Render cuando el frontend web no se compiló con él.
+export async function getFacebookAppId(): Promise<string | null> {
+  if (!apiUrl) throw new Error(apiConfigurationMessage);
+  const response = await apiFetch(`${apiUrl}/auth/social/config`);
+  if (!response.ok) throw new Error(await getErrorMessage(response));
+  const body = await response.json().catch(() => ({})) as { facebookAppId?: string | null };
+  return body.facebookAppId?.trim() || null;
+}
+
 // renuevo los tokens al restaurar la sesión desde el dispositivo.
 export class SessionRefreshError extends Error {
   constructor(message: string, readonly status?: number) { super(message); this.name = 'SessionRefreshError'; }

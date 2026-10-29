@@ -4,11 +4,11 @@ import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 import * as WebBrowser from 'expo-web-browser';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet } from 'react-native';
 import { apiUrl } from '../config/api';
 import { friendlyErrorMessage } from '../services/apiErrors';
-import { socialLogin } from '../services/authApi';
+import { getFacebookAppId, socialLogin } from '../services/authApi';
 import type { Session } from '../types/auth';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -45,16 +45,28 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
   provider: Provider; disabled: boolean; compact?: boolean; onSuccess: (session: Session) => Promise<void>; onError: (message: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const item = config[provider];
+  const [runtimeClientId, setRuntimeClientId] = useState<string | undefined>(item.clientId);
+  const [loadingClientId, setLoadingClientId] = useState(provider === 'facebook' && !item.clientId);
+  const clientId = item.clientId || runtimeClientId;
+  useEffect(() => {
+    if (provider !== 'facebook' || item.clientId) return;
+    let active = true;
+    void getFacebookAppId()
+      .then((appId) => { if (active) setRuntimeClientId(appId ?? undefined); })
+      .catch(() => { if (active) setRuntimeClientId(undefined); })
+      .finally(() => { if (active) setLoadingClientId(false); });
+    return () => { active = false; };
+  }, [item.clientId, provider]);
   const [oauthState] = useState(() => {
     const nonce = Crypto.randomUUID();
     return Platform.OS === 'web' && typeof window !== 'undefined'
       ? `web:${encodeURIComponent(window.location.origin)}:${nonce}`
       : nonce;
   });
-  const item = config[provider];
   const redirectUri = AuthSession.makeRedirectUri({ scheme: 'estanciaapp', path: 'oauth/callback' });
   const [request, , promptAsync] = AuthSession.useAuthRequest({
-    clientId: item.clientId ?? 'not-configured',
+    clientId: clientId ?? 'not-configured',
     redirectUri,
     state: oauthState,
     responseType: AuthSession.ResponseType.Code,
@@ -68,7 +80,7 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
       onError(`Para ingresar con ${item.label} necesitás una compilación de desarrollo. En Expo Go podés usar correo y contraseña.`);
       return;
     }
-    if (!item.clientId) { onError(`Falta configurar el ID público de ${item.label}. Para un APK, agregá EXPO_PUBLIC_${provider === 'google' ? 'GOOGLE_CLIENT_ID_WEB' : provider === 'facebook' ? 'FACEBOOK_APP_ID' : 'GITHUB_CLIENT_ID'} al entorno preview de EAS y generá e instalá un APK nuevo; para desarrollo local, agregalo a frontend/.env.local.`); return; }
+    if (!clientId) { onError(provider === 'facebook' ? 'No se pudo obtener el ID público de Facebook desde Render. Revisá FACEBOOK_APP_ID en el backend.' : `Falta el ID público de ${item.label}. Configuralo en el entorno preview de EAS para el APK o en las variables de Vercel para la web.`); return; }
     if (!request?.url) return;
     setBusy(true);
     try {
@@ -83,7 +95,7 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
       if (result.params.error) throw new Error('El proveedor canceló el inicio de sesión o no pudo autorizarlo.');
       const code = result.params.code;
       if (!code) throw new Error(`No se recibió una credencial válida de ${item.label}.`);
-      const session = await socialLogin(provider, code, { redirectUri: providerRedirectUri, clientId: item.clientId!, codeVerifier: request.codeVerifier });
+      const session = await socialLogin(provider, code, { redirectUri: providerRedirectUri, clientId, codeVerifier: request.codeVerifier });
       await onSuccess(session);
     } catch (cause) {
       onError(friendlyErrorMessage(cause, `No se pudo iniciar sesión con ${item.label}.`));
@@ -91,8 +103,8 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
   }
 
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`Continuar con ${item.label}`} disabled={disabled || busy} onPress={() => void start()} style={[styles.button, compact && styles.compactButton, (disabled || busy) && styles.disabled]}>
-      {busy ? <ActivityIndicator color="#334239" size="small" /> : <MaterialCommunityIcons color={provider === 'facebook' ? '#1877f2' : provider === 'google' ? '#4285f4' : '#26332b'} name={item.icon} size={compact ? 21 : 25} />}
+    <Pressable accessibilityRole="button" accessibilityLabel={`Continuar con ${item.label}`} disabled={disabled || busy || loadingClientId} onPress={() => void start()} style={[styles.button, compact && styles.compactButton, (disabled || busy || loadingClientId) && styles.disabled]}>
+      {busy || loadingClientId ? <ActivityIndicator color="#334239" size="small" /> : <MaterialCommunityIcons color={provider === 'facebook' ? '#1877f2' : provider === 'google' ? '#4285f4' : '#26332b'} name={item.icon} size={compact ? 21 : 25} />}
     </Pressable>
   );
 }

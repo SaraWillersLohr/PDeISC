@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "estanciaapp",
-    "icon": "./assets/branding/app-icon.png",
+    "icon": "./assets/logo-app.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
@@ -14,7 +14,7 @@
       "package": "com.sarawillers.estanciaapp",
       "adaptiveIcon": {
         "backgroundColor": "#123824",
-        "foregroundImage": "./assets/branding/app-icon.png"
+        "foregroundImage": "./assets/logo-app.png"
       },
       "predictiveBackGestureEnabled": false
     },

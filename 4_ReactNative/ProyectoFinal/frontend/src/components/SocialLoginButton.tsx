@@ -12,9 +12,18 @@ import type { Session } from '../types/auth';
 WebBrowser.maybeCompleteAuthSession();
 
 type Provider = 'google' | 'facebook' | 'github';
-const socialIds = Constants.expoConfig?.extra?.socialAuth as {
+const configuredSocialIds = Constants.expoConfig?.extra?.socialAuth as {
   googleClientIdWeb?: string; googleClientIdAndroid?: string; googleClientIdIos?: string; facebookAppId?: string; githubClientId?: string;
 } | undefined;
+// Expo reemplaza estas referencias públicas durante el bundle de EAS; las dejo como fallback
+// si una actualización/manifiesto no expone extra.socialAuth en Constants.expoConfig.
+const socialIds = {
+  googleClientIdWeb: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB || configuredSocialIds?.googleClientIdWeb,
+  googleClientIdAndroid: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || configuredSocialIds?.googleClientIdAndroid,
+  googleClientIdIos: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || configuredSocialIds?.googleClientIdIos,
+  facebookAppId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || configuredSocialIds?.facebookAppId,
+  githubClientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || configuredSocialIds?.githubClientId,
+};
 const config = {
   google: { label: 'Google', icon: 'google' as const, clientId: Platform.select({ web: socialIds?.googleClientIdWeb, android: socialIds?.googleClientIdAndroid || socialIds?.googleClientIdWeb, ios: socialIds?.googleClientIdIos || socialIds?.googleClientIdWeb }), endpoint: 'https://accounts.google.com/o/oauth2/v2/auth', scopes: ['openid', 'email', 'profile'] },
   facebook: { label: 'Facebook', icon: 'facebook' as const, clientId: socialIds?.facebookAppId, endpoint: 'https://www.facebook.com/dialog/oauth', scopes: ['email', 'public_profile'] },
@@ -42,7 +51,7 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
       onError(`Para ingresar con ${item.label} necesitás una compilación de desarrollo. En Expo Go podés usar correo y contraseña.`);
       return;
     }
-    if (!item.clientId) { onError(`Falta configurar el ID público de ${item.label} en frontend/.env.local.`); return; }
+    if (!item.clientId) { onError(`Esta versión no incluye el ID público de ${item.label}. Configurá EXPO_PUBLIC_${provider === 'google' ? 'GOOGLE_CLIENT_ID_WEB' : provider === 'facebook' ? 'FACEBOOK_APP_ID' : 'GITHUB_CLIENT_ID'} en EAS (entorno preview) y generá e instalá un APK nuevo.`); return; }
     if (!request?.url) return;
     setBusy(true);
     try {

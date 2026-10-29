@@ -2,14 +2,14 @@
 
 EstanciaApp es una aplicación multiplataforma para registrar y consultar la operación de una estancia ganadera. El frontend se construyó con React Native, Expo y TypeScript; el backend usa Node.js, Express y TypeScript; MariaDB/MySQL almacena los datos.
 
-Este archivo explica la arquitectura, los roles, la instalación, la configuración, el uso de la API y la relación con la consigna académica. La documentación de referencia de API y de uso está en [DOCUMENTACION_API.md](DOCUMENTACION_API.md), [MANUAL_USUARIO.md](MANUAL_USUARIO.md) y [GUIA_INSTALACION_APK.md](GUIA_INSTALACION_APK.md).
+Este archivo explica la arquitectura, los roles, la instalación, la configuración y el uso de la API. La relación requisito por requisito con la consigna, incluidos los archivos de implementación y el estado de verificación, está en [README_CUMPLIMIENTO_CONSIGNA.md](README_CUMPLIMIENTO_CONSIGNA.md). La referencia de API y uso está en [DOCUMENTACION_API.md](DOCUMENTACION_API.md), [MANUAL_USUARIO.md](MANUAL_USUARIO.md) y [GUIA_INSTALACION_APK.md](GUIA_INSTALACION_APK.md).
 
 ## Estado de los entregables
 
 - El código fuente del cliente y del servidor está organizado en `frontend/` y `backend/`.
 - La especificación inicial de base y algunos datos de ejemplo están en `bd_final.sql`.
 - Las migraciones operativas están en `backend/migrations/`.
-- La aplicación está preparada para generar un APK interno con EAS, pero esta copia del proyecto no contiene un APK generado. Antes del primer build hay que definir un `android.package` único en `frontend/app.json`, vincular el proyecto a EAS y configurar la URL productiva de la API.
+- La aplicación está preparada para generar un APK interno con EAS y ya tiene definido `android.package` en `frontend/app.json`. Esta copia del proyecto no contiene un APK generado: el último intento de build informado falló durante la compresión del proyecto, antes de iniciar la compilación.
 - Las credenciales de correo y OAuth son configuración del despliegue. Los archivos `.env.example` contienen nombres y ejemplos; deben reemplazarse por valores propios.
 
 ## Qué resuelve
@@ -296,7 +296,7 @@ Los scripts del proyecto no definen una suite de pruebas automatizadas. Para una
 
 ## APK Android
 
-Antes de pedir un build, definí en `frontend/app.json` el valor único `expo.android.package`, registrá URLs de retorno OAuth para Android y completá `EXPO_PUBLIC_API_URL` con el backend HTTPS. Vinculá la carpeta `frontend/` con el proyecto EAS y guardá sus variables de build. Luego, desde `frontend/`:
+El identificador `expo.android.package` ya está definido en `frontend/app.json`. Antes de generar el APK, confirmá que las variables públicas de build en EAS apunten a la API HTTPS y contengan los IDs públicos de OAuth, y que las credenciales privadas permanezcan únicamente en Render. Luego, desde `frontend/`:
 
 ```powershell
 npx eas-cli@latest build --platform android --profile preview
@@ -306,6 +306,7 @@ El perfil `preview` produce un APK de distribución interna. `production` produc
 
 ## Documentación relacionada
 
+- [Cumplimiento de la consigna y archivos de implementación](README_CUMPLIMIENTO_CONSIGNA.md)
 - [Descripción funcional del proyecto](DESCRIPCION_PROYECTO.md)
 - [Requerimientos del proyecto](REQUERIMIENTOS_PROYECTO.md)
 - [Documentación de la API](DOCUMENTACION_API.md)

@@ -134,6 +134,32 @@ export async function socialLogin(req: Request, res: Response): Promise<void> {
   }
 }
 
+// vuelvo a abrir la app con la respuesta de oauth para que el navegador móvil cierre el flujo.
+export function socialOAuthCallback(req: Request, res: Response): void {
+  const provider = Array.isArray(req.params.provider) ? req.params.provider[0] : req.params.provider;
+  if (!['google', 'facebook', 'github'].includes(provider)) {
+    res.status(404).send('el proveedor de acceso no existe');
+    return;
+  }
+
+  const callbackUrl = new URL('estanciaapp://oauth/callback');
+  callbackUrl.searchParams.set('provider', provider);
+  const state = typeof req.query.state === 'string' ? req.query.state : '';
+  const code = typeof req.query.code === 'string' ? req.query.code : '';
+  const providerError = typeof req.query.error === 'string' ? req.query.error : '';
+
+  if (state.length > 256 || code.length > 4096 || providerError.length > 128) {
+    callbackUrl.searchParams.set('error', 'invalid_response');
+  } else {
+    if (state) callbackUrl.searchParams.set('state', state);
+    if (code) callbackUrl.searchParams.set('code', code);
+    if (providerError) callbackUrl.searchParams.set('error', providerError);
+    if (!code && !providerError) callbackUrl.searchParams.set('error', 'missing_response');
+  }
+
+  res.redirect(302, callbackUrl.toString());
+}
+
 // renuevo la sesión cuando el token de acceso dejó de ser válido.
 export async function refresh(req: Request, res: Response): Promise<void> {
   const { refreshToken } = req.body as { refreshToken?: string };

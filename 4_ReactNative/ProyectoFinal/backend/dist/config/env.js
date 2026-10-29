@@ -38,12 +38,16 @@ export const env = {
         refreshExpiresIn: requiredEnvironmentAlias('JWT_REFRESH_EXPIRES_IN', 'JWT_EXPIRES_IN'),
     },
     email: {
+        provider: process.env.EMAIL_PROVIDER?.trim().toLowerCase() ?? 'smtp',
         smtpHost: process.env.SMTP_HOST?.trim(),
         smtpPort: Number(process.env.SMTP_PORT ?? 465),
         smtpUser: process.env.SMTP_USER?.trim(),
         smtpPassword: process.env.SMTP_PASS,
         mailFrom: process.env.MAIL_FROM?.trim(),
         verificationCodeSecret: process.env.VERIFICATION_CODE_SECRET,
+        gmailClientId: process.env.GMAIL_CLIENT_ID?.trim(),
+        gmailClientSecret: process.env.GMAIL_CLIENT_SECRET?.trim(),
+        gmailRefreshToken: process.env.GMAIL_REFRESH_TOKEN?.trim(),
     },
     socialAuth: {
         googleClientIds: (process.env.GOOGLE_CLIENT_IDS || process.env.GOOGLE_CLIENT_ID || '').split(',').map((value) => value.trim()).filter(Boolean),

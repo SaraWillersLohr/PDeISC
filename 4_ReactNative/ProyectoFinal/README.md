@@ -42,7 +42,7 @@ ProyectoFinal/
 │   ├── app.json          Configuración Expo y plugins nativos
 │   └── eas.json          Perfiles APK interno y AAB de producción
 ├── bd_final.sql          Esquema inicial y filas de muestra
-├── DOCUMENTACION_API.md  Inventario de rutas, roles y métodos
+├── DOCUMENTACION_API.md  Referencia de API: permisos, parámetros, ejemplos y errores
 ├── MANUAL_USUARIO.md     Guía de operación por rol
 └── GUIA_INSTALACION_APK.md
 ```
@@ -84,7 +84,7 @@ La modalidad offline no equivale a replicar toda la base localmente. Las lectura
 
 - Node.js compatible con las dependencias del proyecto y npm.
 - MariaDB o MySQL compatible con el esquema de `bd_final.sql`.
-- Acceso a un servicio SMTP para verificación, recuperación y activación de cuentas.
+- Acceso a Gmail API o a un servicio SMTP para verificación, recuperación y activación de cuentas.
 - Para OAuth, aplicaciones registradas en Google, Facebook y GitHub y sus URLs de retorno configuradas.
 - Para compilar el APK: cuenta/proyecto de Expo EAS y un identificador Android aprobado para la app.
 
@@ -114,7 +114,8 @@ Editá `backend/.env` con los valores reales:
 | `DB_SSL` | `true` cuando el proveedor exige TLS para la conexión a la base. |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Secretos diferentes, aleatorios y largos para tokens. |
 | `JWT_ACCESS_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN` | Vencimientos compatibles con la librería JWT, por ejemplo `15m` y `7d`. |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Entrega de códigos por correo. |
+| `EMAIL_PROVIDER`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `MAIL_FROM` | Entrega de códigos con Gmail API; ver [configuración en Render](GMAIL_API_RENDER.md). |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Alternativa SMTP cuando `EMAIL_PROVIDER=smtp`. |
 | `VERIFICATION_CODE_SECRET` | Secreto aleatorio para proteger códigos de verificación y activación. |
 | `GOOGLE_CLIENT_IDS` | IDs autorizados de Google, separados por coma. |
 | `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` | Credenciales de la app OAuth de Facebook. |
@@ -178,7 +179,7 @@ La contraseña se guarda como hash. Los códigos de acceso y recuperación vence
 
 ## API REST
 
-La raíz local es `http://localhost:3010/api`. Las rutas protegidas reciben `Authorization: Bearer <accessToken>`. El backend envía JSON y normalmente responde `{ "data": ... }` para consultas y `{ "message": ... }` para acciones. Los errores usan `{ "message": "..." }`.
+La raíz local es `http://localhost:3010/api`. Las rutas protegidas reciben `Authorization: Bearer <accessToken>`. El backend envía JSON y normalmente responde `{ "data": ... }` para consultas y `{ "message": ... }` para acciones. Los errores usan `{ "message": "..." }`. La [documentación detallada de la API](DOCUMENTACION_API.md) incluye permisos, parámetros, cuerpos, ejemplos de respuestas y códigos HTTP por endpoint.
 
 ### Autenticación
 
@@ -252,7 +253,7 @@ La raíz local es `http://localhost:3010/api`. Las rutas protegidas reciben `Aut
 | `GET /events` | administrador, dueño | Consultar eventos; `?todos=1` solicita agenda amplia. |
 | `GET /dashboard` | administrador, dueño | Consultar indicadores. |
 
-Los códigos HTTP habituales son `400` para datos inválidos, `401` para credenciales o token inválidos, `403` para falta de permiso, `404` para recurso ausente, `409` para conflicto/regla de negocio, `500` para error interno y `503` cuando la base no está disponible. Consultá [DOCUMENTACION_API.md](DOCUMENTACION_API.md) para la referencia resumida de uso.
+Los códigos HTTP habituales son `400` para datos inválidos, `401` para credenciales o token inválidos, `403` para falta de permiso, `404` para recurso ausente, `409` para conflicto/regla de negocio, `500` para error interno y `503` cuando la base no está disponible. Consultá [DOCUMENTACION_API.md](DOCUMENTACION_API.md) para el detalle de uso y respuesta de cada endpoint.
 
 ### Operaciones offline admitidas
 
@@ -274,7 +275,7 @@ La estructura está normalizada en entidades como usuarios y roles, animales, ra
 
 | Punto solicitado | Cómo responde el proyecto | Estado / observación |
 | --- | --- | --- |
-| Registro e inicio de sesión | Formularios, solicitud aprobada, recuperación y sesiones JWT. | Implementado; registro requiere SMTP. |
+| Registro e inicio de sesión | Formularios, solicitud aprobada, recuperación y sesiones JWT. | Implementado; registro requiere configurar Gmail API o SMTP. |
 | Tres redes sociales | Google, Facebook y GitHub mediante OAuth. | Implementado en código; necesita credenciales y callbacks de cada proveedor. |
 | Mínimo tres perfiles | Administrador, dueño, peón y veterinario. | Implementado; permisos verificados en backend. |
 | UI móvil y navegación | React Native/Expo, Expo Router, componentes y shell adaptable. | Implementado; web también está configurada. |

@@ -8,7 +8,7 @@ declare module 'nodemailer' {
   }
 
   interface Transporter {
-    sendMail(options: MailOptions): Promise<unknown>;
+    sendMail(options: MailOptions): Promise<{ message?: Buffer }>;
   }
 
   interface TransportOptions {
@@ -18,8 +18,14 @@ declare module 'nodemailer' {
     auth: { user: string; pass: string };
   }
 
+  interface StreamTransportOptions {
+    streamTransport: true;
+    buffer: true;
+    newline: 'unix';
+  }
+
   const nodemailer: {
-    createTransport(options: TransportOptions): Transporter;
+    createTransport(options: TransportOptions | StreamTransportOptions): Transporter;
   };
 
   export default nodemailer;

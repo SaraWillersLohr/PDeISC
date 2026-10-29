@@ -8,9 +8,20 @@ export const maxCodeAttempts = 5;
 const allowedRoles = ['dueno', 'peon', 'veterinario'];
 // detengo los flujos de correo si falta configuración segura.
 export function assertMailConfiguration() {
-    const { smtpHost, smtpUser, smtpPassword, mailFrom, verificationCodeSecret } = env.email;
-    if (!smtpHost || !smtpUser || !smtpPassword || !mailFrom)
-        throw new Error('el registro todavía no está habilitado: falta configurar smtp');
+    const { provider, smtpHost, smtpUser, smtpPassword, mailFrom, gmailClientId, gmailClientSecret, gmailRefreshToken, verificationCodeSecret } = env.email;
+    if (!mailFrom)
+        throw new Error('el registro requiere configurar MAIL_FROM');
+    if (provider === 'gmail_api') {
+        if (!gmailClientId || !gmailClientSecret || !gmailRefreshToken)
+            throw new Error('el registro requiere GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET y GMAIL_REFRESH_TOKEN');
+    }
+    else if (provider === 'smtp') {
+        if (!smtpHost || !smtpUser || !smtpPassword)
+            throw new Error('el registro todavía no está habilitado: falta configurar smtp');
+    }
+    else {
+        throw new Error('EMAIL_PROVIDER debe ser gmail_api o smtp');
+    }
     if (!verificationCodeSecret || verificationCodeSecret.length < 32)
         throw new Error('el registro requiere verification_code_secret de al menos 32 caracteres');
 }

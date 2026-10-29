@@ -24,10 +24,9 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   logo: {
-    height: 260,
-    maxWidth: 320,
-    width: '100%',
-    marginBottom: 32,
+    height: 210,
+    width: 210,
+    marginBottom: 28,
   },
   loadingRow: {
     alignItems: 'center',

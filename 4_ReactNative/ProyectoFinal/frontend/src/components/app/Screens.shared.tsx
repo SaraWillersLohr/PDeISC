@@ -1,12 +1,13 @@
 // reúno tipos y elementos visuales compartidos entre las pantallas principales.
 import NetInfo from '@react-native-community/netinfo';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
-import { Image, Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Image, NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
 import { s } from './ScreensStyles';
+import { ScrollToTop } from './ScrollToTop';
 
 export type ModuleKey = 'inicio' | 'animales' | 'estancia' | 'tareas' | 'sanidad' | 'reproduccion' | 'eventos' | 'equipo' | 'catalogo' | 'perfil';
 
@@ -63,13 +64,17 @@ export function Page({ children }: { children: React.ReactNode }) {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
+  const scrollToTop = useRef<() => void>(() => {});
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) { setShowScrollTop(event.nativeEvent.contentOffset.y > 320); }
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} style={[s.safe, { backgroundColor: colors.bgCanvas }]}>
-      <ScrollView contentContainerStyle={[s.page, isDesktop && s.pageDesktop]} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={(instance) => { scrollToTop.current = () => instance?.scrollTo({ y: 0, animated: true }); }} onScroll={handleScroll} scrollEventThrottle={16} contentContainerStyle={[s.page, isDesktop && s.pageDesktop]} showsVerticalScrollIndicator={false}>
         <View style={[s.contentContainer, isDesktop && s.contentContainerDesktop]}>
           {children}
         </View>
       </ScrollView>
+      <ScrollToTop visible={showScrollTop} onPress={() => scrollToTop.current()} />
     </SafeAreaView>
   );
 }

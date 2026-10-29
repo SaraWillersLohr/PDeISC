@@ -1,10 +1,11 @@
 // organizo los eventos de las especies activas y dejo las demás fuentes en espera.
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
+import { ScrollToTop } from './ScrollToTop';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { listFieldEvents, type FieldEvent, type FieldEventsData } from '../../services/modulesApi';
 
@@ -62,6 +63,9 @@ export function EventsScreen() {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
+  const scrollToTop = useRef<() => void>(() => {});
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) { setShowScrollTop(event.nativeEvent.contentOffset.y > 320); }
   const [data, setData] = useState<FieldEventsData>({ eventos: [], especies: [], razas: [], provincias: [], total_nacional: 0, fuentes: [] });
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(localDateKey(new Date()));
@@ -144,7 +148,7 @@ export function EventsScreen() {
 
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} style={[styles.safe, { backgroundColor: colors.bgCanvas }]}>
-      <ScrollView contentContainerStyle={[styles.page, isDesktop && styles.pageDesktop]}>
+      <ScrollView ref={(instance) => { scrollToTop.current = () => instance?.scrollTo({ y: 0, animated: true }); }} onScroll={handleScroll} scrollEventThrottle={16} contentContainerStyle={[styles.page, isDesktop && styles.pageDesktop]}>
         <View style={[styles.inner, isDesktop && styles.innerDesktop]}>
           <Text style={[styles.heading, { color: colors.textMain }]}>Eventos ganaderos</Text>
           <Text style={[styles.subtitle, { color: colors.textMuted }]}>CALENDARIO DE ASOCIACIONES DE CRIADORES</Text>
@@ -206,6 +210,7 @@ export function EventsScreen() {
           )}
         </View>
       </ScrollView>
+      <ScrollToTop visible={showScrollTop} onPress={() => scrollToTop.current()} />
 
       <Modal animationType="fade" transparent visible={Boolean(filterKind)} onRequestClose={() => setFilterKind(null)}>
         <Pressable onPress={() => setFilterKind(null)} style={styles.modalBackdrop}>

@@ -1,9 +1,11 @@
 // comparto elementos visuales y validaciones de los inventarios ganaderos.
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Platform, Pressable, RefreshControl, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, RefreshControl, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 import { style } from './LivestockStyles';
+import { ScrollToTop } from './ScrollToTop';
 
 export function SpeciesFilterChip({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
   const { colors } = useTheme();
@@ -45,10 +47,16 @@ export function InventoryPage({
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
+  const scrollToTop = useRef<() => void>(() => {});
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) { setShowScrollTop(event.nativeEvent.contentOffset.y > 320); }
 
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} style={[style.safe, { backgroundColor: colors.bgCanvas }]}>
       <ScrollView
+        ref={(instance) => { scrollToTop.current = () => instance?.scrollTo({ y: 0, animated: true }); }}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         contentContainerStyle={[style.page, isDesktop && style.pageDesktop]}
         refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={refreshing} tintColor={colors.primary} />}
         showsVerticalScrollIndicator={false}
@@ -99,6 +107,7 @@ export function InventoryPage({
           )}
         </View>
       </ScrollView>
+      <ScrollToTop visible={showScrollTop} onPress={() => scrollToTop.current()} />
     </SafeAreaView>
   );
 }

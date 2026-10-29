@@ -40,14 +40,14 @@ services:
         value: 7d
       - key: VERIFICATION_CODE_SECRET
         generateValue: true
-      # Render bloquea SMTP en 25, 465 y 587; configurar un proveedor que admita 2525.
-      - key: SMTP_HOST
+      # Gmail API envía por HTTPS, compatible con el plan gratuito de Render.
+      - key: EMAIL_PROVIDER
+        value: gmail_api
+      - key: GMAIL_CLIENT_ID
         sync: false
-      - key: SMTP_PORT
-        value: "2525"
-      - key: SMTP_USER
+      - key: GMAIL_CLIENT_SECRET
         sync: false
-      - key: SMTP_PASS
+      - key: GMAIL_REFRESH_TOKEN
         sync: false
       - key: MAIL_FROM
         sync: false

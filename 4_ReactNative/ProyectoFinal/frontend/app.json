@@ -19,14 +19,14 @@
       "predictiveBackGestureEnabled": false
     },
     "splash": {
-      "image": "./assets/branding/dark/logo.png",
+      "image": "./assets/logo-app.png",
       "resizeMode": "contain",
       "backgroundColor": "#123824"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "splash": {
-        "image": "./assets/branding/dark/logo.png",
+        "image": "./assets/logo-app.png",
         "resizeMode": "contain",
         "backgroundColor": "#123824"
       }
@@ -54,8 +54,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/branding/dark/logo.png",
-          "imageWidth": 220,
+          "image": "./assets/logo-app.png",
+          "imageWidth": 280,
           "resizeMode": "contain",
           "backgroundColor": "#123824"
         }

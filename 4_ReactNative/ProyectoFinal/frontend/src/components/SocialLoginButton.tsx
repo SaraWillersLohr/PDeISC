@@ -21,15 +21,23 @@ const socialIds = {
   googleClientIdWeb: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB || configuredSocialIds?.googleClientIdWeb,
   googleClientIdAndroid: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || configuredSocialIds?.googleClientIdAndroid,
   googleClientIdIos: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || configuredSocialIds?.googleClientIdIos,
-  facebookAppId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || configuredSocialIds?.facebookAppId,
+  facebookAppId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || configuredSocialIds?.facebookAppId || process.env.FACEBOOK_APP_ID || process.env.FACEBOOK_CLIENT_ID,
   githubClientId: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || configuredSocialIds?.githubClientId,
 };
 const config = {
-  google: { label: 'Google', icon: 'google' as const, clientId: Platform.select({ web: socialIds?.googleClientIdWeb, android: socialIds?.googleClientIdAndroid || socialIds?.googleClientIdWeb, ios: socialIds?.googleClientIdIos || socialIds?.googleClientIdWeb }), endpoint: 'https://accounts.google.com/o/oauth2/v2/auth', scopes: ['openid', 'email', 'profile'] },
+  // El callback móvil es HTTPS en nuestro backend, así que Google debe recibir
+  // el ID del cliente web, que es el tipo de cliente que admite esa URI.
+  google: { label: 'Google', icon: 'google' as const, clientId: socialIds?.googleClientIdWeb, endpoint: 'https://accounts.google.com/o/oauth2/v2/auth', scopes: ['openid', 'email', 'profile'] },
   facebook: { label: 'Facebook', icon: 'facebook' as const, clientId: socialIds?.facebookAppId, endpoint: 'https://www.facebook.com/dialog/oauth', scopes: ['email', 'public_profile'] },
   github: { label: 'GitHub', icon: 'github' as const, clientId: socialIds?.githubClientId, endpoint: 'https://github.com/login/oauth/authorize', scopes: ['read:user', 'user:email'] },
 };
-const socialCallbackBaseUri = (process.env.EXPO_PUBLIC_SOCIAL_CALLBACK_BASE_URL || 'https://estanciaapp-api.onrender.com/api/auth').replace(/\/$/, '');
+// En EAS tomo el mismo host/base API que usa la app para evitar que el OAuth
+// callback quede apuntando a un dominio viejo o distinto del backend desplegado.
+const defaultSocialApiUrl = 'https://estanciaapp-api.onrender.com/api';
+const socialCallbackBaseUri = (__DEV__
+  ? process.env.EXPO_PUBLIC_SOCIAL_CALLBACK_BASE_URL || `${defaultSocialApiUrl}/auth`
+  : `${(process.env.EXPO_PUBLIC_API_URL || defaultSocialApiUrl).replace(/\/$/, '')}/auth`
+).replace(/\/$/, '');
 
 export function SocialLoginButton({ provider, disabled, compact = false, onSuccess, onError }: {
   provider: Provider; disabled: boolean; compact?: boolean; onSuccess: (session: Session) => Promise<void>; onError: (message: string) => void;
@@ -51,7 +59,7 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
       onError(`Para ingresar con ${item.label} necesitás una compilación de desarrollo. En Expo Go podés usar correo y contraseña.`);
       return;
     }
-    if (!item.clientId) { onError(`Esta versión no incluye el ID público de ${item.label}. Configurá EXPO_PUBLIC_${provider === 'google' ? 'GOOGLE_CLIENT_ID_WEB' : provider === 'facebook' ? 'FACEBOOK_APP_ID' : 'GITHUB_CLIENT_ID'} en EAS (entorno preview) y generá e instalá un APK nuevo.`); return; }
+    if (!item.clientId) { onError(`Falta configurar el ID público de ${item.label}. Para un APK, agregá EXPO_PUBLIC_${provider === 'google' ? 'GOOGLE_CLIENT_ID_WEB' : provider === 'facebook' ? 'FACEBOOK_APP_ID' : 'GITHUB_CLIENT_ID'} al entorno preview de EAS y generá e instalá un APK nuevo; para desarrollo local, agregalo a frontend/.env.local.`); return; }
     if (!request?.url) return;
     setBusy(true);
     try {

@@ -146,9 +146,19 @@ Completá los IDs públicos de OAuth:
 - `EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB`
 - `EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID`
 - `EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS`
+
 - `EXPO_PUBLIC_FACEBOOK_APP_ID`
 - `EXPO_PUBLIC_GITHUB_CLIENT_ID`
-- `EXPO_PUBLIC_SOCIAL_REDIRECT_URI`, solo si el proveedor requiere una URL fija
+
+En el APK, guardá estos IDs públicos en las variables del entorno `preview` de EAS y volvé a generar e instalar el APK. En desarrollo local, definilos como `EXPO_PUBLIC_*` en `.env.local`. Los secretos nunca van en el frontend.
+
+Los callbacks móviles deben coincidir exactamente con las URLs registradas en cada proveedor:
+
+- Google: `https://estanciaapp-api.onrender.com/api/auth/google/callback`. Usá un cliente OAuth de tipo **Aplicación web**. Configurá su ID en `EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB` y `GOOGLE_CLIENT_IDS` en Render, y su secreto en `GOOGLE_CLIENT_SECRET`.
+- Facebook: `https://estanciaapp-api.onrender.com/api/auth/facebook/callback`. Registralo en la lista de **Valid OAuth Redirect URIs** de Facebook Login. Configurá `EXPO_PUBLIC_FACEBOOK_APP_ID` en EAS y `FACEBOOK_APP_ID` y `FACEBOOK_APP_SECRET` en Render.
+- GitHub: `https://estanciaapp-api.onrender.com/api/auth/github/callback`. Ponelo como **Authorization callback URL** de la OAuth App. Configurá `EXPO_PUBLIC_GITHUB_CLIENT_ID` en EAS y `GITHUB_CLIENT_ID` y `GITHUB_CLIENT_SECRET` en Render.
+
+Si la API está en otro dominio, reemplazá `estanciaapp-api.onrender.com` por el dominio real en las tres consolas, en `EXPO_PUBLIC_SOCIAL_CALLBACK_BASE_URL` de la app y en la URL que usa el backend.
 
 Los secretos OAuth pertenecen exclusivamente al backend. Iniciá Expo:
 

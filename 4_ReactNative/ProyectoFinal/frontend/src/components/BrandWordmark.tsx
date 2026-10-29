@@ -2,8 +2,8 @@
 import { Image, type ImageStyle, StyleSheet, type StyleProp, View, type ViewStyle } from 'react-native';
 
 const logos = {
-  light: require('../../assets/branding/light/logo.png'),
-  dark: require('../../assets/branding/dark/logo.png'),
+  light: require('../../assets/logo-app.png'),
+  dark: require('../../assets/logo-app.png'),
 } as const;
 
 type BrandWordmarkProps = {

@@ -182,7 +182,16 @@ export function socialOAuthCallback(req, res) {
         if (!code && !providerError)
             callbackUrl.searchParams.set('error', 'missing_response');
     }
-    res.redirect(302, callbackUrl.toString());
+    // Algunos navegadores móviles no abren esquemas de app al recibir un 302
+    // desde el proveedor. Lanzamos el enlace desde una página HTTPS del mismo
+    // callback y dejamos un enlace manual como alternativa.
+    const target = callbackUrl.toString();
+    const safeTarget = JSON.stringify(target).replace(/</g, '\\u003c');
+    res.status(200).type('html').send(`<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Volviendo a EstanciaApp</title>
+<style>body{font:16px system-ui,sans-serif;background:#123824;color:#fff;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center}main{padding:32px}a{color:#a7f3c0}</style></head>
+<body><main><p>Volviendo a EstanciaApp…</p><p><a id="open-app" href="${target.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">Abrir EstanciaApp</a></p></main>
+<script>window.location.replace(${safeTarget});</script></body></html>`);
 }
 // renuevo la sesión cuando el token de acceso dejó de ser válido.
 export async function refresh(req, res) {

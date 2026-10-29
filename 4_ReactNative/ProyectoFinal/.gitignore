@@ -3,3 +3,6 @@
 .env.*
 !.env.example
 !**/.env.example
+
+# Vercel usa npm ci en frontend; versiono su lockfile para builds reproducibles.
+!frontend/package-lock.json

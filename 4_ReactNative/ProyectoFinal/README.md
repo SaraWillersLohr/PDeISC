@@ -158,6 +158,8 @@ Los callbacks móviles deben coincidir exactamente con las URLs registradas en c
 - Facebook: `https://estanciaapp-api.onrender.com/api/auth/facebook/callback`. Registralo en la lista de **Valid OAuth Redirect URIs** de Facebook Login. Configurá `EXPO_PUBLIC_FACEBOOK_APP_ID` en EAS y `FACEBOOK_APP_ID` y `FACEBOOK_APP_SECRET` en Render.
 - GitHub: `https://estanciaapp-api.onrender.com/api/auth/github/callback`. Ponelo como **Authorization callback URL** de la OAuth App. Configurá `EXPO_PUBLIC_GITHUB_CLIENT_ID` en EAS y `GITHUB_CLIENT_ID` y `GITHUB_CLIENT_SECRET` en Render.
 
+La web y el APK usan esos mismos callbacks de Render. Para que el callback web vuelva al sitio que inició el acceso, `FRONTEND_ORIGIN` en Render debe incluir el origen exacto de Vercel, por ejemplo `https://mi-app.vercel.app` (sin rutas); se pueden separar varios orígenes con comas.
+
 Si la API está en otro dominio, reemplazá `estanciaapp-api.onrender.com` por el dominio real en las tres consolas, en `EXPO_PUBLIC_SOCIAL_CALLBACK_BASE_URL` de la app y en la URL que usa el backend.
 
 Los secretos OAuth pertenecen exclusivamente al backend. Iniciá Expo:

@@ -2,9 +2,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
+import * as Crypto from 'expo-crypto';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet } from 'react-native';
+import { apiUrl } from '../config/api';
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { socialLogin } from '../services/authApi';
 import type { Session } from '../types/auth';
@@ -36,18 +38,25 @@ const config = {
 const defaultSocialApiUrl = 'https://estanciaapp-api.onrender.com/api';
 const socialCallbackBaseUri = (__DEV__
   ? process.env.EXPO_PUBLIC_SOCIAL_CALLBACK_BASE_URL || `${defaultSocialApiUrl}/auth`
-  : `${(process.env.EXPO_PUBLIC_API_URL || defaultSocialApiUrl).replace(/\/$/, '')}/auth`
+  : `${(apiUrl || defaultSocialApiUrl).replace(/\/$/, '')}/auth`
 ).replace(/\/$/, '');
 
 export function SocialLoginButton({ provider, disabled, compact = false, onSuccess, onError }: {
   provider: Provider; disabled: boolean; compact?: boolean; onSuccess: (session: Session) => Promise<void>; onError: (message: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const [oauthState] = useState(() => {
+    const nonce = Crypto.randomUUID();
+    return Platform.OS === 'web' && typeof window !== 'undefined'
+      ? `web:${encodeURIComponent(window.location.origin)}:${nonce}`
+      : nonce;
+  });
   const item = config[provider];
   const redirectUri = AuthSession.makeRedirectUri({ scheme: 'estanciaapp', path: 'oauth/callback' });
   const [request, , promptAsync] = AuthSession.useAuthRequest({
     clientId: item.clientId ?? 'not-configured',
     redirectUri,
+    state: oauthState,
     responseType: AuthSession.ResponseType.Code,
     scopes: item.scopes,
     usePKCE: provider !== 'facebook',
@@ -63,7 +72,9 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
     if (!request?.url) return;
     setBusy(true);
     try {
-      const providerRedirectUri = Platform.OS === 'web' ? redirectUri : `${socialCallbackBaseUri}/${provider}/callback`;
+      // Todos los proveedores vuelven al mismo callback HTTPS registrado.
+      // El backend usa el state para devolver web a su origen o móvil al deep link.
+      const providerRedirectUri = `${socialCallbackBaseUri}/${provider}/callback`;
       const authorizationUrl = new URL(request.url);
       authorizationUrl.searchParams.set('redirect_uri', providerRedirectUri);
       const result = await promptAsync({ url: authorizationUrl.toString() });

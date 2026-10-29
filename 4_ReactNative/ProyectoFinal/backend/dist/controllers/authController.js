@@ -1,3 +1,4 @@
+import { env } from '../config/env.js';
 import * as authService from '../services/authService.js';
 import * as registrationService from '../services/registrationService.js';
 // distingo una falla de mysql de un error causado por los datos enviados.
@@ -164,11 +165,36 @@ export function socialOAuthCallback(req, res) {
         res.status(404).send('el proveedor de acceso no existe');
         return;
     }
-    const callbackUrl = new URL('estanciaapp://oauth/callback');
-    callbackUrl.searchParams.set('provider', provider);
     const state = typeof req.query.state === 'string' ? req.query.state : '';
     const code = typeof req.query.code === 'string' ? req.query.code : '';
     const providerError = typeof req.query.error === 'string' ? req.query.error : '';
+    let callbackUrl;
+    if (state.startsWith('web:')) {
+        const webState = /^web:([^:]+):([0-9a-f-]{36})$/i.exec(state);
+        let requestedOrigin = '';
+        try {
+            requestedOrigin = webState ? new URL(decodeURIComponent(webState[1])).origin : '';
+        }
+        catch { /* Rechazo el origen inválido más abajo. */ }
+        const allowedOrigins = env.frontendOrigin.split(',').map((origin) => {
+            try {
+                return new URL(origin.trim()).origin;
+            }
+            catch {
+                return '';
+            }
+        }).filter(Boolean);
+        const localDevelopmentOrigin = env.nodeEnv !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestedOrigin);
+        if (!requestedOrigin || (!allowedOrigins.includes(requestedOrigin) && !localDevelopmentOrigin)) {
+            res.status(400).send('el origen web del inicio de sesión no coincide con FRONTEND_ORIGIN');
+            return;
+        }
+        callbackUrl = new URL('/oauth/callback', requestedOrigin);
+    }
+    else {
+        callbackUrl = new URL('estanciaapp://oauth/callback');
+    }
+    callbackUrl.searchParams.set('provider', provider);
     if (state.length > 256 || code.length > 4096 || providerError.length > 128) {
         callbackUrl.searchParams.set('error', 'invalid_response');
     }
@@ -182,9 +208,14 @@ export function socialOAuthCallback(req, res) {
         if (!code && !providerError)
             callbackUrl.searchParams.set('error', 'missing_response');
     }
+    // Web vuelve al callback de su mismo origen para que AuthSession cierre el
+    // popup; móvil usa una página puente HTTPS antes de abrir el esquema nativo.
+    if (state.startsWith('web:')) {
+        res.redirect(302, callbackUrl.toString());
+        return;
+    }
     // Algunos navegadores móviles no abren esquemas de app al recibir un 302
-    // desde el proveedor. Lanzamos el enlace desde una página HTTPS del mismo
-    // callback y dejamos un enlace manual como alternativa.
+    // desde el proveedor. Lanzamos el enlace desde una página HTTPS del callback.
     const target = callbackUrl.toString();
     const safeTarget = JSON.stringify(target).replace(/</g, '\\u003c');
     res.status(200).type('html').send(`<!doctype html>

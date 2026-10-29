@@ -20,13 +20,14 @@ const config = {
   facebook: { label: 'Facebook', icon: 'facebook' as const, clientId: socialIds?.facebookAppId, endpoint: 'https://www.facebook.com/dialog/oauth', scopes: ['email', 'public_profile'] },
   github: { label: 'GitHub', icon: 'github' as const, clientId: socialIds?.githubClientId, endpoint: 'https://github.com/login/oauth/authorize', scopes: ['read:user', 'user:email'] },
 };
+const socialCallbackBaseUri = (process.env.EXPO_PUBLIC_SOCIAL_CALLBACK_BASE_URL || 'https://estanciaapp-api.onrender.com/api/auth').replace(/\/$/, '');
 
 export function SocialLoginButton({ provider, disabled, compact = false, onSuccess, onError }: {
   provider: Provider; disabled: boolean; compact?: boolean; onSuccess: (session: Session) => Promise<void>; onError: (message: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
   const item = config[provider];
-  const redirectUri = process.env.EXPO_PUBLIC_SOCIAL_REDIRECT_URI || AuthSession.makeRedirectUri({ scheme: 'estanciaapp' });
+  const redirectUri = AuthSession.makeRedirectUri({ scheme: 'estanciaapp', path: 'oauth/callback' });
   const [request, , promptAsync] = AuthSession.useAuthRequest({
     clientId: item.clientId ?? 'not-configured',
     redirectUri,
@@ -42,15 +43,19 @@ export function SocialLoginButton({ provider, disabled, compact = false, onSucce
       return;
     }
     if (!item.clientId) { onError(`Falta configurar el ID público de ${item.label} en frontend/.env.local.`); return; }
-    if (!request) return;
+    if (!request?.url) return;
     setBusy(true);
     try {
-      const result = await promptAsync();
+      const providerRedirectUri = Platform.OS === 'web' ? redirectUri : `${socialCallbackBaseUri}/${provider}/callback`;
+      const authorizationUrl = new URL(request.url);
+      authorizationUrl.searchParams.set('redirect_uri', providerRedirectUri);
+      const result = await promptAsync({ url: authorizationUrl.toString() });
       if (result.type !== 'success') return;
       if (request.state && result.params.state !== request.state) throw new Error('La respuesta del proveedor no es válida. Volvé a intentar.');
+      if (result.params.error) throw new Error('El proveedor canceló el inicio de sesión o no pudo autorizarlo.');
       const code = result.params.code;
       if (!code) throw new Error(`No se recibió una credencial válida de ${item.label}.`);
-      const session = await socialLogin(provider, code, { redirectUri, clientId: item.clientId!, codeVerifier: request.codeVerifier });
+      const session = await socialLogin(provider, code, { redirectUri: providerRedirectUri, clientId: item.clientId!, codeVerifier: request.codeVerifier });
       await onSuccess(session);
     } catch (cause) {
       onError(friendlyErrorMessage(cause, `No se pudo iniciar sesión con ${item.label}.`));

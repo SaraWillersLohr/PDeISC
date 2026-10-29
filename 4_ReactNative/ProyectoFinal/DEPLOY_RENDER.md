@@ -6,7 +6,7 @@ El archivo `render.yaml` define la API Express como un Web Service gratuito, com
 
 1. Subir esta versión del proyecto a `SaraWillersLohr/PDeISC`, conservando las carpetas `4_ReactNative/ProyectoFinal/backend/`, `4_ReactNative/ProyectoFinal/frontend/` y el Blueprint dentro de `4_ReactNative/ProyectoFinal/`.
 2. Crear una base de datos MySQL compatible externa. Render no ofrece MySQL administrado gratuito. Para mantener el costo en cero se puede usar un proveedor MySQL compatible con plan gratuito, por ejemplo TiDB Cloud Starter, y habilitar TLS.
-3. Crear el Blueprint en Render desde ese repositorio. En el alta, completar `FRONTEND_ORIGIN`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME`. Render generará los secretos JWT y de verificación automáticamente.
+3. Crear el Blueprint en Render desde ese repositorio. `FRONTEND_ORIGIN` queda configurado como `https://estanciaapp-frontend-nine.vercel.app`; completar `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME`. Render generará los secretos JWT y de verificación automáticamente.
 
 ## Después de publicar la API
 

@@ -3,19 +3,19 @@ import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
 
-// devuelvo miembros con su rol actual para que el administrador los gestione.
+// devuelvo miembros con su rol actual para el dueño y el gestor de usuarios.
 export async function listUsers(_req: Request, res: Response): Promise<void> {
   try { const [data] = await database.execute<RowDataPacket[]>(`SELECT u.id_usuario,u.nombre,u.apellido,u.email,u.activo,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol ORDER BY u.activo DESC,u.apellido`); res.json({ data }); }
   catch { res.status(500).json({ message: 'no se pudo cargar el equipo' }); }
 }
 
-// edito datos personales y rol sin permitir alterar al último administrador.
+// edito datos personales y rol sin modificar cuentas de Dueño.
 export async function updateUser(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id); const { nombre, apellido, rol } = req.body as Record<string, string>;
   if (!Number.isInteger(id) || !nombre?.trim() || !apellido?.trim() || !['peon', 'veterinario', ...(req.rolVigente === 'dueno' ? ['gestor_usuarios'] : [])].includes(rol ?? '')) { res.status(400).json({ message: 'completá nombre, apellido y un rol permitido' }); return; }
   try {
     const [rows] = await database.execute<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre=?', [rol]);
-    if (!rows.length) { res.status(409).json({ message: 'Ese perfil no está disponible. Consultá al administrador.' }); return; }
+    if (!rows.length) { res.status(409).json({ message: 'Ese perfil no está disponible. Consultá al dueño de la estancia.' }); return; }
     const [current] = await database.execute<RowDataPacket[]>(`SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1`, [id]);
     if (!current.length) { res.status(404).json({ message: 'usuario activo no encontrado' }); return; }
     if (current[0].rol === 'dueno' || (req.rolVigente !== 'dueno' && !['peon', 'veterinario'].includes(current[0].rol))) {
@@ -70,7 +70,7 @@ export async function listCatalog(_req: Request, res: Response): Promise<void> {
   } catch { res.status(500).json({ message: 'No se pudo cargar el catálogo. Intentá de nuevo más tarde.' }); }
 }
 
-// agrego una especie aprobada al catálogo de la estancia para dueño o administrador.
+// agrego una especie aprobada al catálogo de la estancia para el dueño.
 export async function createSpecies(req: Request, res: Response): Promise<void> {
   const nombre = String(req.body.nombre ?? '').trim();
   const userId = req.usuario?.id_usuario;
@@ -153,7 +153,7 @@ export async function deleteSpecies(req: Request, res: Response): Promise<void> 
 export async function requestCatalog(req: Request, res: Response): Promise<void> {
   const tipo = String(req.body.tipo); const nombre = String(req.body.nombre ?? '').trim(); const especie = req.body.id_especie ? Number(req.body.id_especie) : null; const user = req.usuario?.id_usuario;
   if (!user || !['especie','raza'].includes(tipo) || !nombre || nombre.length > 80 || (tipo === 'raza' && !especie)) { res.status(400).json({ message: 'completá tipo, nombre y especie para la raza' }); return; }
-  try { await database.execute('INSERT INTO especies_razas_pendientes (tipo,nombre,id_especie,id_usuario) VALUES (?,?,?,?)', [tipo,nombre,especie,user]); res.status(201).json({ message: 'solicitud enviada al administrador' }); }
+  try { await database.execute('INSERT INTO especies_razas_pendientes (tipo,nombre,id_especie,id_usuario) VALUES (?,?,?,?)', [tipo,nombre,especie,user]); res.status(201).json({ message: 'solicitud enviada al dueño' }); }
   catch { res.status(409).json({ message: 'no se pudo registrar la solicitud' }); }
 }
 

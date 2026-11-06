@@ -64,10 +64,16 @@ export async function refreshSession(session: Session): Promise<Session> {
   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await apiFetch(`${apiUrl}/auth/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken: session.refreshToken }), signal: controller.signal });
-    const body = await response.json().catch(() => ({})) as { accessToken?: string; refreshToken?: string; accessTokenExpiresAt?: number; message?: string };
+    const body = await response.json().catch(() => ({})) as { accessToken?: string; refreshToken?: string; accessTokenExpiresAt?: number; rol?: string; message?: string };
     if (!response.ok) throw new SessionRefreshError(friendlyApiMessage(body.message, response.status, 'No se pudo renovar la sesión.'), response.status);
     if (!body.accessToken || !body.refreshToken || !body.accessTokenExpiresAt) throw new SessionRefreshError('No se pudo renovar la sesión. Iniciá sesión nuevamente.', response.status);
-    return { ...session, accessToken: body.accessToken, refreshToken: body.refreshToken, accessTokenExpiresAt: body.accessTokenExpiresAt };
+    return {
+      ...session,
+      accessToken: body.accessToken,
+      refreshToken: body.refreshToken,
+      accessTokenExpiresAt: body.accessTokenExpiresAt,
+      usuario: body.rol ? { ...session.usuario, rol: body.rol } : session.usuario,
+    };
   } finally { clearTimeout(timeout); }
 }
 

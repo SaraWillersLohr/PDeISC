@@ -91,7 +91,7 @@ export async function createReport(req, res) {
             await connection.execute("UPDATE animales SET id_corral=?,estado_salud='enfermo',version_dato=version_dato+1 WHERE id_animal = ?", [destinationId, animalId]);
             if (animals[0].estado_salud !== 'enfermo')
                 await connection.execute('INSERT INTO historial_estado_salud (id_animal,id_usuario,estado_anterior,estado_nuevo,observaciones) VALUES (?,?,?,?,?)', [animalId, userId, animals[0].estado_salud, 'enfermo', motivo || 'Ingreso a enfermería por reporte sanitario']);
-            for (const role of ['veterinario', 'dueno', 'administrador']) {
+            for (const role of ['veterinario', 'dueno']) {
                 await connection.execute('INSERT INTO notificaciones (id_animal,titulo,mensaje,tipo,rol_destino) VALUES (?,?,?,\'reporte_sanitario\',?)', [animalId, 'Animal ingresó a enfermería', `${animals[0].identificador}: ingreso por enfermedad a ${destination.nombre}.${motivo ? ` ${motivo}` : ''}`, role]);
             }
         }

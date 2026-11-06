@@ -94,6 +94,6 @@ export async function sendRegistrationRejection(email: string, name: string): Pr
   await sendEmail({
     to: email,
     subject: 'Actualización de tu solicitud a EstanciaApp',
-    text: `Hola ${name}. El administrador revisó tu solicitud de acceso y no fue aprobada. Si creés que hubo un error, comunicate con el equipo de la estancia.`,
+    text: `Hola ${name}. Tu solicitud de acceso fue rechazada. Si creés que hubo un error, comunicate con el equipo de la estancia.`,
   });
 }

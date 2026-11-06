@@ -173,7 +173,7 @@ export async function approveRegistrationRequest(id: number, adminId: number, ro
     if (!requests.length) throw new Error('la solicitud no existe o ya fue resuelta');
     const request = requests[0] as PendingRequest & { password_hash: string };
     const [roles] = await connection.query<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1', [role]);
-    if (!roles.length) throw new Error('El perfil solicitado no está disponible. Consultá al administrador.');
+    if (!roles.length) throw new Error('El perfil solicitado no está disponible. Consultá al equipo de la estancia.');
     await connection.execute(
       `INSERT INTO usuarios (id_rol, nombre, apellido, email, password_hash, activo, debe_cambiar_password, estado_cuenta, email_verificado_at)
        VALUES (?, ?, ?, ?, ?, 1, 0, 'activo', NOW())`,

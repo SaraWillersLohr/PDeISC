@@ -1,6 +1,6 @@
 import { validateFormBody } from './formValidation';
 // traduzco errores http y de red a mensajes breves para la interfaz.
-export const apiConfigurationMessage = 'La aplicación no está conectada al servicio. Avisale al administrador.';
+export const apiConfigurationMessage = 'La aplicación no está conectada al servicio. Avisale al dueño de la estancia.';
 
 
 export async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
@@ -23,7 +23,7 @@ export function friendlyApiMessage(message: string | undefined, status: number, 
   const text = message?.trim();
   if (!text) return fallback;
   if (/migraci[oó]n|\bER_[A-Z0-9_]+\b|\bSQL\b|\bJWT\b|token_version|endpoint|stack trace|syntax error|fetch failed|network request failed|\bECONN[A-Z]+\b|\bETIMEDOUT\b|smtp_|verification_code_secret|jwt_secret|\b.env\b|access denied|connection (refused|lost)|cannot connect|socket hang up|internal server error/i.test(text)) {
-    return 'No pudimos completar esta acción. Probá de nuevo más tarde o consultá al administrador.';
+    return 'No pudimos completar esta acción. Probá de nuevo más tarde o consultá al equipo de la estancia.';
   }
   if (/entre 10 y 72 bytes/i.test(text)) return 'La contraseña debe tener al menos 10 caracteres y no superar el límite permitido.';
   if (/base de datos no est[aá] disponible/i.test(text)) return 'Hay un problema temporal al cargar la información. Intentá de nuevo en unos segundos.';
@@ -41,7 +41,7 @@ export function friendlyErrorMessage(error: unknown, fallback: string): string {
     return 'No pudimos guardar la sesión en este dispositivo. Revisá el espacio disponible e intentá nuevamente.';
   }
   if (/SQLITE_|SQLSTATE|no such table|database is locked|syntax error|unexpected token|JSON Parse error|cannot read propert|is not a function|stack trace|\bER_[A-Z0-9_]+\b/i.test(message)) {
-    return 'No pudimos procesar la información. Intentá de nuevo y, si el problema continúa, avisale al administrador.';
+    return 'No pudimos procesar la información. Intentá de nuevo y, si el problema continúa, avisale al dueño de la estancia.';
   }
   return friendlyApiMessage(message, 400, fallback);
 }

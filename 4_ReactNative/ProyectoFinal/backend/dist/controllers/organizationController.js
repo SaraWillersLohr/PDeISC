@@ -1,5 +1,5 @@
 import { database } from '../config/database.js';
-// devuelvo miembros con su rol actual para que el administrador los gestione.
+// devuelvo miembros con su rol actual para el dueño y el gestor de usuarios.
 export async function listUsers(_req, res) {
     try {
         const [data] = await database.execute(`SELECT u.id_usuario,u.nombre,u.apellido,u.email,u.activo,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol ORDER BY u.activo DESC,u.apellido`);
@@ -9,18 +9,18 @@ export async function listUsers(_req, res) {
         res.status(500).json({ message: 'no se pudo cargar el equipo' });
     }
 }
-// edito datos personales y rol sin permitir alterar al último administrador.
+// edito datos personales y rol sin modificar cuentas de Dueño.
 export async function updateUser(req, res) {
     const id = Number(req.params.id);
     const { nombre, apellido, rol } = req.body;
-    if (!Number.isInteger(id) || !nombre?.trim() || !apellido?.trim() || !['dueno', 'peon', 'veterinario', 'administrador'].includes(rol ?? '')) {
+    if (!Number.isInteger(id) || !nombre?.trim() || !apellido?.trim() || !['peon', 'veterinario', ...(req.rolVigente === 'dueno' ? ['gestor_usuarios'] : [])].includes(rol ?? '')) {
         res.status(400).json({ message: 'completá nombre, apellido y un rol permitido' });
         return;
     }
     try {
         const [rows] = await database.execute('SELECT id_rol FROM roles WHERE nombre=?', [rol]);
         if (!rows.length) {
-            res.status(409).json({ message: 'Ese perfil no está disponible. Consultá al administrador.' });
+            res.status(409).json({ message: 'Ese perfil no está disponible. Consultá al dueño de la estancia.' });
             return;
         }
         const [current] = await database.execute(`SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1`, [id]);
@@ -28,14 +28,11 @@ export async function updateUser(req, res) {
             res.status(404).json({ message: 'usuario activo no encontrado' });
             return;
         }
-        if (current[0].rol === 'administrador' && rol !== 'administrador') {
-            const [admins] = await database.execute(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
-            if (Number(admins[0]?.total ?? 0) <= 1) {
-                res.status(409).json({ message: 'la organización debe conservar al menos un administrador' });
-                return;
-            }
+        if (current[0].rol === 'dueno' || (req.rolVigente !== 'dueno' && !['peon', 'veterinario'].includes(current[0].rol))) {
+            res.status(403).json({ message: 'Tu rol no puede editar esta cuenta.' });
+            return;
         }
-        const [result] = await database.execute('UPDATE usuarios SET nombre=?,apellido=?,id_rol=?,token_version=token_version+1 WHERE id_usuario=? AND activo=1', [nombre.trim(), apellido.trim(), rows[0].id_rol, id]);
+        const [result] = await database.execute('UPDATE usuarios u JOIN roles r ON r.id_rol=u.id_rol SET u.nombre=?,u.apellido=?,u.id_rol=?,u.token_version=u.token_version+1 WHERE u.id_usuario=? AND u.activo=1 AND r.nombre=?', [nombre.trim(), apellido.trim(), rows[0].id_rol, id, current[0].rol]);
         if (!result.affectedRows) {
             res.status(404).json({ message: 'usuario activo no encontrado' });
             return;
@@ -64,13 +61,10 @@ export async function deactivateUser(req, res) {
             res.status(404).json({ message: 'usuario activo no encontrado' });
             return;
         }
-        if (rows[0].rol === 'administrador') {
-            const [admins] = await connection.execute(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
-            if (Number(admins[0]?.total) <= 1) {
-                await connection.rollback();
-                res.status(409).json({ message: 'la organización debe conservar al menos un administrador' });
-                return;
-            }
+        if (rows[0].rol === 'dueno' || (req.rolVigente !== 'dueno' && !['peon', 'veterinario'].includes(rows[0].rol))) {
+            await connection.rollback();
+            res.status(403).json({ message: 'Tu rol no puede dar de baja esta cuenta.' });
+            return;
         }
         const [tasks] = await connection.execute(`SELECT id_tarea FROM tareas WHERE id_responsable=? AND estado IN ('pendiente','en_progreso') FOR UPDATE`, [id]);
         if (tasks.length && reassignmentId === null) {
@@ -113,7 +107,7 @@ export async function listCatalog(_req, res) {
         res.status(500).json({ message: 'No se pudo cargar el catálogo. Intentá de nuevo más tarde.' });
     }
 }
-// agrego una especie aprobada al catálogo de la estancia para dueño o administrador.
+// agrego una especie aprobada al catálogo de la estancia para el dueño.
 export async function createSpecies(req, res) {
     const nombre = String(req.body.nombre ?? '').trim();
     const userId = req.usuario?.id_usuario;
@@ -258,7 +252,7 @@ export async function requestCatalog(req, res) {
     }
     try {
         await database.execute('INSERT INTO especies_razas_pendientes (tipo,nombre,id_especie,id_usuario) VALUES (?,?,?,?)', [tipo, nombre, especie, user]);
-        res.status(201).json({ message: 'solicitud enviada al administrador' });
+        res.status(201).json({ message: 'solicitud enviada al dueño' });
     }
     catch {
         res.status(409).json({ message: 'no se pudo registrar la solicitud' });

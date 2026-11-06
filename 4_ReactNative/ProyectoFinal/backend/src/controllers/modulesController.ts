@@ -2,6 +2,7 @@
 import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
+import { publishLiveChange } from '../services/liveChanges.js';
 
 const animalGenders = ['hembra', 'macho', 'no_especificado'] as const;
 function isAnimalGender(value: string): boolean { return (animalGenders as readonly string[]).includes(value); }
@@ -195,6 +196,7 @@ export async function publishBirthReminders(): Promise<void> {
       await connection.execute('UPDATE servicios_monta SET recordatorio_nacimiento_en=NOW() WHERE id_servicio=? AND recordatorio_nacimiento_en IS NULL', [row.id_servicio]);
     }
     await connection.commit();
+    if (due.length) publishLiveChange();
   } catch (error) { await connection.rollback(); throw error; }
   finally { connection.release(); }
 }

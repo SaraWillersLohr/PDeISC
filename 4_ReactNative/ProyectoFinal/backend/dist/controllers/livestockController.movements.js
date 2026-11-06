@@ -53,7 +53,7 @@ export async function moveAnimal(req, res) {
         }
         if (req.rolVigente === 'peon') {
             const nursingEntry = Boolean(destination.es_enfermeria);
-            const recipients = nursingEntry ? ['dueno', 'administrador', 'veterinario'] : ['dueno', 'administrador'];
+            const recipients = nursingEntry ? ['dueno', 'veterinario'] : ['dueno'];
             const title = nursingEntry ? 'Animal ingresó a enfermería' : 'Traslado de animal realizado';
             const message = nursingEntry
                 ? `${animal.identificador}: ingresó a ${destination.nombre} con estado ${newHealthStatus}. ${notes ? `Observación del peón: ${notes}` : 'El veterinario puede revisar el caso en enfermería.'}`

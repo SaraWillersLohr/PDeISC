@@ -10,8 +10,7 @@ export function requireRoles(...allowedRoles) {
         try {
             const [rows] = await database.execute(`SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol
          WHERE u.id_usuario = ? AND u.activo = 1 AND u.estado_cuenta = 'activo' LIMIT 1`, [userId]);
-            const storedRole = String(rows[0]?.rol ?? '');
-            const role = storedRole === 'copropietario' ? 'administrador' : storedRole;
+            const role = String(rows[0]?.rol ?? '');
             if (!allowedRoles.includes(role)) {
                 res.status(403).json({ message: 'tu perfil no puede consultar este módulo' });
                 return;

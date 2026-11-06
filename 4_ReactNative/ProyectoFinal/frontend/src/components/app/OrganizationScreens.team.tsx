@@ -180,7 +180,9 @@ export function TeamScreen() {
             <View style={st.rowWrap}>
               {editableRoles.map((role) => (
                 <Pressable
-                  key={roleLabel[role] ?? role}
+                  key={role}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: roleDraft === role }}
                   onPress={() => setRoleDraft(role)}
                   style={[
                     st.option,
@@ -189,21 +191,21 @@ export function TeamScreen() {
                   ]}
                 >
                   <Text style={[st.optionText, { color: colors.textMain }, roleDraft === role && { color: '#ffffff', fontWeight: '800' }]}>
-                    {role === 'dueno' ? 'Dueño' : role === 'peon' ? 'Peón' : role === 'veterinario' ? 'Veterinario' : 'Administrador'}
+                    {roleLabel[role]}
                   </Text>
                 </Pressable>
               ))}
             </View>
             <View style={[st.row, { justifyContent: 'flex-end', marginTop: 18 }]}>
-              <Pressable onPress={() => setSelected(null)} style={[st.secondary, { borderColor: colors.border }]}>
-                <Text style={[st.secondaryText, { color: colors.textMuted }]}>Cancelar</Text>
-              </Pressable>
               <Pressable
                 disabled={busy}
                 onPress={() => void saveUser()}
                 style={[st.primary, { backgroundColor: isDark ? colors.primaryLight : colors.primary }]}
               >
                 <Text style={st.primaryText}>{busy ? 'Guardando…' : 'Guardar cambios'}</Text>
+              </Pressable>
+              <Pressable onPress={() => setSelected(null)} style={[st.secondary, { borderColor: colors.border }]}>
+                <Text style={[st.secondaryText, { color: colors.textMuted }]}>Cancelar</Text>
               </Pressable>
             </View>
           </View>

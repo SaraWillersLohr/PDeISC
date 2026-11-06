@@ -2,13 +2,15 @@
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { requestAccount } from '../services/authApi';
 import { PasswordInput } from './PasswordInput';
 
 type Props = { visible: boolean; onClose: () => void };
 
 export function AccountRequestModal({ visible, onClose }: Props) {
+  const { width, fontScale } = useWindowDimensions();
+  const stacked = width < 520 * Math.max(1, fontScale);
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
@@ -33,27 +35,29 @@ export function AccountRequestModal({ visible, onClose }: Props) {
     finally { setBusy(false); }
   }
 
-  return <Modal animationType="fade" onRequestClose={onClose} statusBarTranslucent transparent visible={visible}>
+  return <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
     <View style={s.backdrop}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
         <View accessibilityViewIsModal style={s.dialog}>
-          <View style={s.header}>
-            <View style={s.heading}><Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text></View>
-            <Pressable accessibilityLabel="Cerrar solicitud de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
-          </View>
-          <Text style={s.copy}>Completá tus datos y verificá tu correo. Te avisaremos cuando se resuelva tu solicitud.</Text>
-          <View style={s.row}>
-            <View style={s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} /></View>
-            <View style={s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={setApellido} placeholder="Tu apellido" style={s.input} value={apellido} /></View>
-          </View>
-          <Text style={s.label}>CORREO ELECTRÓNICO</Text>
-          <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
-          <View style={s.row}>
-            <View style={s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /></View>
-            <View style={s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></View>
-          </View>
-          {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
-          <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Enviar solicitud</Text>}</Pressable>
+          <ScrollView style={s.scroll} contentContainerStyle={[s.content, stacked && s.compactContent]} keyboardShouldPersistTaps="handled">
+            <View style={s.header}>
+              <View style={s.heading}><Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text></View>
+              <Pressable accessibilityLabel="Cerrar solicitud de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
+            </View>
+            <Text style={s.copy}>Completá tus datos y verificá tu correo. Te avisaremos cuando se resuelva tu solicitud.</Text>
+            <View style={!stacked && s.row}>
+              <View style={!stacked && s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} /></View>
+              <View style={!stacked && s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={setApellido} placeholder="Tu apellido" style={s.input} value={apellido} /></View>
+            </View>
+            <Text style={s.label}>CORREO ELECTRÓNICO</Text>
+            <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
+            <View style={!stacked && s.row}>
+              <View style={!stacked && s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /></View>
+              <View style={!stacked && s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></View>
+            </View>
+            {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
+            <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Enviar solicitud</Text>}</Pressable>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -62,8 +66,11 @@ export function AccountRequestModal({ visible, onClose }: Props) {
 
 const s = StyleSheet.create({
   backdrop: { alignItems: 'center', backgroundColor: 'rgba(14,27,18,0.62)', flex: 1, justifyContent: 'center', padding: 14 },
-  keyboard: { alignItems: 'center', justifyContent: 'center', width: '100%' },
-  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, maxWidth: 560, padding: 20, width: '100%' },
+  keyboard: { alignItems: 'center', flex: 1, justifyContent: 'center', width: '100%' },
+  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, flexShrink: 1, maxHeight: '100%', maxWidth: 560, overflow: 'hidden', width: '100%' },
+  scroll: { flexGrow: 0, flexShrink: 1 },
+  content: { padding: 20 },
+  compactContent: { padding: 14 },
   header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
   heading: { flex: 1 },
   eyebrow: { color: '#748076', fontSize: 9, fontWeight: '800', letterSpacing: 1.3 },

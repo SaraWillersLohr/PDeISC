@@ -1,4 +1,5 @@
 import { database } from '../config/database.js';
+import { publishLiveChange } from '../services/liveChanges.js';
 const animalGenders = ['hembra', 'macho', 'no_especificado'];
 function isAnimalGender(value) { return animalGenders.includes(value); }
 export async function listTasks(req, res) {
@@ -8,7 +9,7 @@ export async function listTasks(req, res) {
         const [rows] = await database.execute(`SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.fecha_vencimiento,t.estado,
               u.nombre AS responsable,u.apellido AS apellido_responsable
        FROM tareas t LEFT JOIN usuarios u ON u.id_usuario=t.id_responsable
-       WHERE t.id_responsable=? OR ?='administrador' ORDER BY t.fecha_vencimiento IS NULL,t.fecha_vencimiento,t.created_at DESC`, [userId, role]);
+       WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.fecha_vencimiento IS NULL,t.fecha_vencimiento,t.created_at DESC`, [userId, role]);
         res.json({ data: rows });
     }
     catch {
@@ -42,13 +43,12 @@ export async function updateTask(req, res) {
     const id = Number(req.params.id);
     const state = String(req.body.estado ?? '');
     const userId = req.usuario?.id_usuario ?? 0;
-    const role = req.rolVigente ?? '';
-    if (!Number.isInteger(id) || !['pendiente', 'en_progreso', 'completada', 'cancelada'].includes(state)) {
+    if (!Number.isInteger(id) || !['pendiente', 'en_progreso', 'completada'].includes(state)) {
         res.status(400).json({ message: 'estado de tarea inválido' });
         return;
     }
     try {
-        const [result] = await database.execute(`UPDATE tareas SET estado=? WHERE id_tarea=? AND (id_responsable=? OR ?='administrador')`, [state, id, userId, role]);
+        const [result] = await database.execute(`UPDATE tareas SET estado=? WHERE id_tarea=? AND id_responsable=? AND estado<>'cancelada'`, [state, id, userId]);
         if (!result.affectedRows) {
             res.status(404).json({ message: 'tarea no encontrada o no asignada a tu usuario' });
             return;
@@ -241,6 +241,8 @@ export async function publishBirthReminders() {
             await connection.execute('UPDATE servicios_monta SET recordatorio_nacimiento_en=NOW() WHERE id_servicio=? AND recordatorio_nacimiento_en IS NULL', [row.id_servicio]);
         }
         await connection.commit();
+        if (due.length)
+            publishLiveChange();
     }
     catch (error) {
         await connection.rollback();

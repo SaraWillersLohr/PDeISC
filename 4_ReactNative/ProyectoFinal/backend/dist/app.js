@@ -9,6 +9,8 @@ import { fieldRouter } from './routes/fieldRoutes.js';
 import { organizationRouter } from './routes/organizationRoutes.js';
 import { modulesRouter } from './routes/modulesRoutes.js';
 import { syncRouter } from './routes/syncRoutes.js';
+import { requireAuthentication } from './middleware/authMiddleware.js';
+import { publishLiveChange, waitForLiveChanges } from './services/liveChanges.js';
 export const app = express();
 const allowedOrigins = env.frontendOrigin.split(',').map((origin) => origin.trim()).filter(Boolean);
 app.use(cors({ origin: (origin, callback) => {
@@ -19,6 +21,18 @@ app.use(cors({ origin: (origin, callback) => {
     } }));
 app.use(express.json({ limit: '5mb' }));
 app.get('/api/health', (_request, response) => response.status(200).json({ status: 'ok' }));
+app.get('/api/changes', requireAuthentication, waitForLiveChanges);
+app.use('/api', (req, res, next) => {
+    const writesData = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
+    const changesVisibleData = !req.path.startsWith('/auth/') || ['/auth/verify-email', '/auth/profile'].includes(req.path);
+    if (writesData && changesVisibleData) {
+        res.once('finish', () => {
+            if (res.statusCode >= 200 && res.statusCode < 300)
+                publishLiveChange();
+        });
+    }
+    next();
+});
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', livestockRouter);

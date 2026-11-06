@@ -208,7 +208,7 @@ export function CatalogScreen() {
         <View style={[st.card, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <Text style={[st.title, { color: colors.textMain }]}>El catálogo está vacío</Text>
           <Text style={[st.copy, { color: colors.textMuted }]}>
-            {canCreate ? 'Agregá la primera especie para empezar a cargar animales.' : 'Pedile al administrador que agregue una especie o raza.'}
+            {canCreate ? 'Agregá la primera especie para empezar a cargar animales.' : 'Pedile al dueño que agregue una especie o raza.'}
           </Text>
         </View>
       ) : null}
@@ -250,7 +250,7 @@ export function CatalogScreen() {
               {canCreate ? (kind === 'especie' ? 'Agregar especie' : 'Agregar raza') : (kind === 'especie' ? 'Proponer especie' : 'Proponer raza')}
             </Text>
             <Text style={[st.copy, { color: colors.textSecondary }]}>
-              {kind === 'raza' ? 'La raza se guardará dentro de la especie seleccionada.' : canCreate ? 'Quedará disponible para registrar animales en la estancia.' : 'El administrador revisará la propuesta antes de habilitarla.'}
+              {kind === 'raza' ? 'La raza se guardará dentro de la especie seleccionada.' : canCreate ? 'Quedará disponible para registrar animales en la estancia.' : 'El dueño revisará la propuesta antes de habilitarla.'}
             </Text>
 
             {peon && kind === 'raza' ? (

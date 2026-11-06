@@ -61,6 +61,13 @@ export async function sendAccessCode(email, name, code) {
         text: `Hola ${name}. El administrador aprobó tu acceso. Ingresá con tu correo y este código de un solo uso: ${code}. Vence en 10 minutos.`,
     });
 }
+export async function sendApprovalNotice(email, name) {
+    await sendEmail({
+        to: email,
+        subject: 'Tu acceso a EstanciaApp fue aprobado',
+        text: `Hola ${name}. Ya podés iniciar sesión en EstanciaApp con tu correo y la contraseña que elegiste al registrarte.`,
+    });
+}
 // envío un código temporal para recuperar la contraseña de una cuenta activa.
 export async function sendPasswordRecoveryCode(email, name, code) {
     await sendEmail({
@@ -82,6 +89,6 @@ export async function sendRegistrationRejection(email, name) {
     await sendEmail({
         to: email,
         subject: 'Actualización de tu solicitud a EstanciaApp',
-        text: `Hola ${name}. El administrador revisó tu solicitud de acceso y no fue aprobada. Si creés que hubo un error, comunicate con el equipo de la estancia.`,
+        text: `Hola ${name}. Tu solicitud de acceso fue rechazada. Si creés que hubo un error, comunicate con el equipo de la estancia.`,
     });
 }

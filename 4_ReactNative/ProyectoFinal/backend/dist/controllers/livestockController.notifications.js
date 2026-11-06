@@ -10,14 +10,14 @@ export async function listNotifications(req, res) {
     }
     try {
         const cursorClause = before === null ? '' : 'AND n.id_notificacion < ?';
-        const params = [userId, role, role];
+        const params = [userId, role];
         if (before !== null)
             params.push(before);
         const [rows] = await database.execute(`SELECT n.id_notificacion, n.id_animal, n.titulo, n.mensaje, n.tipo,
               COALESCE(nu.leida, 0) AS leida, n.estado_respuesta, n.created_at
        FROM notificaciones n
        LEFT JOIN notificaciones_usuario nu ON nu.id_notificacion = n.id_notificacion AND nu.id_usuario = ?
-       WHERE (n.rol_destino IS NULL OR n.rol_destino = ?) AND (? <> 'administrador' OR n.rol_destino IS NULL OR n.rol_destino = 'administrador') AND COALESCE(nu.eliminada, 0) = 0 ${cursorClause}
+       WHERE (n.rol_destino IS NULL OR n.rol_destino = ?) AND COALESCE(nu.eliminada, 0) = 0 ${cursorClause}
        ORDER BY n.id_notificacion DESC LIMIT 11`, params);
         res.status(200).json({ data: rows.slice(0, 10), hasMore: rows.length > 10 });
     }
@@ -28,7 +28,7 @@ export async function listNotifications(req, res) {
 export async function getVisibleNotification(id, req) {
     const role = req.rolVigente ?? '';
     const [rows] = await database.execute(`SELECT n.id_notificacion, n.tipo FROM notificaciones n
-     WHERE n.id_notificacion = ? AND (n.rol_destino IS NULL OR n.rol_destino = ?) AND (? <> 'administrador' OR n.rol_destino IS NULL OR n.rol_destino = 'administrador')`, [id, role, role]);
+     WHERE n.id_notificacion = ? AND (n.rol_destino IS NULL OR n.rol_destino = ?)`, [id, role]);
     return rows;
 }
 // guardo leído, borrado y respuesta por usuario para no alterar el estado del resto del equipo.

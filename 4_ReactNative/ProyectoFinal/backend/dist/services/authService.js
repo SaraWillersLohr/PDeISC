@@ -191,7 +191,10 @@ export async function refresh(refreshToken) {
     const user = rows[0];
     if (!user || Number(user.token_version) !== Number(tokenUser.token_version))
         throw new Error('la sesión no puede renovarse');
-    return createSessionTokens({ id_usuario: user.id_usuario, email: user.email, rol: user.rol, token_version: Number(user.token_version) });
+    return {
+        ...createSessionTokens({ id_usuario: user.id_usuario, email: user.email, rol: user.rol, token_version: Number(user.token_version) }),
+        rol: user.rol,
+    };
 }
 // envío códigos de recuperación con límite de reenvíos y respuesta neutra para correos desconocidos.
 export async function requestPasswordRecovery(emailInput) {

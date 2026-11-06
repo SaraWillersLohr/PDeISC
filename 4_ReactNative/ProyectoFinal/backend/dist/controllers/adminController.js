@@ -14,13 +14,13 @@ export async function approveRequest(req, res) {
     const requestId = Number(req.params.id);
     const adminId = req.usuario?.id_usuario;
     const { rol } = req.body;
-    if (!Number.isInteger(requestId) || requestId < 1 || !adminId || !rol) {
+    if (!Number.isInteger(requestId) || requestId < 1 || !adminId || !rol || rol === 'dueno') {
         res.status(400).json({ message: 'seleccioná la solicitud y un rol válido' });
         return;
     }
     try {
         await approveRegistrationRequest(requestId, adminId, rol);
-        res.status(200).json({ message: 'solicitud aprobada; se envió el código de activación' });
+        res.status(200).json({ message: 'solicitud aprobada; la cuenta ya está habilitada' });
     }
     catch (error) {
         const message = error instanceof Error ? error.message : 'no se pudo aprobar la solicitud';

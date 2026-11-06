@@ -11,11 +11,13 @@ type Props = { visible: boolean; onClose: () => void };
 
 const dialogMaxWidth = 560;
 const gutter = 14;
+const mobileBreakpoint = 600;
 
 export function AccountRequestModal({ visible, onClose }: Props) {
   const { width, fontScale } = useWindowDimensions();
+  const mobile = width < mobileBreakpoint;
   const dialogWidth = Math.min(width - 2 * gutter, dialogMaxWidth);
-  const stacked = dialogWidth < 492 * Math.max(1, fontScale);
+  const stacked = mobile || dialogWidth < 492 * Math.max(1, fontScale);
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
@@ -41,10 +43,10 @@ export function AccountRequestModal({ visible, onClose }: Props) {
   }
 
   return <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
-    <SafeAreaView style={s.backdrop}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
-        <View accessibilityViewIsModal style={s.dialog}>
-          <ScrollView style={s.scroll} contentContainerStyle={[s.content, stacked && s.compactContent]} keyboardShouldPersistTaps="handled">
+    <SafeAreaView style={[s.backdrop, mobile && s.mobileBackdrop]}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[s.keyboard, mobile && s.mobileKeyboard]}>
+        <View accessibilityViewIsModal style={[s.dialog, mobile && s.mobileDialog]}>
+          <ScrollView style={[s.scroll, mobile && s.mobileScroll]} contentContainerStyle={[s.content, stacked && s.compactContent]} keyboardShouldPersistTaps="handled">
             <View style={s.header}>
               <View style={s.heading}><Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text></View>
               <Pressable accessibilityLabel="Cerrar solicitud de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
@@ -71,9 +73,13 @@ export function AccountRequestModal({ visible, onClose }: Props) {
 
 const s = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(14,27,18,0.62)', flex: 1 },
+  mobileBackdrop: { backgroundColor: '#f4f6f1' },
   keyboard: { alignItems: 'center', flex: 1, justifyContent: 'center', padding: gutter },
+  mobileKeyboard: { alignItems: 'stretch', padding: 0 },
   dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, flexShrink: 1, maxWidth: dialogMaxWidth, overflow: 'hidden', width: '100%' },
+  mobileDialog: { borderRadius: 0, borderWidth: 0, flex: 1, maxWidth: '100%', minHeight: 0 },
   scroll: { flexGrow: 0, flexShrink: 1 },
+  mobileScroll: { flex: 1, minHeight: 0 },
   content: { padding: 20 },
   compactContent: { padding: 14 },
   header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },

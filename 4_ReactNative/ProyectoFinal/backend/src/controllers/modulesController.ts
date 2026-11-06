@@ -2,6 +2,7 @@
 import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
+import { validDateOnly } from '../utils/dateOnly.js';
 import { publishLiveChange } from '../services/liveChanges.js';
 
 const animalGenders = ['hembra', 'macho', 'no_especificado'] as const;
@@ -26,16 +27,20 @@ export async function createTask(req: Request, res: Response): Promise<void> {
   const title = String(req.body.titulo ?? '').trim();
   const description = String(req.body.descripcion ?? '').trim();
   const responsible = Number(req.body.id_responsable ?? userId);
-  const dueDate = req.body.fecha_vencimiento || null;
-  if (!userId || !title || title.length > 150 || !Number.isInteger(responsible) || (dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(String(dueDate)))) {
-    res.status(400).json({ message: 'indicá título y fecha válida para la tarea' }); return;
+  const dueDate = req.body.fecha_vencimiento;
+  if (!userId || !title || title.length > 150 || !Number.isInteger(responsible)) {
+    res.status(400).json({ message: 'indicá un título y un responsable para la tarea' }); return;
+  }
+  const hasDueDate = dueDate != null && dueDate !== '';
+  if (hasDueDate && !validDateOnly(dueDate)) {
+    res.status(400).json({ message: 'Elegí una fecha límite válida en el calendario.' }); return;
   }
   try {
     const [assignees] = await database.execute<RowDataPacket[]>(`SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 AND r.nombre='peon'`, [responsible]);
     if (!assignees.length) { res.status(400).json({ message: 'asigná la tarea a un peón activo' }); return; }
     const [result] = await database.execute<ResultSetHeader>(
       'INSERT INTO tareas (titulo,descripcion,id_responsable,fecha_vencimiento,id_creador) VALUES (?,?,?,?,?)',
-      [title, description || null, responsible, dueDate, userId],
+      [title, description || null, responsible, hasDueDate ? dueDate : null, userId],
     );
     res.status(201).json({ data: { id_tarea: result.insertId } });
   } catch { res.status(409).json({ message: 'no se pudo crear la tarea; revisá el responsable' }); }

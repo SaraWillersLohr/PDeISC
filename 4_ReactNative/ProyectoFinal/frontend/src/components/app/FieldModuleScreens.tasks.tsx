@@ -13,6 +13,14 @@ import { listOrganizationUsers, type OrganizationUser } from '../../services/org
 import { Frame } from './FieldModuleScreens.shared';
 import { s } from './FieldModuleStyles';
 
+const taskStates = {
+  pendiente: 'Pendiente',
+  en_progreso: 'En proceso',
+  completada: 'Completada',
+} as const;
+type TaskState = keyof typeof taskStates;
+const taskStateOptions = Object.keys(taskStates) as TaskState[];
+
 export function TasksManagerScreen() {
   const { session } = useSession();
   const revision = useLiveChanges();
@@ -29,7 +37,9 @@ export function TasksManagerScreen() {
   const [due, setDue] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [changingTask, setChangingTask] = useState<number | null>(null);
   const [message, setMessage] = useState('');
+  const fieldUsers = users.filter((user) => user.rol === 'peon' && user.activo);
 
   const load = useCallback(async () => {
     if (!session) return;
@@ -64,7 +74,7 @@ export function TasksManagerScreen() {
   }, [session, admin, revision]);
 
   async function add(): Promise<void> {
-    if (!session || !title.trim() || !responsible) {
+    if (!session || !title.trim() || !responsible || !fieldUsers.some((user) => user.id_usuario === responsible)) {
       setMessage('Escribí un título y asigná la tarea a un peón activo.');
       return;
     }
@@ -85,14 +95,17 @@ export function TasksManagerScreen() {
     }
   }
 
-  async function change(row: TaskRecord): Promise<void> {
-    if (!session) return;
-    const next = row.estado === 'pendiente' ? 'en_progreso' : row.estado === 'en_progreso' ? 'completada' : 'pendiente';
+  async function change(row: TaskRecord, next: TaskState): Promise<void> {
+    if (!session || row.id_responsable !== session.usuario.id_usuario || changingTask !== null || row.estado === next) return;
+    setChangingTask(row.id_tarea);
     try {
       await updateTask(session, row.id_tarea, next);
-      await load();
+      setRows((current) => current.map((task) => task.id_tarea === row.id_tarea && task.estado === row.estado ? { ...task, estado: next } : task));
+      setMessage('');
     } catch (e) {
       setMessage(friendlyErrorMessage(e, 'No se pudo actualizar la tarea.'));
+    } finally {
+      setChangingTask(null);
     }
   }
 
@@ -117,21 +130,28 @@ export function TasksManagerScreen() {
             style={[s.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
             value={notes}
           />
+          <Text style={[s.section, { color: colors.textSecondary }]}>Fecha límite (opcional)</Text>
           <DateField
-            accessibilityLabel="Fecha de vencimiento"
+            accessibilityLabel="Fecha límite de la tarea"
             onChangeText={setDue}
-            placeholder="Fecha límite AAAA-MM-DD (opcional)"
+            placeholder="Elegir fecha"
             placeholderTextColor={colors.textMuted}
+            showCalendarIcon
             style={[s.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
             value={due}
           />
+          {due ? (
+            <Pressable accessibilityRole="button" onPress={() => setDue('')} style={[s.userChip, { alignSelf: 'flex-start', backgroundColor: colors.bgCardMuted }]}>
+              <Text style={[s.userChipText, { color: colors.textMain }]}>Quitar fecha</Text>
+            </Pressable>
+          ) : null}
           <Text style={[s.section, { color: colors.textSecondary }]}>Asignar al personal de campo</Text>
           <View style={s.rowWrap}>
-            {users
-              .filter((user) => user.rol === 'peon' && user.activo)
-              .map((user) => (
+            {fieldUsers.map((user) => (
                 <Pressable
                   key={user.id_usuario}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: responsible === user.id_usuario }}
                   onPress={() => setResponsible(user.id_usuario)}
                   style={[
                     s.userChip,
@@ -149,7 +169,7 @@ export function TasksManagerScreen() {
                     {user.nombre} {user.apellido}
                   </Text>
                 </Pressable>
-              ))}
+            ))}
           </View>
           <Pressable
             disabled={saving || !responsible}
@@ -172,15 +192,12 @@ export function TasksManagerScreen() {
             const isDone = row.estado === 'completada';
             const inProgress = row.estado === 'en_progreso';
             return (
-              <Pressable
+              <View
                 key={row.id_tarea}
-                disabled={!canChange}
-                onPress={() => void change(row)}
-                style={({ pressed }) => [
+                style={[
                   s.card,
                   { backgroundColor: colors.bgCard, borderColor: colors.border },
                   isDesktop && s.cardDesktop,
-                  pressed && { opacity: 0.85 },
                 ]}
               >
                 <View style={s.row}>
@@ -211,7 +228,7 @@ export function TasksManagerScreen() {
                         { color: isDone ? '#2d6a4f' : inProgress ? '#b45309' : '#475569' },
                       ]}
                     >
-                      {row.estado.replace('_', ' ')}
+                      {taskStates[row.estado as TaskState] ?? (row.estado === 'cancelada' ? 'Cancelada' : row.estado)}
                     </Text>
                   </View>
                 </View>
@@ -225,9 +242,27 @@ export function TasksManagerScreen() {
                     Responsable: {row.responsable ? `${row.responsable} ${row.apellido_responsable ?? ''}` : 'Sin asignar'}
                     {row.fecha_vencimiento ? ` · vence ${String(row.fecha_vencimiento).slice(0, 10)}` : ''}
                   </Text>
-                  {canChange ? <Text style={[s.actionHint, { color: colors.accentLime }]}>Tocá para avanzar estado →</Text> : null}
                 </View>
-              </Pressable>
+                {canChange ? (
+                  <>
+                    <Text style={[s.section, { color: colors.textSecondary }]}>{changingTask === row.id_tarea ? 'Guardando estado…' : 'Cambiar estado'}</Text>
+                    <View style={s.rowWrap}>
+                      {taskStateOptions.map((state) => (
+                        <Pressable
+                          key={state}
+                          accessibilityRole="radio"
+                          accessibilityState={{ checked: row.estado === state }}
+                          disabled={changingTask !== null}
+                          onPress={() => void change(row, state)}
+                          style={[s.userChip, { backgroundColor: row.estado === state ? colors.primary : colors.bgCardMuted }]}
+                        >
+                          <Text style={[s.userChipText, { color: row.estado === state ? '#fff' : colors.textMain }]}>{taskStates[state]}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </>
+                ) : null}
+              </View>
             );
           })}
         </View>

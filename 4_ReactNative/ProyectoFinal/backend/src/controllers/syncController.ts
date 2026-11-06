@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { PoolConnection } from 'mysql2/promise';
 import { database } from '../config/database.js';
+import { validDateOnly as validDate } from '../utils/dateOnly.js';
 
 interface SyncOperation { id_operacion: string; tipo_operacion: string; entidad: string; payload: unknown; }
 type SyncResult = { id_operacion: string; estado: 'aplicada' | 'repetida' | 'rechazada'; mensaje?: string; data?: unknown };
@@ -154,11 +155,6 @@ function asObject(value: unknown): Record<string, unknown> {
   return parsed as Record<string, unknown>;
 }
 function positiveInteger(value: unknown): number | null { const number = Number(value); return Number.isInteger(number) && number > 0 ? number : null; }
-function validDate(value: unknown): string | null {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0,10) === value ? value : null;
-}
 function shortText(value: unknown, limit: number): string { return typeof value === 'string' ? value.trim().slice(0,limit) : ''; }
 function readPhoto(value: unknown): string | null | false {
   if (value == null || value === '') return null;

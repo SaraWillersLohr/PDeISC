@@ -295,23 +295,16 @@ export default function LoginScreen() {
                     <Text
                       style={[s.primaryText, desktop && s.desktopInputText]}
                     >
-                      Ingresar <Text style={s.arrow}>→</Text>
+                      Iniciar sesión <Text style={s.arrow}>→</Text>
                     </Text>
                   )}
                 </Pressable>
 
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() => setAccountRequestVisible(true)}
-                  style={s.createAccount}
-                >
-                  <Text style={s.createAccountText}>Crear cuenta</Text>
-                </Pressable>
                 <View
                   style={[s.socialDivider, desktop && s.desktopCompactSocial]}
                 >
                   <View style={s.dividerLine} />
-                  <Text style={s.dividerText}>O CONTINUÁ CON</Text>
+                  <Text style={s.dividerText}>O INICIÁ SESIÓN CON</Text>
                   <View style={s.dividerLine} />
                 </View>
                 <View
@@ -343,16 +336,25 @@ export default function LoginScreen() {
                   />
                 </View>
 
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setAccountRequestVisible(true)}
+                  style={s.createAccount}
+                >
+                  <Text style={s.createAccountText}>Crear cuenta con correo</Text>
+                </Pressable>
+
               </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </ImageBackground>
-      <PasswordRecoveryModal
-        initialEmail={email.trim()}
-        onClose={() => setRecoveryVisible(false)}
-        visible={recoveryVisible}
-      />
+      {recoveryVisible ? (
+        <PasswordRecoveryModal
+          initialEmail={email.trim()}
+          onClose={() => setRecoveryVisible(false)}
+        />
+      ) : null}
       <AccountRequestModal
         onClose={() => setAccountRequestVisible(false)}
         visible={accountRequestVisible}

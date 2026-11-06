@@ -1,6 +1,6 @@
 // presento el flujo de recuperación como una ventana sobre el ingreso.
 import { friendlyErrorMessage } from '../services/apiErrors';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { router } from 'expo-router';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSession } from '../context/SessionContext';
@@ -8,9 +8,9 @@ import { completePasswordRecovery, redeemPasswordRecoveryCode, requestPasswordRe
 import { saveSession } from '../services/sessionStorage';
 import { PasswordInput } from './PasswordInput';
 
-type Props = { visible: boolean; initialEmail: string; onClose: () => void };
+type Props = { initialEmail: string; onClose: () => void };
 
-export function PasswordRecoveryModal({ visible, initialEmail, onClose }: Props) {
+export function PasswordRecoveryModal({ initialEmail, onClose }: Props) {
   const { setSession } = useSession();
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState('');
@@ -21,10 +21,6 @@ export function PasswordRecoveryModal({ visible, initialEmail, onClose }: Props)
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-
-  useEffect(() => {
-    if (visible && !requested && !resetToken) setEmail(initialEmail);
-  }, [initialEmail, requested, resetToken, visible]);
 
   async function requestCode(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
@@ -61,7 +57,7 @@ export function PasswordRecoveryModal({ visible, initialEmail, onClose }: Props)
   }
 
   return (
-    <Modal animationType="fade" onRequestClose={onClose} statusBarTranslucent transparent visible={visible}>
+    <Modal animationType="fade" onRequestClose={onClose} statusBarTranslucent transparent visible>
       <View style={s.backdrop}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
           <View accessibilityViewIsModal style={s.dialog}>

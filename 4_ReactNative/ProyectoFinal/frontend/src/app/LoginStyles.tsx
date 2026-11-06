@@ -198,7 +198,7 @@ export const s = StyleSheet.create({
     justifyContent: "center",
     marginTop: 8,
   },
-  createAccount: { alignItems: "center", borderColor: "#214d35", borderRadius: 999, borderWidth: 1, justifyContent: "center", marginTop: 8, minHeight: 44 },
+  createAccount: { alignItems: "center", borderColor: "#214d35", borderRadius: 999, borderWidth: 1, justifyContent: "center", marginTop: 16, minHeight: 44 },
   createAccountText: { color: "#214d35", fontSize: 14, fontWeight: "800" },
   links: {
     alignItems: "center",

@@ -1,3 +1,4 @@
+import { AppSectionIcon, type AppSectionIconName } from './AppSectionIcon';
 // navegación y estructura responsiva optimizada para escritorio y dispositivos móviles.
 import { Ionicons } from '@expo/vector-icons';
 import { styles } from './OwnerDesktopShellStyles';
@@ -16,8 +17,8 @@ const logo = require('../../../assets/branding/dark/logo.png');
 type SectionItem = {
   key: string;
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  activeIcon: keyof typeof Ionicons.glyphMap;
+  icon: AppSectionIconName;
+  activeIcon: AppSectionIconName;
   category: 'operaciones' | 'gestion' | 'cuenta';
   roles: string[];
 };
@@ -26,7 +27,7 @@ const sections: SectionItem[] = [
   // Operaciones de campo
   { key: 'inicio', label: 'Inicio', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['dueno', 'peon', 'veterinario', 'gestor_usuarios'] },
   { key: 'estancia', label: 'Mi estancia', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['dueno', 'peon'] },
-  { key: 'animales', label: 'Mis animales', icon: 'paw-outline', activeIcon: 'paw', category: 'operaciones', roles: ['dueno', 'peon'] },
+  { key: 'animales', label: 'Mis animales', icon: 'horseshoe', activeIcon: 'horseshoe', category: 'operaciones', roles: ['dueno', 'peon'] },
   { key: 'tareas', label: 'Tareas', icon: 'checkbox-outline', activeIcon: 'checkbox', category: 'operaciones', roles: ['dueno', 'peon'] },
   { key: 'sanidad', label: 'Sanidad y Enfermería', icon: 'medkit-outline', activeIcon: 'medkit', category: 'operaciones', roles: ['dueno', 'veterinario'] },
   { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch-outline', activeIcon: 'git-branch', category: 'operaciones', roles: ['dueno', 'peon'] },
@@ -163,7 +164,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
                       style={[styles.mobileLink, active && styles.mobileLinkActive]}
                     >
                       <View style={[styles.mobileIconBadge, active && styles.mobileIconBadgeActive]}>
-                        <Ionicons
+                        <AppSectionIcon
                           color={active ? '#86efac' : '#b7c8ba'}
                           name={active ? item.activeIcon : item.icon}
                           size={19}
@@ -251,7 +252,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
                 >
                   {active ? <View style={styles.activeBar} /> : null}
                   <View style={[styles.navIconBadge, active && styles.navIconBadgeActive]}>
-                    <Ionicons
+                    <AppSectionIcon
                       color={active ? '#86efac' : '#b2c5b5'}
                       name={active ? item.activeIcon : item.icon}
                       size={18}
@@ -284,7 +285,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
                     >
                       {active ? <View style={styles.activeBar} /> : null}
                       <View style={[styles.navIconBadge, active && styles.navIconBadgeActive]}>
-                        <Ionicons
+                        <AppSectionIcon
                           color={active ? '#86efac' : '#b2c5b5'}
                           name={active ? item.activeIcon : item.icon}
                           size={18}
@@ -317,7 +318,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
                 >
                   {active ? <View style={styles.activeBar} /> : null}
                   <View style={[styles.navIconBadge, active && styles.navIconBadgeActive]}>
-                    <Ionicons
+                    <AppSectionIcon
                       color={active ? '#86efac' : '#b2c5b5'}
                       name={active ? item.activeIcon : item.icon}
                       size={18}

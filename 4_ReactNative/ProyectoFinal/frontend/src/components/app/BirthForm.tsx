@@ -4,6 +4,7 @@ import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { listCatalog, type Breed, type Species } from '../../services/organizationApi';
 import { listAnimals, listCorrals, type AnimalGender, type AnimalRecord, type CorralRecord } from '../../services/livestockApi';
 import { createBirth } from '../../services/modulesApi';
@@ -13,7 +14,8 @@ const g = '#214d35';
 const genderOptions: { value: AnimalGender; label: string }[] = [{ value: 'hembra', label: 'Hembra' }, { value: 'macho', label: 'Macho' }, { value: 'no_especificado', label: 'No especificado' }];
 export function BirthForm({ onSaved, initialMother }: { onSaved: () => void; initialMother?: AnimalRecord }) {
   const { session } = useSession(); const [animals, setAnimals] = useState<AnimalRecord[]>([]); const [corrals, setCorrals] = useState<CorralRecord[]>([]); const [species, setSpecies] = useState<Species[]>([]); const [breeds, setBreeds] = useState<Breed[]>([]);
-  const [motherSearch, setMotherSearch] = useState(''); const [fatherSearch, setFatherSearch] = useState(''); const [mother, setMother] = useState<AnimalRecord | null>(null); const [father, setFather] = useState<AnimalRecord | null>(null); const [motherText, setMotherText] = useState(''); const [fatherText, setFatherText] = useState('');
+  const revision = useLiveChanges();
+  const [motherSearch, setMotherSearch] = useState(''); const [fatherSearch, setFatherSearch] = useState(''); const [mother, setMother] = useState<AnimalRecord | null>(initialMother ?? null); const [father, setFather] = useState<AnimalRecord | null>(null); const [motherText, setMotherText] = useState(''); const [fatherText, setFatherText] = useState('');
   const [speciesId, setSpeciesId] = useState<number | null>(null); const [breedId, setBreedId] = useState<number | null>(null); const [corralId, setCorralId] = useState<number | null>(null);
   const [gender, setGender] = useState<AnimalGender>('no_especificado');
   const [photo, setPhoto] = useState<string | null>(null);
@@ -23,12 +25,15 @@ export function BirthForm({ onSaved, initialMother }: { onSaved: () => void; ini
   const fatherMatches = useMemo(() => animals.filter((item) => `${item.identificador} ${item.nombre ?? ''}`.toLowerCase().includes(fatherSearch.toLowerCase())).slice(0, 5), [animals, fatherSearch]);
   useEffect(() => {
     let active = true; if (!session) return () => { active = false; };
-    Promise.all([listAnimals(session), listCorrals(session), listCatalog(session)]).then(([animalRows, corralRows, catalog]) => { if (active) { setAnimals(animalRows); setMother(initialMother ?? null); setCorrals(corralRows.filter((row) => !row.es_enfermeria)); setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId(catalog.especies[0]?.id_especie ?? null); setCorralId(corralRows.find((row) => !row.es_enfermeria)?.id_corral ?? null); } })
+    Promise.all([listAnimals(session), listCorrals(session), listCatalog(session)]).then(([animalRows, corralRows, catalog]) => { if (active) { setAnimals(animalRows); setCorrals(corralRows.filter((row) => !row.es_enfermeria)); setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId((current) => current ?? catalog.especies[0]?.id_especie ?? null); setCorralId((current) => current ?? corralRows.find((row) => !row.es_enfermeria)?.id_corral ?? null); } })
       .catch((cause: unknown) => { if (active) setError(friendlyErrorMessage(cause, 'No se pudieron cargar animales y catálogo.')); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [initialMother, session]);
+  }, [session, revision]);
   async function save(): Promise<void> {
     if (!session || !identifier.trim() || !breedId || !corralId || (!mother && !motherText.trim()) || (!father && !fatherText.trim()) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) { setError('Completá ficha, fecha y los dos progenitores, por animal registrado o por nombre.'); return; }
+    if ([mother, father].some((parent) => parent && !animals.some((animal) => animal.id_animal === parent.id_animal && animal.activo))) {
+      setError('Uno de los animales está inactivo. El nacimiento no se guardó.'); return;
+    }
     // No registro un hecho anterior al nacimiento del animal seleccionado.
     if (mother?.fecha_nacimiento && date < mother.fecha_nacimiento.slice(0, 10)) { setError('La fecha no puede ser anterior al nacimiento de la madre.'); return; }
     setSaving(true); setError('');

@@ -1,3 +1,4 @@
+import { AppSectionIcon } from './AppSectionIcon';
 import { animalBirthError } from '../../services/formValidation';
 import { DateField } from './DateField';
 // muestro la ficha ganadera y sus operaciones desde el inventario.
@@ -6,11 +7,11 @@ import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { Image, Modal, Platform, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
-import { deactivateAnimal, listAnimals, listCorrals, moveAnimal, permanentlyDeleteInactiveAnimal, updateAnimal, type AnimalGender, type AnimalRecord, type CorralRecord } from '../../services/livestockApi';
+import { deactivateAnimal, listAnimals, listCorrals, moveAnimal, updateAnimal, type AnimalGender, type AnimalRecord, type CorralRecord } from '../../services/livestockApi';
 import { reportAnimal } from '../../services/productionApi';
 import { listCatalog } from '../../services/organizationApi';
 import { AnimalCreateModal } from './AnimalCreateModal';
@@ -49,7 +50,6 @@ export function AnimalsInventoryScreen() {
   const [rows, setRows] = useState<AnimalRecord[]>([]);
   const [catalogSpecies, setCatalogSpecies] = useState<string[]>([]);
   const [selectedSpecies, setSelectedSpecies] = useState('Todas');
-  const [includeInactive, setIncludeInactive] = useState(false);
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -61,7 +61,7 @@ export function AnimalsInventoryScreen() {
   const [moveError, setMoveError] = useState('');
   const [editing, setEditing] = useState<AnimalRecord | null>(null);
   const [openedAnimal, setViewing] = useState<AnimalRecord | null>(null);
-  const viewing = openedAnimal ? rows.find((animal) => animal.id_animal === openedAnimal.id_animal) ?? openedAnimal : null;
+  const viewing = openedAnimal ? rows.find((animal) => animal.id_animal === openedAnimal.id_animal) ?? { ...openedAnimal, activo: 0 } : null;
   const [deactivating, setDeactivating] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState<'venta' | 'muerte' | 'otro'>('venta');
   const [deactivationDetail, setDeactivationDetail] = useState('');
@@ -76,9 +76,6 @@ export function AnimalsInventoryScreen() {
   const [illnessCorralId, setIllnessCorralId] = useState<number | null>(null);
   const [illnessError, setIllnessError] = useState('');
   const [illnessSaving, setIllnessSaving] = useState(false);
-  const [confirmPermanentDelete, setConfirmPermanentDelete] = useState(false);
-  const [permanentDeleteError, setPermanentDeleteError] = useState('');
-  const [permanentDeleteBusy, setPermanentDeleteBusy] = useState(false);
   const [registeringMating, setRegisteringMating] = useState(false);
   const [registeringBirth, setRegisteringBirth] = useState(false);
   const [serviceNotice, setServiceNotice] = useState('');
@@ -94,27 +91,27 @@ export function AnimalsInventoryScreen() {
   const load = useCallback(async () => {
     if (!session) return;
     setError(''); setCorralError('');
-    const [animalsResult, corralsResult] = await Promise.allSettled([listAnimals(session, includeInactive), listCorrals(session)]);
+    const [animalsResult, corralsResult] = await Promise.allSettled([listAnimals(session), listCorrals(session)]);
     if (animalsResult.status === 'fulfilled') setRows(animalsResult.value);
-    else { setRows([]); setError(friendlyErrorMessage(animalsResult.reason, 'No se pudo cargar el inventario de animales.')); }
+    else { setError(friendlyErrorMessage(animalsResult.reason, 'No se pudo cargar el inventario de animales.')); }
     if (corralsResult.status === 'fulfilled') setCorrals(corralsResult.value);
     else { setCorrals([]); setCorralError(friendlyErrorMessage(corralsResult.reason, 'No se pudieron cargar los corrales.')); }
     setLoading(false); setRefreshing(false);
-  }, [includeInactive, session]);
+  }, [session]);
 
   useEffect(() => {
     if (!session) return;
     let active = true;
-    Promise.allSettled([listAnimals(session, includeInactive), listCorrals(session)]).then(([animalsResult, corralsResult]) => {
+    Promise.allSettled([listAnimals(session), listCorrals(session)]).then(([animalsResult, corralsResult]) => {
       if (!active) return;
       setError(''); setCorralError('');
       if (animalsResult.status === 'fulfilled') setRows(animalsResult.value);
-      else { setRows([]); setError(friendlyErrorMessage(animalsResult.reason, 'No se pudo cargar el inventario de animales.')); }
+      else { setError(friendlyErrorMessage(animalsResult.reason, 'No se pudo cargar el inventario de animales.')); }
       if (corralsResult.status === 'fulfilled') setCorrals(corralsResult.value);
       else { setCorrals([]); setCorralError(friendlyErrorMessage(corralsResult.reason, 'No se pudieron cargar los corrales.')); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [includeInactive, load, session, revision]);
+  }, [session, revision]);
 
   useEffect(() => {
     if (!session) return;
@@ -155,10 +152,6 @@ export function AnimalsInventoryScreen() {
       refreshing={refreshing}
       headerAction={(
         <View style={style.inventoryActions}>
-          <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: includeInactive }} onPress={() => { setLoading(true); setError(''); setCorralError(''); setIncludeInactive((value) => !value); }} style={[style.cancelButton, { borderColor: colors.border, flexDirection: 'row', gap: 6 }]}>
-            <Ionicons color={colors.primary} name={includeInactive ? 'checkbox-outline' : 'square-outline'} size={18} />
-            <Text style={[style.cancelText, { color: colors.textSecondary }]}>Incluir inactivos</Text>
-          </Pressable>
           {canEdit ? (
             <Pressable onPress={() => setCreating(true)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
               <Ionicons color="#ffffff" name="add" size={17} style={{ marginRight: 4 }} />
@@ -191,30 +184,32 @@ export function AnimalsInventoryScreen() {
               isDesktop && style.cardDesktop,
             ]}
           >
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Ver ficha de ${animal.nombre || animal.identificador}`}
+              onPress={() => { setViewing(animal); setRegisteringMating(false); setRegisteringBirth(false); }}
+              style={({ pressed }) => [StyleSheet.absoluteFill, { zIndex: 1, borderRadius: 16 }, pressed && { backgroundColor: 'rgba(45,106,79,0.08)' }]}
+            />
             <View style={style.row}>
               <View style={[style.badge, { backgroundColor: isDark ? 'rgba(134,239,172,0.14)' : '#e8f5ed' }]}>
-                {animal.foto ? <Image source={{ uri: animal.foto }} style={style.animalPhoto} /> : <Ionicons color={isDark ? '#86efac' : '#2d6a4f'} name="paw" size={18} />}
+                {animal.foto ? <Image source={{ uri: animal.foto }} style={style.animalPhoto} /> : <AppSectionIcon color={isDark ? '#86efac' : '#2d6a4f'} name="horseshoe" size={18} />}
               </View>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Ver ficha de ${animal.nombre || animal.identificador}`}
-                onPress={() => { setViewing(animal); setRegisteringMating(false); setRegisteringBirth(false); }}
-                style={{ flex: 1 }}
-              >
+              <View style={{ flex: 1 }}>
                 <Text style={[style.title, { color: colors.textMain }]}>{animal.nombre || animal.identificador}</Text>
                 <Text style={[style.detail, { color: colors.textMuted }]}>{animal.identificador} · {animal.especie} {animal.raza} · {genderLabel(animal.genero)}</Text>
-              </Pressable>
+              </View>
               <View style={[style.statePill, !animal.activo ? { backgroundColor: colors.bgCardMuted } : animal.estado_salud === 'sano' ? style.stateHealthy : style.stateAlert]}>
                 <Text style={[style.stateText, !animal.activo ? { color: colors.textMuted } : animal.estado_salud === 'sano' ? style.stateTextHealthy : style.stateTextAlert]}>
                   {animal.activo ? animal.estado_salud.replaceAll('_', ' ') : 'Inactivo'}
                 </Text>
               </View>
+              <Ionicons color={colors.textMuted} name="chevron-up" size={17} />
             </View>
 
             <View style={[style.divider, { backgroundColor: colors.borderLight }]} />
 
-            <View style={style.row}>
-              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View pointerEvents="box-none" style={[style.row, { zIndex: 2, flexWrap: 'wrap' }]}>
+              <View pointerEvents="none" style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <Ionicons color={colors.textMuted} name="location-outline" size={14} />
                 <Text style={[style.detail, { color: colors.textSecondary }]}>
                   {animal.corral}  ·  {animal.peso_kg == null ? 'Sin peso' : `${animal.peso_kg} kg`}
@@ -252,8 +247,8 @@ export function AnimalsInventoryScreen() {
 
       {!loading && !error && filtered.length === 0 ? (
         <Empty
-          title={query || selectedSpecies !== 'Todas' ? 'No encontramos animales' : includeInactive ? 'Todavía no hay animales registrados' : 'No hay animales activos'}
-          text={query || selectedSpecies !== 'Todas' ? 'Probá cambiar la especie o buscar por identificador, nombre, raza o corral.' : includeInactive ? 'Los animales registrados del establecimiento aparecerán acá.' : 'Activá «Incluir inactivos» para consultar las fichas de animales dados de baja.'}
+          title={query || selectedSpecies !== 'Todas' ? 'No encontramos animales' : 'No hay animales activos'}
+          text={query || selectedSpecies !== 'Todas' ? 'Probá cambiar la especie o buscar por identificador, nombre, raza o corral.' : 'Los animales activos de la estancia aparecerán acá.'}
         />
       ) : null}
 
@@ -310,17 +305,7 @@ export function AnimalsInventoryScreen() {
       <Modal animationType="fade" onRequestClose={() => { setViewing(null); setRegisteringMating(false); setRegisteringBirth(false); setDeactivating(false); setReportingIllness(false); }} transparent visible={Boolean(viewing)}>
         <View style={style.backdrop}>
           <View style={[style.modal, style.animalDetailModal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-            {confirmPermanentDelete && viewing ? (
-              <View>
-                <Text style={[style.modalTitle, { color: colors.textMain }]}>Eliminar definitivamente {viewing.nombre || viewing.identificador}</Text>
-                <Text style={[style.detail, { color: colors.textSecondary, marginTop: 8 }]}>Se eliminará la ficha inactiva y sus registros vinculados. Esta acción no se puede deshacer.</Text>
-                {permanentDeleteError ? <Text style={style.errorText}>{permanentDeleteError}</Text> : null}
-                <View style={style.modalActions}>
-                  <Pressable disabled={permanentDeleteBusy} onPress={() => { setConfirmPermanentDelete(false); setPermanentDeleteError(''); }} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text></Pressable>
-                  <Pressable disabled={permanentDeleteBusy} onPress={() => void permanentlyDeleteViewingAnimal()} style={[style.confirmButton, { backgroundColor: '#dc2626' }, permanentDeleteBusy && style.disabledButton]}><Text style={style.confirmText}>{permanentDeleteBusy ? 'Eliminando…' : 'Eliminar definitivamente'}</Text></Pressable>
-                </View>
-              </View>
-            ) : reportingIllness && viewing ? (
+            {reportingIllness && viewing?.activo ? (
               <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>Reportar enfermedad</Text>
                 <Text style={[style.detail, { color: colors.textSecondary, marginBottom: 12 }]}>{viewing.nombre || viewing.identificador} · se registrará el problema y el traslado físico a enfermería.</Text>
@@ -336,7 +321,7 @@ export function AnimalsInventoryScreen() {
                   <Pressable disabled={illnessSaving || !illnessCorralId} onPress={() => void submitIllnessReport()} style={[style.confirmButton, { backgroundColor: colors.primary }, (illnessSaving || !illnessCorralId) && style.disabledButton]}><Text style={style.confirmText}>{illnessSaving ? 'Guardando…' : 'Reportar e ingresar'}</Text></Pressable>
                 </View>
               </ScrollView>
-            ) : deactivating && viewing ? (
+            ) : deactivating && viewing?.activo ? (
               <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>{deactivationReason === 'muerte' ? `Notificar muerte · ${viewing.nombre || viewing.identificador}` : `Dar de baja ${viewing.nombre || viewing.identificador}`}</Text>
                 <Text style={[style.detail, { color: colors.textSecondary, marginBottom: 12 }]}>{deactivationReason === 'muerte' ? ownerCanDeactivate ? 'La muerte quedará registrada y la ficha se conservará.' : 'La muerte quedará notificada para revisión administrativa y la ficha se conservará.' : 'El animal dejará de aparecer en el inventario activo. Su ficha y su historial se conservarán.'}</Text>
@@ -355,7 +340,7 @@ export function AnimalsInventoryScreen() {
                   <Pressable disabled={deactivatingBusy} onPress={() => void confirmDeactivation()} style={[style.confirmButton, { backgroundColor: '#dc2626' }, deactivatingBusy && style.disabledButton]}><Text style={style.confirmText}>{deactivatingBusy ? 'Guardando…' : deactivationReason === 'muerte' ? ownerCanDeactivate ? 'Confirmar muerte' : 'Notificar muerte' : 'Confirmar baja'}</Text></Pressable>
                 </View>
               </ScrollView>
-            ) : registeringMating && viewing ? (
+            ) : registeringMating && viewing?.activo ? (
               <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
                 <MatingServiceForm
                   animals={rows}
@@ -365,10 +350,10 @@ export function AnimalsInventoryScreen() {
                   onSaved={() => { setServiceNotice('Servicio reproductivo registrado.'); setViewing(null); setRegisteringMating(false); }}
                 />
               </ScrollView>
-            ) : registeringBirth && viewing ? (
+            ) : registeringBirth && viewing?.activo ? (
               <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
                 <BirthForm
-                  initialMother={viewing}
+                  initialMother={openedAnimal ?? undefined}
                   onSaved={() => { setServiceNotice('Nacimiento registrado.'); setViewing(null); setRegisteringBirth(false); }}
                 />
                 <View style={style.matingActions}>
@@ -433,12 +418,6 @@ export function AnimalsInventoryScreen() {
                     <Pressable onPress={() => { setDeactivationReason('venta'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); setDeactivationError(''); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}><Ionicons color="#ffffff" name="trash-outline" size={16} /><Text style={style.confirmText}>Borrar animal</Text></Pressable>
                     <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); setDeactivationError(''); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#a83232' }]}><Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text></Pressable>
                   </View>
-                ) : null}
-                {!viewing?.activo && ownerCanDeactivate ? (
-                  <Pressable onPress={() => { setPermanentDeleteError(''); setConfirmPermanentDelete(true); }} style={[style.matingCta, { backgroundColor: '#dc2626', marginTop: 12 }]}>
-                    <Ionicons color="#ffffff" name="trash-outline" size={16} />
-                    <Text style={style.confirmText}>Eliminar ficha definitivamente</Text>
-                  </Pressable>
                 ) : null}
                 <View style={style.modalActions}>
                   <Pressable onPress={() => setViewing(null)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
@@ -577,14 +556,5 @@ export function AnimalsInventoryScreen() {
     finally { setIllnessSaving(false); }
   }
 
-  async function permanentlyDeleteViewingAnimal(): Promise<void> {
-    if (!session || !viewing || viewing.activo) return;
-    setPermanentDeleteBusy(true); setPermanentDeleteError('');
-    try {
-      await permanentlyDeleteInactiveAnimal(session, viewing.id_animal);
-      setRows((current) => current.filter((animal) => animal.id_animal !== viewing.id_animal));
-      setViewing(null); setConfirmPermanentDelete(false); setServiceNotice('Ficha y registros vinculados eliminados definitivamente.');
-    } catch (cause) { setPermanentDeleteError(friendlyErrorMessage(cause, 'No se pudo eliminar definitivamente la ficha.')); }
-    finally { setPermanentDeleteBusy(false); }
-  }
+
 }

@@ -5,7 +5,7 @@ import type { Session } from '../types/auth';
 import type { AnimalGender } from './livestockApi';
 
 export interface TaskRecord { id_tarea: number; id_responsable: number; titulo: string; descripcion: string | null; fecha_vencimiento: string | null; estado: string; responsable: string | null; apellido_responsable: string | null; }
-export interface MatingService { id_servicio: number; fecha: string; metodo: string; estado: string; observaciones: string | null; fecha_estimada_nacimiento: string | null; prenez_confirmada_en: string | null; especie: string; madre: string; nombre_madre: string | null; padre: string | null; padre_texto: string | null; }
+export interface MatingService { id_servicio: number; fecha: string; metodo: string; estado: string; observaciones: string | null; fecha_estimada_nacimiento: string | null; prenez_confirmada_en: string | null; especie: string; madre: string; nombre_madre: string | null; madre_activa?: number; padre: string | null; padre_texto: string | null; }
 export interface BirthRecord { id_nacimiento: number; fecha: string; observaciones: string | null; cria: string; nombre_cria: string | null; madre: string | null; madre_texto: string | null; padre: string | null; padre_texto: string | null; }
 export interface ReproductionData { servicios: MatingService[]; nacimientos: BirthRecord[]; }
 export interface FieldEvent { id_evento: string; titulo: string; descripcion: string | null; tipo_evento: string | null; fecha_inicio: string; fecha_fin: string | null; ubicacion: string | null; provincia: string | null; localidad: string | null; organizador: string | null; especie: string | null; raza: string | null; fuente: string | null; url: string | null; }

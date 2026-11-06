@@ -1,5 +1,5 @@
 // protejo las secciones y ordeno la navegación móvil por perfil.
-import { Ionicons } from '@expo/vector-icons';
+import { AppSectionIcon, type AppSectionIconName } from '../../components/app/AppSectionIcon';
 import { Redirect, Tabs } from 'expo-router';
 import { StyleSheet, View, type ColorValue } from 'react-native';
 import { useSession } from '../../context/SessionContext';
@@ -7,7 +7,7 @@ import { LiveChangesProvider } from '../../context/LiveChangesContext';
 import { OwnerDesktopShell } from '../../components/app/OwnerDesktopShell';
 import { BrandLoadingScreen } from '../../components/BrandLoadingScreen';
 
-type IconName = keyof typeof Ionicons.glyphMap;
+type IconName = AppSectionIconName;
 
 export default function AppTabs() {
   const { session, restoring } = useSession();
@@ -24,7 +24,7 @@ export default function AppTabs() {
     tabBarLabelStyle: styles.tabLabel,
   }}>
     <Tabs.Screen name="home" options={{ title: isVet ? 'Enfermería' : 'Inicio', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name={isVet ? 'medkit-outline' : 'home-outline'} activeName={isVet ? 'medkit' : 'home'} /> }} />
-    <Tabs.Screen name="animals" options={{ title: 'Mis animales', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="paw-outline" activeName="paw" /> }} />
+    <Tabs.Screen name="animals" options={{ title: 'Mis animales', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="horseshoe" activeName="horseshoe" /> }} />
     <Tabs.Screen name="estate" options={{ title: 'Mi estancia', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="home-outline" activeName="home" /> }} />
     <Tabs.Screen name="corrals" options={{ title: 'Corrales', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="grid-outline" activeName="grid" /> }} />
     <Tabs.Screen name="events" options={{ title: 'Eventos', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="calendar-outline" activeName="calendar" /> }} />
@@ -38,7 +38,7 @@ export default function AppTabs() {
 
 function TabIcon({ color, focused, name, activeName }: { color: ColorValue; focused: boolean; name: IconName; activeName: IconName }) {
   return <View style={[styles.iconBadge, focused && styles.iconBadgeActive]}>
-    <Ionicons color={typeof color === 'number' ? String(color) : color ?? '#214d35'} name={focused ? activeName : name} size={20} />
+    <AppSectionIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} name={focused ? activeName : name} size={20} />
   </View>;
 }
 

@@ -1,3 +1,4 @@
+import { AppSectionIcon } from './AppSectionIcon';
 // resuelvo módulos secundarios y solicitudes administrativas.
 // presento los resúmenes y accesos principales según el perfil activo.
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -52,7 +53,7 @@ export function ModuleInDevelopmentScreen({ moduleKey, item }: { moduleKey: stri
       <Header title={title} subtitle="MÓDULO DE ESTANCIAAPP" />
       <View style={[s.developmentCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
         <View style={[s.developmentIcon, { backgroundColor: isDark ? 'rgba(134,239,172,0.12)' : '#e8f5ed' }]}>
-          <Ionicons color={isDark ? '#86efac' : '#2d6a4f'} name={item?.icon ?? 'construct-outline'} size={30} />
+          <AppSectionIcon color={isDark ? '#86efac' : '#2d6a4f'} name={item?.icon ?? 'construct-outline'} size={30} />
         </View>
         <Text style={[s.developmentTitle, { color: colors.textMain }]}>Sección en desarrollo</Text>
         <Text style={[s.developmentCopy, { color: colors.textMuted }]}>

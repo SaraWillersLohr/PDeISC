@@ -61,7 +61,7 @@ export async function listReproduction(req: Request, res: Response): Promise<voi
   try {
     const [services] = await database.execute<RowDataPacket[]>(
       `SELECT s.id_servicio,s.fecha,s.metodo,s.estado,s.observaciones,s.fecha_estimada_nacimiento,s.prenez_confirmada_en,
-              m.identificador AS madre,m.nombre AS nombre_madre,e.nombre AS especie,p.identificador AS padre,s.padre_texto
+              m.identificador AS madre,m.nombre AS nombre_madre,m.activo AS madre_activa,e.nombre AS especie,p.identificador AS padre,s.padre_texto
        FROM servicios_monta s JOIN animales m ON m.id_animal=s.id_madre
        JOIN razas r ON r.id_raza=m.id_raza JOIN especies e ON e.id_especie=r.id_especie
        LEFT JOIN animales p ON p.id_animal=s.id_padre ORDER BY s.fecha DESC LIMIT 200`,
@@ -151,7 +151,7 @@ export async function confirmPregnancy(req: Request, res: Response): Promise<voi
     await connection.beginTransaction();
     const [rows] = await connection.execute<RowDataPacket[]>(
       `SELECT s.id_servicio,s.id_madre,s.fecha_estimada_nacimiento,e.nombre AS especie,s.prenez_confirmada_en,
-              COALESCE(a.nombre,a.identificador) AS madre
+              COALESCE(a.nombre,a.identificador) AS madre,a.activo AS madre_activa
        FROM servicios_monta s JOIN animales a ON a.id_animal=s.id_madre
        JOIN razas r ON r.id_raza=a.id_raza JOIN especies e ON e.id_especie=r.id_especie
        WHERE s.id_servicio=? FOR UPDATE`, [id],
@@ -160,6 +160,11 @@ export async function confirmPregnancy(req: Request, res: Response): Promise<voi
     if (rows[0].prenez_confirmada_en) {
       await connection.commit();
       res.json({ data: { fecha_estimada_nacimiento: toDateOnly(rows[0].fecha_estimada_nacimiento), ya_confirmada: true } });
+      return;
+    }
+    if (!rows[0].madre_activa) {
+      await connection.rollback();
+      res.status(409).json({ message: 'La madre está inactiva. La preñez no se registró.' });
       return;
     }
     const days = gestationDays(String(rows[0].especie));
@@ -188,7 +193,7 @@ export async function publishBirthReminders(): Promise<void> {
     const [due] = await connection.execute<RowDataPacket[]>(
       `SELECT s.id_servicio,s.id_madre,s.fecha_estimada_nacimiento,COALESCE(m.nombre,m.identificador) AS madre
        FROM servicios_monta s JOIN animales m ON m.id_animal=s.id_madre
-       WHERE s.prenez_confirmada_en IS NOT NULL AND s.recordatorio_nacimiento_en IS NULL
+       WHERE m.activo=1 AND s.prenez_confirmada_en IS NOT NULL AND s.recordatorio_nacimiento_en IS NULL
        AND DATE_SUB(s.fecha_estimada_nacimiento, INTERVAL 1 MONTH)=CURRENT_DATE() FOR UPDATE`,
     );
     for (const row of due) {
@@ -227,12 +232,13 @@ export async function createBirth(req: Request, res: Response): Promise<void> {
     if (!breedRows.length) throw new Error('la raza seleccionada no existe');
     if (motherId !== null && fatherId !== null && motherId === fatherId) throw new Error('la madre y el padre no pueden ser el mismo animal');
     const [parents] = await connection.execute<RowDataPacket[]>(
-      `SELECT a.id_animal,a.genero,r.id_especie
+      `SELECT a.id_animal,a.genero,a.activo,r.id_especie
        FROM animales a JOIN razas r ON r.id_raza=a.id_raza
-       WHERE a.id_animal IN (?,?)`, [motherId ?? 0, fatherId ?? 0],
+       WHERE a.id_animal IN (?,?) FOR UPDATE`, [motherId ?? 0, fatherId ?? 0],
     );
     const dam = motherId === null ? undefined : parents.find((parent) => Number(parent.id_animal) === motherId);
     const sire = fatherId === null ? undefined : parents.find((parent) => Number(parent.id_animal) === fatherId);
+    if ((dam && !dam.activo) || (sire && !sire.activo)) throw new Error('Uno de los animales seleccionados está inactivo. El nacimiento no se registró.');
     if (motherId !== null && (!dam || dam.genero !== 'hembra' || Number(dam.id_especie) !== Number(breedRows[0].id_especie))) {
       throw new Error('la madre registrada debe ser hembra y de la misma especie que la cría');
     }

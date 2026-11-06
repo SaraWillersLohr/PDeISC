@@ -76,18 +76,22 @@ export async function createVeterinaryRecord(req: Request, res: Response): Promi
   if (!Number.isInteger(animalId) || animalId < 1 || !userId || !validBirthDate(date) || !['tratamiento', 'nota'].includes(type) || !detail || detail.length > 5000 || photo === false) {
     res.status(400).json({ message: 'completá una fecha válida y una nota de hasta 5.000 caracteres; la foto debe ser válida y no superar 1,5 MB' }); return;
   }
+  const connection = await database.getConnection();
   try {
-    const [animals] = await database.execute<RowDataPacket[]>(
+    await connection.beginTransaction();
+    const [animals] = await connection.execute<RowDataPacket[]>(
       `SELECT a.id_animal FROM animales a JOIN corrales c ON c.id_corral=a.id_corral
-       WHERE a.id_animal=? AND a.activo=1 AND c.es_enfermeria=1`, [animalId],
+       WHERE a.id_animal=? AND a.activo=1 AND c.es_enfermeria=1 FOR UPDATE`, [animalId],
     );
-    if (!animals.length) { res.status(409).json({ message: 'solo se puede registrar la evolución de un animal activo en enfermería' }); return; }
-    const [result] = await database.execute<ResultSetHeader>(
+    if (!animals.length) { await connection.rollback(); res.status(409).json({ message: 'solo se puede registrar la evolución de un animal activo en enfermería' }); return; }
+    const [result] = await connection.execute<ResultSetHeader>(
       'INSERT INTO tratamientos (id_animal,id_veterinario,fecha_inicio,tipo,descripcion,foto) VALUES (?,?,?,?,?,?)',
       [animalId, userId, date, type, detail, photo],
     );
+    await connection.commit();
     res.status(201).json({ data: { id_registro: result.insertId } });
-  } catch { res.status(500).json({ message: 'no se pudo guardar la evolución veterinaria' }); }
+  } catch { await connection.rollback(); res.status(500).json({ message: 'no se pudo guardar la evolución veterinaria' }); }
+  finally { connection.release(); }
 }
 
 // actualizo el diagnóstico veterinario y dejo constancia visible en la evolución.

@@ -1,6 +1,6 @@
 // reúno tipos y elementos visuales compartidos entre las pantallas principales.
 import NetInfo from '@react-native-community/netinfo';
-import { Ionicons } from '@expo/vector-icons';
+import type { AppSectionIconName } from './AppSectionIcon';
 import { useEffect, useRef, useState } from 'react';
 import { Image, NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,11 +11,11 @@ import { ScrollToTop } from './ScrollToTop';
 
 export type ModuleKey = 'inicio' | 'animales' | 'estancia' | 'tareas' | 'sanidad' | 'reproduccion' | 'eventos' | 'equipo' | 'catalogo' | 'perfil';
 
-export type ModuleItem = { key: ModuleKey; label: string; icon: keyof typeof Ionicons.glyphMap; description: string; badgeColor: string; badgeBg: string; roles: string[] };
+export type ModuleItem = { key: ModuleKey; label: string; icon: AppSectionIconName; description: string; badgeColor: string; badgeBg: string; roles: string[] };
 
 export const modules: ModuleItem[] = [
   { key: 'estancia', label: 'Mi estancia', icon: 'home', description: 'Corrales de la estancia', badgeColor: '#b06d2c', badgeBg: '#fef3e7', roles: ['dueno', 'peon'] },
-  { key: 'animales', label: 'Mis animales', icon: 'paw', description: 'Fichas, pesajes, movimientos e historial', badgeColor: '#2d6a4f', badgeBg: '#e8f5ed', roles: ['dueno', 'peon'] },
+  { key: 'animales', label: 'Mis animales', icon: 'horseshoe', description: 'Fichas, pesajes, movimientos e historial', badgeColor: '#2d6a4f', badgeBg: '#e8f5ed', roles: ['dueno', 'peon'] },
   { key: 'tareas', label: 'Tareas', icon: 'checkbox', description: 'Pendientes y trabajo del equipo', badgeColor: '#366aa1', badgeBg: '#edf4fb', roles: ['dueno', 'peon'] },
   { key: 'sanidad', label: 'Corral de enfermería', icon: 'medkit', description: 'Animales enfermos y tratamientos', badgeColor: '#a8473d', badgeBg: '#faecea', roles: ['dueno', 'veterinario'] },
   { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch', description: 'Servicios, diagnósticos y nacimientos', badgeColor: '#6a4d95', badgeBg: '#f2effa', roles: ['dueno', 'peon'] },

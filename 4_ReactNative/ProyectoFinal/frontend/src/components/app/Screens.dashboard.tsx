@@ -1,3 +1,4 @@
+import { AppSectionIcon } from './AppSectionIcon';
 // muestro los indicadores y accesos rápidos del inicio.
 // presento los resúmenes y accesos principales según el perfil activo.
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -90,7 +91,7 @@ export function HomeScreen() {
           </View>
           <View style={[s.actionGrid, isDesktop && s.actionGridDesktop]}>
             {[
-              { title: 'Ver animales', description: 'Consultá fichas, registrá pesajes y movimientos.', icon: 'paw-outline' as const, color: '#2d6a4f', route: '/(app)/animals' },
+              { title: 'Ver animales', description: 'Consultá fichas, registrá pesajes y movimientos.', icon: 'horseshoe' as const, color: '#2d6a4f', route: '/(app)/animals' },
               { title: 'Mis tareas', description: 'Revisá pendientes y actualizá su estado.', icon: 'checkbox-outline' as const, color: '#366aa1', route: '/(app)/tasks' },
               { title: 'Mi estancia', description: 'Ubicá corrales y consultá el establecimiento.', icon: 'home-outline' as const, color: '#b06d2c', route: '/(app)/estate' },
               { title: 'Reproducción', description: 'Accedé a servicios, diagnósticos y nacimientos.', icon: 'git-branch-outline' as const, color: '#6a4d95', route: '/(app)/reproduccion' },
@@ -102,7 +103,7 @@ export function HomeScreen() {
                 style={({ pressed }) => [s.actionCard, isDesktop && s.actionCardWide, { backgroundColor: colors.bgCard, borderColor: colors.border }, pressed && s.actionCardPressed]}
               >
                 <View style={[s.actionIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : `${item.color}16` }]}>
-                  <Ionicons color={item.color} name={item.icon} size={21} />
+                  <AppSectionIcon color={item.color} name={item.icon} size={21} />
                 </View>
                 <Text style={[s.actionTitle, { color: colors.textMain }]}>{item.title}</Text>
                 <Text style={[s.actionDescription, { color: colors.textMuted }]}>{item.description}</Text>

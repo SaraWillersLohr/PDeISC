@@ -94,7 +94,7 @@ export function ReproductionScreen() {
                   {owner ? <Pressable accessibilityRole="button" accessibilityLabel="Borrar servicio reproductivo" disabled={busy} onPress={() => setDeleteTarget({ type: 'servicio', id: item.id_servicio, label: `${item.nombre_madre || item.madre} · ${item.fecha.slice(0, 10)}` })}><Ionicons color="#dc2626" name="trash-outline" size={18} /></Pressable> : null}
                 </View>
                 {item.observaciones ? <Text style={[s.copy, { color: colors.textMuted, marginTop: 6 }]}>{item.observaciones}</Text> : null}
-                {canConfirmPregnancy && !item.fecha_estimada_nacimiento ? (
+                {canConfirmPregnancy && item.madre_activa !== 0 && !item.fecha_estimada_nacimiento ? (
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={`Confirmar preñez de ${item.nombre_madre || item.madre}`}

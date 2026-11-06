@@ -25,6 +25,10 @@ export function MatingServiceForm({ mother, animals, onBack, onCancel, onSaved }
     .slice(0, 5), [animals, fatherSearch, mother.id_animal]);
 
   async function save(): Promise<void> {
+    if (!mother.activo || (father && !animals.some((animal) => animal.id_animal === father.id_animal && animal.activo))) {
+      setError('Uno de los animales está inactivo. El servicio no se guardó.');
+      return;
+    }
     if (!session || (!father && !fatherName.trim()) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !method.trim()) {
       setError('Indicá el padre, la fecha y el método del servicio.');
       return;

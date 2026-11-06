@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ScrollToTop } from './ScrollToTop';
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -61,6 +62,7 @@ function monthCells(month: Date): (number | null)[] {
 
 export function EventsScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -86,7 +88,7 @@ export function EventsScreen() {
       .catch((cause: unknown) => { if (active) setError(friendlyErrorMessage(cause, 'No se pudieron cargar los eventos.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session, allEvents]);
+  }, [session, allEvents, revision]);
 
   const filteredEvents = useMemo(() => data.eventos.filter((event) =>
     (!selectedSpecies || !event.especie || event.especie.toLocaleLowerCase('es') === selectedSpecies.toLocaleLowerCase('es')) &&

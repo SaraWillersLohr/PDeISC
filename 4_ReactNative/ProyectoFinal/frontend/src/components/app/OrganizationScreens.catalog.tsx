@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Modal, Platform, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { createBreed, createSpecies, deleteBreed, deleteSpecies, listCatalog, requestCatalog, reviewCatalog, type CatalogData, type Species } from '../../services/organizationApi';
 import { Screen } from './OrganizationScreens.shared';
@@ -12,6 +13,7 @@ import { st } from './OrganizationStyles';
 
 export function CatalogScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -53,7 +55,7 @@ export function CatalogScreen() {
       .catch((e: unknown) => { if (active) setError(friendlyErrorMessage(e, 'No se pudo cargar el catálogo.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session]);
+  }, [session, revision]);
 
   function openForm(nextKind: 'especie' | 'raza', species?: Species): void {
     setKind(nextKind);

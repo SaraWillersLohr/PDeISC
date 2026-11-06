@@ -92,6 +92,7 @@ export interface NotificationRecord {
 export interface NotificationPage {
   data: NotificationRecord[];
   hasMore: boolean;
+  unread: number;
 }
 
 async function invalidate(session: Session, paths: string[]): Promise<void> {
@@ -502,6 +503,7 @@ export async function listNotifications(
   const payload = (await response.json().catch(() => ({}))) as {
     data?: NotificationRecord[];
     hasMore?: boolean;
+    unread?: number;
     message?: string;
   };
   if (!response.ok)
@@ -512,7 +514,8 @@ export async function listNotifications(
         "No se pudieron cargar las notificaciones.",
       ),
     );
-  return { data: payload.data ?? [], hasMore: Boolean(payload.hasMore) };
+  const data = payload.data ?? [];
+  return { data, hasMore: Boolean(payload.hasMore), unread: payload.unread ?? data.filter((item) => !item.leida && !item.estado_respuesta).length };
 }
 
 export async function updateNotification(

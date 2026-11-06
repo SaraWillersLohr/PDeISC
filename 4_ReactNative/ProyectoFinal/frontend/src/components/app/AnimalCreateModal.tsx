@@ -20,33 +20,38 @@ const genderOptions: { value: AnimalGender; label: string }[] = [
 export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { visible: boolean; corrals: CorralRecord[]; onClose: () => void; onCreated: () => void }) {
   const { session } = useSession();
   const [species, setSpecies] = useState<Species[]>([]); const [breeds, setBreeds] = useState<Breed[]>([]);
-  const [speciesId, setSpeciesId] = useState<number | null>(null); const [breedId, setBreedId] = useState<number | null>(null); const [corralId, setCorralId] = useState<number | null>(null);
+  const [speciesId, setSpeciesId] = useState<number | null>(null); const [breedId, setBreedId] = useState<number | null>(null); const [selectedCorralId, setCorralId] = useState<number | null>(null);
   const [gender, setGender] = useState<AnimalGender | null>(null);
   const [identifier, setIdentifier] = useState(''); const [name, setName] = useState(''); const [birth, setBirth] = useState(''); const [weight, setWeight] = useState('');
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
   const availableBreeds = useMemo(() => breeds.filter((breed) => breed.id_especie === speciesId), [breeds, speciesId]);
   const availableCorrals = useMemo(() => corrals.filter((corral) => !corral.es_enfermeria && Number(corral.ocupacion) < Number(corral.capacidad)), [corrals]);
+  const corralId = selectedCorralId ?? availableCorrals[0]?.id_corral ?? null;
 
   useEffect(() => {
     if (!visible || !session) return;
     let active = true;
-    listCatalog(session).then((catalog) => { if (active) { const firstSpecies = catalog.especies[0]; setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId(firstSpecies?.id_especie ?? null); setBreedId(catalog.razas.find((breed) => breed.id_especie === firstSpecies?.id_especie)?.id_raza ?? null); setCorralId(corrals.find((corral) => !corral.es_enfermeria && Number(corral.ocupacion) < Number(corral.capacidad))?.id_corral ?? null); } })
+    listCatalog(session).then((catalog) => { if (active) { const firstSpecies = catalog.especies[0]; setSpecies(catalog.especies); setBreeds(catalog.razas); setSpeciesId(firstSpecies?.id_especie ?? null); setBreedId(catalog.razas.find((breed) => breed.id_especie === firstSpecies?.id_especie)?.id_raza ?? null); } })
       .catch((cause: unknown) => { if (active) setMessage(friendlyErrorMessage(cause, 'No se pudo cargar el catálogo.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [visible, session, corrals]);
+  }, [visible, session]);
 
   function close(): void {
     setLoading(true);
     setMessage('');
     setGender(null);
+    setCorralId(null);
     onClose();
   }
 
   async function save(): Promise<void> {
     if (!session || !identifier.trim() || !gender || !breedId || !corralId || (birth && !isValidBirthDate(birth)) || (weight && (!Number.isFinite(Number(weight)) || Number(weight) <= 0))) {
       setMessage('Completá identificador, género, especie, raza y corral. Revisá que la fecha exista y que el peso sea mayor a cero.'); return;
+    }
+    if (!availableCorrals.some((corral) => corral.id_corral === corralId)) {
+      setMessage('El corral seleccionado ya no está disponible. Elegí otro corral.'); return;
     }
     // Aplico el límite a la especie elegida sin cambiar el registro del animal.
     const ageError = animalBirthError(birth, species.find((item) => item.id_especie === speciesId)?.nombre ?? '');

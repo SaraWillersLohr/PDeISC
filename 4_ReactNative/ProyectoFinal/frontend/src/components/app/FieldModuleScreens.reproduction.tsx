@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Modal, Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { confirmPregnancy, deleteBirthRecord, deleteMatingService, listReproduction, type ReproductionData } from '../../services/modulesApi';
 import { Frame } from './FieldModuleScreens.shared';
@@ -12,6 +13,7 @@ import { s } from './FieldModuleStyles';
 
 export function ReproductionScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -36,11 +38,11 @@ export function ReproductionScreen() {
     if (!session) return;
     let active = true;
     listReproduction(session)
-      .then((result) => { if (active) { setData(result); setMessage(''); } })
+      .then((result) => { if (active) setData(result); })
       .catch((e: unknown) => { if (active) setMessage(friendlyErrorMessage(e, 'No se pudo cargar reproducción.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session]);
+  }, [session, revision]);
 
   async function removeRecord(): Promise<void> {
     if (!session || !deleteTarget) return;

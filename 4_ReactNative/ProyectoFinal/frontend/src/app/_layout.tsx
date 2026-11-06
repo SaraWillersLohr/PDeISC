@@ -5,6 +5,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SessionProvider } from '../context/SessionContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
+export const unstable_settings = { anchor: 'index' };
+
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
@@ -24,7 +26,7 @@ function AppNavigation() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: isDark ? '#101b14' : '#f4f6f1' } }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="register" />
-        <Stack.Screen name="verify" />
+        <Stack.Screen name="verify" options={{ presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }} />
         <Stack.Screen name="access" />
         <Stack.Screen name="recover" />
         <Stack.Screen name="(app)" />

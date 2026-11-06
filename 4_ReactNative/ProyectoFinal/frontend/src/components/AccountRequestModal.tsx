@@ -3,14 +3,19 @@ import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { requestAccount } from '../services/authApi';
 import { PasswordInput } from './PasswordInput';
 
 type Props = { visible: boolean; onClose: () => void };
 
+const dialogMaxWidth = 560;
+const gutter = 14;
+
 export function AccountRequestModal({ visible, onClose }: Props) {
   const { width, fontScale } = useWindowDimensions();
-  const stacked = width < 520 * Math.max(1, fontScale);
+  const dialogWidth = Math.min(width - 2 * gutter, dialogMaxWidth);
+  const stacked = dialogWidth < 492 * Math.max(1, fontScale);
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
@@ -36,7 +41,7 @@ export function AccountRequestModal({ visible, onClose }: Props) {
   }
 
   return <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
-    <View style={s.backdrop}>
+    <SafeAreaView style={s.backdrop}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
         <View accessibilityViewIsModal style={s.dialog}>
           <ScrollView style={s.scroll} contentContainerStyle={[s.content, stacked && s.compactContent]} keyboardShouldPersistTaps="handled">
@@ -60,14 +65,14 @@ export function AccountRequestModal({ visible, onClose }: Props) {
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
   </Modal>;
 }
 
 const s = StyleSheet.create({
-  backdrop: { alignItems: 'center', backgroundColor: 'rgba(14,27,18,0.62)', flex: 1, justifyContent: 'center', padding: 14 },
-  keyboard: { alignItems: 'center', flex: 1, justifyContent: 'center', width: '100%' },
-  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, flexShrink: 1, maxHeight: '100%', maxWidth: 560, overflow: 'hidden', width: '100%' },
+  backdrop: { backgroundColor: 'rgba(14,27,18,0.62)', flex: 1 },
+  keyboard: { alignItems: 'center', flex: 1, justifyContent: 'center', padding: gutter },
+  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, flexShrink: 1, maxWidth: dialogMaxWidth, overflow: 'hidden', width: '100%' },
   scroll: { flexGrow: 0, flexShrink: 1 },
   content: { padding: 20 },
   compactContent: { padding: 14 },
@@ -75,16 +80,16 @@ const s = StyleSheet.create({
   heading: { flex: 1 },
   eyebrow: { color: '#748076', fontSize: 9, fontWeight: '800', letterSpacing: 1.3 },
   title: { color: '#202c23', fontSize: 23, fontWeight: '800', marginTop: 4 },
-  close: { alignItems: 'center', height: 34, justifyContent: 'center', marginLeft: 8, width: 34 },
+  close: { alignItems: 'center', height: 44, justifyContent: 'center', marginLeft: 8, width: 44 },
   closeText: { color: '#526257', fontSize: 28, lineHeight: 30 },
-  copy: { color: '#748076', fontSize: 11, lineHeight: 16, marginBottom: 9, marginTop: 5 },
+  copy: { color: '#748076', fontSize: 13, lineHeight: 19, marginBottom: 9, marginTop: 5 },
   row: { flexDirection: 'row', gap: 10 },
   half: { flex: 1, minWidth: 0 },
-  label: { color: '#626e63', fontSize: 8, fontWeight: '800', letterSpacing: 0.7, marginBottom: 4, marginTop: 8 },
-  input: { backgroundColor: '#fff', borderColor: '#e3e8e1', borderRadius: 9, borderWidth: 1, color: '#202c23', fontSize: 13, height: 42, paddingHorizontal: 10, width: '100%' },
-  passwordText: { color: '#202c23', fontSize: 13, height: 42, paddingLeft: 10 },
-  error: { backgroundColor: '#fff0ed', borderRadius: 8, color: '#9b3d36', fontSize: 10, lineHeight: 14, marginTop: 8, padding: 8 },
-  primary: { alignItems: 'center', backgroundColor: '#214d35', borderRadius: 10, height: 44, justifyContent: 'center', marginTop: 14 },
+  label: { color: '#626e63', fontSize: 10, fontWeight: '800', letterSpacing: 0.7, marginBottom: 4, marginTop: 8 },
+  input: { backgroundColor: '#fff', borderColor: '#e3e8e1', borderRadius: 9, borderWidth: 1, color: '#202c23', fontSize: 16, minHeight: 44, paddingHorizontal: 10, width: '100%' },
+  passwordText: { color: '#202c23', fontSize: 16, minHeight: 44 },
+  error: { backgroundColor: '#fff0ed', borderRadius: 8, color: '#9b3d36', fontSize: 12, lineHeight: 17, marginTop: 8, padding: 8 },
+  primary: { alignItems: 'center', backgroundColor: '#214d35', borderRadius: 10, minHeight: 44, justifyContent: 'center', marginTop: 14, padding: 8 },
   disabled: { opacity: 0.7 },
   primaryText: { color: '#fff', fontSize: 13, fontWeight: '700' },
 });

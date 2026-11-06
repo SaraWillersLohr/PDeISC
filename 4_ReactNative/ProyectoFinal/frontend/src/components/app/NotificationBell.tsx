@@ -4,12 +4,14 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { listNotifications, updateNotification, type NotificationRecord } from '../../services/livestockApi';
 
 export function NotificationBell() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationRecord[]>([]);
@@ -19,13 +21,14 @@ export function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState('');
-  const unread = items.filter((item) => !item.leida && !item.estado_respuesta).length;
+  const [unread, setUnread] = useState(0);
 
   const loadFirst = useCallback(async () => {
     if (!session) return;
     setLoading(true); setError('');
     try {
       const page = await listNotifications(session);
+      setUnread(page.unread);
       setItems(page.data); setHasMore(page.hasMore); setOlderThan(page.data[page.data.length - 1]?.id_notificacion ?? null); setPageHistory([null]);
     } catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudieron cargar las notificaciones.')); }
     finally { setLoading(false); }
@@ -37,23 +40,19 @@ export function NotificationBell() {
     return () => clearTimeout(timer);
   }, [open, loadFirst]);
 
-  // Mantengo actualizado el contador y la lista con una consulta liviana cada cinco segundos.
   useEffect(() => {
     if (!session) return;
     let active = true;
-    const timer = setInterval(() => {
-      void listNotifications(session).then((page) => {
-        if (!active) return;
-        setItems((current) => {
-          const byId = new Map<number, NotificationRecord>();
-          for (const item of current) byId.set(item.id_notificacion, item);
-          for (const item of page.data) byId.set(item.id_notificacion, item);
-          return [...byId.values()].sort((a, b) => b.id_notificacion - a.id_notificacion).slice(0, Math.max(10, current.length));
-        });
-      }).catch(() => undefined);
-    }, 5000);
-    return () => { active = false; clearInterval(timer); };
-  }, [session]);
+    void listNotifications(session).then((page) => {
+      if (!active) return;
+      setUnread(page.unread);
+      if (pageHistory.length > 1) return;
+      setItems(page.data);
+      setHasMore(page.hasMore);
+      setOlderThan(page.data[page.data.length - 1]?.id_notificacion ?? null);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [session, revision, pageHistory.length]);
 
   async function loadOlder(): Promise<void> {
     if (!session || loading || !hasMore || olderThan === null) return;
@@ -90,8 +89,9 @@ export function NotificationBell() {
     finally { setBusyId(null); }
   }
 
-  function destinationFor(item: NotificationRecord): '/(app)/animals' | '/(app)/health' | null {
+  function destinationFor(item: NotificationRecord): '/(app)/animals' | '/(app)/health' | '/(app)/team' | null {
     const role = session?.usuario.rol.toLowerCase() ?? '';
+    if (item.tipo === 'registro_pendiente' && ['dueno', 'gestor_usuarios'].includes(role)) return '/(app)/team';
     return item.tipo === 'alta_enfermeria' && ['peon', 'dueno'].includes(role)
       ? '/(app)/animals'
       : ['reporte_sanitario', 'ingreso_enfermeria', 'estado_salud'].includes(item.tipo) && ['peon', 'veterinario', 'dueno'].includes(role)
@@ -143,7 +143,7 @@ export function NotificationBell() {
                   <Pressable disabled={busyId === item.id_notificacion} onPress={() => void act(item, 'reject')} style={[styles.action, styles.reject]}><Text style={styles.rejectText}>Rechazar</Text></Pressable>
                   <Pressable disabled={busyId === item.id_notificacion} onPress={() => void act(item, 'accept')} style={[styles.action, { backgroundColor: colors.primary }]}><Text style={styles.acceptText}>Aceptar</Text></Pressable>
                 </View> : <View style={styles.actions}>
-                  {canOpen ? <Pressable onPress={() => openDestination(item)} style={[styles.action, styles.linkAction]}><Text style={[styles.linkText, { color: colors.primary }]}>Ir al módulo</Text><Ionicons color={colors.primary} name="arrow-forward" size={14} /></Pressable> : null}
+                  {canOpen ? <Pressable onPress={() => openDestination(item)} style={[styles.action, styles.linkAction]}><Text style={[styles.linkText, { color: colors.primary }]}>{item.tipo === 'registro_pendiente' ? 'Ver solicitudes' : 'Ir al módulo'}</Text><Ionicons color={colors.primary} name="arrow-forward" size={14} /></Pressable> : null}
                   {!item.leida && !resolved ? <Pressable disabled={busyId === item.id_notificacion} onPress={() => void act(item, 'read')} style={[styles.action, { backgroundColor: colors.primary }]}><Text style={styles.acceptText}>Marcar como leída</Text></Pressable> : resolved ? <Text style={[styles.response, { color: colors.textMuted }]}>Solicitud {item.estado_respuesta}</Text> : null}
                 </View>}
               </View>;

@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { Image, Modal, Platform, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { deactivateAnimal, listAnimals, listCorrals, moveAnimal, permanentlyDeleteInactiveAnimal, updateAnimal, type AnimalGender, type AnimalRecord, type CorralRecord } from '../../services/livestockApi';
 import { reportAnimal } from '../../services/productionApi';
@@ -33,6 +34,7 @@ export function genderLabel(gender: AnimalGender): string {
 // consulto animales y aplico búsqueda local sobre la respuesta vigente.
 export function AnimalsInventoryScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -58,7 +60,8 @@ export function AnimalsInventoryScreen() {
   const [saving, setSaving] = useState(false);
   const [moveError, setMoveError] = useState('');
   const [editing, setEditing] = useState<AnimalRecord | null>(null);
-  const [viewing, setViewing] = useState<AnimalRecord | null>(null);
+  const [openedAnimal, setViewing] = useState<AnimalRecord | null>(null);
+  const viewing = openedAnimal ? rows.find((animal) => animal.id_animal === openedAnimal.id_animal) ?? openedAnimal : null;
   const [deactivating, setDeactivating] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState<'venta' | 'muerte' | 'otro'>('venta');
   const [deactivationDetail, setDeactivationDetail] = useState('');
@@ -111,7 +114,7 @@ export function AnimalsInventoryScreen() {
       else { setCorrals([]); setCorralError(friendlyErrorMessage(corralsResult.reason, 'No se pudieron cargar los corrales.')); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [includeInactive, load, session]);
+  }, [includeInactive, load, session, revision]);
 
   useEffect(() => {
     if (!session) return;
@@ -125,7 +128,7 @@ export function AnimalsInventoryScreen() {
         if (active) setCatalogSpecies([]);
       });
     return () => { active = false; };
-  }, [session]);
+  }, [session, revision]);
 
   const availableSpecies = useMemo(() => {
     const names = catalogSpecies.length ? catalogSpecies : rows.map((animal) => animal.especie);

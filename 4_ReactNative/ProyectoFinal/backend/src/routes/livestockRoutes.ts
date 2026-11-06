@@ -22,5 +22,5 @@ livestockRouter.get('/health/animals/:id/records', requireRoles('dueno', 'veteri
 livestockRouter.post('/health/animals/:id/records', requireRoles('veterinario'), asyncHandler(livestockController.createVeterinaryRecord));
 livestockRouter.patch('/health/animals/:id/status', requireRoles('veterinario'), asyncHandler(livestockController.updateNursingHealthStatus));
 livestockRouter.post('/health/animals/:id/discharge', requireRoles('veterinario'), asyncHandler(livestockController.dischargeNursingAnimal));
-livestockRouter.get('/notifications', requireRoles('dueno', 'peon', 'veterinario'), asyncHandler(livestockController.listNotifications));
-livestockRouter.patch('/notifications/:id', requireRoles('dueno', 'peon', 'veterinario'), asyncHandler(livestockController.updateNotification));
+livestockRouter.get('/notifications', requireRoles('dueno', 'peon', 'veterinario', 'gestor_usuarios'), asyncHandler(livestockController.listNotifications));
+livestockRouter.patch('/notifications/:id', requireRoles('dueno', 'peon', 'veterinario', 'gestor_usuarios'), asyncHandler(livestockController.updateNotification));

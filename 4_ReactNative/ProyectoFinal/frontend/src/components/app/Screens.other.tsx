@@ -6,6 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { approveRegistrationRequest, listRegistrationRequests, rejectRegistrationRequest, type RegistrationRequest, type RequestedRole } from '../../services/adminApi';
 import { AnimalsInventoryScreen, NursingScreen } from './LivestockScreens';
@@ -75,6 +76,7 @@ export function TeamModuleScreen() {
 // muestro solicitudes verificadas y permito al administrador asignar un rol antes de aprobar.
 export function AdminRequestsScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const token = session?.accessToken;
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
@@ -92,7 +94,7 @@ export function AdminRequestsScreen() {
       if (active) setError(friendlyErrorMessage(cause, 'No se pudieron cargar las solicitudes.'));
     });
     return () => { active = false; };
-  }, [token]);
+  }, [token, revision]);
 
   async function resolveRequest(): Promise<void> {
     if (!decision || !token) return;

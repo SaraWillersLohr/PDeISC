@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { createVeterinaryRecord, dischargeAnimal, listNursingAnimals, listVeterinaryRecords, updateNursingHealthStatus, type NursingAnimalRecord, type VeterinaryRecord } from '../../services/livestockApi';
 import { PhotoAttachment } from './PhotoAttachment';
@@ -15,6 +16,7 @@ import { style } from './LivestockStyles';
 // permito al veterinario registrar el alta sin alterar la ubicación física.
 export function NursingScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -53,7 +55,18 @@ export function NursingScreen() {
       .catch((cause: unknown) => { if (active) setError(friendlyErrorMessage(cause, 'No se pudo cargar enfermería.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session]);
+  }, [session, revision]);
+
+  const historyAnimalId = historyAnimal?.id_animal;
+  useEffect(() => {
+    if (!session || !historyAnimalId) return;
+    let active = true;
+    listVeterinaryRecords(session, historyAnimalId)
+      .then((records) => { if (active) setHistory(records); })
+      .catch((cause: unknown) => { if (active) setHistoryError(friendlyErrorMessage(cause, 'No se pudo cargar la evolución del animal.')); })
+      .finally(() => { if (active) setHistoryLoading(false); });
+    return () => { active = false; };
+  }, [session, historyAnimalId, revision]);
 
   async function confirmDischarge(): Promise<void> {
     if (!session || !selected) return;
@@ -68,13 +81,10 @@ export function NursingScreen() {
     }
   }
 
-  async function openHistory(animal: NursingAnimalRecord): Promise<void> {
+  function openHistory(animal: NursingAnimalRecord): void {
     if (!session) return;
     setDiagnosis(animal.estado_salud === 'herido' ? 'herido' : 'enfermo');
     setHistoryAnimal(animal); setHistory([]); setHistoryError(''); setHistoryLoading(true);
-    try { setHistory(await listVeterinaryRecords(session, animal.id_animal)); }
-    catch (cause) { setHistoryError(friendlyErrorMessage(cause, 'No se pudo cargar la evolución del animal.')); }
-    finally { setHistoryLoading(false); }
   }
 
   async function saveEvolution(): Promise<void> {

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Modal, Platform, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { deactivateOrganizationUser, listOrganizationUsers, updateOrganizationUser, type OrganizationUser } from '../../services/organizationApi';
 import { roleLabel } from './Screens.shared';
@@ -13,6 +14,7 @@ import { st } from './OrganizationStyles';
 
 export function TeamScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -50,7 +52,7 @@ export function TeamScreen() {
       .catch((e: unknown) => { if (active) setError(friendlyErrorMessage(e, 'No se pudo cargar el equipo.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session]);
+  }, [session, revision]);
 
   async function saveUser(): Promise<void> {
     if (!session || !selected || !name.trim() || !surname.trim()) {

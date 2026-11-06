@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Platform, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { createTask, listTasks, updateTask, type TaskRecord } from '../../services/modulesApi';
 import { listOrganizationUsers, type OrganizationUser } from '../../services/organizationApi';
@@ -14,6 +15,7 @@ import { s } from './FieldModuleStyles';
 
 export function TasksManagerScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
@@ -55,12 +57,11 @@ export function TasksManagerScreen() {
         setUsers(members);
         const fieldUsers = members.filter((user) => user.rol === 'peon' && user.activo);
         setResponsible((current) => current ?? fieldUsers[0]?.id_usuario ?? null);
-        setMessage('');
       })
       .catch((e: unknown) => { if (active) setMessage(friendlyErrorMessage(e, 'No se pudieron cargar las tareas.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [session, admin]);
+  }, [session, admin, revision]);
 
   async function add(): Promise<void> {
     if (!session || !title.trim() || !responsible) {

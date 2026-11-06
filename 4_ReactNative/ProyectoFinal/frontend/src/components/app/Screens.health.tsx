@@ -6,6 +6,7 @@ import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, Pressable, Text, TextInput, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { AnimalsInventoryScreen, NursingScreen } from './LivestockScreens';
 import { TasksManagerScreen } from './FieldModuleScreens';
@@ -55,6 +56,7 @@ export function AdministratorHealthScreen() {
 // permito al administrador confirmar o rechazar bajas pendientes.
 export function DeathReviewScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { colors } = useTheme();
   const [rows, setRows] = useState<DeathReport[]>([]);
   const [rejectionReasons, setRejectionReasons] = useState<Record<number, string>>({});
@@ -71,7 +73,7 @@ export function DeathReviewScreen() {
     let active = true;
     listPendingDeaths(session).then((data) => { if (active) setRows(data); }).catch((cause: unknown) => { if (active) setMessage(friendlyErrorMessage(cause, 'No se pudieron cargar los reportes.')); });
     return () => { active = false; };
-  }, [session]);
+  }, [session, revision]);
 
   async function decide(row: DeathReport, decision: 'confirmar' | 'rechazar'): Promise<void> {
     if (!session) return;

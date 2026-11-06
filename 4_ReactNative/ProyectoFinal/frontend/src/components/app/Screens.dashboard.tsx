@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getDashboard, type DashboardMetrics } from '../../services/productionApi';
 import { listAnimals } from '../../services/livestockApi';
@@ -16,6 +17,7 @@ import { s } from './ScreensStyles';
 
 export function HomeScreen() {
   const { session } = useSession();
+  const revision = useLiveChanges();
   const { width } = useWindowDimensions();
   const { colors, isDark } = useTheme();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -45,7 +47,7 @@ export function HomeScreen() {
       setBreedCountsLoaded(true);
     }).catch((cause: unknown) => { if (active) { setBreedCountsLoaded(true); setMetricsError(friendlyErrorMessage(cause, 'No se pudieron cargar los animales por raza.')); } });
     return () => { active = false; };
-  }, [session, isManager]);
+  }, [session, isManager, revision]);
 
   if (role === 'gestor_usuarios') return <TeamModuleScreen />;
   if (isVet) return <HealthScreen />;

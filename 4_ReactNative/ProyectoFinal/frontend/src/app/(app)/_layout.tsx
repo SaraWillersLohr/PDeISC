@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
 import { StyleSheet, View, type ColorValue } from 'react-native';
 import { useSession } from '../../context/SessionContext';
+import { LiveChangesProvider } from '../../context/LiveChangesContext';
 import { OwnerDesktopShell } from '../../components/app/OwnerDesktopShell';
 import { BrandLoadingScreen } from '../../components/BrandLoadingScreen';
 
@@ -16,7 +17,7 @@ export default function AppTabs() {
   const role = session.usuario.rol.toLowerCase();
   const isVet = role === 'veterinario';
 
-  return <OwnerDesktopShell><Tabs screenOptions={{
+  return <LiveChangesProvider><OwnerDesktopShell><Tabs screenOptions={{
     headerShown: false,
     tabBarStyle: styles.hiddenTabBar,
     tabBarItemStyle: styles.tabItem,
@@ -32,7 +33,7 @@ export default function AppTabs() {
     <Tabs.Screen name="health" options={{ title: 'Reportes', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="medkit-outline" activeName="medkit" /> }} />
     <Tabs.Screen name="more" options={{ title: 'Mi perfil', tabBarIcon: ({ color, focused }) => <TabIcon color={typeof color === 'number' ? String(color) : color ?? '#214d35'} focused={focused} name="person-circle-outline" activeName="person-circle" /> }} />
     <Tabs.Screen name="[module]" options={{ title: 'Sección' }} />
-  </Tabs></OwnerDesktopShell>;
+  </Tabs></OwnerDesktopShell></LiveChangesProvider>;
 }
 
 function TabIcon({ color, focused, name, activeName }: { color: ColorValue; focused: boolean; name: IconName; activeName: IconName }) {

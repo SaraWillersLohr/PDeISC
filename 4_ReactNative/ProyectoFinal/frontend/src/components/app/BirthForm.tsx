@@ -1,3 +1,4 @@
+import { DateField } from './DateField';
 // registro el nacimiento junto con la ficha de la cría y sus progenitores.
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useEffect, useMemo, useState } from 'react';
@@ -28,13 +29,15 @@ export function BirthForm({ onSaved, initialMother }: { onSaved: () => void; ini
   }, [initialMother, session]);
   async function save(): Promise<void> {
     if (!session || !identifier.trim() || !breedId || !corralId || (!mother && !motherText.trim()) || (!father && !fatherText.trim()) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) { setError('Completá ficha, fecha y los dos progenitores, por animal registrado o por nombre.'); return; }
+    // No registro un hecho anterior al nacimiento del animal seleccionado.
+    if (mother?.fecha_nacimiento && date < mother.fecha_nacimiento.slice(0, 10)) { setError('La fecha no puede ser anterior al nacimiento de la madre.'); return; }
     setSaving(true); setError('');
     try { await createBirth(session, { identificador: identifier.trim(), nombre: name.trim() || undefined, foto: photo, genero: gender, id_raza: breedId, id_corral: corralId, fecha: date, ...(mother ? { id_madre: mother.id_animal } : { madre_texto: motherText.trim() }), ...(father ? { id_padre: father.id_animal } : { padre_texto: fatherText.trim() }), observaciones: notes.trim() || undefined }); setIdentifier(''); setName(''); setNotes(''); setPhoto(null); setMother(null); setFather(null); setMotherText(''); setFatherText(''); setGender('no_especificado'); setError('Nacimiento registrado.'); onSaved(); }
     catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo guardar el nacimiento.')); }
     finally { setSaving(false); }
   }
   return <View style={s.card}><Text style={s.title}>Registrar nacimiento</Text>{loading ? <ActivityIndicator color={g} /> : <>
-    <TextInput onChangeText={setIdentifier} placeholder="Identificador de la cría" style={s.input} value={identifier} /><TextInput onChangeText={setName} placeholder="Nombre (opcional)" style={s.input} value={name} /><PhotoAttachment compact value={photo} onChange={setPhoto} /><TextInput onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" style={s.input} value={date} />
+    <TextInput onChangeText={setIdentifier} placeholder="Identificador de la cría" style={s.input} value={identifier} /><TextInput onChangeText={setName} placeholder="Nombre (opcional)" style={s.input} value={name} /><PhotoAttachment compact value={photo} onChange={setPhoto} /><DateField onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" style={s.input} value={date} />
     <Text style={s.label}>GÉNERO DE LA CRÍA</Text><View style={s.options}>{genderOptions.map((item) => <Pressable accessibilityRole="radio" accessibilityState={{ selected: gender === item.value }} key={item.value} onPress={() => setGender(item.value)} style={[s.option, gender === item.value && s.active]}><Text style={[s.optionText, gender === item.value && s.activeText]}>{item.label}</Text></Pressable>)}</View>
     <Text style={s.label}>ESPECIE Y RAZA</Text><View style={s.options}>{species.map((item) => <Pressable key={item.id_especie} onPress={() => { setSpeciesId(item.id_especie); setBreedId(null); }} style={[s.option, speciesId === item.id_especie && s.active]}><Text style={[s.optionText, speciesId === item.id_especie && s.activeText]}>{item.nombre}</Text></Pressable>)}</View><View style={s.options}>{filteredBreeds.map((item) => <Pressable key={item.id_raza} onPress={() => setBreedId(item.id_raza)} style={[s.option, breedId === item.id_raza && s.active]}><Text style={[s.optionText, breedId === item.id_raza && s.activeText]}>{item.nombre}</Text></Pressable>)}</View>
     <Text style={s.label}>CORRAL DE LA CRÍA</Text><View style={s.options}>{corrals.map((item) => <Pressable key={item.id_corral} disabled={item.ocupacion >= item.capacidad} onPress={() => setCorralId(item.id_corral)} style={[s.option, corralId === item.id_corral && s.active, item.ocupacion >= item.capacidad && s.disabled]}><Text style={[s.optionText, corralId === item.id_corral && s.activeText]}>{item.nombre} · {item.ocupacion}/{item.capacidad}</Text></Pressable>)}</View>

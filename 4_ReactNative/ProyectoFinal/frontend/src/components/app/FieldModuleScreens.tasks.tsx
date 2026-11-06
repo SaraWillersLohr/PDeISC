@@ -1,3 +1,4 @@
+import { DateField } from './DateField';
 // gestiono las tareas asignadas al equipo de campo.
 // muestro operaciones de campo conectadas a las APIs productivas.
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -16,7 +17,7 @@ export function TasksManagerScreen() {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
-  const admin = session?.usuario.rol.toLowerCase() === 'administrador';
+  const admin = session?.usuario.rol.toLowerCase() === 'dueno';
 
   const [rows, setRows] = useState<TaskRecord[]>([]);
   const [users, setUsers] = useState<OrganizationUser[]>([]);
@@ -115,7 +116,7 @@ export function TasksManagerScreen() {
             style={[s.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
             value={notes}
           />
-          <TextInput
+          <DateField
             accessibilityLabel="Fecha de vencimiento"
             onChangeText={setDue}
             placeholder="Fecha límite AAAA-MM-DD (opcional)"
@@ -166,11 +167,13 @@ export function TasksManagerScreen() {
       ) : (
         <View style={[s.gridWrap, isDesktop && s.gridWrapDesktop]}>
           {rows.map((row) => {
+            const canChange = row.id_responsable === session?.usuario.id_usuario && row.estado !== 'cancelada';
             const isDone = row.estado === 'completada';
             const inProgress = row.estado === 'en_progreso';
             return (
               <Pressable
                 key={row.id_tarea}
+                disabled={!canChange}
                 onPress={() => void change(row)}
                 style={({ pressed }) => [
                   s.card,
@@ -221,7 +224,7 @@ export function TasksManagerScreen() {
                     Responsable: {row.responsable ? `${row.responsable} ${row.apellido_responsable ?? ''}` : 'Sin asignar'}
                     {row.fecha_vencimiento ? ` · vence ${String(row.fecha_vencimiento).slice(0, 10)}` : ''}
                   </Text>
-                  <Text style={[s.actionHint, { color: colors.accentLime }]}>Tocá para avanzar estado →</Text>
+                  {canChange ? <Text style={[s.actionHint, { color: colors.accentLime }]}>Tocá para avanzar estado →</Text> : null}
                 </View>
               </Pressable>
             );

@@ -12,14 +12,14 @@ export async function listNotifications(req: Request, res: Response): Promise<vo
   if (!userId || (before !== null && (!Number.isInteger(before) || before < 1))) { res.status(400).json({ message: 'página de notificaciones inválida' }); return; }
   try {
     const cursorClause = before === null ? '' : 'AND n.id_notificacion < ?';
-    const params: Array<number | string> = [userId, role, role];
+    const params: Array<number | string> = [userId, role];
     if (before !== null) params.push(before);
     const [rows] = await database.execute<RowDataPacket[]>(
       `SELECT n.id_notificacion, n.id_animal, n.titulo, n.mensaje, n.tipo,
               COALESCE(nu.leida, 0) AS leida, n.estado_respuesta, n.created_at
        FROM notificaciones n
        LEFT JOIN notificaciones_usuario nu ON nu.id_notificacion = n.id_notificacion AND nu.id_usuario = ?
-       WHERE (n.rol_destino IS NULL OR n.rol_destino = ?) AND (? <> 'administrador' OR n.rol_destino IS NULL OR n.rol_destino = 'administrador') AND COALESCE(nu.eliminada, 0) = 0 ${cursorClause}
+       WHERE (n.rol_destino IS NULL OR n.rol_destino = ?) AND COALESCE(nu.eliminada, 0) = 0 ${cursorClause}
        ORDER BY n.id_notificacion DESC LIMIT 11`, params,
     );
     res.status(200).json({ data: rows.slice(0, 10), hasMore: rows.length > 10 });
@@ -32,7 +32,7 @@ export async function getVisibleNotification(id: number, req: Request): Promise<
   const role = req.rolVigente ?? '';
   const [rows] = await database.execute<RowDataPacket[]>(
     `SELECT n.id_notificacion, n.tipo FROM notificaciones n
-     WHERE n.id_notificacion = ? AND (n.rol_destino IS NULL OR n.rol_destino = ?) AND (? <> 'administrador' OR n.rol_destino IS NULL OR n.rol_destino = 'administrador')`, [id, role, role],
+     WHERE n.id_notificacion = ? AND (n.rol_destino IS NULL OR n.rol_destino = ?)`, [id, role],
   );
   return rows;
 }

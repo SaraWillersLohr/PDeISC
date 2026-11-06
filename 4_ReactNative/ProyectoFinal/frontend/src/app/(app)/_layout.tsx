@@ -13,7 +13,7 @@ export default function AppTabs() {
   if (restoring) return <BrandLoadingScreen />;
   if (!session) return <Redirect href="/" />;
 
-  const role = session.usuario.rol.toLowerCase() === 'copropietario' ? 'administrador' : session.usuario.rol.toLowerCase();
+  const role = session.usuario.rol.toLowerCase();
   const isVet = role === 'veterinario';
 
   return <OwnerDesktopShell><Tabs screenOptions={{

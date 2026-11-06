@@ -4,7 +4,7 @@ import { apiConfigurationMessage, apiFetch, friendlyApiMessage } from './apiErro
 import type { Session } from '../types/auth';
 import type { AnimalGender } from './livestockApi';
 
-export interface TaskRecord { id_tarea: number; titulo: string; descripcion: string | null; fecha_vencimiento: string | null; estado: string; responsable: string | null; apellido_responsable: string | null; }
+export interface TaskRecord { id_tarea: number; id_responsable: number; titulo: string; descripcion: string | null; fecha_vencimiento: string | null; estado: string; responsable: string | null; apellido_responsable: string | null; }
 export interface MatingService { id_servicio: number; fecha: string; metodo: string; estado: string; observaciones: string | null; fecha_estimada_nacimiento: string | null; prenez_confirmada_en: string | null; especie: string; madre: string; nombre_madre: string | null; padre: string | null; padre_texto: string | null; }
 export interface BirthRecord { id_nacimiento: number; fecha: string; observaciones: string | null; cria: string; nombre_cria: string | null; madre: string | null; madre_texto: string | null; padre: string | null; padre_texto: string | null; }
 export interface ReproductionData { servicios: MatingService[]; nacimientos: BirthRecord[]; }

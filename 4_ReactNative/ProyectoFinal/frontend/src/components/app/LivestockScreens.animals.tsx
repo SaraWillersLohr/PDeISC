@@ -1,3 +1,5 @@
+import { animalBirthError } from '../../services/formValidation';
+import { DateField } from './DateField';
 // muestro la ficha ganadera y sus operaciones desde el inventario.
 // muestro los inventarios de animales y corrales con datos del backend.
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -36,7 +38,7 @@ export function AnimalsInventoryScreen() {
   const isDesktop = Platform.OS === 'web' && width >= 860;
 
   const storedRole = session?.usuario.rol.toLowerCase();
-  const role = storedRole === 'copropietario' ? 'administrador' : storedRole;
+  const role = storedRole;
   const canMove = role === 'peon';
   const canWeigh = role === 'peon';
   const canEdit = role === 'dueno' || role === 'peon';
@@ -273,7 +275,7 @@ export function AnimalsInventoryScreen() {
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={editIdentifier}
             />
-            <TextInput
+            <DateField
               accessibilityLabel="Fecha de nacimiento"
               onChangeText={setEditBirth}
               placeholder="AAAA-MM-DD"
@@ -517,7 +519,7 @@ export function AnimalsInventoryScreen() {
   }
 
   async function persistAnimal(): Promise<void> {
-    if (!session || !editing || !editIdentifier.trim() || (editBirth.trim() && !isValidBirthDate(editBirth.trim()))) {
+    if (!session || !editing || !editIdentifier.trim() || (editBirth.trim() && (!isValidBirthDate(editBirth.trim()) || Boolean(animalBirthError(editBirth.trim(), editing.especie))))) {
       setEditError('El identificador es obligatorio. Revisá que la fecha de nacimiento sea real y no futura.');
       return;
     }

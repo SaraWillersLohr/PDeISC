@@ -10,6 +10,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { getDashboard, type DashboardMetrics } from '../../services/productionApi';
 import { listAnimals } from '../../services/livestockApi';
 import { normalizeRole , Page , Header , roleLabel , SpeciesBarChart } from './Screens.shared';
+import { TeamModuleScreen } from './Screens.other';
 import { HealthScreen } from './Screens.health';
 import { s } from './ScreensStyles';
 
@@ -25,13 +26,13 @@ export function HomeScreen() {
   const name = session?.usuario.nombre?.trim() || 'equipo';
   const isVet = role === 'veterinario';
   const isField = role === 'peon';
-  const isManager = role === 'administrador' || role === 'dueno';
+  const isManager = role === 'dueno';
   const isDesktop = Platform.OS === 'web' && width >= 860;
   const dashboardCopy = isVet ? 'Controles y seguimiento de animales en enfermería.' : isField ? 'Lo importante para las tareas y ganado de hoy.' : 'Monitoreo productivo y sanitario de la estancia.';
   const today = new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
   useEffect(() => {
-    if (!session || isField || isVet) return;
+    if (!session || !isManager) return;
     let active = true;
     getDashboard(session).then((data) => { if (active) setMetrics(data); }).catch((cause: unknown) => { if (active) setMetricsError(friendlyErrorMessage(cause, 'No se pudieron cargar las estadísticas.')); });
     listAnimals(session).then((animals) => {
@@ -44,8 +45,9 @@ export function HomeScreen() {
       setBreedCountsLoaded(true);
     }).catch((cause: unknown) => { if (active) { setBreedCountsLoaded(true); setMetricsError(friendlyErrorMessage(cause, 'No se pudieron cargar los animales por raza.')); } });
     return () => { active = false; };
-  }, [session, isField, isVet]);
+  }, [session, isManager]);
 
+  if (role === 'gestor_usuarios') return <TeamModuleScreen />;
   if (isVet) return <HealthScreen />;
 
   const statistics = metrics ? [
@@ -54,7 +56,7 @@ export function HomeScreen() {
     { label: 'Servicios · 90 días', value: metrics.servicios_90_dias, color: '#3f78b8', icon: 'git-network-outline' as const, note: 'Actividad de monta' },
     { label: 'Ventas · año', value: metrics.ventas_ano, color: '#8a5c32', icon: 'pricetag-outline' as const, note: 'Animales dados de baja por venta' },
     { label: 'Muertes · año', value: metrics.muertes_ano, color: '#9d3b3b', icon: 'heart-dislike-outline' as const, note: 'Muertes confirmadas' },
-    { label: role === 'administrador' ? 'Muertes pendientes' : 'Alertas sanitarias', value: role === 'administrador' ? metrics.muertes_pendientes : metrics.alertas_sanitarias, color: '#c74c3e', icon: 'alert-circle-outline' as const, note: 'Requieren atención' },
+    { label: role === 'dueno' ? 'Muertes pendientes' : 'Alertas sanitarias', value: role === 'dueno' ? metrics.muertes_pendientes : metrics.alertas_sanitarias, color: '#c74c3e', icon: 'alert-circle-outline' as const, note: 'Requieren atención' },
   ] : [];
 
   return (

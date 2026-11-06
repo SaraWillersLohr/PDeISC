@@ -51,8 +51,10 @@ const part = StyleSheet.create({
   genderOption: { borderRadius: 9, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 9 },
   matingActions: { gap: 8, marginTop: 18 },
   matingActionButton: { alignItems: 'center', borderRadius: 10, borderWidth: 1, justifyContent: 'center', minHeight: 44, paddingHorizontal: 12 },
+  // Permito envolver las acciones en pantallas angostas.
   modalActions: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 10,
       justifyContent: 'flex-end',
       marginTop: 18,

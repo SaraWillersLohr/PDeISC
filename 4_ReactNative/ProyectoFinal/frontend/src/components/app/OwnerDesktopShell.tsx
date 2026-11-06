@@ -24,25 +24,24 @@ type SectionItem = {
 
 const sections: SectionItem[] = [
   // Operaciones de campo
-  { key: 'inicio', label: 'Inicio', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['administrador', 'dueno', 'peon', 'veterinario'] },
-  { key: 'estancia', label: 'Mi estancia', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['administrador', 'dueno', 'peon'] },
-  { key: 'animales', label: 'Mis animales', icon: 'paw-outline', activeIcon: 'paw', category: 'operaciones', roles: ['administrador', 'dueno', 'peon'] },
-  { key: 'tareas', label: 'Tareas', icon: 'checkbox-outline', activeIcon: 'checkbox', category: 'operaciones', roles: ['administrador', 'peon'] },
-  { key: 'sanidad', label: 'Sanidad y Enfermería', icon: 'medkit-outline', activeIcon: 'medkit', category: 'operaciones', roles: ['administrador', 'dueno', 'veterinario'] },
-  { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch-outline', activeIcon: 'git-branch', category: 'operaciones', roles: ['administrador', 'dueno', 'peon'] },
+  { key: 'inicio', label: 'Inicio', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['dueno', 'peon', 'veterinario', 'gestor_usuarios'] },
+  { key: 'estancia', label: 'Mi estancia', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['dueno', 'peon'] },
+  { key: 'animales', label: 'Mis animales', icon: 'paw-outline', activeIcon: 'paw', category: 'operaciones', roles: ['dueno', 'peon'] },
+  { key: 'tareas', label: 'Tareas', icon: 'checkbox-outline', activeIcon: 'checkbox', category: 'operaciones', roles: ['dueno', 'peon'] },
+  { key: 'sanidad', label: 'Sanidad y Enfermería', icon: 'medkit-outline', activeIcon: 'medkit', category: 'operaciones', roles: ['dueno', 'veterinario'] },
+  { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch-outline', activeIcon: 'git-branch', category: 'operaciones', roles: ['dueno', 'peon'] },
 
   // Gestión de estancia
-  { key: 'eventos', label: 'Eventos y Remates', icon: 'calendar-outline', activeIcon: 'calendar', category: 'gestion', roles: ['administrador', 'dueno'] },
-  { key: 'equipo', label: 'Equipo y Accesos', icon: 'people-outline', activeIcon: 'people', category: 'gestion', roles: ['administrador', 'dueno'] },
-  { key: 'catalogo', label: 'Especies y Razas', icon: 'list-outline', activeIcon: 'list', category: 'gestion', roles: ['administrador', 'dueno', 'peon'] },
+  { key: 'eventos', label: 'Eventos y Remates', icon: 'calendar-outline', activeIcon: 'calendar', category: 'gestion', roles: ['dueno'] },
+  { key: 'equipo', label: 'Equipo y Accesos', icon: 'people-outline', activeIcon: 'people', category: 'gestion', roles: ['dueno', 'gestor_usuarios'] },
+  { key: 'catalogo', label: 'Especies y Razas', icon: 'list-outline', activeIcon: 'list', category: 'gestion', roles: ['dueno', 'peon'] },
 
   // Cuenta
-  { key: 'perfil', label: 'Mi perfil', icon: 'person-circle-outline', activeIcon: 'person-circle', category: 'cuenta', roles: ['administrador', 'dueno', 'peon', 'veterinario'] },
+  { key: 'perfil', label: 'Mi perfil', icon: 'person-circle-outline', activeIcon: 'person-circle', category: 'cuenta', roles: ['dueno', 'peon', 'veterinario', 'gestor_usuarios'] },
 ];
 
 const roleLabels: Record<string, { label: string; color: string; bg: string }> = {
-  administrador: { label: 'Administrador', color: '#86efac', bg: 'rgba(134, 239, 172, 0.16)' },
-  copropietario: { label: 'Administrador', color: '#86efac', bg: 'rgba(134, 239, 172, 0.16)' },
+  gestor_usuarios: { label: 'Gestor de usuarios', color: '#86efac', bg: 'rgba(134, 239, 172, 0.16)' },
   dueno: { label: 'Dueño', color: '#fde047', bg: 'rgba(253, 224, 71, 0.16)' },
   peon: { label: 'Peón de Campo', color: '#93c5fd', bg: 'rgba(147, 197, 253, 0.16)' },
   veterinario: { label: 'Veterinario', color: '#a7f3d0', bg: 'rgba(167, 243, 208, 0.16)' },
@@ -56,7 +55,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const rawRole = session?.usuario.rol.toLowerCase() ?? '';
-  const role = rawRole === 'copropietario' ? 'administrador' : rawRole;
+  const role = rawRole;
   const isDesktop = Platform.OS === 'web' && width >= 860;
   const visibleSections = sections.filter((item) => item.roles.includes(role));
 

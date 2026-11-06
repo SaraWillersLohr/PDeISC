@@ -3,6 +3,8 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 // publico únicamente los identificadores OAuth; los secretos quedan en el servidor.
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
+  // Incluyo el selector de fechas en el próximo APK.
+  plugins: [...(config.plugins ?? []), "@react-native-community/datetimepicker"],
   name: config.name ?? 'EstanciaApp',
   slug: config.slug ?? 'estanciaapp',
   extra: {

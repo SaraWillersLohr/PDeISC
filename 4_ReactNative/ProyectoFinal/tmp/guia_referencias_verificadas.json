@@ -1,0 +1,707 @@
+[
+  {
+    "file": "frontend/package.json",
+    "line": 4,
+    "search": "expo-router/entry"
+  },
+  {
+    "file": "frontend/src/app/_layout.tsx",
+    "line": 8,
+    "search": "function RootLayout"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.tsx",
+    "line": 2,
+    "search": "HomeScreen"
+  },
+  {
+    "file": "backend/src/app.ts",
+    "line": 14,
+    "search": "export const app"
+  },
+  {
+    "file": "frontend/src/app/_layout.tsx",
+    "line": 8,
+    "search": "function RootLayout"
+  },
+  {
+    "file": "frontend/src/app/(app)/_layout.tsx",
+    "line": 11,
+    "search": "function AppTabs"
+  },
+  {
+    "file": "frontend/src/components/app/OwnerDesktopShell.tsx",
+    "line": 25,
+    "search": "const sections"
+  },
+  {
+    "file": "frontend/src/components/app/OwnerDesktopShell.tsx",
+    "line": 88,
+    "search": "function navigate"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.other.tsx",
+    "line": 20,
+    "search": "function GenericModuleScreen"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.shared.tsx",
+    "line": 63,
+    "search": "function Page"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.shared.tsx",
+    "line": 32,
+    "search": "function Header"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.shared.tsx",
+    "line": 20,
+    "search": "function InventoryPage"
+  },
+  {
+    "file": "frontend/src/app/index.tsx",
+    "line": 32,
+    "search": "function LoginScreen"
+  },
+  {
+    "file": "frontend/src/app/index.tsx",
+    "line": 56,
+    "search": "async function submit"
+  },
+  {
+    "file": "frontend/src/services/authApi.ts",
+    "line": 17,
+    "search": "export async function login"
+  },
+  {
+    "file": "backend/src/routes/authRoutes.ts",
+    "line": 9,
+    "search": "'/login'"
+  },
+  {
+    "file": "backend/src/services/authService.ts",
+    "line": 56,
+    "search": "export async function login"
+  },
+  {
+    "file": "backend/src/utils/jwt.ts",
+    "line": 10,
+    "search": "createAccessToken"
+  },
+  {
+    "file": "frontend/src/services/sessionStorage.ts",
+    "line": 9,
+    "search": "function saveSession"
+  },
+  {
+    "file": "frontend/src/context/SessionContext.tsx",
+    "line": 13,
+    "search": "function SessionProvider"
+  },
+  {
+    "file": "frontend/src/components/SocialLoginButton.tsx",
+    "line": 17,
+    "search": "const config"
+  },
+  {
+    "file": "frontend/src/components/SocialLoginButton.tsx",
+    "line": 78,
+    "search": "async function start"
+  },
+  {
+    "file": "frontend/src/services/authApi.ts",
+    "line": 37,
+    "search": "function socialLogin"
+  },
+  {
+    "file": "backend/src/controllers/authController.ts",
+    "line": 144,
+    "search": "socialOAuthCallback"
+  },
+  {
+    "file": "backend/src/services/authService.ts",
+    "line": 87,
+    "search": "function loginWithSocial"
+  },
+  {
+    "file": "frontend/src/app/oauth/callback.tsx",
+    "line": 8,
+    "search": "function OAuthCallbackRoute"
+  },
+  {
+    "file": "frontend/src/components/AccountRequestModal.tsx",
+    "line": 11,
+    "search": "export function"
+  },
+  {
+    "file": "frontend/src/services/authApi.ts",
+    "line": 92,
+    "search": "function requestAccount"
+  },
+  {
+    "file": "backend/src/services/registrationService.ts",
+    "line": 36,
+    "search": "function createRegistrationRequest"
+  },
+  {
+    "file": "backend/src/services/registrationService.ts",
+    "line": 84,
+    "search": "function verifyRegistrationEmail"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.other.tsx",
+    "line": 76,
+    "search": "function AdminRequestsScreen"
+  },
+  {
+    "file": "backend/src/services/registrationService.ts",
+    "line": 162,
+    "search": "function approveRegistrationRequest"
+  },
+  {
+    "file": "backend/src/services/registrationService.ts",
+    "line": 227,
+    "search": "function redeemAccessCode"
+  },
+  {
+    "file": "frontend/src/components/AccountActivationModal.tsx",
+    "line": 12,
+    "search": "export function"
+  },
+  {
+    "file": "frontend/src/components/PasswordRecoveryModal.tsx",
+    "line": 13,
+    "search": "export function"
+  },
+  {
+    "file": "backend/src/services/authService.ts",
+    "line": 211,
+    "search": "function requestPasswordRecovery"
+  },
+  {
+    "file": "backend/src/services/authService.ts",
+    "line": 297,
+    "search": "function completePasswordRecovery"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.dashboard.tsx",
+    "line": 39,
+    "search": "const counts = new Map"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.dashboard.tsx",
+    "line": 117,
+    "search": "Animales por especie"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.shared.tsx",
+    "line": 82,
+    "search": "function SpeciesBarChart"
+  },
+  {
+    "file": "frontend/src/services/productionApi.ts",
+    "line": 28,
+    "search": "function getDashboard"
+  },
+  {
+    "file": "backend/src/controllers/fieldController.ts",
+    "line": 7,
+    "search": "function dashboard"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 32,
+    "search": "function AnimalsInventoryScreen"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 133,
+    "search": "const filtered = useMemo"
+  },
+  {
+    "file": "frontend/src/services/livestockApi.ts",
+    "line": 121,
+    "search": "function listAnimals"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.animals.ts",
+    "line": 13,
+    "search": "function listAnimals"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.shared.tsx",
+    "line": 128,
+    "search": "function formatAnimalAge"
+  },
+  {
+    "file": "frontend/src/components/app/AnimalCreateModal.tsx",
+    "line": 17,
+    "search": "export function"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.animals.ts",
+    "line": 41,
+    "search": "function createAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 519,
+    "search": "async function persistAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/AnimalWeightModal.tsx",
+    "line": 11,
+    "search": "export function"
+  },
+  {
+    "file": "frontend/src/services/productionApi.ts",
+    "line": 31,
+    "search": "function recordWeight"
+  },
+  {
+    "file": "frontend/src/components/app/EstateScreen.tsx",
+    "line": 4,
+    "search": "function EstateScreen"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.corrals.tsx",
+    "line": 15,
+    "search": "function CorralsInventoryScreen"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.corrals.ts",
+    "line": 8,
+    "search": "function listCorrals"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.corrals.ts",
+    "line": 51,
+    "search": "function deleteCorral"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 507,
+    "search": "async function saveMovement"
+  },
+  {
+    "file": "frontend/src/services/livestockApi.ts",
+    "line": 180,
+    "search": "function moveAnimal"
+  },
+  {
+    "file": "backend/src/controllers/syncController.ts",
+    "line": 87,
+    "search": "async function moveAnimal"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.movements.ts",
+    "line": 11,
+    "search": "function moveAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.health.tsx",
+    "line": 28,
+    "search": "function HealthScreen"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.nursing.tsx",
+    "line": 15,
+    "search": "function NursingScreen"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 563,
+    "search": "async function submitIllnessReport"
+  },
+  {
+    "file": "frontend/src/services/productionApi.ts",
+    "line": 38,
+    "search": "function reportAnimal"
+  },
+  {
+    "file": "backend/src/controllers/syncController.ts",
+    "line": 115,
+    "search": "async function reportAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.nursing.tsx",
+    "line": 70,
+    "search": "async function openHistory"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.nursing.tsx",
+    "line": 79,
+    "search": "async function saveEvolution"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.nursing.ts",
+    "line": 30,
+    "search": "function listVeterinaryRecords"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.nursing.tsx",
+    "line": 57,
+    "search": "async function confirmDischarge"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.nursing.ts",
+    "line": 130,
+    "search": "function dischargeNursingAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 552,
+    "search": "async function captureDeathLocation"
+  },
+  {
+    "file": "frontend/src/components/app/LivestockScreens.animals.tsx",
+    "line": 532,
+    "search": "async function confirmDeactivation"
+  },
+  {
+    "file": "backend/src/controllers/syncController.ts",
+    "line": 115,
+    "search": "async function reportAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.health.tsx",
+    "line": 56,
+    "search": "function DeathReviewScreen"
+  },
+  {
+    "file": "frontend/src/services/productionApi.ts",
+    "line": 48,
+    "search": "function reviewDeath"
+  },
+  {
+    "file": "backend/src/controllers/fieldController.ts",
+    "line": 83,
+    "search": "function reviewDeaths"
+  },
+  {
+    "file": "frontend/src/services/livestockApi.ts",
+    "line": 144,
+    "search": "function deactivateAnimal"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.animals.ts",
+    "line": 101,
+    "search": "function deactivateAnimal"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.animals.ts",
+    "line": 138,
+    "search": "function permanentlyDeleteInactiveAnimal"
+  },
+  {
+    "file": "frontend/src/components/app/MatingServiceForm.tsx",
+    "line": 10,
+    "search": "export function"
+  },
+  {
+    "file": "frontend/src/services/modulesApi.ts",
+    "line": 27,
+    "search": "function createMatingService"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 111,
+    "search": "function createMatingService"
+  },
+  {
+    "file": "frontend/src/components/app/FieldModuleScreens.reproduction.tsx",
+    "line": 13,
+    "search": "function ReproductionScreen"
+  },
+  {
+    "file": "frontend/src/components/app/FieldModuleScreens.reproduction.tsx",
+    "line": 56,
+    "search": "async function confirmServicePregnancy"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 59,
+    "search": "function listReproduction"
+  },
+  {
+    "file": "frontend/src/components/app/BirthForm.tsx",
+    "line": 13,
+    "search": "export function"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 203,
+    "search": "function createBirth"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 80,
+    "search": "async function deleteReproductionRecord"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 145,
+    "search": "function confirmPregnancy"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 178,
+    "search": "const gestationBySpecies"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 183,
+    "search": "function publishBirthReminders"
+  },
+  {
+    "file": "backend/src/server.ts",
+    "line": 14,
+    "search": "setInterval(publish"
+  },
+  {
+    "file": "frontend/src/components/app/FieldModuleScreens.tasks.tsx",
+    "line": 14,
+    "search": "function TasksManagerScreen"
+  },
+  {
+    "file": "frontend/src/components/app/FieldModuleScreens.tasks.tsx",
+    "line": 64,
+    "search": "async function add"
+  },
+  {
+    "file": "frontend/src/components/app/FieldModuleScreens.tasks.tsx",
+    "line": 86,
+    "search": "async function change"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 9,
+    "search": "function listTasks"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 23,
+    "search": "function createTask"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 43,
+    "search": "function updateTask"
+  },
+  {
+    "file": "frontend/src/components/app/OrganizationScreens.team.tsx",
+    "line": 13,
+    "search": "function TeamScreen"
+  },
+  {
+    "file": "frontend/src/components/app/OrganizationScreens.team.tsx",
+    "line": 53,
+    "search": "async function saveUser"
+  },
+  {
+    "file": "backend/src/controllers/organizationController.ts",
+    "line": 31,
+    "search": "function deactivateUser"
+  },
+  {
+    "file": "frontend/src/components/app/OrganizationScreens.catalog.tsx",
+    "line": 13,
+    "search": "function CatalogScreen"
+  },
+  {
+    "file": "frontend/src/components/app/OrganizationScreens.catalog.tsx",
+    "line": 64,
+    "search": "async function submit"
+  },
+  {
+    "file": "frontend/src/services/organizationApi.ts",
+    "line": 25,
+    "search": "function listCatalog"
+  },
+  {
+    "file": "backend/src/routes/organizationRoutes.ts",
+    "line": 15,
+    "search": "'/catalog/species'"
+  },
+  {
+    "file": "backend/src/controllers/organizationController.ts",
+    "line": 73,
+    "search": "function createSpecies"
+  },
+  {
+    "file": "backend/src/controllers/organizationController.ts",
+    "line": 89,
+    "search": "function createBreed"
+  },
+  {
+    "file": "backend/src/controllers/organizationController.ts",
+    "line": 152,
+    "search": "function requestCatalog"
+  },
+  {
+    "file": "backend/src/controllers/organizationController.ts",
+    "line": 160,
+    "search": "function reviewCatalog"
+  },
+  {
+    "file": "frontend/src/components/app/EventsScreen.tsx",
+    "line": 54,
+    "search": "function monthCells"
+  },
+  {
+    "file": "frontend/src/components/app/EventsScreen.tsx",
+    "line": 61,
+    "search": "function EventsScreen"
+  },
+  {
+    "file": "frontend/src/components/app/EventsScreen.tsx",
+    "line": 95,
+    "search": "const eventsByDate"
+  },
+  {
+    "file": "frontend/src/services/modulesApi.ts",
+    "line": 32,
+    "search": "function listFieldEvents"
+  },
+  {
+    "file": "backend/src/controllers/modulesController.ts",
+    "line": 265,
+    "search": "function listEvents"
+  },
+  {
+    "file": "backend/src/services/eventSources.ts",
+    "line": 343,
+    "search": "function synchronizeAssociationEvents"
+  },
+  {
+    "file": "backend/src/services/eventSources.ts",
+    "line": 288,
+    "search": "async function collectSourceEvents"
+  },
+  {
+    "file": "backend/src/server.ts",
+    "line": 20,
+    "search": "setInterval(syncEvents"
+  },
+  {
+    "file": "frontend/src/components/app/NotificationBell.tsx",
+    "line": 11,
+    "search": "function NotificationBell"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.notifications.ts",
+    "line": 8,
+    "search": "function listNotifications"
+  },
+  {
+    "file": "backend/src/controllers/livestockController.notifications.ts",
+    "line": 41,
+    "search": "function updateNotification"
+  },
+  {
+    "file": "frontend/src/services/offlineSync.ts",
+    "line": 12,
+    "search": "function submitOfflineOperation"
+  },
+  {
+    "file": "frontend/src/services/offlineSync.ts",
+    "line": 25,
+    "search": "function synchronizePendingOperations"
+  },
+  {
+    "file": "frontend/src/services/offlineDatabase.ts",
+    "line": 13,
+    "search": "function initializeOfflineDatabase"
+  },
+  {
+    "file": "frontend/src/services/offlineDatabase.web.ts",
+    "line": 28,
+    "search": "function enqueueOperation"
+  },
+  {
+    "file": "frontend/src/components/app/OfflineSyncBanner.tsx",
+    "line": 9,
+    "search": "function OfflineSyncBanner"
+  },
+  {
+    "file": "backend/src/controllers/syncController.ts",
+    "line": 22,
+    "search": "async function synchronizeOne"
+  },
+  {
+    "file": "backend/src/controllers/syncController.ts",
+    "line": 59,
+    "search": "async function applyOperation"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.profile.tsx",
+    "line": 17,
+    "search": "function MoreScreen"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.profile.tsx",
+    "line": 48,
+    "search": "async function saveProfile"
+  },
+  {
+    "file": "frontend/src/components/app/Screens.profile.tsx",
+    "line": 34,
+    "search": "async function logout"
+  },
+  {
+    "file": "frontend/src/context/ThemeContext.tsx",
+    "line": 82,
+    "search": "function ThemeProvider"
+  },
+  {
+    "file": "frontend/src/components/ThemeToggle.tsx",
+    "line": 10,
+    "search": "export function"
+  },
+  {
+    "file": "frontend/src/components/app/PhotoAttachment.tsx",
+    "line": 15,
+    "search": "async function choosePhoto"
+  },
+  {
+    "file": "backend/src/server.ts",
+    "line": 7,
+    "search": "app.listen"
+  },
+  {
+    "file": "backend/src/app.ts",
+    "line": 23,
+    "search": "app.use('/api/auth'"
+  },
+  {
+    "file": "frontend/src/config/api.ts",
+    "line": 18,
+    "search": "apiUrl"
+  },
+  {
+    "file": "backend/src/config/database.ts",
+    "line": 6,
+    "search": "createPool"
+  },
+  {
+    "file": "backend/src/middleware/authMiddleware.ts",
+    "line": 8,
+    "search": "function requireAuthentication"
+  },
+  {
+    "file": "backend/src/middleware/roleMiddleware.ts",
+    "line": 7,
+    "search": "function requireRoles"
+  },
+  {
+    "file": "backend/src/middleware/adminMiddleware.ts",
+    "line": 7,
+    "search": "requireAdministrator"
+  },
+  {
+    "file": "backend/src/scripts/migrate.ts",
+    "line": 8,
+    "search": "const migrations"
+  }
+]

@@ -2,7 +2,7 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 import { database } from '../config/database.js';
-import { sendAccessCode, sendNewRequestNotice, sendRegistrationRejection, sendVerificationCode } from './emailService.js';
+import { sendAccessCode, sendApprovalNotice, sendNewRequestNotice, sendRegistrationRejection, sendVerificationCode } from './emailService.js';
 import { createAccessToken, createRefreshToken, getTokenExpirationTimestamp } from '../utils/jwt.js';
 import { assertMailConfiguration, digest, issueCode, matchesDigest, maxCodeAttempts, isRequestedRole, type RequestedRole } from './registrationCodeService.js';
 
@@ -120,7 +120,7 @@ export async function verifyRegistrationEmail(emailInput: string, code: string):
   if (wrongCode) throw new Error('el código ingresado no es correcto');
   const [admins] = await database.query<RowDataPacket[]>(
     `SELECT u.email FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol
-     WHERE r.nombre = 'administrador' AND u.activo = 1 AND u.estado_cuenta = 'activo'`,
+     WHERE r.nombre IN ('dueno', 'gestor_usuarios') AND u.activo = 1 AND u.estado_cuenta = 'activo'`,
   );
   for (const admin of admins) {
     try { await sendNewRequestNotice(String(admin.email), requestName, email); }
@@ -158,14 +158,12 @@ export async function listPendingRegistrationRequests(): Promise<PendingRequest[
   return rows;
 }
 
-// aprueba la solicitud, asigna el rol y envía el código temporal de primer acceso.
+// aprueba la solicitud, asigna el rol y avisa que la cuenta está habilitada.
 export async function approveRegistrationRequest(id: number, adminId: number, role: RequestedRole): Promise<void> {
   if (!isRequestedRole(role)) throw new Error('elegí un rol permitido para la cuenta');
   const connection = await database.getConnection();
   let email = '';
   let name = '';
-  let code = '';
-  let idUser = 0;
   try {
     await connection.beginTransaction();
     const [requests] = await connection.query<PendingRequest[]>(
@@ -176,13 +174,11 @@ export async function approveRegistrationRequest(id: number, adminId: number, ro
     const request = requests[0] as PendingRequest & { password_hash: string };
     const [roles] = await connection.query<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1', [role]);
     if (!roles.length) throw new Error('El perfil solicitado no está disponible. Consultá al administrador.');
-    const [created] = await connection.execute<ResultSetHeader>(
+    await connection.execute(
       `INSERT INTO usuarios (id_rol, nombre, apellido, email, password_hash, activo, debe_cambiar_password, estado_cuenta, email_verificado_at)
-       VALUES (?, ?, ?, ?, ?, 1, 0, 'pendiente_acceso', NOW())`,
+       VALUES (?, ?, ?, ?, ?, 1, 0, 'activo', NOW())`,
       [roles[0].id_rol, request.nombre, request.apellido, request.email, request.password_hash],
     );
-    idUser = created.insertId;
-    code = await issueCode(connection, 'codigos_acceso_usuario', 'id_usuario', idUser, 'acceso');
     await connection.execute(
       "UPDATE solicitudes_registro SET estado = 'aprobada', password_hash = '', resuelta_at = NOW(), resuelta_por = ? WHERE id_solicitud = ?",
       [adminId, id],
@@ -194,7 +190,8 @@ export async function approveRegistrationRequest(id: number, adminId: number, ro
     await connection.rollback();
     throw error;
   } finally { connection.release(); }
-  await sendAccessCode(email, name, code);
+  try { await sendApprovalNotice(email, name); }
+  catch { console.error('[auth] no se pudo enviar el aviso de aprobación.'); }
 }
 
 // rechaza una solicitud pendiente y deja la decisión vinculada al administrador.

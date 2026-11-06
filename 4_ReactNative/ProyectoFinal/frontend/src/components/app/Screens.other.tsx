@@ -24,7 +24,7 @@ export function GenericModuleScreen() {
   if (!item || !item.roles.includes(role)) {
     return <ModuleInDevelopmentScreen moduleKey={module ?? ''} item={item} />;
   }
-  if (role === 'administrador' && item.key === 'equipo') return <AdminRequestsScreen />;
+  if (['dueno', 'gestor_usuarios'].includes(role) && item.key === 'equipo') return <AdminRequestsScreen />;
   if (item.key === 'equipo') return <TeamScreen />;
   if (item.key === 'catalogo') return <CatalogScreen />;
   if (item.key === 'perfil') return <MoreScreen />;
@@ -69,7 +69,7 @@ export function ModuleInDevelopmentScreen({ moduleKey, item }: { moduleKey: stri
 }
 
 export function TeamModuleScreen() {
-  return useMyRole() === 'administrador' ? <AdminRequestsScreen /> : <TeamScreen />;
+  return ['dueno', 'gestor_usuarios'].includes(useMyRole()) ? <AdminRequestsScreen /> : <TeamScreen />;
 }
 
 // muestro solicitudes verificadas y permito al administrador asignar un rol antes de aprobar.
@@ -101,7 +101,7 @@ export function AdminRequestsScreen() {
       if (decision.action === 'approve') await approveRegistrationRequest(token, decision.request.id_solicitud, selectedRoles[decision.request.id_solicitud] ?? 'peon');
       else await rejectRegistrationRequest(token, decision.request.id_solicitud);
       setRequests((current) => current.filter((request) => request.id_solicitud !== decision.request.id_solicitud));
-      setNotice(decision.action === 'approve' ? 'Solicitud aprobada. Se envió el código de acceso al correo.' : 'Solicitud rechazada.');
+      setNotice(decision.action === 'approve' ? 'Solicitud aprobada. La cuenta ya está habilitada.' : 'Solicitud rechazada.');
       setDecision(null);
     } catch (cause) {
       setError(friendlyErrorMessage(cause, 'No se pudo resolver la solicitud.'));
@@ -110,7 +110,7 @@ export function AdminRequestsScreen() {
     }
   }
 
-  const roleOptions: { role: RequestedRole; label: string }[] = [{ role: 'dueno', label: 'Dueño' }, { role: 'peon', label: 'Peón' }, { role: 'veterinario', label: 'Veterinario' }];
+  const roleOptions: { role: RequestedRole; label: string }[] = [{ role: 'peon', label: 'Peón' }, { role: 'veterinario', label: 'Veterinario' }];
   if (showTeam) return (
     <View style={{ flex: 1 }}>
       <Pressable onPress={() => setShowTeam(false)} style={[s.backBtn, { backgroundColor: colors.bgCardMuted }]}>
@@ -158,7 +158,7 @@ export function AdminRequestsScreen() {
                 <Text style={s.rejectText}>Rechazar</Text>
               </Pressable>
               <Pressable disabled={busyId === request.id_solicitud} onPress={() => setDecision({ request, action: 'approve' })} style={[s.approveButton, { backgroundColor: colors.primary }]}>
-                <Text style={s.approveText}>{busyId === request.id_solicitud ? 'Procesando…' : 'Aprobar y enviar código'}</Text>
+                <Text style={s.approveText}>{busyId === request.id_solicitud ? 'Procesando…' : 'Aprobar solicitud'}</Text>
               </Pressable>
             </View>
           </View>
@@ -182,7 +182,7 @@ export function AdminRequestsScreen() {
             <Text style={[s.modalCopy, { color: colors.textSecondary }]}>
               {decision ? `${decision.request.nombre} ${decision.request.apellido} · ${decision.request.email}` : ''}
               {decision?.action === 'approve'
-                ? `\nRol asignado: ${roleOptions.find((option) => option.role === (selectedRoles[decision.request.id_solicitud] ?? 'peon'))?.label}. Se enviará un código de acceso.`
+                ? `\nRol asignado: ${roleOptions.find((option) => option.role === (selectedRoles[decision.request.id_solicitud] ?? 'peon'))?.label}. La persona podrá iniciar sesión con su contraseña.`
                 : '\nNo se creará una cuenta activa.'}
             </Text>
             <View style={s.requestActions}>

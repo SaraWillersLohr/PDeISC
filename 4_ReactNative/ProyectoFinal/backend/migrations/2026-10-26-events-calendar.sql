@@ -80,3 +80,4 @@ INSERT INTO fuentes_eventos (codigo_fuente,nombre,url,especie,raza,pais) VALUES
 ('corriedale_argentina','Asociación Argentina Criadores de Corriedale','https://www.corriedale.org.ar/','ovino','corriedale','Argentina'),
 ('porcinos_argentina','Asociación Argentina Productores de Porcinos','https://porcinos.org.ar/','porcino',NULL,'Argentina')
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre),url=VALUES(url),especie=VALUES(especie),raza=VALUES(raza),pais=VALUES(pais);
+

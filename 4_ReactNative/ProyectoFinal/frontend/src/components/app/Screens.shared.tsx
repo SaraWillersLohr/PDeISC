@@ -14,20 +14,20 @@ export type ModuleKey = 'inicio' | 'animales' | 'estancia' | 'tareas' | 'sanidad
 export type ModuleItem = { key: ModuleKey; label: string; icon: keyof typeof Ionicons.glyphMap; description: string; badgeColor: string; badgeBg: string; roles: string[] };
 
 export const modules: ModuleItem[] = [
-  { key: 'estancia', label: 'Mi estancia', icon: 'home', description: 'Corrales de la estancia', badgeColor: '#b06d2c', badgeBg: '#fef3e7', roles: ['administrador', 'dueno', 'peon'] },
-  { key: 'animales', label: 'Mis animales', icon: 'paw', description: 'Fichas, pesajes, movimientos e historial', badgeColor: '#2d6a4f', badgeBg: '#e8f5ed', roles: ['administrador', 'dueno', 'peon'] },
-  { key: 'tareas', label: 'Tareas', icon: 'checkbox', description: 'Pendientes y trabajo del equipo', badgeColor: '#366aa1', badgeBg: '#edf4fb', roles: ['administrador', 'peon'] },
-  { key: 'sanidad', label: 'Corral de enfermería', icon: 'medkit', description: 'Animales enfermos y tratamientos', badgeColor: '#a8473d', badgeBg: '#faecea', roles: ['administrador', 'dueno', 'veterinario'] },
-  { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch', description: 'Servicios, diagnósticos y nacimientos', badgeColor: '#6a4d95', badgeBg: '#f2effa', roles: ['administrador', 'dueno', 'peon'] },
-  { key: 'eventos', label: 'Eventos y Remates', icon: 'calendar', description: 'Remates y exposiciones nacionales', badgeColor: '#c28b34', badgeBg: '#fbf4e8', roles: ['administrador', 'dueno'] },
-  { key: 'equipo', label: 'Equipo de campo', icon: 'people', description: 'Personas, roles y accesos', badgeColor: '#4f46e5', badgeBg: '#eef2ff', roles: ['administrador', 'dueno'] },
-  { key: 'catalogo', label: 'Especies y razas', icon: 'list', description: 'Catálogo productivo de la organización', badgeColor: '#059669', badgeBg: '#ecfdf5', roles: ['administrador', 'dueno', 'peon'] },
-  { key: 'perfil', label: 'Mi perfil', icon: 'person-circle', description: 'Datos personales y sesión', badgeColor: '#475569', badgeBg: '#f1f5f9', roles: ['administrador', 'dueno', 'peon', 'veterinario'] },
+  { key: 'estancia', label: 'Mi estancia', icon: 'home', description: 'Corrales de la estancia', badgeColor: '#b06d2c', badgeBg: '#fef3e7', roles: ['dueno', 'peon'] },
+  { key: 'animales', label: 'Mis animales', icon: 'paw', description: 'Fichas, pesajes, movimientos e historial', badgeColor: '#2d6a4f', badgeBg: '#e8f5ed', roles: ['dueno', 'peon'] },
+  { key: 'tareas', label: 'Tareas', icon: 'checkbox', description: 'Pendientes y trabajo del equipo', badgeColor: '#366aa1', badgeBg: '#edf4fb', roles: ['dueno', 'peon'] },
+  { key: 'sanidad', label: 'Corral de enfermería', icon: 'medkit', description: 'Animales enfermos y tratamientos', badgeColor: '#a8473d', badgeBg: '#faecea', roles: ['dueno', 'veterinario'] },
+  { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch', description: 'Servicios, diagnósticos y nacimientos', badgeColor: '#6a4d95', badgeBg: '#f2effa', roles: ['dueno', 'peon'] },
+  { key: 'eventos', label: 'Eventos y Remates', icon: 'calendar', description: 'Remates y exposiciones nacionales', badgeColor: '#c28b34', badgeBg: '#fbf4e8', roles: ['dueno'] },
+  { key: 'equipo', label: 'Equipo de campo', icon: 'people', description: 'Personas, roles y accesos', badgeColor: '#4f46e5', badgeBg: '#eef2ff', roles: ['dueno', 'gestor_usuarios'] },
+  { key: 'catalogo', label: 'Especies y razas', icon: 'list', description: 'Catálogo productivo de la organización', badgeColor: '#059669', badgeBg: '#ecfdf5', roles: ['dueno', 'peon'] },
+  { key: 'perfil', label: 'Mi perfil', icon: 'person-circle', description: 'Datos personales y sesión', badgeColor: '#475569', badgeBg: '#f1f5f9', roles: ['dueno', 'peon', 'veterinario', 'gestor_usuarios'] },
 ];
 
-export const roleLabel: Record<string, string> = { administrador: 'Administrador', dueno: 'Dueño', copropietario: 'Administrador', peon: 'Peón', veterinario: 'Veterinario' };
+export const roleLabel: Record<string, string> = { gestor_usuarios: 'Gestor de usuarios', dueno: 'Dueño', peon: 'Peón', veterinario: 'Veterinario' };
 
-export function normalizeRole(role: string): string { return role === 'copropietario' ? 'administrador' : role; }
+export function normalizeRole(role: string): string { return role; }
 
 export function Header({ title, subtitle }: { title: string; subtitle: string }) {
   const { session } = useSession();

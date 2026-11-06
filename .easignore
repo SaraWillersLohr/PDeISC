@@ -1,0 +1,8 @@
+# Existing exclusions from .gitignore
+.workspace/
+node_modules/
+package-lock.json
+*.env
+
+# Exclude the broken portfolio junction that EAS cannot archive
+3_React/R3-Portfolio/

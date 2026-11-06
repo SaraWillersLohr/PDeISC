@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.sarawillers.estanciaapp",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#123824",
         "foregroundImage": "./assets/logo-app.png"

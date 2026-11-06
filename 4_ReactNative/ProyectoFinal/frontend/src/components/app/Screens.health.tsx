@@ -29,8 +29,7 @@ export function HealthScreen() {
   const role = useMyRole();
   if (role === 'veterinario') return <NursingScreen />;
   if (role === 'peon') return <Redirect href="/(app)/animals" />;
-  if (role === 'administrador') return <AdministratorHealthScreen />;
-  if (role === 'dueno') return <NursingScreen />;
+  if (role === 'dueno') return <AdministratorHealthScreen />;
   return <AnimalsInventoryScreen />;
 }
 
@@ -38,7 +37,8 @@ export function AdministratorHealthScreen() {
   const { colors } = useTheme();
   const [section, setSection] = useState<'muertes' | 'enfermeria'>('muertes');
   return <>
-    <Page>
+    {/* El encabezado no ocupa otra pantalla completa sobre el contenido activo. */}
+    <View style={{ paddingHorizontal: 18, paddingTop: 14 }}>
       <Header title="Sanidad y enfermería" subtitle="REPORTES DE MUERTE Y SEGUIMIENTO VETERINARIO" />
       <View style={[s.requestActions, { marginBottom: 12 }]}>
         {(['muertes', 'enfermeria'] as const).map((item) => (
@@ -47,7 +47,7 @@ export function AdministratorHealthScreen() {
           </Pressable>
         ))}
       </View>
-    </Page>
+    </View>
     {section === 'muertes' ? <DeathReviewScreen /> : <NursingScreen />}
   </>;
 }

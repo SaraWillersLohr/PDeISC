@@ -64,6 +64,14 @@ export async function sendAccessCode(email: string, name: string, code: string):
   });
 }
 
+export async function sendApprovalNotice(email: string, name: string): Promise<void> {
+  await sendEmail({
+    to: email,
+    subject: 'Tu acceso a EstanciaApp fue aprobado',
+    text: `Hola ${name}. Ya podés iniciar sesión en EstanciaApp con tu correo y la contraseña que elegiste al registrarte.`,
+  });
+}
+
 // envío un código temporal para recuperar la contraseña de una cuenta activa.
 export async function sendPasswordRecoveryCode(email: string, name: string, code: string): Promise<void> {
   await sendEmail({

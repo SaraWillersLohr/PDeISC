@@ -1,3 +1,4 @@
+import { DateField } from './DateField';
 // presento el seguimiento clínico y el alta veterinaria.
 // muestro los inventarios de animales y corrales con datos del backend.
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -234,7 +235,7 @@ export function NursingScreen() {
                 <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
                   {(['tratamiento', 'nota'] as const).map((type) => <Pressable key={type} onPress={() => setRecordType(type)} style={[style.destination, { backgroundColor: recordType === type ? colors.primary : colors.bgCardMuted, borderColor: recordType === type ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: recordType === type ? '#fff' : colors.textSecondary }]}>{type === 'tratamiento' ? 'Tratamiento' : 'Nota'}</Text></Pressable>)}
                 </View>
-                <TextInput accessibilityLabel="Fecha del tratamiento o nota" onChangeText={setRecordDate} placeholder="Fecha · AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, marginTop: 9 }]} value={recordDate} />
+                <DateField accessibilityLabel="Fecha del tratamiento o nota" onChangeText={setRecordDate} placeholder="Fecha · AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, marginTop: 9 }]} value={recordDate} />
                 <TextInput accessibilityLabel="Detalle de la evolución veterinaria" multiline onChangeText={setRecordDetail} placeholder="Tratamiento realizado, observaciones y evolución" placeholderTextColor={colors.textMuted} style={[style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, minHeight: 88 }]} value={recordDetail} />
                 <PhotoAttachment compact value={recordPhoto} onChange={setRecordPhoto} />
                 <Pressable disabled={historySaving} onPress={() => void saveEvolution()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 12 }]}><Text style={style.confirmText}>{historySaving ? 'Guardando…' : 'Guardar en la evolución'}</Text></Pressable>

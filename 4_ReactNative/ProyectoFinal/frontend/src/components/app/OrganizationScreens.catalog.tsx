@@ -17,7 +17,7 @@ export function CatalogScreen() {
   const isDesktop = Platform.OS === 'web' && width >= 860;
 
   const role = session?.usuario.rol.toLowerCase();
-  const admin = role === 'administrador' || role === 'copropietario';
+  const admin = role === 'dueno';
   const owner = role === 'dueno';
   const canCreate = owner;
   const peon = role === 'peon';

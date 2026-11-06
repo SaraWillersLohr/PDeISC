@@ -1,4 +1,3 @@
-// ingreso principal; el fondo verde ocupa toda la pantalla y la tarjeta mantiene el formulario legible.
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { forest, s } from './LoginStyles';
 import NetInfo from "@react-native-community/netinfo";
@@ -22,13 +21,17 @@ import { BrandWordmark } from "../components/BrandWordmark";
 import { BrandLoadingScreen } from "../components/BrandLoadingScreen";
 import { PasswordRecoveryModal } from "../components/PasswordRecoveryModal";
 import { AccountRequestModal } from "../components/AccountRequestModal";
-import { AccountActivationModal } from "../components/AccountActivationModal";
 import { SocialLoginButton } from "../components/SocialLoginButton";
 import { useSession } from "../context/SessionContext";
 import { initializeOfflineDatabase } from "../services/offlineDatabase";
 import { login } from "../services/authApi";
 import { removeSession, saveSession } from "../services/sessionStorage";
 
+/**
+ * Muestra la pantalla de inicio de sesión y administra el estado del formulario.
+ * Si la sesión ya está restaurada o existe una sesión activa, muestra la pantalla
+ * de carga o redirige al inicio de la aplicación, respectivamente.
+ */
 export default function LoginScreen() {
   const { session, setSession, restoring } = useSession();
   const { width, height } = useWindowDimensions();
@@ -43,8 +46,9 @@ export default function LoginScreen() {
   const [error, setError] = useState("");
   const [recoveryVisible, setRecoveryVisible] = useState(false);
   const [accountRequestVisible, setAccountRequestVisible] = useState(false);
-  const [accountActivationVisible, setAccountActivationVisible] = useState(false);
 
+  // Inicializa la base de datos local y escucha cambios en la conexión a internet.
+  // Al desmontarse la pantalla, deja de escuchar los cambios de conectividad.
   useEffect(() => {
     void initializeOfflineDatabase().catch(() => undefined);
     const unsubscribe = NetInfo.addEventListener((state) =>
@@ -53,6 +57,11 @@ export default function LoginScreen() {
     return unsubscribe;
   }, []);
 
+  /**
+   * Valida los datos ingresados e intenta iniciar sesión con el servidor.
+   * Según la opción elegida, guarda o elimina la sesión persistida; también
+   * informa errores y mantiene el estado de carga actualizado.
+   */
   async function submit(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
@@ -82,6 +91,10 @@ export default function LoginScreen() {
     }
   }
 
+  /**
+   * Recibe la sesión obtenida mediante un proveedor social, la persiste solo
+   * si el usuario eligió mantenerla iniciada y actualiza el contexto global.
+   */
   async function acceptSocialSession(
     nextSession: import("../types/auth").Session,
   ): Promise<void> {
@@ -287,6 +300,13 @@ export default function LoginScreen() {
                   )}
                 </Pressable>
 
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setAccountRequestVisible(true)}
+                  style={s.createAccount}
+                >
+                  <Text style={s.createAccountText}>Crear cuenta</Text>
+                </Pressable>
                 <View
                   style={[s.socialDivider, desktop && s.desktopCompactSocial]}
                 >
@@ -323,28 +343,6 @@ export default function LoginScreen() {
                   />
                 </View>
 
-                <View style={[s.links, desktop && s.desktopCompactLinks]}>
-                  <Text style={[s.joinText, desktop && s.desktopSecondaryText]}>
-                    ¿Todavía no tenés cuenta?
-                  </Text>
-                  <Pressable
-                    accessibilityRole="link"
-                    onPress={() => setAccountRequestVisible(true)}
-                  >
-                    <Text style={[s.link, desktop && s.desktopSecondaryText]}>
-                      Solicitar acceso
-                    </Text>
-                  </Pressable>
-                </View>
-                <Pressable
-                  accessibilityRole="link"
-                  onPress={() => setAccountActivationVisible(true)}
-                  style={[s.accessLink, desktop && s.desktopCompactAccess]}
-                >
-                  <Text style={s.accessText}>
-                    ¿Ya aprobaron tu solicitud? Activá tu acceso
-                  </Text>
-                </Pressable>
               </View>
             </View>
           </ScrollView>
@@ -359,11 +357,7 @@ export default function LoginScreen() {
         onClose={() => setAccountRequestVisible(false)}
         visible={accountRequestVisible}
       />
-      <AccountActivationModal
-        onClose={() => setAccountActivationVisible(false)}
-        visible={accountActivationVisible}
-      />
+
     </SafeAreaView>
   );
 }
-

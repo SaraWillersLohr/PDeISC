@@ -92,11 +92,11 @@ export function NotificationBell() {
 
   function destinationFor(item: NotificationRecord): '/(app)/animals' | '/(app)/health' | null {
     const role = session?.usuario.rol.toLowerCase() ?? '';
-    return item.tipo === 'alta_enfermeria' && ['administrador', 'copropietario', 'peon', 'dueno'].includes(role)
+    return item.tipo === 'alta_enfermeria' && ['peon', 'dueno'].includes(role)
       ? '/(app)/animals'
-      : ['reporte_sanitario', 'ingreso_enfermeria', 'estado_salud'].includes(item.tipo) && ['administrador', 'copropietario', 'peon', 'veterinario', 'dueno'].includes(role)
+      : ['reporte_sanitario', 'ingreso_enfermeria', 'estado_salud'].includes(item.tipo) && ['peon', 'veterinario', 'dueno'].includes(role)
       ? '/(app)/health'
-      : item.tipo === 'movimiento_animal' && ['administrador', 'copropietario', 'dueno'].includes(role)
+      : item.tipo === 'movimiento_animal' && ['dueno'].includes(role)
       ? '/(app)/animals'
       : null;
   }

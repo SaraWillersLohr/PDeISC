@@ -7,6 +7,7 @@ import { ActivityIndicator, Modal, Platform, Pressable, Text, TextInput, useWind
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
 import { deactivateOrganizationUser, listOrganizationUsers, updateOrganizationUser, type OrganizationUser } from '../../services/organizationApi';
+import { roleLabel } from './Screens.shared';
 import { Screen } from './OrganizationScreens.shared';
 import { st } from './OrganizationStyles';
 
@@ -15,7 +16,8 @@ export function TeamScreen() {
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
-  const admin = session?.usuario.rol.toLowerCase() === 'administrador';
+  const owner = session?.usuario.rol.toLowerCase() === 'dueno';
+  const editableRoles = owner ? ['peon', 'veterinario', 'gestor_usuarios'] : ['peon', 'veterinario'];
 
   const [users, setUsers] = useState<OrganizationUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,12 +125,12 @@ export function TeamScreen() {
                       { color: user.activo ? (isDark ? '#86efac' : '#2d6a4f') : '#dc2626' },
                     ]}
                   >
-                    {user.activo ? user.rol : 'inactivo'}
+                    {user.activo ? roleLabel[user.rol] ?? user.rol : 'Inactivo'}
                   </Text>
                 </View>
               </View>
 
-              {admin ? (
+              {Boolean(user.activo) && user.rol !== 'dueno' && (owner || editableRoles.includes(user.rol)) ? (
                 <View style={[st.row, { justifyContent: 'flex-end', marginTop: 14 }]}>
                   <Pressable
                     onPress={() => {
@@ -176,9 +178,9 @@ export function TeamScreen() {
             />
             <Text style={[st.copy, { color: colors.textSecondary, marginTop: 12 }]}>Rol en la estancia</Text>
             <View style={st.rowWrap}>
-              {(['dueno', 'peon', 'veterinario', 'administrador'] as const).map((role) => (
+              {editableRoles.map((role) => (
                 <Pressable
-                  key={role}
+                  key={roleLabel[role] ?? role}
                   onPress={() => setRoleDraft(role)}
                   style={[
                     st.option,

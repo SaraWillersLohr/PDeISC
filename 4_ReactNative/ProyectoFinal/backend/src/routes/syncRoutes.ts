@@ -7,4 +7,4 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 
 export const syncRouter = Router();
 syncRouter.use(requireAuthentication);
-syncRouter.post('/operations', requireRoles('administrador','dueno','peon','veterinario'), asyncHandler(synchronizeOperations));
+syncRouter.post('/operations', requireRoles('dueno','peon','veterinario'), asyncHandler(synchronizeOperations));

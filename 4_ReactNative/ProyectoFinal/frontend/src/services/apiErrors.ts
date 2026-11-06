@@ -1,7 +1,14 @@
+import { validateFormBody } from './formValidation';
 // traduzco errores http y de red a mensajes breves para la interfaz.
 export const apiConfigurationMessage = 'La aplicación no está conectada al servicio. Avisale al administrador.';
 
+
 export async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  // Valido antes de enviar para conservar los errores legibles del formulario.
+  if (typeof init?.body === 'string') {
+    let body: unknown; try { body = JSON.parse(init.body); } catch { /* Puede no ser JSON. */ }
+    validateFormBody(body);
+  }
   try { return await fetch(input, init); }
   catch (error) {
     if (error instanceof Error && error.name === 'AbortError') throw new Error('La solicitud tardó demasiado. Intentá de nuevo.');

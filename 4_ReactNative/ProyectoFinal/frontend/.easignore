@@ -1,0 +1,17 @@
+# App source is in this folder. Keep EAS from packaging sibling projects.
+../
+**/R4-Portfolio
+**/R4-Portfolio/**
+node_modules/
+.expo/
+dist/
+
+# Excluyo configuración local y credenciales del paquete enviado a Expo.
+.env
+.env.*
+*.jks
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision

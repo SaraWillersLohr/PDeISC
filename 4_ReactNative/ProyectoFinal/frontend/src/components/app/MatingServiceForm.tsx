@@ -1,3 +1,4 @@
+import { DateField } from './DateField';
 // formulario para registrar un servicio reproductivo.
 import { useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
@@ -28,6 +29,8 @@ export function MatingServiceForm({ mother, animals, onBack, onCancel, onSaved }
       setError('Indicá el padre, la fecha y el método del servicio.');
       return;
     }
+    // No registro un hecho anterior al nacimiento del animal seleccionado.
+    if (mother?.fecha_nacimiento && date < mother.fecha_nacimiento.slice(0, 10)) { setError('La fecha no puede ser anterior al nacimiento de la madre.'); return; }
     setSaving(true);
     setError('');
     try {
@@ -80,7 +83,7 @@ export function MatingServiceForm({ mother, animals, onBack, onCancel, onSaved }
           />
         </>
       )}
-      <TextInput accessibilityLabel="Fecha del servicio" onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={date} />
+      <DateField accessibilityLabel="Fecha del servicio" onChangeText={setDate} placeholder="Fecha AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={date} />
       <TextInput accessibilityLabel="Método reproductivo" onChangeText={setMethod} placeholder="Método (monta natural, inseminación…)" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={method} />
       <TextInput accessibilityLabel="Observaciones del servicio" multiline onChangeText={setNotes} placeholder="Observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={notes} />
       {error ? <Text style={style.errorText}>{error}</Text> : null}

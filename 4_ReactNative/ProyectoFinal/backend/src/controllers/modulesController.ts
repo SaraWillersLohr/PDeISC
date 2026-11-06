@@ -13,7 +13,7 @@ export async function listTasks(req: Request, res: Response): Promise<void> {
       `SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.fecha_vencimiento,t.estado,
               u.nombre AS responsable,u.apellido AS apellido_responsable
        FROM tareas t LEFT JOIN usuarios u ON u.id_usuario=t.id_responsable
-       WHERE t.id_responsable=? OR ?='administrador' ORDER BY t.fecha_vencimiento IS NULL,t.fecha_vencimiento,t.created_at DESC`,
+       WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.fecha_vencimiento IS NULL,t.fecha_vencimiento,t.created_at DESC`,
       [userId, role],
     );
     res.json({ data: rows });
@@ -42,14 +42,14 @@ export async function createTask(req: Request, res: Response): Promise<void> {
 
 export async function updateTask(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id); const state = String(req.body.estado ?? '');
-  const userId = req.usuario?.id_usuario ?? 0; const role = req.rolVigente ?? '';
-  if (!Number.isInteger(id) || !['pendiente','en_progreso','completada','cancelada'].includes(state)) {
+  const userId = req.usuario?.id_usuario ?? 0;
+  if (!Number.isInteger(id) || !['pendiente','en_progreso','completada'].includes(state)) {
     res.status(400).json({ message: 'estado de tarea inválido' }); return;
   }
   try {
     const [result] = await database.execute<ResultSetHeader>(
-      `UPDATE tareas SET estado=? WHERE id_tarea=? AND (id_responsable=? OR ?='administrador')`,
-      [state, id, userId, role],
+      `UPDATE tareas SET estado=? WHERE id_tarea=? AND id_responsable=? AND estado<>'cancelada'`,
+      [state, id, userId],
     );
     if (!result.affectedRows) { res.status(404).json({ message: 'tarea no encontrada o no asignada a tu usuario' }); return; }
     res.json({ message: 'tarea actualizada' });

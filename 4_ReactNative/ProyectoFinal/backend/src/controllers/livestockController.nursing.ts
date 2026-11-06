@@ -114,7 +114,7 @@ export async function updateNursingHealthStatus(req: Request, res: Response): Pr
         [animalId, veterinarianId, previous, status, notes || 'Diagnóstico veterinario'],
       );
       const message = `${animals[0].identificador}: el veterinario actualizó el estado sanitario de ${previous} a ${status}.${notes ? ` ${notes}` : ''}`;
-      for (const role of ['dueno', 'administrador']) {
+      for (const role of ['dueno']) {
         await transaction.execute('INSERT INTO notificaciones (id_animal, titulo, mensaje, tipo, rol_destino) VALUES (?, ?, ?, \'estado_salud\', ?)', [animalId, 'Actualización veterinaria', message, role]);
       }
     }
@@ -153,7 +153,7 @@ export async function dischargeNursingAnimal(req: Request, res: Response): Promi
         'INSERT INTO historial_estado_salud (id_animal, id_usuario, estado_anterior, estado_nuevo, observaciones) VALUES (?, ?, ?, \'sano\', ?)',
         [animalId, veterinarianId, animal.estado_salud, notes || 'Alta médica veterinaria'],
       );
-      for (const role of ['dueno', 'administrador']) {
+      for (const role of ['dueno']) {
         await transaction.execute(
           'INSERT INTO notificaciones (id_animal, titulo, mensaje, tipo, rol_destino) VALUES (?, ?, ?, \'estado_salud\', ?)',
           [animalId, 'Alta médica registrada', `${animal.identificador}: alta veterinaria confirmada; estado sanitario actualizado a sano. El peón realizará el traslado físico desde enfermería.`, role],

@@ -41,7 +41,7 @@ export function AccountRequestModal({ visible, onClose }: Props) {
             <View style={s.heading}><Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text></View>
             <Pressable accessibilityLabel="Cerrar solicitud de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
           </View>
-          <Text style={s.copy}>Completá tus datos; el administrador revisará la solicitud y asignará tu rol.</Text>
+          <Text style={s.copy}>Completá tus datos y verificá tu correo. Te avisaremos cuando se resuelva tu solicitud.</Text>
           <View style={s.row}>
             <View style={s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} /></View>
             <View style={s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={setApellido} placeholder="Tu apellido" style={s.input} value={apellido} /></View>

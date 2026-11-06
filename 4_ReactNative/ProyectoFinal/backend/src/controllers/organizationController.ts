@@ -12,17 +12,19 @@ export async function listUsers(_req: Request, res: Response): Promise<void> {
 // edito datos personales y rol sin permitir alterar al último administrador.
 export async function updateUser(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id); const { nombre, apellido, rol } = req.body as Record<string, string>;
-  if (!Number.isInteger(id) || !nombre?.trim() || !apellido?.trim() || !['dueno','peon','veterinario','administrador'].includes(rol ?? '')) { res.status(400).json({ message: 'completá nombre, apellido y un rol permitido' }); return; }
+  if (!Number.isInteger(id) || !nombre?.trim() || !apellido?.trim() || !['peon', 'veterinario', ...(req.rolVigente === 'dueno' ? ['gestor_usuarios'] : [])].includes(rol ?? '')) { res.status(400).json({ message: 'completá nombre, apellido y un rol permitido' }); return; }
   try {
     const [rows] = await database.execute<RowDataPacket[]>('SELECT id_rol FROM roles WHERE nombre=?', [rol]);
     if (!rows.length) { res.status(409).json({ message: 'Ese perfil no está disponible. Consultá al administrador.' }); return; }
     const [current] = await database.execute<RowDataPacket[]>(`SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1`, [id]);
     if (!current.length) { res.status(404).json({ message: 'usuario activo no encontrado' }); return; }
-    if (current[0].rol === 'administrador' && rol !== 'administrador') {
-      const [admins] = await database.execute<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
-      if (Number(admins[0]?.total ?? 0) <= 1) { res.status(409).json({ message: 'la organización debe conservar al menos un administrador' }); return; }
+    if (current[0].rol === 'dueno' || (req.rolVigente !== 'dueno' && !['peon', 'veterinario'].includes(current[0].rol))) {
+      res.status(403).json({ message: 'Tu rol no puede editar esta cuenta.' }); return;
     }
-    const [result] = await database.execute<ResultSetHeader>('UPDATE usuarios SET nombre=?,apellido=?,id_rol=?,token_version=token_version+1 WHERE id_usuario=? AND activo=1', [nombre.trim(), apellido.trim(), rows[0].id_rol, id]);
+    const [result] = await database.execute<ResultSetHeader>(
+      'UPDATE usuarios u JOIN roles r ON r.id_rol=u.id_rol SET u.nombre=?,u.apellido=?,u.id_rol=?,u.token_version=u.token_version+1 WHERE u.id_usuario=? AND u.activo=1 AND r.nombre=?',
+      [nombre.trim(), apellido.trim(), rows[0].id_rol, id, current[0].rol],
+    );
     if (!result.affectedRows) { res.status(404).json({ message: 'usuario activo no encontrado' }); return; } res.json({ message: 'usuario actualizado' });
   } catch { res.status(500).json({ message: 'no se pudo editar el usuario' }); }
 }
@@ -37,9 +39,8 @@ export async function deactivateUser(req: Request, res: Response): Promise<void>
     await connection.beginTransaction();
     const [rows] = await connection.execute<RowDataPacket[]>(`SELECT u.id_usuario,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 FOR UPDATE`, [id]);
     if (!rows.length) { await connection.rollback(); res.status(404).json({ message: 'usuario activo no encontrado' }); return; }
-    if (rows[0].rol === 'administrador') {
-      const [admins] = await connection.execute<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE r.nombre='administrador' AND u.activo=1`);
-      if (Number(admins[0]?.total) <= 1) { await connection.rollback(); res.status(409).json({ message: 'la organización debe conservar al menos un administrador' }); return; }
+    if (rows[0].rol === 'dueno' || (req.rolVigente !== 'dueno' && !['peon', 'veterinario'].includes(rows[0].rol))) {
+      await connection.rollback(); res.status(403).json({ message: 'Tu rol no puede dar de baja esta cuenta.' }); return;
     }
     const [tasks] = await connection.execute<RowDataPacket[]>(`SELECT id_tarea FROM tareas WHERE id_responsable=? AND estado IN ('pendiente','en_progreso') FOR UPDATE`, [id]);
     if (tasks.length && reassignmentId === null) {

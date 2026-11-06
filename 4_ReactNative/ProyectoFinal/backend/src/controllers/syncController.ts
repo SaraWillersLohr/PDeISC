@@ -106,7 +106,7 @@ async function moveAnimal(connection: PoolConnection, payload: Record<string, un
   const health = destination.es_enfermeria ? animal.estado_salud === 'sano' ? 'enfermo' : animal.estado_salud : dischargeId ? 'sano' : animal.estado_salud;
   await connection.execute('UPDATE animales SET id_corral=?,estado_salud=?,version_dato=version_dato+1 WHERE id_animal=?', [destinationId,health,animalId]);
   if (health !== animal.estado_salud) await connection.execute('INSERT INTO historial_estado_salud (id_animal,id_usuario,estado_anterior,estado_nuevo,observaciones) VALUES (?,?,?,?,?)', [animalId,userId,animal.estado_salud,health,notes || 'movimiento sincronizado desde el dispositivo']);
-  const targetRoles = destination.es_enfermeria ? ['dueno','administrador','veterinario'] : ['dueno','administrador'];
+  const targetRoles = destination.es_enfermeria ? ['dueno','veterinario'] : ['dueno'];
   for (const role of targetRoles) await connection.execute('INSERT INTO notificaciones (id_animal,titulo,mensaje,tipo,rol_destino) VALUES (?,?,?,?,?)', [animalId,destination.es_enfermeria ? 'Animal ingresó a enfermería' : 'Traslado de animal realizado',`${animal.identificador}: traslado registrado en ${destination.nombre}.`,'movimiento_animal',role]);
   await audit(connection,'animal',animalId,'movimiento',userId,{ id_corral_origen: animal.id_corral,id_corral_destino: destinationId,id_movimiento: movement.insertId });
   return movement.insertId;
@@ -140,7 +140,7 @@ async function reportAnimal(connection: PoolConnection, payload: Record<string, 
   const [created] = await connection.execute<ResultSetHeader>('INSERT INTO reportes_sanitarios (id_animal,id_usuario,fecha,motivo) VALUES (?,?,?,?)', [animalId,userId,date,reason]);
   await connection.execute("UPDATE animales SET id_corral=?,estado_salud='enfermo',version_dato=version_dato+1 WHERE id_animal=?", [destinationId,animalId]);
   if (animal.estado_salud !== 'enfermo') await connection.execute('INSERT INTO historial_estado_salud (id_animal,id_usuario,estado_anterior,estado_nuevo,observaciones) VALUES (?,?,?,?,?)', [animalId,userId,animal.estado_salud,'enfermo',reason]);
-  for (const role of ['veterinario','dueno','administrador']) await connection.execute('INSERT INTO notificaciones (id_animal,titulo,mensaje,tipo,rol_destino) VALUES (?,?,?,?,?)', [animalId,'Animal ingresó a enfermería',`${animal.identificador}: reporte sanitario sincronizado. ${reason}`,'reporte_sanitario',role]);
+  for (const role of ['veterinario','dueno']) await connection.execute('INSERT INTO notificaciones (id_animal,titulo,mensaje,tipo,rol_destino) VALUES (?,?,?,?,?)', [animalId,'Animal ingresó a enfermería',`${animal.identificador}: reporte sanitario sincronizado. ${reason}`,'reporte_sanitario',role]);
   await audit(connection,'animal',animalId,'reporte_sanitario',userId,{ fecha: date,motivo: reason,id_corral_destino: destinationId });
   return created.insertId;
 }

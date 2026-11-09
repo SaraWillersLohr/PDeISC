@@ -1,10 +1,11 @@
+import { FormDialog } from '../FormDialog';
 import { DateField } from './DateField';
 // presento el seguimiento clínico y el alta veterinaria.
 // muestro los inventarios de animales y corrales con datos del backend.
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Image, Modal, Platform, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -14,7 +15,7 @@ import { InventoryPage , Empty } from './LivestockScreens.shared';
 import { style } from './LivestockStyles';
 
 // permito al veterinario registrar el alta sin alterar la ubicación física.
-export function NursingScreen() {
+export function NursingScreen({ headerContent }: { headerContent?: React.ReactNode } = {}) {
   const { session } = useSession();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
@@ -116,6 +117,8 @@ export function NursingScreen() {
   return (
     <InventoryPage
       title="Enfermería"
+      headerContent={headerContent}
+      showSearch={false}
       subtitle="SEGUIMIENTO VETERINARIO Y ALTAS CLÍNICAS"
       count={rows.length}
       search=""
@@ -189,7 +192,7 @@ export function NursingScreen() {
 
       <Modal animationType="fade" onRequestClose={() => setSelected(null)} transparent visible={Boolean(selected)}>
         <View style={style.backdrop}>
-          <View style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[style.modalTitle, { color: colors.textMain }]}>Registrar alta médica veterinaria</Text>
             <Text style={[style.detail, { color: colors.textSecondary }]}>
               {selected?.nombre || selected?.identificador} permanecerá en enfermería hasta que el personal de campo concrete el traslado físico.
@@ -204,9 +207,6 @@ export function NursingScreen() {
               value={notes}
             />
             <View style={style.modalActions}>
-              <Pressable onPress={() => setSelected(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
-                <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
-              </Pressable>
               <Pressable
                 disabled={saving}
                 onPress={() => void confirmDischarge()}
@@ -214,45 +214,46 @@ export function NursingScreen() {
               >
                 <Text style={style.confirmText}>{saving ? 'Guardando…' : 'Dar el alta médica'}</Text>
               </Pressable>
+              <Pressable onPress={() => setSelected(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
+                <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
+              </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
       <Modal animationType="fade" onRequestClose={() => setHistoryAnimal(null)} transparent visible={Boolean(historyAnimal)}>
         <View style={style.backdrop}>
-          <View style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border, maxHeight: '92%' }]}>
-            <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-              <Text style={[style.modalTitle, { color: colors.textMain }]}>Evolución veterinaria</Text>
-              <Text style={[style.detail, { color: colors.textMuted }]}>{historyAnimal?.nombre || historyAnimal?.identificador} · {historyAnimal?.identificador}</Text>
-              {historyError ? <Text style={style.errorText}>{historyError}</Text> : null}
-              {historyLoading ? <ActivityIndicator color={colors.primary} style={{ marginVertical: 16 }} /> : history.length ? history.map((record) => (
-                <View key={record.id_registro} style={[style.card, { backgroundColor: colors.bgCardMuted, borderColor: colors.border, marginTop: 10, width: '100%' }]}>
-                  <Text style={[style.title, { color: colors.textMain }]}>{record.tipo === 'tratamiento' ? 'Tratamiento' : record.tipo === 'nota' ? 'Nota veterinaria' : record.tipo === 'alta' ? 'Alta clínica' : record.tipo === 'estado_salud' ? 'Cambio de estado sanitario' : record.tipo === 'ingreso_enfermeria' ? 'Ingreso a enfermería' : record.tipo === 'movimiento' ? 'Traslado' : 'Reporte sanitario'} · {record.fecha.slice(0, 10)}</Text>
-                  <Text style={[style.detail, { color: colors.textMuted }]}>{record.nombre_autor} {record.apellido_autor}</Text>
-                  <Text style={[style.detail, { color: colors.textSecondary, marginTop: 7 }]}>{record.detalle}</Text>
-                  {record.foto ? <Image resizeMode="cover" source={{ uri: record.foto }} style={style.evolutionPhoto} /> : null}
-                </View>
-              )) : !historyLoading ? <Text style={[style.detail, { color: colors.textMuted, marginTop: 12 }]}>Todavía no hay tratamientos ni notas registrados.</Text> : null}
+          <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+            <Text style={[style.modalTitle, { color: colors.textMain }]}>Evolución veterinaria</Text>
+            <Text style={[style.detail, { color: colors.textMuted }]}>{historyAnimal?.nombre || historyAnimal?.identificador} · {historyAnimal?.identificador}</Text>
+            {historyError ? <Text style={style.errorText}>{historyError}</Text> : null}
+            {historyLoading ? <ActivityIndicator color={colors.primary} style={{ marginVertical: 16 }} /> : history.length ? history.map((record) => (
+              <View key={record.id_registro} style={[style.card, { backgroundColor: colors.bgCardMuted, borderColor: colors.border, marginTop: 10, width: '100%' }]}>
+                <Text style={[style.title, { color: colors.textMain }]}>{record.tipo === 'tratamiento' ? 'Tratamiento' : record.tipo === 'nota' ? 'Nota veterinaria' : record.tipo === 'alta' ? 'Alta clínica' : record.tipo === 'estado_salud' ? 'Cambio de estado sanitario' : record.tipo === 'ingreso_enfermeria' ? 'Ingreso a enfermería' : record.tipo === 'movimiento' ? 'Traslado' : 'Reporte sanitario'} · {record.fecha.slice(0, 10)}</Text>
+                <Text style={[style.detail, { color: colors.textMuted }]}>{record.nombre_autor} {record.apellido_autor}</Text>
+                <Text style={[style.detail, { color: colors.textSecondary, marginTop: 7 }]}>{record.detalle}</Text>
+                {record.foto ? <Image resizeMode="cover" source={{ uri: record.foto }} style={style.evolutionPhoto} /> : null}
+              </View>
+            )) : !historyLoading ? <Text style={[style.detail, { color: colors.textMuted, marginTop: 12 }]}>Todavía no hay tratamientos ni notas registrados.</Text> : null}
 
-              {canAddEvolution ? <View style={{ borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth, marginTop: 16, paddingTop: 12 }}>
-                <Text style={[style.title, { color: colors.textMain }]}>Diagnóstico actual · {historyAnimal?.estado_salud.replaceAll('_', ' ')}</Text>
-                <Text style={[style.detail, { color: colors.textMuted, marginTop: 4 }]}>El alta veterinaria actualiza el estado a sano. El animal permanece en enfermería hasta que el peón complete el traslado físico.</Text>
-                <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
-                  {(['enfermo', 'herido'] as const).map((status) => <Pressable key={status} onPress={() => setDiagnosis(status)} style={[style.destination, { backgroundColor: diagnosis === status ? colors.primary : colors.bgCardMuted, borderColor: diagnosis === status ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: diagnosis === status ? '#fff' : colors.textSecondary }]}>{status === 'enfermo' ? 'Enfermo' : 'Herido'}</Text></Pressable>)}
-                </View>
-                <Pressable disabled={diagnosisSaving} onPress={() => void saveDiagnosis()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 9 }]}><Text style={style.confirmText}>{diagnosisSaving ? 'Guardando…' : 'Guardar diagnóstico y avisar'}</Text></Pressable>
-                <Text style={[style.title, { color: colors.textMain }]}>Agregar evolución</Text>
-                <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
-                  {(['tratamiento', 'nota'] as const).map((type) => <Pressable key={type} onPress={() => setRecordType(type)} style={[style.destination, { backgroundColor: recordType === type ? colors.primary : colors.bgCardMuted, borderColor: recordType === type ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: recordType === type ? '#fff' : colors.textSecondary }]}>{type === 'tratamiento' ? 'Tratamiento' : 'Nota'}</Text></Pressable>)}
-                </View>
-                <DateField accessibilityLabel="Fecha del tratamiento o nota" onChangeText={setRecordDate} placeholder="Fecha · AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, marginTop: 9 }]} value={recordDate} />
-                <TextInput accessibilityLabel="Detalle de la evolución veterinaria" multiline onChangeText={setRecordDetail} placeholder="Tratamiento realizado, observaciones y evolución" placeholderTextColor={colors.textMuted} style={[style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, minHeight: 88 }]} value={recordDetail} />
-                <PhotoAttachment compact value={recordPhoto} onChange={setRecordPhoto} />
-                <Pressable disabled={historySaving} onPress={() => void saveEvolution()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 12 }]}><Text style={style.confirmText}>{historySaving ? 'Guardando…' : 'Guardar en la evolución'}</Text></Pressable>
-              </View> : null}
-              <Pressable onPress={() => setHistoryAnimal(null)} style={[style.cancelButton, { alignSelf: 'flex-end', borderColor: colors.border, marginTop: 14 }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Cerrar</Text></Pressable>
-            </ScrollView>
-          </View>
+            {canAddEvolution ? <View style={{ borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth, marginTop: 16, paddingTop: 12 }}>
+              <Text style={[style.title, { color: colors.textMain }]}>Diagnóstico actual · {historyAnimal?.estado_salud.replaceAll('_', ' ')}</Text>
+              <Text style={[style.detail, { color: colors.textMuted, marginTop: 4 }]}>El alta veterinaria actualiza el estado a sano. El animal permanece en enfermería hasta que el peón complete el traslado físico.</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
+                {(['enfermo', 'herido'] as const).map((status) => <Pressable key={status} onPress={() => setDiagnosis(status)} style={[style.destination, { backgroundColor: diagnosis === status ? colors.primary : colors.bgCardMuted, borderColor: diagnosis === status ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: diagnosis === status ? '#fff' : colors.textSecondary }]}>{status === 'enfermo' ? 'Enfermo' : 'Herido'}</Text></Pressable>)}
+              </View>
+              <Pressable disabled={diagnosisSaving} onPress={() => void saveDiagnosis()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 9 }]}><Text style={style.confirmText}>{diagnosisSaving ? 'Guardando…' : 'Guardar diagnóstico y avisar'}</Text></Pressable>
+              <Text style={[style.title, { color: colors.textMain }]}>Agregar evolución</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
+                {(['tratamiento', 'nota'] as const).map((type) => <Pressable key={type} onPress={() => setRecordType(type)} style={[style.destination, { backgroundColor: recordType === type ? colors.primary : colors.bgCardMuted, borderColor: recordType === type ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: recordType === type ? '#fff' : colors.textSecondary }]}>{type === 'tratamiento' ? 'Tratamiento' : 'Nota'}</Text></Pressable>)}
+              </View>
+              <DateField accessibilityLabel="Fecha del tratamiento o nota" onChangeText={setRecordDate} placeholder="Fecha · AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, marginTop: 9 }]} value={recordDate} />
+              <TextInput accessibilityLabel="Detalle de la evolución veterinaria" multiline onChangeText={setRecordDetail} placeholder="Tratamiento realizado, observaciones y evolución" placeholderTextColor={colors.textMuted} style={[style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, minHeight: 88 }]} value={recordDetail} />
+              <PhotoAttachment compact value={recordPhoto} onChange={setRecordPhoto} />
+              <Pressable disabled={historySaving} onPress={() => void saveEvolution()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 12 }]}><Text style={style.confirmText}>{historySaving ? 'Guardando…' : 'Guardar en la evolución'}</Text></Pressable>
+            </View> : null}
+            <Pressable onPress={() => setHistoryAnimal(null)} style={[style.cancelButton, { alignSelf: 'flex-end', borderColor: colors.border, marginTop: 14 }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Cerrar</Text></Pressable>
+          </FormDialog>
         </View>
       </Modal>
     </InventoryPage>

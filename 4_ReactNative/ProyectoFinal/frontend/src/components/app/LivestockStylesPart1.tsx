@@ -197,9 +197,12 @@ const part = StyleSheet.create({
       alignItems: 'center',
       borderRadius: 10,
       flexDirection: 'row',
-      height: 44,
+      // El texto puede ocupar dos líneas con letra grande o en celulares angostos.
+      minHeight: 44,
+      maxWidth: '100%',
       justifyContent: 'center',
       paddingHorizontal: 16,
+      paddingVertical: 10,
     },
   matingCtas: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   matingCta: { alignItems: 'center', borderRadius: 10, flexBasis: '48%', flexDirection: 'row', flexGrow: 1, gap: 8, justifyContent: 'center', minHeight: 44, paddingHorizontal: 14 },
@@ -212,9 +215,11 @@ const part = StyleSheet.create({
       alignItems: 'center',
       borderRadius: 10,
       borderWidth: 1,
-      height: 44,
+      minHeight: 44,
+      maxWidth: '100%',
       justifyContent: 'center',
       paddingHorizontal: 16,
+      paddingVertical: 10,
     },
   cancelText: {
       fontSize: 12,
@@ -233,13 +238,9 @@ const part = StyleSheet.create({
   modal: {
       borderRadius: 20,
       borderWidth: 1,
-      maxHeight: '85%',
       maxWidth: 440,
       padding: 22,
       width: '100%',
-    },
-  animalDetailScroll: {
-      flexShrink: 1,
     }
 });
 

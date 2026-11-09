@@ -2,7 +2,8 @@
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FormDialog } from '../components/FormDialog';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { resendAccountCode, verifyAccountEmail } from '../services/authApi';
 
@@ -43,7 +44,7 @@ export default function VerifyScreen() {
   return (
     <SafeAreaView style={s.backdrop}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
-        <ScrollView accessibilityViewIsModal style={s.dialog} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
+        <FormDialog style={s.dialog} contentContainerStyle={s.content}>
           <View style={s.header}>
             <View style={s.heading}>
               <Text style={s.eyebrow}>ACCESO AL EQUIPO</Text>
@@ -75,7 +76,7 @@ export default function VerifyScreen() {
               </Pressable>
             </>
           )}
-        </ScrollView>
+        </FormDialog>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -84,7 +85,7 @@ export default function VerifyScreen() {
 const s = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(14,27,18,0.62)', flex: 1 },
   keyboard: { alignItems: 'center', flex: 1, justifyContent: 'center', padding: 14 },
-  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, flexGrow: 0, flexShrink: 1, maxWidth: 480, width: '100%' },
+  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, maxWidth: 480, width: '100%' },
   content: { padding: 20 },
   header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
   heading: { flex: 1 },

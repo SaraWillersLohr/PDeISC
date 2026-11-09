@@ -3,7 +3,7 @@ import { apiUrl } from '../config/api';
 import { apiConfigurationMessage, apiFetch, friendlyApiMessage } from './apiErrors';
 import type { Session } from '../types/auth';
 
-export interface OrganizationUser { id_usuario: number; nombre: string; apellido: string; email: string; activo: number; rol: string; }
+export interface OrganizationUser { id_usuario: number; nombre: string; apellido: string; email: string; activo: number; rol: string; foto_perfil?: string | null; }
 export interface Species { id_especie: number; nombre: string; }
 export interface Breed { id_raza: number; id_especie: number; nombre: string; }
 export interface CatalogRequest { id_solicitud_catalogo: number; tipo: 'especie'|'raza'; nombre: string; especie?: string; estado: string; }
@@ -17,7 +17,9 @@ async function request<T>(session: Session, path: string, method = 'GET', body?:
   return payload.data as T;
 }
 
-export function listOrganizationUsers(session: Session): Promise<OrganizationUser[]> { return request(session, '/users'); }
+export function listOrganizationUsers(session: Session, includePhotos = false): Promise<OrganizationUser[]> {
+  return request(session, includePhotos ? '/users?fotos=1' : '/users');
+}
 export function updateOrganizationUser(session: Session, user: OrganizationUser, role: string): Promise<void> { return request(session, `/users/${user.id_usuario}`, 'PUT', { nombre: user.nombre, apellido: user.apellido || '-', rol: role }); }
 export function deactivateOrganizationUser(session: Session, id: number, reassignmentId?: number): Promise<void> {
   return request(session, `/users/${id}`, 'DELETE', reassignmentId ? { id_responsable_reasignacion: reassignmentId } : {});

@@ -12,7 +12,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { getDashboard, type DashboardMetrics } from '../../services/productionApi';
 import { listAnimals } from '../../services/livestockApi';
 import { normalizeRole , Page , Header , roleLabel , SpeciesBarChart } from './Screens.shared';
-import { TeamModuleScreen } from './Screens.other';
+import { listOrganizationUsers, type OrganizationUser } from '../../services/organizationApi';
 import { HealthScreen } from './Screens.health';
 import { s } from './ScreensStyles';
 
@@ -25,13 +25,16 @@ export function HomeScreen() {
   const [speciesCounts, setSpeciesCounts] = useState<{ species: string; count: number }[]>([]);
   const [breedCountsLoaded, setBreedCountsLoaded] = useState(false);
   const [metricsError, setMetricsError] = useState('');
+  const [teamUsers, setTeamUsers] = useState<OrganizationUser[] | null>(null);
+  const [teamError, setTeamError] = useState('');
   const role = normalizeRole(session?.usuario.rol.toLowerCase() ?? 'dueno');
   const name = session?.usuario.nombre?.trim() || 'equipo';
   const isVet = role === 'veterinario';
   const isField = role === 'peon';
   const isManager = role === 'dueno';
+  const isUserManager = role === 'gestor_usuarios';
   const isDesktop = Platform.OS === 'web' && width >= 860;
-  const dashboardCopy = isVet ? 'Controles y seguimiento de animales en enfermería.' : isField ? 'Lo importante para las tareas y ganado de hoy.' : 'Monitoreo productivo y sanitario de la estancia.';
+  const dashboardCopy = isUserManager ? 'Consultá las cuentas aprobadas y los roles de tu equipo.' : isField ? 'Lo importante para las tareas y ganado de hoy.' : 'Monitoreo productivo y sanitario de la estancia.';
   const today = new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
   useEffect(() => {
@@ -50,8 +53,31 @@ export function HomeScreen() {
     return () => { active = false; };
   }, [session, isManager, revision]);
 
-  if (role === 'gestor_usuarios') return <TeamModuleScreen />;
+  useEffect(() => {
+    if (!session || !isUserManager) return;
+    let active = true;
+    listOrganizationUsers(session)
+      .then((users) => {
+        if (!active) return;
+        setTeamUsers(users.filter((user) => user.activo === 1));
+        setTeamError('');
+      })
+      .catch((cause: unknown) => {
+        if (!active) return;
+        setTeamUsers(null);
+        setTeamError(friendlyErrorMessage(cause, 'No se pudieron cargar las estadísticas del equipo.'));
+      });
+    return () => { active = false; };
+  }, [session, isUserManager, revision]);
+
   if (isVet) return <HealthScreen />;
+
+  const teamStatistics = teamUsers ? [
+    { label: 'Usuarios aprobados', value: teamUsers.length, icon: 'people-outline' },
+    { label: 'Dueños', value: teamUsers.filter((user) => user.rol === 'dueno').length, icon: 'key-outline' },
+    { label: 'Peones', value: teamUsers.filter((user) => user.rol === 'peon').length, icon: 'leaf-outline' },
+    { label: 'Veterinarios', value: teamUsers.filter((user) => user.rol === 'veterinario').length, icon: 'medkit-outline' },
+  ] as const : null;
 
   const statistics = metrics ? [
     { label: 'Crías del año', value: metrics.crias_ano, color: '#3d9458', icon: 'leaf-outline' as const, note: 'Nacimientos registrados' },
@@ -64,7 +90,7 @@ export function HomeScreen() {
 
   return (
     <Page>
-      <Header title={isManager ? `¡Hola, ${name}!` : 'Panel de Campo'} subtitle={`${roleLabel[role] ?? 'EQUIPO'} · ${today.toUpperCase()}`} />
+      <Header title={isManager || isUserManager ? `¡Hola, ${name}!` : 'Panel de Campo'} subtitle={`${roleLabel[role] ?? 'EQUIPO'} · ${today.toUpperCase()}`} />
 
       {/* Agro Welcome Banner */}
       <View style={[s.welcome, isDark && s.welcomeDark]}>
@@ -79,6 +105,34 @@ export function HomeScreen() {
           <Ionicons color="#fde047" name="sunny" size={36} />
         </View>
       </View>
+
+      {isUserManager ? (
+        <View style={[s.statsCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <View>
+            <Text style={[s.sectionTitle, { color: colors.textMain }]}>Estadísticas del equipo</Text>
+            <Text style={[s.sectionCopy, { color: colors.textMuted }]}>Cuentas activas de la estancia</Text>
+          </View>
+          {teamStatistics ? (
+            <View style={[s.statsGrid, isDesktop && s.statsGridDesktop]}>
+              {teamStatistics.map((item) => (
+                <View key={item.label} style={[s.statBox, isDesktop && s.statBoxDesktop, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8faf7', borderColor: colors.borderLight }]}>
+                  <View style={s.statBoxTop}>
+                    <View style={[s.statIconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#edf4ec' }]}>
+                      <Ionicons color={colors.primary} name={item.icon} size={18} />
+                    </View>
+                    <Text style={[s.statBoxValue, { color: colors.textMain }]}>{item.value}</Text>
+                  </View>
+                  <Text style={[s.statBoxLabel, { color: colors.textSecondary }]}>{item.label}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={teamError ? s.requestError : [s.sectionCopy, { color: colors.textMuted }]}>
+              {teamError || 'Cargando estadísticas del equipo…'}
+            </Text>
+          )}
+        </View>
+      ) : null}
 
       {isField ? (
         <View style={s.fieldShortcuts}>

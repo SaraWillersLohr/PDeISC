@@ -1,5 +1,4 @@
-// Mantengo siete columnas sin que el redondeo móvil desplace el domingo.
-// organizo los eventos de las especies activas y dejo las demás fuentes en espera.
+// Muestro el calendario y separo la navegación del mes del detalle de cada evento.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Linking, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
@@ -12,6 +11,8 @@ import { friendlyErrorMessage } from '../../services/apiErrors';
 import { listFieldEvents, type FieldEvent, type FieldEventsData } from '../../services/modulesApi';
 
 type FilterKind = 'especie' | 'raza' | 'provincia';
+// La fecha de origen permite volver a la lista del día desde un evento.
+type EventSelection = { kind: 'day'; date: string } | { kind: 'event'; id: string; fromDate?: string };
 const weekdays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
 // convierto valores de fecha de mysql o iso en la misma clave local del calendario.
@@ -25,23 +26,9 @@ function localDateKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-function normalizeSpecies(value: string | null | undefined): string {
-  const normalized = String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase('es');
-  if (/bovin|vaca|toro/.test(normalized)) return 'bovino';
-  if (/equin|caball|yegua/.test(normalized)) return 'equino';
-  if (/ovin|oveja|carnero/.test(normalized)) return 'ovino';
-  if (/porcin|cerdo|chancho/.test(normalized)) return 'porcino';
-  return normalized.replace(/s$/, '');
-}
-
 function displayTag(value: string | null | undefined): string {
   const text = String(value ?? '').trim();
   return text ? `${text[0].toLocaleUpperCase('es')}${text.slice(1)}` : '';
-}
-
-function displaySpecies(value: string): string {
-  const names: Record<string, string> = { bovino: 'Bovinos', equino: 'Equinos', ovino: 'Ovinos', porcino: 'Porcinos' };
-  return names[normalizeSpecies(value)] ?? displayTag(value);
 }
 
 // formateo una fecha sin cambiar su día por conversiones de zona horaria.
@@ -69,9 +56,10 @@ export function EventsScreen() {
   const scrollToTop = useRef<() => void>(() => {});
   const [showScrollTop, setShowScrollTop] = useState(false);
   function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) { setShowScrollTop(event.nativeEvent.contentOffset.y > 320); }
-  const [data, setData] = useState<FieldEventsData>({ eventos: [], especies: [], razas: [], provincias: [], total_nacional: 0, fuentes: [] });
+  const [data, setData] = useState<FieldEventsData>({ eventos: [], especies: [], razas: [], provincias: [], total_nacional: 0 });
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(localDateKey(new Date()));
+  const [selection, setSelection] = useState<EventSelection | null>(null);
   const [filterKind, setFilterKind] = useState<FilterKind | null>(null);
   const [selectedSpecies, setSelectedSpecies] = useState('');
   const [selectedBreed, setSelectedBreed] = useState('');
@@ -112,33 +100,25 @@ export function EventsScreen() {
   }, [filteredEvents]);
   const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
   const todayKey = localDateKey(new Date());
-  const monthEventCount = [...eventsByDate.entries()]
-    .filter(([key]) => key.startsWith(`${monthKey}-`))
-    .flatMap(([, events]) => events.map((event) => event.id_evento))
-    .filter((id, index, all) => all.indexOf(id) === index).length;
-  const selectedDayEvents = eventsByDate.get(selectedDate) ?? [];
-  const sourceGroups = useMemo(() => {
-    const activeSpecies = new Set(data.especies.map(normalizeSpecies));
-    const groups = new Map<string, { especie: string; enEspera: boolean; fuentes: NonNullable<FieldEventsData['fuentes']> }>();
-    for (const source of data.fuentes ?? []) {
-      const especie = source.especie ?? 'Sin especie';
-      const key = normalizeSpecies(especie) || 'sin-especie';
-      const enEspera = !activeSpecies.has(key);
-      const existing = groups.get(key) ?? { especie, enEspera, fuentes: [] };
-      existing.fuentes.push(source);
-      groups.set(key, existing);
-    }
-    return [...groups.values()].sort((a, b) => Number(a.enEspera) - Number(b.enEspera) || a.especie.localeCompare(b.especie, 'es'));
-  }, [data.especies, data.fuentes]);
+  // Consulto los datos actuales para que el modal refleje cambios mientras está abierto.
+  const modalEvents = selection?.kind === 'day' ? eventsByDate.get(selection.date) ?? [] : [];
+  const modalEvent = selection?.kind === 'event' ? data.eventos.find((event) => event.id_evento === selection.id) : undefined;
   const cells = monthCells(month);
   const filterOptions = filterKind === 'especie' ? data.especies : filterKind === 'raza' ? data.razas : data.provincias;
   const monthLabel = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(month);
 
-  // cambio el mes visible y selecciono su primer día para actualizar el detalle.
+  // Resalto el primer día del nuevo mes sin abrir un modal.
   function changeMonth(offset: number): void {
     const next = new Date(month.getFullYear(), month.getMonth() + offset, 1);
     setMonth(next);
     setSelectedDate(`${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-01`);
+  }
+
+  // Un evento abre su ficha de inmediato. Varios eventos abren la lista del día.
+  function openDay(date: string, events: FieldEvent[]): void {
+    setSelectedDate(date);
+    if (events.length === 1) setSelection({ kind: 'event', id: events[0].id_evento });
+    if (events.length > 1) setSelection({ kind: 'day', date });
   }
 
   // guardo la opción elegida sin modificar los demás filtros.
@@ -187,33 +167,61 @@ export function EventsScreen() {
                       const selected = key === selectedDate;
                       const visibleEvents = dayEvents.slice(0, 2);
                       return <View key={key} style={[styles.dayCell, selected && { backgroundColor: isDark ? '#23533d' : '#e9f4ec' }]}>
-                        <Pressable accessibilityRole="button" accessibilityState={{ selected }} onPress={() => setSelectedDate(key)} style={styles.dayButton}>
+                        <Pressable accessibilityRole="button" accessibilityState={{ selected }} accessibilityLabel={displayDate(key)} onPress={() => openDay(key, dayEvents)} style={styles.dayButton}>
                           <Text style={[styles.dayNumber, { color: selected ? colors.primary : colors.textMain }]}>{day}</Text>
                         </Pressable>
-                        {visibleEvents.map((event) => <Pressable key={event.id_evento} accessibilityRole="button" accessibilityLabel={`${event.titulo}, ${displayDate(event.fecha_inicio)}`} onPress={() => setSelectedDate(key)} style={[styles.dayEvent, { backgroundColor: selected ? colors.bgCard : isDark ? '#214532' : '#eaf4ec' }]}>
+                        {visibleEvents.map((event) => <Pressable key={event.id_evento} accessibilityRole="button" accessibilityLabel={`${event.titulo}, ${displayDate(event.fecha_inicio)}`} onPress={() => { setSelectedDate(key); setSelection({ kind: 'event', id: event.id_evento }); }} style={[styles.dayEvent, { backgroundColor: selected ? colors.bgCard : isDark ? '#214532' : '#eaf4ec' }]}>
                           <Text numberOfLines={1} style={[styles.dayEventTitle, { color: colors.textMain }]}>{event.titulo}</Text>
                         </Pressable>)}
-                        {dayEvents.length > visibleEvents.length ? <Text style={[styles.dayEventMore, { color: selected ? colors.primary : colors.textMuted }]}>+{dayEvents.length - visibleEvents.length} más</Text> : null}
+                        {dayEvents.length > visibleEvents.length ? (
+                          <Pressable accessibilityRole="button" accessibilityLabel={`Ver todos los eventos del ${displayDate(key)}`} onPress={() => openDay(key, dayEvents)}>
+                            <Text style={[styles.dayEventMore, { color: selected ? colors.primary : colors.textMuted }]}>+{dayEvents.length - visibleEvents.length} más</Text>
+                          </Pressable>
+                        ) : null}
                       </View>;
                     })}
                   </View>
-                <View style={[styles.calendarDetails, { borderTopColor: colors.border }]}>
-                  <View style={styles.calendarDetailsHeader}>
-                    <View><Text style={[styles.sectionTitle, { color: colors.textMain }]}>Eventos del {displayDate(selectedDate)}</Text><Text style={[styles.sectionSubtitle, { color: colors.textMuted }]}>{monthEventCount} eventos en {monthLabel}</Text></View>
-                  </View>
-                  {selectedDayEvents.length ? selectedDayEvents.map((event) => <EventCard key={event.id_evento} event={event} />) : <Text style={[styles.calendarEmpty, { color: colors.textMuted }]}>No hay eventos para este día. Los días con eventos muestran sus nombres en el calendario.</Text>}
-                </View>
               </View>
-              {sourceGroups.length ? <View style={[styles.sourceStatus, { borderColor: colors.border, backgroundColor: colors.bgCard }]}>
-                <Text style={[styles.statusTitle, { color: colors.textMain }]}>Fuentes organizadas por especie</Text>
-                {sourceGroups.some((group) => group.enEspera) ? <Text style={[styles.statusDetail, { color: colors.textMuted }]}>Las especies en espera quedan ocultas de la agenda hasta que la estancia las incorpore.</Text> : null}
-                {sourceGroups.map((group) => <SourceGroup key={group.especie} title={displaySpecies(group.especie)} enEspera={group.enEspera} fuentes={group.fuentes} />)}
-              </View> : null}
             </>
           )}
         </View>
       </ScrollView>
       <ScrollToTop visible={showScrollTop} onPress={() => scrollToTop.current()} />
+
+      {/* El modal conserva el mes, los filtros y la posición del calendario al cerrarse. */}
+      <Modal animationType="fade" transparent visible={selection !== null} onRequestClose={() => setSelection(null)}>
+        <View style={styles.modalBackdrop}>
+          <Pressable accessible={false} importantForAccessibility="no" onPress={() => setSelection(null)} style={StyleSheet.absoluteFill} />
+          <View accessibilityViewIsModal style={[styles.eventModal, { backgroundColor: colors.bgCard }]}>
+            <View style={[styles.eventModalHeader, { borderBottomColor: colors.border }]}>
+              <Text accessibilityRole="header" style={[styles.eventModalHeading, { color: colors.textMain }]}>
+                {selection?.kind === 'day' ? `Eventos del ${displayDate(selection.date)}` : 'Detalle del evento'}
+              </Text>
+              <Pressable accessibilityRole="button" accessibilityLabel="Cerrar eventos" onPress={() => setSelection(null)} style={styles.eventModalClose}>
+                <Ionicons color={colors.textMain} name="close" size={24} />
+              </Pressable>
+            </View>
+            <ScrollView style={styles.eventModalScroll} contentContainerStyle={styles.eventModalContent} key={selection?.kind === 'event' ? selection.id : selection?.date}>
+              {selection?.kind === 'day' ? (
+                modalEvents.length ? modalEvents.map((event) => (
+                  <Pressable key={event.id_evento} accessibilityRole="button" onPress={() => setSelection({ kind: 'event', id: event.id_evento, fromDate: selection.date })} style={[styles.eventChoice, { borderColor: colors.border }]}>
+                    <Text style={[styles.eventChoiceTitle, { color: colors.textMain }]}>{event.titulo}</Text>
+                    <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+                  </Pressable>
+                )) : <Text style={[styles.eventCopy, { color: colors.textMuted }]}>Ya no hay eventos disponibles para este día.</Text>
+              ) : modalEvent ? <EventDetails key={modalEvent.id_evento} event={modalEvent} /> : (
+                <Text style={[styles.eventCopy, { color: colors.textMuted }]}>El evento ya no está disponible.</Text>
+              )}
+              {selection?.kind === 'event' && selection.fromDate ? (
+                <Pressable accessibilityRole="button" onPress={() => { if (selection.fromDate) setSelection({ kind: 'day', date: selection.fromDate }); }} style={styles.eventBack}>
+                  <Ionicons name="chevron-back" size={18} color={colors.primary} />
+                  <Text style={[styles.eventActionText, { color: colors.primary }]}>Volver a los eventos del día</Text>
+                </Pressable>
+              ) : null}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       <Modal animationType="fade" transparent visible={Boolean(filterKind)} onRequestClose={() => setFilterKind(null)}>
         <Pressable onPress={() => setFilterKind(null)} style={styles.modalBackdrop}>
@@ -237,31 +245,40 @@ function FilterButton({ label, active, onPress }: { label: string; active: boole
   return <Pressable accessibilityRole="button" onPress={onPress} style={[styles.filterButton, { backgroundColor: colors.bgCard, borderColor: active ? colors.primary : colors.border }]}><Text numberOfLines={1} style={[styles.filterText, { color: active ? colors.primary : colors.textSecondary }]}>{label}</Text><Ionicons color={active ? colors.primary : colors.textMuted} name="chevron-down" size={14} /></Pressable>;
 }
 
-// dibujo una tarjeta con la fuente original para conservar trazabilidad.
-function EventCard({ event }: { event: FieldEvent }) {
+// Conservo el enlace oficial dentro del detalle y aviso si no puede abrirse.
+function EventDetails({ event }: { event: FieldEvent }) {
   const { colors } = useTheme();
-  return <View style={[styles.eventCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-    <View style={styles.eventTop}><View style={[styles.eventIcon, { backgroundColor: '#fef3e7' }]}><Ionicons color="#b06d2c" name={event.tipo_evento === 'remate' ? 'pricetag-outline' : 'calendar-outline'} size={17} /></View><View style={{ flex: 1 }}><Pressable disabled={!event.url} accessibilityRole={event.url ? 'link' : undefined} onPress={() => event.url && void Linking.openURL(event.url).catch(() => undefined)}><Text style={[styles.eventTitle, { color: event.url ? colors.primary : colors.textMain }]}>{event.titulo}</Text></Pressable><Text style={[styles.eventMeta, { color: colors.textMuted }]}>{displayDate(event.fecha_inicio)}{event.fecha_fin && dateKey(event.fecha_fin) !== dateKey(event.fecha_inicio) ? ` al ${displayDate(event.fecha_fin)}` : ''}</Text></View></View>
-    <Text style={[styles.eventMeta, { color: colors.textSecondary }]}>{[displayTag(event.tipo_evento), displayTag(event.especie), displayTag(event.raza), event.localidad, event.provincia, event.ubicacion].filter(Boolean).join(' · ') || 'Evento ganadero'}</Text>
-    {event.descripcion ? <Text style={[styles.eventMeta, { color: colors.textSecondary }]}>{event.descripcion}</Text> : null}
-    {(event.organizador || event.fuente) ? <Text style={[styles.eventMeta, { color: colors.textMuted }]}>{event.organizador ? `Organiza: ${event.organizador}` : ''}{event.organizador && event.fuente ? ' · ' : ''}{event.fuente ? `Fuente: ${event.fuente}` : ''}</Text> : null}
-    {event.url ? <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(event.url!).catch(() => undefined)} style={styles.sourceLink}><Text style={[styles.source, { color: colors.primary }]}>Abrir evento y publicación oficial</Text><Ionicons color={colors.primary} name="open-outline" size={13} /></Pressable> : <Text style={[styles.eventMeta, { color: colors.textMuted }]}>La asociación no publicó un enlace directo para este evento.</Text>}
-  </View>;
-}
-
-function SourceGroup({ title, enEspera, fuentes }: { title: string; enEspera: boolean; fuentes: NonNullable<FieldEventsData['fuentes']> }) {
-  const { colors } = useTheme();
-  const [open, setOpen] = useState(!enEspera);
-  return <View style={[styles.sourceGroup, { borderColor: colors.border }]}>
-    <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((value) => !value)} style={styles.sourceGroupHeader}>
-      <View style={{ flex: 1 }}><Text style={[styles.sourceGroupTitle, { color: colors.textMain }]}>{title} · {enEspera ? 'En espera' : 'Activo'}</Text><Text style={[styles.statusDetail, { color: colors.textMuted }]}>{fuentes.length} fuente{fuentes.length === 1 ? '' : 's'}</Text></View>
-      <Ionicons color={colors.textMuted} name={open ? 'chevron-up' : 'chevron-down'} size={17} />
-    </Pressable>
-    {open ? fuentes.map((source) => <View key={source.nombre} style={styles.statusRow}>
-      <View style={{ flex: 1 }}><Text style={[styles.statusName, { color: colors.textSecondary }]}>{source.nombre}{source.raza ? ` · ${displayTag(source.raza)}` : ''}</Text><Text style={[styles.statusDetail, { color: colors.textMuted }]}>{source.consultada_en ? `Consultada ${displayDate(source.consultada_en)} · ${source.eventos_leidos ?? 0} eventos` : 'Pendiente de primera consulta'}{source.ultimo_error ? ` · ${source.ultimo_error}` : ''}</Text></View>
-      <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(source.url).catch(() => undefined)}><Ionicons color={colors.primary} name="open-outline" size={16} /></Pressable>
-    </View>) : null}
-  </View>;
+  const [linkError, setLinkError] = useState(false);
+  const endDate = event.fecha_fin && dateKey(event.fecha_fin) !== dateKey(event.fecha_inicio) ? event.fecha_fin : null;
+  const location = [...new Set([event.ubicacion, event.localidad, event.provincia].filter(Boolean))].join(' · ');
+  const category = [event.tipo_evento, event.especie, event.raza].map(displayTag).filter(Boolean).join(' · ');
+  const officialUrl = event.url && /^https?:\/\//i.test(event.url) ? event.url : null;
+  return (
+    <View style={styles.eventDetails}>
+      {category ? <Text style={[styles.eventCategory, { color: colors.primary }]}>{category}</Text> : null}
+      <Text accessibilityRole="header" style={[styles.eventTitle, { color: colors.textMain }]}>{event.titulo}</Text>
+      <View style={styles.eventInfoRow}>
+        <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+        <Text style={[styles.eventCopy, { color: colors.textMain }]}>{displayDate(event.fecha_inicio)}{endDate ? ` al ${displayDate(endDate)}` : ''}</Text>
+      </View>
+      {location ? (
+        <View style={styles.eventInfoRow}>
+          <Ionicons name="location-outline" size={20} color={colors.primary} />
+          <Text style={[styles.eventCopy, { color: colors.textMain }]}>{location}</Text>
+        </View>
+      ) : null}
+      {event.descripcion ? <Text style={[styles.eventCopy, { color: colors.textSecondary }]}>{event.descripcion}</Text> : null}
+      {event.organizador ? <Text style={[styles.eventCopy, { color: colors.textSecondary }]}>Organiza: {event.organizador}</Text> : null}
+      {event.fuente ? <Text style={[styles.eventCopy, { color: colors.textMuted }]}>Fuente: {event.fuente}</Text> : null}
+      {officialUrl ? (
+        <Pressable accessibilityRole="link" onPress={() => { setLinkError(false); void Linking.openURL(officialUrl).catch(() => setLinkError(true)); }} style={[styles.eventLink, { backgroundColor: colors.primary }]}>
+          <Text style={[styles.eventActionText, { color: '#fff' }]}>Abrir publicación oficial</Text>
+          <Ionicons name="open-outline" size={18} color="#fff" />
+        </Pressable>
+      ) : null}
+      {linkError ? <Text accessibilityRole="alert" style={styles.error}>No se pudo abrir la publicación oficial.</Text> : null}
+    </View>
+  );
 }
 
 // muestro cada opción con el estado seleccionado del filtro.
@@ -275,7 +292,24 @@ const styles = StyleSheet.create({
   heading: { fontSize: 27, fontWeight: '800', letterSpacing: -0.6 }, subtitle: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2, marginTop: 5 },
   filterRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 18 }, filterButton: { alignItems: 'center', borderRadius: 18, borderWidth: 1, flexDirection: 'row', gap: 5, maxWidth: 180, paddingHorizontal: 11, paddingVertical: 8 }, filterText: { fontSize: 12, fontWeight: '700' }, clearText: { fontSize: 12, fontWeight: '700', padding: 8 },
   scope: { alignItems: 'center', borderRadius: 12, borderWidth: 1, flexDirection: 'row', gap: 10, marginTop: 12, padding: 12 }, scopeText: { flex: 1, fontSize: 12, fontWeight: '700' }, toggle: { backgroundColor: '#9ca3af', borderRadius: 10, height: 20, justifyContent: 'center', padding: 2, width: 36 }, toggleDot: { backgroundColor: '#ffffff', borderRadius: 8, height: 16, width: 16 }, toggleDotOn: { alignSelf: 'flex-end' },
-  calendar: { borderRadius: 16, borderWidth: 1, marginTop: 16, padding: 12 }, monthHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }, monthActions: { alignItems: 'center', flexDirection: 'row' }, todayText: { fontSize: 12, fontWeight: '800', paddingHorizontal: 8 }, monthArrow: { alignItems: 'center', height: 36, justifyContent: 'center', width: 40 }, monthTitle: { fontSize: 16, fontWeight: '800', textTransform: 'capitalize' }, calendarGrid: { flexDirection: 'row', flexWrap: 'wrap', width: '100%' }, weekday: { alignItems: 'center', fontSize: 11, fontWeight: '800', paddingVertical: 8, textAlign: 'center', width: '14.285%', flexShrink: 0 }, dayCell: { borderRadius: 8, marginBottom: 2, minHeight: 82, padding: 2, width: '14.285%', flexShrink: 0 }, dayButton: { alignSelf: 'flex-start', minWidth: 24, padding: 3 }, dayNumber: { fontSize: 13, fontWeight: '700' }, dayEvent: { borderRadius: 4, marginTop: 2, paddingHorizontal: 2, paddingVertical: 2 }, dayEventTitle: { fontSize: 8, fontWeight: '700', lineHeight: 10 }, dayEventMore: { fontSize: 8, fontWeight: '700', marginTop: 2, textAlign: 'center' }, calendarDetails: { borderTopWidth: 1, marginTop: 12, paddingTop: 12 }, calendarDetailsHeader: { marginBottom: 10 }, calendarEmpty: { fontSize: 11, lineHeight: 16, paddingBottom: 4 }, sectionTitle: { fontSize: 17, fontWeight: '800', textTransform: 'capitalize' }, sectionSubtitle: { fontSize: 11, marginTop: 3 }, eventCard: { borderRadius: 14, borderWidth: 1, gap: 8, marginBottom: 10, padding: 14 }, eventTop: { alignItems: 'center', flexDirection: 'row', gap: 10 }, eventIcon: { alignItems: 'center', borderRadius: 10, height: 36, justifyContent: 'center', width: 36 }, eventTitle: { fontSize: 14, fontWeight: '800' }, eventMeta: { fontSize: 11, lineHeight: 16 }, source: { fontSize: 11, fontWeight: '700' }, sourceLink: { alignItems: 'center', flexDirection: 'row', gap: 4, alignSelf: 'flex-start' }, sourceStatus: { borderRadius: 14, borderWidth: 1, gap: 10, marginTop: 12, padding: 14 }, statusTitle: { fontSize: 13, fontWeight: '800' }, statusRow: { alignItems: 'center', flexDirection: 'row', gap: 10 }, statusName: { fontSize: 11, fontWeight: '700' }, statusDetail: { fontSize: 10, lineHeight: 15, marginTop: 2 }, sourceGroup: { borderTopWidth: 1, gap: 10, paddingTop: 10 }, sourceGroupHeader: { alignItems: 'center', flexDirection: 'row', gap: 10 }, sourceGroupTitle: { fontSize: 12, fontWeight: '800' },
-  emptyCard: { alignItems: 'center', borderRadius: 14, borderWidth: 1, gap: 8, padding: 22 }, emptyTitle: { fontSize: 14, fontWeight: '800', textAlign: 'center' }, emptyCopy: { fontSize: 12, lineHeight: 17, textAlign: 'center' }, error: { color: '#b42318', fontSize: 12, marginTop: 12 },
+  calendar: { borderRadius: 16, borderWidth: 1, marginTop: 16, padding: 12 }, monthHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }, monthActions: { alignItems: 'center', flexDirection: 'row' }, todayText: { fontSize: 12, fontWeight: '800', paddingHorizontal: 8 }, monthArrow: { alignItems: 'center', height: 36, justifyContent: 'center', width: 40 }, monthTitle: { fontSize: 16, fontWeight: '800', textTransform: 'capitalize' }, calendarGrid: { flexDirection: 'row', flexWrap: 'wrap', width: '100%' }, weekday: { alignItems: 'center', fontSize: 11, fontWeight: '800', paddingVertical: 8, textAlign: 'center', width: '14.285%', flexShrink: 0 }, dayCell: { borderRadius: 8, marginBottom: 2, minHeight: 82, padding: 2, width: '14.285%', flexShrink: 0 }, dayButton: { alignSelf: 'flex-start', minWidth: 24, padding: 3 }, dayNumber: { fontSize: 13, fontWeight: '700' }, dayEvent: { borderRadius: 4, marginTop: 2, paddingHorizontal: 2, paddingVertical: 2 }, dayEventTitle: { fontSize: 8, fontWeight: '700', lineHeight: 10 }, dayEventMore: { fontSize: 8, fontWeight: '700', marginTop: 2, textAlign: 'center' },
+  emptyCopy: { fontSize: 12, lineHeight: 17, textAlign: 'center' },
+  error: { color: '#b42318', fontSize: 12, marginTop: 12 },
+  eventModal: { borderRadius: 20, flexShrink: 1, maxHeight: '90%', maxWidth: 680, overflow: 'hidden', width: '100%' },
+  eventModalHeader: { alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth, flexDirection: 'row', gap: 12, paddingHorizontal: 18, paddingVertical: 8 },
+  eventModalHeading: { flex: 1, fontSize: 17, fontWeight: '800' },
+  eventModalClose: { alignItems: 'center', height: 44, justifyContent: 'center', width: 44 },
+  eventModalScroll: { flexGrow: 0, flexShrink: 1 },
+  eventModalContent: { gap: 12, padding: 18 },
+  eventChoice: { alignItems: 'center', borderRadius: 12, borderWidth: 1, flexDirection: 'row', gap: 12, minHeight: 48, padding: 12 },
+  eventChoiceTitle: { flex: 1, fontSize: 15, fontWeight: '700' },
+  eventDetails: { gap: 12 },
+  eventCategory: { fontSize: 12, fontWeight: '800' },
+  eventTitle: { fontSize: 25, fontWeight: '800' },
+  eventInfoRow: { alignItems: 'flex-start', flexDirection: 'row', gap: 8 },
+  eventCopy: { flexShrink: 1, fontSize: 14, lineHeight: 21 },
+  eventLink: { alignItems: 'center', alignSelf: 'flex-start', borderRadius: 12, flexDirection: 'row', gap: 8, minHeight: 44, paddingHorizontal: 12, paddingVertical: 8 },
+  eventBack: { alignItems: 'center', flexDirection: 'row', gap: 6, minHeight: 44 },
+  eventActionText: { flexShrink: 1, fontSize: 14, fontWeight: '700' },
   modalBackdrop: { alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.42)', flex: 1, justifyContent: 'center', padding: 20 }, modalCard: { borderRadius: 16, maxHeight: '70%', maxWidth: 480, padding: 18, width: '100%' }, modalTitle: { fontSize: 17, fontWeight: '800', marginBottom: 12 }, optionList: { maxHeight: 400 }, option: { alignItems: 'center', borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', minHeight: 44, paddingHorizontal: 10 }, optionText: { fontSize: 13, textTransform: 'capitalize' },
 });

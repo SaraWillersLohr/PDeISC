@@ -197,6 +197,7 @@ export default function LoginScreen() {
                   CONTRASEÑA
                 </Text>
                 <View
+                  {...{ dataSet: { focusField: 'container' } }}
                   style={[s.passwordWrap, desktop && s.desktopCompactInput]}
                 >
                   <TextInput

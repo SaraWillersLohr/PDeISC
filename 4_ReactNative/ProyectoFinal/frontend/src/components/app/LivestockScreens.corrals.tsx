@@ -1,5 +1,6 @@
 // consulto la ocupación y administración operativa de corrales.
 // muestro los inventarios de animales y corrales con datos del backend.
+import { FormDialog } from '../FormDialog';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -159,7 +160,7 @@ export function CorralsInventoryScreen() {
 
       <Modal animationType="fade" onRequestClose={() => setEditing(false)} transparent visible={editing !== false}>
         <View style={style.backdrop}>
-          <View style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[style.modalTitle, { color: colors.textMain }]}>{editing ? 'Editar corral' : 'Nuevo corral'}</Text>
             <Text style={[style.selectLabel, { color: colors.textMuted }]}>NOMBRE</Text>
             <TextInput
@@ -187,13 +188,13 @@ export function CorralsInventoryScreen() {
                 <Text style={style.confirmText}>{savingCorral ? 'Guardando…' : 'Guardar corral'}</Text>
               </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
 
       <Modal animationType="fade" onRequestClose={() => setDeleting(null)} transparent visible={Boolean(deleting)}>
         <View style={style.backdrop}>
-          <View style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[style.modalTitle, { color: colors.textMain }]}>Dar de baja {deleting?.nombre}</Text>
             <Text style={[style.detail, { color: colors.textSecondary }]}>
               {Number(deleting?.ocupacion ?? 0) > 0 ? `Primero trasladá los ${deleting?.ocupacion} animales asignados a otro corral antes de darlo de baja.` : 'El corral quedará inactivo y se conservará su historial productivo.'}
@@ -211,7 +212,7 @@ export function CorralsInventoryScreen() {
                 <Text style={style.confirmText}>{savingCorral ? 'Procesando…' : 'Confirmar baja'}</Text>
               </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
     </InventoryPage>

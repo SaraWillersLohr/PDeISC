@@ -1,5 +1,6 @@
 // registro servicios reproductivos, preñeces y nacimientos.
 // muestro operaciones de campo conectadas a las APIs productivas.
+import { FormDialog } from '../FormDialog';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -137,14 +138,14 @@ export function ReproductionScreen() {
         </>
       )}
       <Modal animationType="fade" onRequestClose={() => { if (!busy) setDeleteTarget(null); }} transparent visible={Boolean(deleteTarget)}>
-        <View style={s.overlay}><View style={[s.card, s.modalCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+        <View style={s.overlay}><FormDialog style={[s.card, s.modalCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <Text style={[s.cardTitle, { color: colors.textMain, fontSize: 17 }]}>¿Estás seguro de que querés borrar este registro?</Text>
           <Text style={[s.copy, { color: colors.textSecondary, marginTop: 8 }]}>{deleteTarget?.label}{'\n'}Este elemento se eliminará de forma permanente.{deleteTarget?.type === 'nacimiento' ? ' La ficha de la cría se conservará.' : ''}</Text>
-          <View style={[s.row, { justifyContent: 'flex-end', marginTop: 18 }]}>
+          <View style={[s.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
             <Pressable disabled={busy} onPress={() => setDeleteTarget(null)} style={[s.primary, { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1, marginTop: 0 }]}><Text style={[s.copy, { color: colors.textMuted }]}>No, cancelar</Text></Pressable>
             <Pressable disabled={busy} onPress={() => void removeRecord()} style={[s.primary, { backgroundColor: '#dc2626' }, busy && { opacity: 0.6 }]}><Text style={s.primaryText}>{busy ? 'Borrando…' : 'Sí, borrar'}</Text></Pressable>
           </View>
-        </View></View>
+        </FormDialog></View>
       </Modal>
     </Frame>
   );

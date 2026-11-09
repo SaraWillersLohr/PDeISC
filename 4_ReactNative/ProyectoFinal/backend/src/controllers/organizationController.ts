@@ -4,8 +4,10 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
 
 // devuelvo miembros con su rol actual para el dueño y el gestor de usuarios.
-export async function listUsers(_req: Request, res: Response): Promise<void> {
-  try { const [data] = await database.execute<RowDataPacket[]>(`SELECT u.id_usuario,u.nombre,u.apellido,u.email,u.activo,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol ORDER BY u.activo DESC,u.apellido`); res.json({ data }); }
+export async function listUsers(req: Request, res: Response): Promise<void> {
+  // La vista de equipo pide las fotos; los selectores de responsables solo necesitan los nombres.
+  const photoColumn = req.query.fotos === '1' ? ',u.foto_perfil' : '';
+  try { const [data] = await database.execute<RowDataPacket[]>(`SELECT u.id_usuario,u.nombre,u.apellido,u.email,u.activo,r.nombre AS rol${photoColumn} FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol ORDER BY u.activo DESC,u.apellido`); res.json({ data }); }
   catch { res.status(500).json({ message: 'no se pudo cargar el equipo' }); }
 }
 

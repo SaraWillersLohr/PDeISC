@@ -1,13 +1,14 @@
 // administro las cuentas y los accesos del equipo.
 // hago operativas la consulta del equipo y la aprobación del catálogo.
+import { FormDialog } from '../FormDialog';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Modal, Platform, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { deactivateOrganizationUser, listOrganizationUsers, updateOrganizationUser, type OrganizationUser } from '../../services/organizationApi';
+import { ProfileAvatar } from './ProfileAvatar';
 import { roleLabel } from './Screens.shared';
 import { Screen } from './OrganizationScreens.shared';
 import { st } from './OrganizationStyles';
@@ -35,7 +36,7 @@ export function TeamScreen() {
   const load = useCallback(async () => {
     if (!session) return;
     try {
-      setUsers(await listOrganizationUsers(session));
+      setUsers(await listOrganizationUsers(session, true));
       setError('');
     } catch (e) {
       setError(friendlyErrorMessage(e, 'No se pudo cargar el equipo.'));
@@ -47,7 +48,8 @@ export function TeamScreen() {
   useEffect(() => {
     if (!session) return;
     let active = true;
-    listOrganizationUsers(session)
+    // Al guardar un perfil, la actualización del servidor vuelve a cargar la foto del equipo.
+    listOrganizationUsers(session, true)
       .then((result) => { if (active) { setUsers(result); setError(''); } })
       .catch((e: unknown) => { if (active) setError(friendlyErrorMessage(e, 'No se pudo cargar el equipo.')); })
       .finally(() => { if (active) setLoading(false); });
@@ -104,36 +106,35 @@ export function TeamScreen() {
               ]}
             >
               <View style={st.row}>
-                <View style={[st.avatarBadge, { backgroundColor: isDark ? 'rgba(134,239,172,0.15)' : '#e8f5ed' }]}>
-                  <Ionicons color={isDark ? '#86efac' : '#2d6a4f'} name="person" size={18} />
-                </View>
-                <View style={{ flex: 1 }}>
+                <ProfileAvatar photo={user.foto_perfil} name={user.nombre} surname={user.apellido} size={44} />
+                <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={[st.title, { color: colors.textMain }]}>{user.nombre} {user.apellido}</Text>
                   <Text style={[st.copy, { color: colors.textMuted }]}>{user.email}</Text>
-                </View>
-                <View
-                  style={[
-                    st.roleBadge,
-                    {
-                      backgroundColor: user.activo
-                        ? isDark ? 'rgba(134,239,172,0.15)' : '#eaf4ec'
-                        : isDark ? 'rgba(239,68,68,0.15)' : '#fee2e2',
-                    },
-                  ]}
-                >
-                  <Text
+                  <View
                     style={[
-                      st.roleBadgeText,
-                      { color: user.activo ? (isDark ? '#86efac' : '#2d6a4f') : '#dc2626' },
+                      st.roleBadge,
+                      { alignSelf: 'flex-start', marginTop: 6 },
+                      {
+                        backgroundColor: user.activo
+                          ? isDark ? 'rgba(134,239,172,0.15)' : '#eaf4ec'
+                          : isDark ? 'rgba(239,68,68,0.15)' : '#fee2e2',
+                      },
                     ]}
                   >
-                    {user.activo ? roleLabel[user.rol] ?? user.rol : 'Inactivo'}
-                  </Text>
+                    <Text
+                      style={[
+                        st.roleBadgeText,
+                        { color: user.activo ? (isDark ? '#86efac' : '#2d6a4f') : '#dc2626' },
+                      ]}
+                    >
+                      {user.activo ? roleLabel[user.rol] ?? user.rol : 'Inactivo'}
+                    </Text>
+                  </View>
                 </View>
               </View>
 
               {Boolean(user.activo) && user.rol !== 'dueno' && (owner || editableRoles.includes(user.rol)) ? (
-                <View style={[st.row, { justifyContent: 'flex-end', marginTop: 14 }]}>
+                <View style={[st.rowWrap, { justifyContent: 'flex-end', marginTop: 14 }]}>
                   <Pressable
                     onPress={() => {
                       setSelected(user);
@@ -160,7 +161,7 @@ export function TeamScreen() {
       {/* Edit User Modal */}
       <Modal transparent visible={Boolean(selected)} onRequestClose={() => setSelected(null)}>
         <View style={st.overlay}>
-          <View style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>Editar usuario</Text>
             <TextInput
               accessibilityLabel="Nombre"
@@ -198,7 +199,7 @@ export function TeamScreen() {
                 </Pressable>
               ))}
             </View>
-            <View style={[st.row, { justifyContent: 'flex-end', marginTop: 18 }]}>
+            <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
               <Pressable
                 disabled={busy}
                 onPress={() => void saveUser()}
@@ -210,14 +211,14 @@ export function TeamScreen() {
                 <Text style={[st.secondaryText, { color: colors.textMuted }]}>Cancelar</Text>
               </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
 
       {/* Delete User Modal */}
       <Modal transparent visible={Boolean(confirmDelete)} onRequestClose={() => { setConfirmDelete(null); setReassignmentId(null); }}>
         <View style={st.overlay}>
-          <View style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>Dar de baja usuario</Text>
             <Text style={[st.copy, { color: colors.textSecondary, marginTop: 8 }]}>
               Se bloqueará el acceso de {confirmDelete?.nombre} {confirmDelete?.apellido} y se conservará toda la trazabilidad histórica de sus registros.
@@ -231,7 +232,7 @@ export function TeamScreen() {
               ))}
             </View>
             {reassignmentId !== null ? <Pressable onPress={() => setReassignmentId(null)}><Text style={[st.copy, { color: colors.primary, marginTop: 8 }]}>Quitar responsable seleccionado</Text></Pressable> : null}
-            <View style={[st.row, { justifyContent: 'flex-end', marginTop: 18 }]}>
+            <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
               <Pressable onPress={() => { setConfirmDelete(null); setReassignmentId(null); }} style={[st.secondary, { borderColor: colors.border }]}>
                 <Text style={[st.secondaryText, { color: colors.textMuted }]}>Cancelar</Text>
               </Pressable>
@@ -243,7 +244,7 @@ export function TeamScreen() {
                 <Text style={[st.dangerText, { color: '#ffffff' }]}>{busy ? 'Procesando…' : 'Confirmar baja'}</Text>
               </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
     </Screen>

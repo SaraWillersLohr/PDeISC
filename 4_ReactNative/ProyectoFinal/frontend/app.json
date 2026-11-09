@@ -43,6 +43,7 @@
         "expo-image-picker",
         {
           "photosPermission": "EstanciaApp necesita acceder a tus fotos para elegir una imagen de perfil.",
+          "cameraPermission": "EstanciaApp necesita usar la cámara para tomar tu foto de perfil.",
           "microphonePermission": false
         }
       ],

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SessionProvider } from '../context/SessionContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import '../styles/fieldFocus.css';
 
 export const unstable_settings = { anchor: 'index' };
 

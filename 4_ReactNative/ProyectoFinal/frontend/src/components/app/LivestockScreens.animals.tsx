@@ -1,3 +1,4 @@
+import { FormDialog } from '../FormDialog';
 import { AppSectionIcon } from './AppSectionIcon';
 import { animalBirthError } from '../../services/formValidation';
 import { DateField } from './DateField';
@@ -255,7 +256,7 @@ export function AnimalsInventoryScreen() {
       {/* Edit Modal */}
       <Modal animationType="fade" onRequestClose={() => setEditing(null)} transparent visible={Boolean(editing)}>
         <View style={style.backdrop}>
-          <View style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[style.modalTitle, { color: colors.textMain }]}>Editar ficha del animal</Text>
             <TextInput
               accessibilityLabel="Nombre"
@@ -275,9 +276,11 @@ export function AnimalsInventoryScreen() {
             />
             <DateField
               accessibilityLabel="Fecha de nacimiento"
+              maximumDate={new Date()}
               onChangeText={setEditBirth}
-              placeholder="AAAA-MM-DD"
+              placeholder="Fecha de nacimiento"
               placeholderTextColor={colors.textMuted}
+              showCalendarIcon
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={editBirth}
             />
@@ -290,23 +293,23 @@ export function AnimalsInventoryScreen() {
             </View>
             {editError ? <Text style={style.errorText}>{editError}</Text> : null}
             <View style={style.modalActions}>
-              <Pressable onPress={() => setEditing(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
-                <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
-              </Pressable>
               <Pressable onPress={() => void persistAnimal()} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
                 <Text style={style.confirmText}>Guardar cambios</Text>
               </Pressable>
+              <Pressable onPress={() => setEditing(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
+                <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
+              </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
 
       {/* View Details Modal */}
       <Modal animationType="fade" onRequestClose={() => { setViewing(null); setRegisteringMating(false); setRegisteringBirth(false); setDeactivating(false); setReportingIllness(false); }} transparent visible={Boolean(viewing)}>
         <View style={style.backdrop}>
-          <View style={[style.modal, style.animalDetailModal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog key={reportingIllness ? "illness" : deactivating ? "deactivation" : registeringMating ? "mating" : registeringBirth ? "birth" : "details"} style={[style.modal, style.animalDetailModal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             {reportingIllness && viewing?.activo ? (
-              <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
+              <>
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>Reportar enfermedad</Text>
                 <Text style={[style.detail, { color: colors.textSecondary, marginBottom: 12 }]}>{viewing.nombre || viewing.identificador} · se registrará el problema y el traslado físico a enfermería.</Text>
                 <Text style={[style.selectLabel, { color: colors.textMuted }]}>CORRAL DE ENFERMERÍA</Text>
@@ -317,12 +320,12 @@ export function AnimalsInventoryScreen() {
                 <TextInput accessibilityLabel="Observaciones de enfermedad" maxLength={500} multiline onChangeText={setIllnessNotes} placeholder="Síntomas u observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={illnessNotes} />
                 {illnessError ? <Text style={style.errorText}>{illnessError}</Text> : null}
                 <View style={style.modalActions}>
-                  <Pressable disabled={illnessSaving} onPress={() => setReportingIllness(false)} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver</Text></Pressable>
                   <Pressable disabled={illnessSaving || !illnessCorralId} onPress={() => void submitIllnessReport()} style={[style.confirmButton, { backgroundColor: colors.primary }, (illnessSaving || !illnessCorralId) && style.disabledButton]}><Text style={style.confirmText}>{illnessSaving ? 'Guardando…' : 'Reportar e ingresar'}</Text></Pressable>
+                  <Pressable disabled={illnessSaving} onPress={() => setReportingIllness(false)} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver</Text></Pressable>
                 </View>
-              </ScrollView>
+              </>
             ) : deactivating && viewing?.activo ? (
-              <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
+              <>
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>{deactivationReason === 'muerte' ? `Notificar muerte · ${viewing.nombre || viewing.identificador}` : `Dar de baja ${viewing.nombre || viewing.identificador}`}</Text>
                 <Text style={[style.detail, { color: colors.textSecondary, marginBottom: 12 }]}>{deactivationReason === 'muerte' ? ownerCanDeactivate ? 'La muerte quedará registrada y la ficha se conservará.' : 'La muerte quedará notificada para revisión administrativa y la ficha se conservará.' : 'El animal dejará de aparecer en el inventario activo. Su ficha y su historial se conservarán.'}</Text>
                 {ownerCanDeactivate && deactivationReason !== 'muerte' ? <><Text style={[style.selectLabel, { color: colors.textMuted }]}>MOTIVO</Text><View style={style.genderOptions}>{(['venta', 'otro'] as const).map((reason) => <Pressable key={reason} accessibilityRole="radio" accessibilityState={{ selected: deactivationReason === reason }} onPress={() => setDeactivationReason(reason)} style={[style.genderOption, { backgroundColor: deactivationReason === reason ? colors.primary : colors.bgCardMuted, borderColor: deactivationReason === reason ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: deactivationReason === reason ? '#fff' : colors.textSecondary }]}>{reason === 'otro' ? 'Otro' : 'Venta'}</Text></Pressable>)}</View></> : <Text style={[style.selectLabel, { color: colors.textMuted }]}>NOTIFICACIÓN DE MUERTE</Text>}
@@ -336,23 +339,21 @@ export function AnimalsInventoryScreen() {
                 </> : null}
                 {deactivationError ? <Text style={style.errorText}>{deactivationError}</Text> : null}
                 <View style={style.modalActions}>
-                  <Pressable disabled={deactivatingBusy} onPress={() => setDeactivating(false)} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver</Text></Pressable>
                   <Pressable disabled={deactivatingBusy} onPress={() => void confirmDeactivation()} style={[style.confirmButton, { backgroundColor: '#dc2626' }, deactivatingBusy && style.disabledButton]}><Text style={style.confirmText}>{deactivatingBusy ? 'Guardando…' : deactivationReason === 'muerte' ? ownerCanDeactivate ? 'Confirmar muerte' : 'Notificar muerte' : 'Confirmar baja'}</Text></Pressable>
+                  <Pressable disabled={deactivatingBusy} onPress={() => setDeactivating(false)} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver</Text></Pressable>
                 </View>
-              </ScrollView>
+              </>
             ) : registeringMating && viewing?.activo ? (
-              <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
                 <MatingServiceForm
                   animals={rows}
                   mother={viewing}
                   onBack={() => setRegisteringMating(false)}
-                  onCancel={() => { setViewing(null); setRegisteringMating(false); }}
                   onSaved={() => { setServiceNotice('Servicio reproductivo registrado.'); setViewing(null); setRegisteringMating(false); }}
                 />
-              </ScrollView>
             ) : registeringBirth && viewing?.activo ? (
-              <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: '82%' }}>
+              <>
                 <BirthForm
+                  embedded
                   initialMother={openedAnimal ?? undefined}
                   onSaved={() => { setServiceNotice('Nacimiento registrado.'); setViewing(null); setRegisteringBirth(false); }}
                 />
@@ -360,17 +361,11 @@ export function AnimalsInventoryScreen() {
                   <Pressable onPress={() => setRegisteringBirth(false)} style={[style.matingActionButton, { borderColor: colors.border }]}>
                     <Text style={[style.cancelText, { color: colors.textMuted }]}>Volver a ficha</Text>
                   </Pressable>
-                  <Pressable onPress={() => { setViewing(null); setRegisteringBirth(false); }} style={[style.matingActionButton, { borderColor: colors.border }]}>
-                    <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
-                  </Pressable>
                 </View>
-              </ScrollView>
+              </>
             ) : (
-              <ScrollView
-                contentContainerStyle={style.animalDetailContent}
-                showsVerticalScrollIndicator
-                style={style.animalDetailScroll}
-              >
+
+              <>
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>{viewing?.nombre || 'Ficha del animal'}</Text>
                 <Text style={[style.detail, { color: colors.textMuted }]}>Identificador · {viewing?.identificador}</Text>
                 <View style={[style.divider, { backgroundColor: colors.borderLight }]} />
@@ -420,20 +415,27 @@ export function AnimalsInventoryScreen() {
                   </View>
                 ) : null}
                 <View style={style.modalActions}>
-                  <Pressable onPress={() => setViewing(null)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
+                  <Pressable
+                disabled={!destination || saving}
+                onPress={() => void saveMovement()}
+                style={[style.confirmButton, { backgroundColor: colors.primary }, (!destination || saving) && style.disabledButton]}
+              >
+                <Text style={style.confirmText}>{saving ? 'Guardando…' : 'Confirmar traslado'}</Text>
+              </Pressable>
+              <Pressable onPress={() => setViewing(null)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
                     <Text style={style.confirmText}>Cerrar ficha</Text>
                   </Pressable>
                 </View>
-              </ScrollView>
+              </>
             )}
-          </View>
+          </FormDialog>
         </View>
       </Modal>
 
       {/* Move Animal Modal */}
       <Modal animationType="fade" onRequestClose={() => setMoving(null)} transparent visible={Boolean(moving)}>
         <View style={style.backdrop}>
-          <View style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[style.modalTitle, { color: colors.textMain }]}>Mover animal</Text>
             <Text style={[style.detail, { color: colors.textMuted }]}>
               {moving?.nombre || moving?.identificador} · ubicación actual: {moving?.corral}
@@ -444,42 +446,33 @@ export function AnimalsInventoryScreen() {
               </View>
             ) : null}
             <Text style={[style.selectLabel, { color: colors.textMuted }]}>SELECCIONÁ EL CORRAL DE DESTINO</Text>
-            <ScrollView style={{ maxHeight: 220 }}>
               {corrals
-                .filter((corral) => corral.id_corral !== moving?.id_corral && Number(corral.ocupacion) < Number(corral.capacidad))
-                .map((corral) => (
-                  <Pressable
-                    key={corral.id_corral}
-                    onPress={() => setDestination(corral.id_corral)}
-                    style={[
-                      style.destination,
-                      { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#f8faf7', borderColor: colors.borderLight },
-                      destination === corral.id_corral && { backgroundColor: colors.primary, borderColor: colors.primary },
-                    ]}
-                  >
-                    <Text style={[style.destinationText, { color: colors.textMain }, destination === corral.id_corral && { color: '#ffffff' }]}>
-                      {corral.nombre}
-                    </Text>
-                    <Text style={[style.detail, { color: colors.textMuted }, destination === corral.id_corral && { color: 'rgba(255,255,255,0.85)' }]}>
-                      {corral.ocupacion}/{corral.capacidad} animales · {corral.es_enfermeria ? 'Enfermería' : 'General'}
-                    </Text>
-                  </Pressable>
-                ))}
-            </ScrollView>
+              .filter((corral) => corral.id_corral !== moving?.id_corral && Number(corral.ocupacion) < Number(corral.capacidad))
+              .map((corral) => (
+                <Pressable
+                  key={corral.id_corral}
+                  onPress={() => setDestination(corral.id_corral)}
+                  style={[
+                    style.destination,
+                    { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#f8faf7', borderColor: colors.borderLight },
+                    destination === corral.id_corral && { backgroundColor: colors.primary, borderColor: colors.primary },
+                  ]}
+                >
+                  <Text style={[style.destinationText, { color: colors.textMain }, destination === corral.id_corral && { color: '#ffffff' }]}>
+                    {corral.nombre}
+                  </Text>
+                  <Text style={[style.detail, { color: colors.textMuted }, destination === corral.id_corral && { color: 'rgba(255,255,255,0.85)' }]}>
+                    {corral.ocupacion}/{corral.capacidad} animales · {corral.es_enfermeria ? 'Enfermería' : 'General'}
+                  </Text>
+                </Pressable>
+              ))}
             {moveError ? <Text style={style.errorText}>{moveError}</Text> : null}
             <View style={style.modalActions}>
               <Pressable onPress={() => setMoving(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
                 <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
               </Pressable>
-              <Pressable
-                disabled={!destination || saving}
-                onPress={() => void saveMovement()}
-                style={[style.confirmButton, { backgroundColor: colors.primary }, (!destination || saving) && style.disabledButton]}
-              >
-                <Text style={style.confirmText}>{saving ? 'Guardando…' : 'Confirmar traslado'}</Text>
-              </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
 

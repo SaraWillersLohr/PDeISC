@@ -8,7 +8,7 @@ const codeTtlMinutes = 10;
 const resendCooldownSeconds = 60;
 const maxDailyEmails = 5;
 export const maxCodeAttempts = 5;
-const allowedRoles = ['dueno', 'peon', 'veterinario'] as const;
+const allowedRoles = ['peon', 'veterinario', 'gestor_usuarios'] as const;
 export type RequestedRole = (typeof allowedRoles)[number];
 
 // detengo los flujos de correo si falta configuración segura.

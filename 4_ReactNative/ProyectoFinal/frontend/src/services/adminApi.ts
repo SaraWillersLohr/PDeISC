@@ -2,7 +2,7 @@
 import { apiUrl } from '../config/api';
 import { apiConfigurationMessage, apiFetch, friendlyApiMessage } from './apiErrors';
 
-export type RequestedRole = 'dueno' | 'peon' | 'veterinario';
+export type RequestedRole = 'peon' | 'veterinario' | 'gestor_usuarios';
 export interface RegistrationRequest {
   id_solicitud: number;
   nombre: string;

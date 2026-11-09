@@ -1,6 +1,7 @@
 // respondo consultas y decisiones administrativas sobre solicitudes de acceso.
 import type { Request, Response } from 'express';
 import { approveRegistrationRequest, listPendingRegistrationRequests, rejectRegistrationRequest, type RequestedRole } from '../services/registrationService.js';
+import { isRequestedRole } from '../services/registrationCodeService.js';
 
 // listo las solicitudes cuyo correo ya fue verificado.
 export async function listRequests(_req: Request, res: Response): Promise<void> {
@@ -12,13 +13,18 @@ export async function listRequests(_req: Request, res: Response): Promise<void> 
   }
 }
 
-// apruebo una solicitud con el rol elegido por el administrador.
+// El dueño puede designar varios gestores, tanto al aprobar como al editar una cuenta.
 export async function approveRequest(req: Request, res: Response): Promise<void> {
   const requestId = Number(req.params.id);
   const adminId = req.usuario?.id_usuario;
   const { rol } = req.body as { rol?: RequestedRole };
-  if (!Number.isInteger(requestId) || requestId < 1 || !adminId || !rol || rol === 'dueno') {
+  if (!Number.isInteger(requestId) || requestId < 1 || !adminId || !rol || !isRequestedRole(rol)) {
     res.status(400).json({ message: 'seleccioná la solicitud y un rol válido' });
+    return;
+  }
+  // Verifico el permiso en el servidor aunque se intente enviar el rol manualmente.
+  if (rol === 'gestor_usuarios' && req.rolVigente !== 'dueno') {
+    res.status(403).json({ message: 'Solo el dueño puede designar gestores de usuarios.' });
     return;
   }
   try {

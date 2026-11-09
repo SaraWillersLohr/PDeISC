@@ -5,9 +5,6 @@ const part = StyleSheet.create({
   animalDetailModal: {
       maxWidth: 620,
     },
-  animalDetailContent: {
-      paddingBottom: 2,
-    },
   modalTitle: {
       fontSize: 18,
       fontWeight: '800',

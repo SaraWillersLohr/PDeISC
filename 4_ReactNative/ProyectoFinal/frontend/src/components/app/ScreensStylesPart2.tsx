@@ -60,6 +60,7 @@ const part = StyleSheet.create({
     },
   profileColumn: {
       flex: 1,
+      minWidth: 0,
     },
   profileCard: {
       borderRadius: 18,
@@ -73,22 +74,6 @@ const part = StyleSheet.create({
       gap: 14,
       marginVertical: 14,
     },
-  photo: {
-      borderRadius: 36,
-      height: 72,
-      width: 72,
-    },
-  photoFallback: {
-      alignItems: 'center',
-      borderRadius: 36,
-      height: 72,
-      justifyContent: 'center',
-      width: 72,
-    },
-  photoInitials: {
-      fontSize: 22,
-      fontWeight: '900',
-    },
   profileFullName: {
       fontSize: 17,
       fontWeight: '800',
@@ -100,22 +85,19 @@ const part = StyleSheet.create({
   photoActions: {
       alignItems: 'center',
       flexDirection: 'row',
-      gap: 12,
-      marginTop: 8,
+      flexWrap: 'wrap',
+      gap: 8,
     },
   smallBtn: {
       borderRadius: 8,
+      justifyContent: 'center',
+      minHeight: 44,
       paddingHorizontal: 12,
       paddingVertical: 7,
     },
   smallBtnText: {
       fontSize: 11,
       fontWeight: '800',
-    },
-  removePhoto: {
-      color: '#dc2626',
-      fontSize: 11,
-      fontWeight: '700',
     },
   formLabel: {
       fontSize: 9,

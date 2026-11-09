@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { Pressable, TextInput, View, Text, Platform, type TextInputProps } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
+import { formatLocalDate } from '../../services/formValidation';
 
-export function DateField({ showCalendarIcon, ...props }: TextInputProps & { showCalendarIcon?: boolean }) {
+export function DateField({ showCalendarIcon, maximumDate, ...props }: TextInputProps & { showCalendarIcon?: boolean; maximumDate?: Date }) {
   const [open, setOpen] = useState(false);
   const parsed = new Date(`${props.value || ''}T12:00:00`);
+  const pickerValue = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
   const iconColor = typeof props.placeholderTextColor === 'string' ? props.placeholderTextColor : '#214d35';
   return <View><Pressable accessibilityRole="button" accessibilityLabel={props.accessibilityLabel || props.placeholder || 'Elegir fecha'} disabled={props.editable === false} onPress={() => setOpen(true)}>
     <TextInput {...props} editable={false} pointerEvents="none" style={[props.style, showCalendarIcon && { paddingRight: 40 }]} />
@@ -16,6 +18,6 @@ export function DateField({ showCalendarIcon, ...props }: TextInputProps & { sho
       </View>
     ) : null}
   </Pressable>
-    {open && <><DateTimePicker value={Number.isNaN(parsed.getTime()) ? new Date() : parsed} mode="date" onChange={(_, date) => { if (Platform.OS === 'android') setOpen(false); if (date) props.onChangeText?.(`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`); }} /><Pressable onPress={() => setOpen(false)}><Text>Cerrar calendario</Text></Pressable></>}
+    {open && <><DateTimePicker value={maximumDate && pickerValue > maximumDate ? maximumDate : pickerValue} maximumDate={maximumDate} mode="date" onChange={(_, date) => { if (Platform.OS === 'android') setOpen(false); if (date) props.onChangeText?.(formatLocalDate(date)); }} /><Pressable onPress={() => setOpen(false)}><Text>Cerrar calendario</Text></Pressable></>}
   </View>;
 }

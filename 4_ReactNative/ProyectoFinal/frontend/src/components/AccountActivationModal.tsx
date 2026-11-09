@@ -1,4 +1,5 @@
 // activo una cuenta aprobada desde una ventana compacta sobre el ingreso.
+import { FormDialog } from './FormDialog';
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
 import { router } from 'expo-router';
@@ -42,7 +43,7 @@ export function AccountActivationModal({ visible, onClose }: Props) {
   return <Modal animationType="fade" onRequestClose={onClose} statusBarTranslucent transparent visible={visible}>
     <View style={s.backdrop}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
-        <View accessibilityViewIsModal style={s.dialog}>
+        <FormDialog style={s.dialog}>
           <View style={s.header}>
             <View style={s.heading}><Text style={s.eyebrow}>ESTANCIAAPP</Text><Text style={s.title}>Activá tu acceso</Text></View>
             <Pressable accessibilityLabel="Cerrar activación de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
@@ -55,7 +56,7 @@ export function AccountActivationModal({ visible, onClose }: Props) {
           {notice ? <Text style={s.notice}>{notice}</Text> : null}{error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Activar e ingresar</Text>}</Pressable>
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => void resend()} style={s.link}><Text style={s.linkText}>Reenviar código de acceso</Text></Pressable>
-        </View>
+        </FormDialog>
       </KeyboardAvoidingView>
     </View>
   </Modal>;
@@ -63,7 +64,7 @@ export function AccountActivationModal({ visible, onClose }: Props) {
 
 const s = StyleSheet.create({
   backdrop: { alignItems: 'center', backgroundColor: 'rgba(14,27,18,0.62)', flex: 1, justifyContent: 'center', padding: 16 },
-  keyboard: { alignItems: 'center', justifyContent: 'center', width: '100%' },
+  keyboard: { alignItems: 'center', flex: 1, minHeight: 0, justifyContent: 'center', width: '100%' },
   dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, maxWidth: 480, padding: 22, width: '100%' },
   header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
   heading: { flex: 1 },

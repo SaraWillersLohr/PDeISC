@@ -1,5 +1,6 @@
 // consulto y gestiono especies, razas y propuestas del catálogo.
 // hago operativas la consulta del equipo y la aprobación del catálogo.
+import { FormDialog } from '../FormDialog';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -247,7 +248,7 @@ export function CatalogScreen() {
       {/* Add Species/Breed Modal */}
       <Modal animationType="fade" onRequestClose={() => setModalOpen(false)} transparent visible={modalOpen}>
         <View style={st.overlay}>
-          <View style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>
               {canCreate ? (kind === 'especie' ? 'Agregar especie' : 'Agregar raza') : (kind === 'especie' ? 'Proponer especie' : 'Proponer raza')}
             </Text>
@@ -295,7 +296,7 @@ export function CatalogScreen() {
 
             {error ? <Text accessibilityRole="alert" style={st.error}>{error}</Text> : null}
 
-            <View style={[st.row, { justifyContent: 'flex-end', marginTop: 18 }]}>
+            <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
               <Pressable disabled={busy} onPress={() => setModalOpen(false)} style={[st.secondary, { borderColor: colors.border }]}>
                 <Text style={[st.secondaryText, { color: colors.textMuted }]}>Cancelar</Text>
               </Pressable>
@@ -308,20 +309,20 @@ export function CatalogScreen() {
                 <Text style={st.primaryText}>{busy ? 'Guardando…' : canCreate ? 'Guardar' : 'Enviar solicitud'}</Text>
               </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
 
       <Modal animationType="fade" onRequestClose={() => { if (!busy) setDeleteTarget(null); }} transparent visible={Boolean(deleteTarget)}>
-        <View style={st.overlay}><View style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+        <View style={st.overlay}><FormDialog style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>¿Estás seguro de que querés borrar {deleteTarget?.type === 'especie' ? 'esta especie' : 'esta raza'}?</Text>
           <Text style={[st.copy, { color: colors.textSecondary, marginTop: 8 }]}>Este elemento se eliminará de forma permanente. {deleteTarget?.type === 'especie' ? 'También se borrarán sus razas si no tienen animales asociados.' : ''}</Text>
           {error ? <Text accessibilityRole="alert" style={st.error}>{error}</Text> : null}
-          <View style={[st.row, { justifyContent: 'flex-end', marginTop: 18 }]}>
+          <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
             <Pressable disabled={busy} onPress={() => { setDeleteTarget(null); setError(''); }} style={[st.secondary, { borderColor: colors.border }]}><Text style={[st.secondaryText, { color: colors.textMuted }]}>No, cancelar</Text></Pressable>
             <Pressable disabled={busy} onPress={() => void removeCatalogItem()} style={[st.danger, busy && { opacity: 0.6 }]}><Text style={st.dangerText}>{busy ? 'Borrando…' : 'Sí, borrar'}</Text></Pressable>
           </View>
-        </View></View>
+        </FormDialog></View>
       </Modal>
     </Screen>
   );

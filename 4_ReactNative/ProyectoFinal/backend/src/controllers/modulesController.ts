@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
 import { validDateOnly } from '../utils/dateOnly.js';
+import { validBirthDate } from './livestockController.shared.js';
 import { publishLiveChange } from '../services/liveChanges.js';
 
 const animalGenders = ['hembra', 'macho', 'no_especificado'] as const;
@@ -223,7 +224,8 @@ export async function createBirth(req: Request, res: Response): Promise<void> {
   const photo = photoValue == null || photoValue === '' ? null : typeof photoValue === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photoValue) && Buffer.byteLength(photoValue, 'utf8') <= 1_500_000 ? photoValue : false;
   if (photo === false) { res.status(400).json({ message: 'la foto debe ser JPG, PNG o WebP y no superar 1,5 MB' }); return; }
   if (!isAnimalGender(gender)) { res.status(400).json({ message: 'elegí un género válido para la cría' }); return; }
-  if (!userId || !identifier || identifier.length > 50 || !Number.isInteger(breedId) || !Number.isInteger(corralId) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || (!motherId && !motherText) || (!fatherId && !fatherText) || (motherId && !Number.isInteger(motherId)) || (fatherId && !Number.isInteger(fatherId))) {
+  if (!validBirthDate(date)) { res.status(400).json({ message: 'Elegí una fecha de nacimiento válida, de hoy o anterior.' }); return; }
+  if (!userId || !identifier || identifier.length > 50 || !Number.isInteger(breedId) || !Number.isInteger(corralId) || (!motherId && !motherText) || (!fatherId && !fatherText) || (motherId && !Number.isInteger(motherId)) || (fatherId && !Number.isInteger(fatherId))) {
     res.status(400).json({ message: 'completá identificador, raza, corral, fecha y ambos progenitores (animal o nombre)' }); return;
   }
   const connection = await database.getConnection();

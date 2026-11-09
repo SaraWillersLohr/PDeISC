@@ -1,3 +1,4 @@
+import { FormDialog } from '../FormDialog';
 import { AppSectionIcon } from './AppSectionIcon';
 // resuelvo módulos secundarios y solicitudes administrativas.
 // presento los resúmenes y accesos principales según el perfil activo.
@@ -74,12 +75,13 @@ export function TeamModuleScreen() {
   return ['dueno', 'gestor_usuarios'].includes(useMyRole()) ? <AdminRequestsScreen /> : <TeamScreen />;
 }
 
-// muestro solicitudes verificadas y permito al administrador asignar un rol antes de aprobar.
+// El dueño puede aprobar gestores. Los gestores solo asignan perfiles de campo.
 export function AdminRequestsScreen() {
   const { session } = useSession();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const token = session?.accessToken;
+  const owner = session?.usuario.rol === 'dueno';
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<Record<number, RequestedRole>>({});
   const [busyId, setBusyId] = useState<number | null>(null);
@@ -114,6 +116,7 @@ export function AdminRequestsScreen() {
   }
 
   const roleOptions: { role: RequestedRole; label: string }[] = [{ role: 'peon', label: 'Peón' }, { role: 'veterinario', label: 'Veterinario' }];
+  if (owner) roleOptions.push({ role: 'gestor_usuarios', label: 'Gestor de usuarios' });
   if (showTeam) return (
     <View style={{ flex: 1 }}>
       <Pressable onPress={() => setShowTeam(false)} style={[s.backBtn, { backgroundColor: colors.bgCardMuted }]}>
@@ -178,7 +181,7 @@ export function AdminRequestsScreen() {
 
       <Modal animationType="fade" onRequestClose={() => setDecision(null)} transparent visible={Boolean(decision)}>
         <View style={s.modalBackdrop}>
-          <View style={[s.modalCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+          <FormDialog style={[s.modalCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[s.modalTitle, { color: colors.textMain }]}>
               {decision?.action === 'approve' ? 'Aprobar solicitud' : 'Rechazar solicitud'}
             </Text>
@@ -196,7 +199,7 @@ export function AdminRequestsScreen() {
                 <Text style={s.approveText}>Confirmar</Text>
               </Pressable>
             </View>
-          </View>
+          </FormDialog>
         </View>
       </Modal>
     </Page>

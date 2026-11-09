@@ -11,7 +11,7 @@ export function PasswordInput({ containerStyle, inputStyle, ...inputProps }: Pro
   const [visible, setVisible] = useState(false);
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View {...{ dataSet: { focusField: 'container' } }} style={[styles.container, containerStyle]}>
       <TextInput {...inputProps} secureTextEntry={!visible} style={[styles.input, inputStyle]} />
       <Pressable
         accessibilityLabel={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}

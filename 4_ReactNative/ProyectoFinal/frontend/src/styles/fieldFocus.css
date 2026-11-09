@@ -1,0 +1,18 @@
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #3d9458;
+  outline-offset: -2px;
+}
+
+@supports selector(:has(> input:focus)) {
+  /* Los campos con iconos dibujan su borde en el contenedor. */
+  [data-focus-field="container"]:has(> input:focus) {
+    outline: 2px solid #3d9458;
+    outline-offset: -2px;
+  }
+
+  [data-focus-field="container"] > input:focus {
+    outline: none;
+  }
+}

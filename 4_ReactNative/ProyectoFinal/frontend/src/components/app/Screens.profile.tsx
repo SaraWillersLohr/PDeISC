@@ -2,15 +2,17 @@
 // presento los resúmenes y accesos principales según el perfil activo.
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, Platform, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
 import { removeSession, saveSession } from '../../services/sessionStorage';
 import { changeMyPassword, updateMyProfile } from '../../services/authApi';
 import { PasswordInput } from '../PasswordInput';
+import { ProfileAvatar } from './ProfileAvatar';
+import { ProfileCamera, pickProfilePhoto } from './ProfileCamera';
+import { ProfilePhotoAction } from './ProfilePhotoAction';
 import { normalizeRole , Page , Header , roleLabel } from './Screens.shared';
 import { s } from './ScreensStyles';
 
@@ -24,6 +26,8 @@ export function MoreScreen() {
   const [name, setName] = useState(session?.usuario.nombre ?? '');
   const [surname, setSurname] = useState(session?.usuario.apellido ?? '');
   const [photo, setPhoto] = useState<string | null>(session?.usuario.foto_perfil ?? null);
+  const [photoError, setPhotoError] = useState('');
+  const photoPending = photo !== (session?.usuario.foto_perfil ?? null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -37,12 +41,15 @@ export function MoreScreen() {
     router.replace('/');
   }
 
+  // La foto elegida se muestra primero como vista previa y se publica al guardar los datos.
   async function pickPhoto(): Promise<void> {
-    setError('');
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) { setError('Necesitamos permiso para abrir tus fotos.'); return; }
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.45, base64: true });
-    if (!result.canceled && result.assets[0]?.base64) setPhoto(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    setPhotoError('');
+    try {
+      const selected = await pickProfilePhoto();
+      if (selected) setPhoto(selected);
+    } catch (cause) {
+      setPhotoError(friendlyErrorMessage(cause, 'No se pudo abrir la imagen. Elegí otra foto.'));
+    }
   }
 
   async function saveProfile(): Promise<void> {
@@ -88,30 +95,19 @@ export function MoreScreen() {
         <View style={[s.profileCard, isDesktop && s.profileColumn, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <Text style={[s.sectionTitle, { color: colors.textMain }]}>Datos personales</Text>
           <View style={s.photoRow}>
-            {photo ? (
-              <Image source={{ uri: photo }} style={s.photo} />
-            ) : (
-              <View style={[s.photoFallback, { backgroundColor: isDark ? 'rgba(134, 239, 172, 0.15)' : '#e8efe5' }]}>
-                <Text style={[s.photoInitials, { color: isDark ? '#86efac' : '#1c4630' }]}>
-                  {`${name[0] ?? 'E'}${surname[0] ?? ''}`.toUpperCase()}
-                </Text>
-              </View>
-            )}
-            <View style={{ flex: 1 }}>
+            <ProfileAvatar photo={photo} name={name} surname={surname} size={64} />
+            <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={[s.profileFullName, { color: colors.textMain }]}>{name || session?.usuario.nombre} {surname || session?.usuario.apellido}</Text>
               <Text style={[s.profileMetaText, { color: colors.textMuted }]}>{roleLabel[role] ?? role} · {session?.usuario.email}</Text>
-              <View style={s.photoActions}>
-                <Pressable onPress={() => void pickPhoto()} style={[s.smallBtn, { backgroundColor: isDark ? 'rgba(134,239,172,0.15)' : '#e8efe5' }]}>
-                  <Text style={[s.smallBtnText, { color: isDark ? '#86efac' : '#1c4630' }]}>Elegir foto</Text>
-                </Pressable>
-                {photo ? (
-                  <Pressable onPress={() => setPhoto(null)}>
-                    <Text style={s.removePhoto}>Quitar foto</Text>
-                  </Pressable>
-                ) : null}
-              </View>
             </View>
           </View>
+          <View style={s.photoActions}>
+            <ProfilePhotoAction label="Subir foto" disabled={busy} onPress={() => void pickPhoto()} />
+            <ProfileCamera disabled={busy} onPhoto={setPhoto} onError={setPhotoError} />
+            {photo ? <ProfilePhotoAction label="Quitar foto" disabled={busy} onPress={() => { setPhotoError(''); setPhoto(null); }} /> : null}
+          </View>
+          {photoPending ? <Text style={[s.formHelp, { color: colors.textMuted }]}>{photo ? 'Vista previa. Guardá los datos personales para aplicar la foto.' : 'Guardá los datos personales para quitar la foto.'}</Text> : null}
+          {photoError ? <Text accessibilityRole="alert" style={s.requestError}>{photoError}</Text> : null}
 
           <Text style={[s.formLabel, { color: colors.textMuted }]}>NOMBRE</Text>
           <TextInput

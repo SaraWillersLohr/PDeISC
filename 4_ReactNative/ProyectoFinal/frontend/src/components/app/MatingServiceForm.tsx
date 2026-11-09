@@ -8,7 +8,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { createMatingService } from '../../services/modulesApi';
 import type { AnimalRecord } from '../../services/livestockApi';
 import { style } from './LivestockStyles';
-export function MatingServiceForm({ mother, animals, onBack, onCancel, onSaved }: { mother: AnimalRecord; animals: AnimalRecord[]; onBack: () => void; onCancel: () => void; onSaved: () => void }) {
+export function MatingServiceForm({ mother, animals, onBack, onSaved }: { mother: AnimalRecord; animals: AnimalRecord[]; onBack: () => void; onSaved: () => void }) {
   const { session } = useSession();
   const { colors } = useTheme();
   const [fatherSearch, setFatherSearch] = useState('');
@@ -92,9 +92,9 @@ export function MatingServiceForm({ mother, animals, onBack, onCancel, onSaved }
       <TextInput accessibilityLabel="Observaciones del servicio" multiline onChangeText={setNotes} placeholder="Observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={notes} />
       {error ? <Text style={style.errorText}>{error}</Text> : null}
       <View style={style.matingActions}>
-        <Pressable onPress={onBack} style={[style.matingActionButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver a ficha</Text></Pressable>
-        <Pressable onPress={onCancel} style={[style.matingActionButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text></Pressable>
+        {/* Guardar es la primera acción. Volver conserva el contexto de la ficha. */}
         <Pressable disabled={saving} onPress={() => void save()} style={[style.matingActionButton, { backgroundColor: colors.primary, borderColor: colors.primary }, saving && { opacity: 0.6 }]}><Text style={style.confirmText}>{saving ? 'Guardando…' : 'Guardar servicio'}</Text></Pressable>
+        <Pressable onPress={onBack} style={[style.matingActionButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver a ficha</Text></Pressable>
       </View>
     </View>
   );

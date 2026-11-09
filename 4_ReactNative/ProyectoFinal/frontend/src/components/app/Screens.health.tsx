@@ -30,18 +30,19 @@ export function HealthScreen() {
   const role = useMyRole();
   if (role === 'veterinario') return <NursingScreen />;
   if (role === 'peon') return <Redirect href="/(app)/animals" />;
-  if (role === 'dueno') return <AdministratorHealthScreen />;
+  if (role === 'dueno') return <OwnerHealthScreen />;
   return <AnimalsInventoryScreen />;
 }
 
-export function AdministratorHealthScreen() {
+export function OwnerHealthScreen() {
   const { colors } = useTheme();
   const [section, setSection] = useState<'muertes' | 'enfermeria'>('muertes');
-  return <>
-    {/* El encabezado no ocupa otra pantalla completa sobre el contenido activo. */}
-    <View style={{ paddingHorizontal: 18, paddingTop: 14 }}>
+  // El encabezado y las pestañas se desplazan dentro de la vista activa.
+  // Así se evita reservar una zona vacía sobre Enfermería o Revisión de muertes.
+  const header = (
+    <View>
       <Header title="Sanidad y enfermería" subtitle="REPORTES DE MUERTE Y SEGUIMIENTO VETERINARIO" />
-      <View style={[s.requestActions, { marginBottom: 12 }]}>
+      <View style={[s.requestActions, { flexWrap: 'wrap', marginBottom: 16 }]}>
         {(['muertes', 'enfermeria'] as const).map((item) => (
           <Pressable key={item} accessibilityRole="tab" accessibilityState={{ selected: section === item }} onPress={() => setSection(item)} style={[s.healthTab, { backgroundColor: section === item ? colors.primary : colors.bgCard, borderColor: colors.border }]}>
             <Text style={[s.healthTabText, { color: section === item ? '#ffffff' : colors.textMain }]}>{item === 'muertes' ? 'Muertes pendientes' : 'Enfermería'}</Text>
@@ -49,12 +50,12 @@ export function AdministratorHealthScreen() {
         ))}
       </View>
     </View>
-    {section === 'muertes' ? <DeathReviewScreen /> : <NursingScreen />}
-  </>;
+  );
+  return section === 'muertes' ? <DeathReviewScreen headerContent={header} /> : <NursingScreen headerContent={header} />;
 }
 
-// permito al administrador confirmar o rechazar bajas pendientes.
-export function DeathReviewScreen() {
+// El dueño confirma o rechaza las bajas conservando el historial del reporte.
+export function DeathReviewScreen({ headerContent }: { headerContent?: React.ReactNode } = {}) {
   const { session } = useSession();
   const revision = useLiveChanges();
   const { colors } = useTheme();
@@ -91,7 +92,13 @@ export function DeathReviewScreen() {
 
   return (
     <Page>
-      <Header title="Revisión de muertes" subtitle="BAJAS PENDIENTES DE CONFIRMACIÓN" />
+      {headerContent}
+      {headerContent ? (
+        <View style={{ marginBottom: 16 }}>
+          <Text accessibilityRole="header" style={[s.sectionTitle, { color: colors.textMain, marginTop: 0 }]}>Revisión de muertes</Text>
+          <Text style={[s.formHelp, { color: colors.textMuted }]}>Bajas pendientes de confirmación</Text>
+        </View>
+      ) : <Header title="Revisión de muertes" subtitle="BAJAS PENDIENTES DE CONFIRMACIÓN" />}
       {message ? <Text style={s.requestNotice}>{message}</Text> : null}
       {rows.length ? (
         rows.map((row) => (

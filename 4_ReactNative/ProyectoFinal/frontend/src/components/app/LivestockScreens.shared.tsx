@@ -29,6 +29,8 @@ export function InventoryPage({
   onRefresh,
   refreshing,
   headerAction,
+  headerContent,
+  showSearch = true,
   children,
 }: {
   title: string;
@@ -42,6 +44,8 @@ export function InventoryPage({
   onRefresh: () => void;
   refreshing: boolean;
   headerAction?: React.ReactNode;
+  headerContent?: React.ReactNode;
+  showSearch?: boolean;
   children: React.ReactNode;
 }) {
   const { colors } = useTheme();
@@ -62,6 +66,7 @@ export function InventoryPage({
         showsVerticalScrollIndicator={false}
       >
         <View style={[style.innerWrapper, isDesktop && style.innerWrapperDesktop]}>
+          {headerContent}
           <View style={[style.pageHead, isDesktop && style.pageHeadDesktop]}>
             <View>
               <Text style={[style.heading, { color: colors.textMain }]}>{title}</Text>
@@ -72,9 +77,9 @@ export function InventoryPage({
             </View>
           </View>
 
-          {/* Search bar & Action Button */}
-          <View style={[style.searchRow, isDesktop && style.searchRowDesktop]}>
-            <View style={[style.searchBox, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+          {/* Solo muestro búsqueda cuando la pantalla tiene un filtro funcional. */}
+          {showSearch || headerAction ? <View style={[style.searchRow, isDesktop && style.searchRowDesktop]}>
+            {showSearch ? <View {...{ dataSet: { focusField: 'container' } }} style={[style.searchBox, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
               <Ionicons color={colors.textMuted} name="search-outline" size={18} style={{ marginRight: 8 }} />
               <TextInput
                 accessibilityLabel={`Buscar ${title.toLowerCase()}`}
@@ -84,9 +89,9 @@ export function InventoryPage({
                 style={[style.searchInput, { color: colors.inputText }]}
                 value={search}
               />
-            </View>
+            </View> : null}
             {headerAction}
-          </View>
+          </View> : null}
 
           {loading ? (
             <View style={style.message}>

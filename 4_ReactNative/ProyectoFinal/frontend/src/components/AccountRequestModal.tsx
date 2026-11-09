@@ -1,8 +1,9 @@
 // solicito una cuenta de equipo desde una ventana compacta sobre el ingreso.
+import { FormDialog } from './FormDialog';
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { requestAccount } from '../services/authApi';
 import { PasswordInput } from './PasswordInput';
@@ -11,13 +12,11 @@ type Props = { visible: boolean; onClose: () => void };
 
 const dialogMaxWidth = 560;
 const gutter = 14;
-const mobileBreakpoint = 600;
 
 export function AccountRequestModal({ visible, onClose }: Props) {
   const { width, fontScale } = useWindowDimensions();
-  const mobile = width < mobileBreakpoint;
   const dialogWidth = Math.min(width - 2 * gutter, dialogMaxWidth);
-  const stacked = mobile || dialogWidth < 492 * Math.max(1, fontScale);
+  const stacked = dialogWidth < 492 * Math.max(1, fontScale);
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
@@ -43,29 +42,27 @@ export function AccountRequestModal({ visible, onClose }: Props) {
   }
 
   return <Modal animationType="fade" onRequestClose={onClose} transparent visible={visible}>
-    <SafeAreaView style={[s.backdrop, mobile && s.mobileBackdrop]}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[s.keyboard, mobile && s.mobileKeyboard]}>
-        <View accessibilityViewIsModal style={[s.dialog, mobile && s.mobileDialog]}>
-          <ScrollView style={[s.scroll, mobile && s.mobileScroll]} contentContainerStyle={[s.content, stacked && s.compactContent]} keyboardShouldPersistTaps="handled">
-            <View style={s.header}>
-              <View style={s.heading}><Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text></View>
-              <Pressable accessibilityLabel="Cerrar solicitud de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
-            </View>
-            <Text style={s.copy}>Completá tus datos y verificá tu correo. Te avisaremos cuando se resuelva tu solicitud.</Text>
-            <View style={!stacked && s.row}>
-              <View style={!stacked && s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} /></View>
-              <View style={!stacked && s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={setApellido} placeholder="Tu apellido" style={s.input} value={apellido} /></View>
-            </View>
-            <Text style={s.label}>CORREO ELECTRÓNICO</Text>
-            <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
-            <View style={!stacked && s.row}>
-              <View style={!stacked && s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /></View>
-              <View style={!stacked && s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></View>
-            </View>
-            {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
-            <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Enviar solicitud</Text>}</Pressable>
-          </ScrollView>
-        </View>
+    <SafeAreaView style={s.backdrop}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.keyboard}>
+        <FormDialog style={s.dialog} contentContainerStyle={[s.content, stacked && s.compactContent]}>
+          <View style={s.header}>
+            <View style={s.heading}><Text style={s.eyebrow}>ACCESO AL EQUIPO</Text><Text style={s.title}>Solicitar cuenta</Text></View>
+            <Pressable accessibilityLabel="Cerrar solicitud de cuenta" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
+          </View>
+          <Text style={s.copy}>Completá tus datos y verificá tu correo. Te avisaremos cuando se resuelva tu solicitud.</Text>
+          <View style={!stacked && s.row}>
+            <View style={!stacked && s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} /></View>
+            <View style={!stacked && s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={setApellido} placeholder="Tu apellido" style={s.input} value={apellido} /></View>
+          </View>
+          <Text style={s.label}>CORREO ELECTRÓNICO</Text>
+          <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
+          <View style={!stacked && s.row}>
+            <View style={!stacked && s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /></View>
+            <View style={!stacked && s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></View>
+          </View>
+          {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
+          <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Enviar solicitud</Text>}</Pressable>
+        </FormDialog>
       </KeyboardAvoidingView>
     </SafeAreaView>
   </Modal>;
@@ -73,13 +70,8 @@ export function AccountRequestModal({ visible, onClose }: Props) {
 
 const s = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(14,27,18,0.62)', flex: 1 },
-  mobileBackdrop: { backgroundColor: '#f4f6f1' },
   keyboard: { alignItems: 'center', flex: 1, justifyContent: 'center', padding: gutter },
-  mobileKeyboard: { alignItems: 'stretch', padding: 0 },
-  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, flexShrink: 1, maxWidth: dialogMaxWidth, overflow: 'hidden', width: '100%' },
-  mobileDialog: { borderRadius: 0, borderWidth: 0, flex: 1, maxWidth: '100%', minHeight: 0 },
-  scroll: { flexGrow: 0, flexShrink: 1 },
-  mobileScroll: { flex: 1, minHeight: 0 },
+  dialog: { backgroundColor: '#f4f6f1', borderColor: '#e3e8e1', borderRadius: 18, borderWidth: 1, maxWidth: dialogMaxWidth, width: '100%' },
   content: { padding: 20 },
   compactContent: { padding: 14 },
   header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },

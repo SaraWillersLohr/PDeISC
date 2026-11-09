@@ -3,6 +3,28 @@ import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { database } from '../config/database.js';
 
+// Cuento las cuentas directamente en la base. Un rol sin cuentas devuelve cero real.
+export async function userStatistics(_req: Request, res: Response): Promise<void> {
+  try {
+    const [rows] = await database.execute<RowDataPacket[]>(
+      `SELECT r.nombre AS rol, COUNT(u.id_usuario) AS total,
+              COALESCE(SUM(u.activo=1 AND u.estado_cuenta='activo'), 0) AS activos
+       FROM roles r LEFT JOIN usuarios u ON u.id_rol=r.id_rol
+       GROUP BY r.id_rol,r.nombre ORDER BY r.id_rol`,
+    );
+    const roles = rows.map((row) => ({
+      rol: String(row.rol), total: Number(row.total), activos: Number(row.activos),
+      sin_acceso: Number(row.total) - Number(row.activos),
+    }));
+    // Los totales generales se obtienen de la misma consulta para mantenerlos consistentes.
+    const total = roles.reduce((sum, role) => sum + role.total, 0);
+    const activos = roles.reduce((sum, role) => sum + role.activos, 0);
+    res.json({ data: { total, activos, sin_acceso: total - activos, roles } });
+  } catch {
+    res.status(503).json({ message: 'No se pudieron consultar las estadísticas de usuarios.' });
+  }
+}
+
 // devuelvo miembros con su rol actual para el dueño y el gestor de usuarios.
 export async function listUsers(req: Request, res: Response): Promise<void> {
   // La vista de equipo pide las fotos; los selectores de responsables solo necesitan los nombres.

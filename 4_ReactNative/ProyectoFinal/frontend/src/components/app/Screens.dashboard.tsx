@@ -12,21 +12,22 @@ import { useTheme } from '../../context/ThemeContext';
 import { getDashboard, type DashboardMetrics } from '../../services/productionApi';
 import { listAnimals } from '../../services/livestockApi';
 import { normalizeRole , Page , Header , roleLabel , SpeciesBarChart } from './Screens.shared';
-import { listOrganizationUsers, type OrganizationUser } from '../../services/organizationApi';
+import { getUserStatistics, type UserStatistics } from '../../services/organizationApi';
 import { HealthScreen } from './Screens.health';
 import { s } from './ScreensStyles';
 
 export function HomeScreen() {
   const { session } = useSession();
   const revision = useLiveChanges();
-  const { width } = useWindowDimensions();
+  const { width, fontScale } = useWindowDimensions();
   const { colors, isDark } = useTheme();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [speciesCounts, setSpeciesCounts] = useState<{ species: string; count: number }[]>([]);
   const [breedCountsLoaded, setBreedCountsLoaded] = useState(false);
   const [metricsError, setMetricsError] = useState('');
-  const [teamUsers, setTeamUsers] = useState<OrganizationUser[] | null>(null);
+  const [userStatistics, setUserStatistics] = useState<UserStatistics | null>(null);
   const [teamError, setTeamError] = useState('');
+  const [statisticsRetry, setStatisticsRetry] = useState(0);
   const role = normalizeRole(session?.usuario.rol.toLowerCase() ?? 'dueno');
   const name = session?.usuario.nombre?.trim() || 'equipo';
   const isVet = role === 'veterinario';
@@ -34,7 +35,9 @@ export function HomeScreen() {
   const isManager = role === 'dueno';
   const isUserManager = role === 'gestor_usuarios';
   const isDesktop = Platform.OS === 'web' && width >= 860;
-  const dashboardCopy = isUserManager ? 'Consultá las cuentas aprobadas y los roles de tu equipo.' : isField ? 'Lo importante para las tareas y ganado de hoy.' : 'Monitoreo productivo y sanitario de la estancia.';
+  // En celulares y con texto ampliado, una tarjeta por fila mantiene legibles los roles.
+  const stackUserStatistics = width < 520 * Math.max(1, fontScale);
+  const dashboardCopy = isUserManager ? 'Consultá los usuarios registrados y gestioná los accesos del equipo.' : isField ? 'Lo importante para las tareas y ganado de hoy.' : 'Monitoreo productivo y sanitario de la estancia.';
   const today = new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
   useEffect(() => {
@@ -56,28 +59,37 @@ export function HomeScreen() {
   useEffect(() => {
     if (!session || !isUserManager) return;
     let active = true;
-    listOrganizationUsers(session)
-      .then((users) => {
+    // Inicio consulta conteos reales y se actualiza al aprobar, desactivar o cambiar un rol.
+    getUserStatistics(session)
+      .then((statistics) => {
         if (!active) return;
-        setTeamUsers(users.filter((user) => user.activo === 1));
+        setUserStatistics(statistics);
         setTeamError('');
       })
       .catch((cause: unknown) => {
         if (!active) return;
-        setTeamUsers(null);
+        setUserStatistics(null);
         setTeamError(friendlyErrorMessage(cause, 'No se pudieron cargar las estadísticas del equipo.'));
       });
     return () => { active = false; };
-  }, [session, isUserManager, revision]);
+  }, [session, isUserManager, revision, statisticsRetry]);
 
   if (isVet) return <HealthScreen />;
 
-  const teamStatistics = teamUsers ? [
-    { label: 'Usuarios aprobados', value: teamUsers.length, icon: 'people-outline' },
-    { label: 'Dueños', value: teamUsers.filter((user) => user.rol === 'dueno').length, icon: 'key-outline' },
-    { label: 'Peones', value: teamUsers.filter((user) => user.rol === 'peon').length, icon: 'leaf-outline' },
-    { label: 'Veterinarios', value: teamUsers.filter((user) => user.rol === 'veterinario').length, icon: 'medkit-outline' },
-  ] as const : null;
+  const roleNames: Record<string, string> = { dueno: 'Dueños', peon: 'Peones', veterinario: 'Veterinarios', gestor_usuarios: 'Gestores de usuarios' };
+  const roleIcons: Record<string, keyof typeof Ionicons.glyphMap> = { dueno: 'key-outline', peon: 'leaf-outline', veterinario: 'medkit-outline', gestor_usuarios: 'people-outline' };
+  // Mientras carga o falla la consulta no invento cifras ni reemplazo los datos con ceros.
+  const teamStatistics = userStatistics ? [
+    { label: 'Usuarios registrados', value: userStatistics.total, icon: 'people-outline' as const, note: 'Cuentas existentes en la estancia' },
+    { label: 'Con acceso habilitado', value: userStatistics.activos, icon: 'checkmark-circle-outline' as const, note: 'Cuentas activas que pueden ingresar' },
+    { label: 'Sin acceso habilitado', value: userStatistics.sin_acceso, icon: 'lock-closed-outline' as const, note: 'Cuentas desactivadas o pendientes de habilitación' },
+    ...userStatistics.roles.map((entry) => ({
+      label: roleNames[entry.rol] ?? roleLabel[entry.rol] ?? entry.rol,
+      value: entry.total,
+      icon: roleIcons[entry.rol] ?? 'person-outline' as const,
+      note: `${entry.activos} con acceso · ${entry.sin_acceso} sin acceso`,
+    })),
+  ] : null;
 
   const statistics = metrics ? [
     { label: 'Crías del año', value: metrics.crias_ano, color: '#3d9458', icon: 'leaf-outline' as const, note: 'Nacimientos registrados' },
@@ -110,12 +122,12 @@ export function HomeScreen() {
         <View style={[s.statsCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <View>
             <Text style={[s.sectionTitle, { color: colors.textMain }]}>Estadísticas del equipo</Text>
-            <Text style={[s.sectionCopy, { color: colors.textMuted }]}>Cuentas activas de la estancia</Text>
+            <Text style={[s.sectionCopy, { color: colors.textMuted }]}>Cuentas registradas por rol. Las solicitudes todavía sin aprobar se consultan en Equipo y Accesos.</Text>
           </View>
           {teamStatistics ? (
             <View style={[s.statsGrid, isDesktop && s.statsGridDesktop]}>
               {teamStatistics.map((item) => (
-                <View key={item.label} style={[s.statBox, isDesktop && s.statBoxDesktop, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8faf7', borderColor: colors.borderLight }]}>
+                <View key={item.label} style={[s.statBox, isDesktop && s.statBoxDesktop, stackUserStatistics && { flexBasis: '100%' }, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8faf7', borderColor: colors.borderLight }]}>
                   <View style={s.statBoxTop}>
                     <View style={[s.statIconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#edf4ec' }]}>
                       <Ionicons color={colors.primary} name={item.icon} size={18} />
@@ -123,6 +135,7 @@ export function HomeScreen() {
                     <Text style={[s.statBoxValue, { color: colors.textMain }]}>{item.value}</Text>
                   </View>
                   <Text style={[s.statBoxLabel, { color: colors.textSecondary }]}>{item.label}</Text>
+                  <Text style={[s.statBoxNote, { color: colors.textMuted }]}>{item.note}</Text>
                 </View>
               ))}
             </View>
@@ -131,6 +144,14 @@ export function HomeScreen() {
               {teamError || 'Cargando estadísticas del equipo…'}
             </Text>
           )}
+          {teamError ? (
+            <Pressable accessibilityRole="button" onPress={() => setStatisticsRetry((current) => current + 1)} style={[s.smallBtn, { alignSelf: 'flex-start', backgroundColor: colors.bgCardMuted, marginTop: 12 }]}>
+              <Text style={[s.smallBtnText, { color: colors.textMain }]}>Reintentar consulta</Text>
+            </Pressable>
+          ) : null}
+          <Pressable accessibilityRole="button" onPress={() => router.push('/(app)/team')} style={[s.primaryBtn, { backgroundColor: colors.primary, marginTop: 16 }]}>
+            <Text style={s.primaryBtnText}>Ir a Equipo y Accesos</Text>
+          </Pressable>
         </View>
       ) : null}
 

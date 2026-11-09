@@ -4,6 +4,12 @@ import { apiConfigurationMessage, apiFetch, friendlyApiMessage } from './apiErro
 import type { Session } from '../types/auth';
 
 export interface OrganizationUser { id_usuario: number; nombre: string; apellido: string; email: string; activo: number; rol: string; foto_perfil?: string | null; }
+export interface UserStatistics {
+  total: number;
+  activos: number;
+  sin_acceso: number;
+  roles: { rol: string; total: number; activos: number; sin_acceso: number }[];
+}
 export interface Species { id_especie: number; nombre: string; }
 export interface Breed { id_raza: number; id_especie: number; nombre: string; }
 export interface CatalogRequest { id_solicitud_catalogo: number; tipo: 'especie'|'raza'; nombre: string; especie?: string; estado: string; }
@@ -19,6 +25,11 @@ async function request<T>(session: Session, path: string, method = 'GET', body?:
 
 export function listOrganizationUsers(session: Session, includePhotos = false): Promise<OrganizationUser[]> {
   return request(session, includePhotos ? '/users?fotos=1' : '/users');
+}
+
+// Inicio recibe los conteos de la base, sin descargar la lista personal del equipo.
+export function getUserStatistics(session: Session): Promise<UserStatistics> {
+  return request(session, '/users/statistics');
 }
 export function updateOrganizationUser(session: Session, user: OrganizationUser, role: string): Promise<void> { return request(session, `/users/${user.id_usuario}`, 'PUT', { nombre: user.nombre, apellido: user.apellido || '-', rol: role }); }
 export function deactivateOrganizationUser(session: Session, id: number, reassignmentId?: number): Promise<void> {

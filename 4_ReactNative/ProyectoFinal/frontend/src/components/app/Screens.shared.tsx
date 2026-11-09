@@ -1,8 +1,7 @@
 // reúno tipos y elementos visuales compartidos entre las pantallas principales.
-import NetInfo from '@react-native-community/netinfo';
 import type { AppSectionIconName } from './AppSectionIcon';
-import { useEffect, useRef, useState } from 'react';
-import { Image, NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -30,32 +29,12 @@ export const roleLabel: Record<string, string> = { gestor_usuarios: 'Gestor de u
 export function normalizeRole(role: string): string { return role; }
 
 export function Header({ title, subtitle }: { title: string; subtitle: string }) {
-  const { session } = useSession();
-  const { isDark, colors } = useTheme();
-  const [online, setOnline] = useState(true);
-  useEffect(() => { const unsubscribe = NetInfo.addEventListener((state) => setOnline(Boolean(state.isConnected))); return unsubscribe; }, []);
-  const initials = `${session?.usuario.nombre?.[0] ?? 'E'}${session?.usuario.apellido?.[0] ?? ''}`.toUpperCase();
+  const { colors } = useTheme();
+  // Todas las páginas comparten este encabezado. La barra principal muestra el estado del sistema.
   return (
     <View style={s.header}>
-      <View style={s.brandLine}>
-        <View style={[s.connection, !online && s.connectionOff, isDark && s.connectionDark]}>
-          <View style={[s.connectionDot, !online && s.connectionDotOff]} />
-          <Text style={[s.connectionText, isDark && { color: colors.textSecondary }]}>{online ? 'En línea' : 'Sin señal'}</Text>
-        </View>
-      </View>
-      <View style={s.titleRow}>
-        <View style={{ flex: 1 }}>
-          <Text style={[s.pageTitle, { color: colors.textMain }]}>{title}</Text>
-          <Text style={[s.pageSubtitle, { color: colors.textMuted }]}>{subtitle}</Text>
-        </View>
-        {session?.usuario.foto_perfil ? (
-          <Image source={{ uri: session.usuario.foto_perfil }} style={s.avatarImg} />
-        ) : (
-          <View style={[s.avatar, isDark && { backgroundColor: 'rgba(134,239,172,0.15)', borderColor: '#23392b' }]}>
-            <Text style={[s.avatarText, isDark && { color: '#86efac' }]}>{initials}</Text>
-          </View>
-        )}
-      </View>
+      <Text accessibilityRole="header" style={[s.pageTitle, { color: colors.textMain }]}>{title}</Text>
+      <Text style={[s.pageSubtitle, { color: colors.textMuted }]}>{subtitle}</Text>
     </View>
   );
 }

@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
   },
   brandTagText: {
     color: '#8ba690',
-    fontSize: 9,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: 1.4,
   },
@@ -69,7 +69,7 @@ export const styles = StyleSheet.create({
   },
   brandSubtitle: {
     color: '#8ba690',
-    fontSize: 9,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: 1.2,
     marginTop: 2,
@@ -85,7 +85,7 @@ export const styles = StyleSheet.create({
   },
   categoryTitle: {
     color: '#657e6b',
-    fontSize: 9,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: 1.4,
     marginBottom: 4,
@@ -127,7 +127,7 @@ export const styles = StyleSheet.create({
   },
   navItemText: {
     color: '#b7c8ba',
-    fontSize: 12.5,
+    fontSize: 13,
     fontWeight: '600',
   },
   navItemTextActive: {
@@ -167,7 +167,7 @@ export const styles = StyleSheet.create({
   },
   avatarText: {
     color: '#86efac',
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '800',
   },
   profileImage: {
@@ -177,7 +177,7 @@ export const styles = StyleSheet.create({
   },
   name: {
     color: '#f0fdf4',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
   },
   roleBadge: {
@@ -188,7 +188,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   roleText: {
-    fontSize: 9.5,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: 0.2,
   },
@@ -241,7 +241,7 @@ export const styles = StyleSheet.create({
   },
   onlineText: {
     color: '#2d6a4f',
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
   },
   screenInner: {

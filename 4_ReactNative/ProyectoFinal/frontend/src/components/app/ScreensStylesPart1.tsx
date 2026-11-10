@@ -9,7 +9,7 @@ const part = StyleSheet.create({
   contentContainerDesktop: { alignSelf: 'center', maxWidth: 1200, width: '100%' },
   header: { marginBottom: 20 },
   pageTitle: { fontSize: 26, fontWeight: '800', letterSpacing: -0.6 },
-  pageSubtitle: { fontSize: 10, fontWeight: '800', letterSpacing: 1.2, marginTop: 4 },
+  pageSubtitle: { fontSize: 13, fontWeight: '800', letterSpacing: 1.2, marginTop: 4 },
   welcome: {
       backgroundColor: '#122e1e',
       borderRadius: 20,
@@ -34,7 +34,7 @@ const part = StyleSheet.create({
     },
   welcomeEyebrow: {
       color: '#86efac',
-      fontSize: 9.5,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 1.2,
     },
@@ -46,7 +46,7 @@ const part = StyleSheet.create({
     },
   welcomeCopy: {
       color: '#cad9cc',
-      fontSize: 12,
+      fontSize: 13,
       lineHeight: 18,
       marginTop: 6,
       maxWidth: 540,
@@ -66,7 +66,7 @@ const part = StyleSheet.create({
   verticalChart: { marginTop: 12 },
   verticalChartRow: { flexDirection: 'row', height: 228 },
   yAxis: { justifyContent: 'space-between', paddingBottom: 32, paddingRight: 8, width: 32 },
-  axisTick: { fontSize: 9, textAlign: 'right' },
+  axisTick: { fontSize: 13, textAlign: 'right' },
   plotArea: { flex: 1, height: 228, position: 'relative' },
   gridLine: { height: 1, left: 0, position: 'absolute', right: 0 },
   columns: { flexDirection: 'row', height: '100%' },
@@ -74,8 +74,8 @@ const part = StyleSheet.create({
   barSlot: { alignItems: 'center', flex: 1, justifyContent: 'flex-end', position: 'relative', width: '100%' },
   verticalBar: { borderTopLeftRadius: 4, borderTopRightRadius: 4, maxWidth: 42, minHeight: 2, width: '58%' },
   barValue: { fontSize: 9, fontWeight: '800', position: 'absolute', transform: [{ translateY: -3 }] },
-  xAxisLabel: { fontSize: 9, height: 32, marginTop: 5, textAlign: 'center' },
-  axisTitle: { fontSize: 9, marginTop: 2, textAlign: 'center' },
+  xAxisLabel: { fontSize: 13, height: 32, marginTop: 5, textAlign: 'center' },
+  axisTitle: { fontSize: 13, marginTop: 2, textAlign: 'center' },
   statsGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -112,7 +112,7 @@ const part = StyleSheet.create({
       fontWeight: '800',
     },
   statBoxLabel: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
       marginTop: 8,
     },
@@ -128,7 +128,7 @@ const part = StyleSheet.create({
       height: 6,
     },
   statBoxNote: {
-      fontSize: 9.5,
+      fontSize: 13,
     },
   sectionHead: {
       alignItems: 'center',
@@ -143,7 +143,7 @@ const part = StyleSheet.create({
       letterSpacing: -0.3,
     },
   sectionCopy: {
-      fontSize: 11,
+      fontSize: 13,
       marginTop: 3,
     },
   dateChip: {
@@ -154,7 +154,7 @@ const part = StyleSheet.create({
     },
   dateChipText: {
       color: '#2d6a4f',
-      fontSize: 9,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 0.8,
     },
@@ -197,8 +197,8 @@ const part = StyleSheet.create({
       paddingRight: 20,
     },
   actionDescription: {
-      fontSize: 10.5,
-      lineHeight: 15,
+      fontSize: 13,
+      lineHeight: 18,
       marginTop: 5,
       paddingRight: 12,
     },

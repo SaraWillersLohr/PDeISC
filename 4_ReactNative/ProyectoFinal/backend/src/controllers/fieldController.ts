@@ -54,7 +54,6 @@ export async function createReport(req: Request, res: Response): Promise<void> {
     if (!animals.length) throw new Error('el animal ya no está activo');
     if (kind === 'muerte') {
       const lat = req.body.latitud == null ? null : Number(req.body.latitud); const lon = req.body.longitud == null ? null : Number(req.body.longitud);
-      if (lat === null || lon === null || !Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) throw new Error('la ubicación GPS es obligatoria y debe ser válida');
       await connection.execute('INSERT INTO reportes_muerte (id_animal, id_usuario, fecha, motivo, latitud, longitud, foto) VALUES (?, ?, ?, ?, ?, ?, ?)', [animalId, userId, fecha, motivo || 'Muerte notificada desde la ficha', lat, lon, photo]);
       await connection.execute('UPDATE animales SET activo = 0, version_dato = version_dato + 1 WHERE id_animal = ?', [animalId]);
     } else {

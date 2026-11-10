@@ -85,11 +85,11 @@ export function OfflineSyncBanner() {
 
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', borderRadius: 12, borderWidth: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 12, margin: 12, padding: 12 },
-  title: { fontSize: 12, fontWeight: '800' },
-  copy: { fontSize: 11, marginTop: 3 },
+  title: { fontSize: 13, fontWeight: '800' },
+  copy: { fontSize: 13, marginTop: 3 },
   button: { borderRadius: 8, paddingHorizontal: 12, paddingVertical: 9 },
-  buttonText: { color: '#ffffff', fontSize: 11, fontWeight: '700' },
+  buttonText: { color: '#ffffff', fontSize: 13, fontWeight: '700' },
   actions: { alignItems: 'center', flexDirection: 'row', gap: 6 },
   discardButton: { borderRadius: 8, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 8 },
-  discardText: { fontSize: 10, fontWeight: '700' },
+  discardText: { fontSize: 13, fontWeight: '700' },
 });

@@ -10,6 +10,9 @@ export function DateField(props: TextInputProps & { showCalendarIcon?: boolean; 
   }
 
   const max = props.maximumDate;
+  // Los estilos de RN usan ejes; el input HTML necesita propiedades CSS reales.
+  const fieldStyle = StyleSheet.flatten(props.style) ?? {};
+  const { paddingHorizontal, paddingVertical, marginHorizontal, marginVertical, ...cssStyle } = fieldStyle;
   return createElement('input', {
     type: 'date',
     value: props.value || '',
@@ -17,7 +20,15 @@ export function DateField(props: TextInputProps & { showCalendarIcon?: boolean; 
     'aria-label': props.accessibilityLabel || props.placeholder,
     onClick: props.showCalendarIcon ? openCalendar : undefined,
     onChange: (event: { target: { value: string } }) => props.onChangeText?.(event.target.value),
-    style: { ...StyleSheet.flatten(props.style), boxSizing: 'border-box', width: '100%', minWidth: 0 },
+    style: {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      fontSize: 16, borderStyle: 'solid', borderRadius: 12,
+      paddingLeft: paddingHorizontal, paddingRight: paddingHorizontal,
+      paddingTop: paddingVertical, paddingBottom: paddingVertical,
+      marginLeft: marginHorizontal, marginRight: marginHorizontal,
+      marginTop: marginVertical, marginBottom: marginVertical,
+      ...cssStyle, boxSizing: 'border-box', width: '100%', minWidth: 0,
+    },
     disabled: props.editable === false,
   });
 }

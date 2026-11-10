@@ -246,7 +246,7 @@ export function TasksManagerScreen() {
 
       {message ? <Text style={s.error}>{message}</Text> : null}
 
-      {eligible.length > 0 ? <View style={styles.deleteActions}>
+      {eligible.length > 1 ? <View style={styles.deleteActions}>
         <Pressable accessibilityRole="button" onPress={() => setSelected(selectedIds.length === eligible.length ? [] : eligible.map((row) => row.id_tarea))} style={[styles.deleteTaskButton, { borderColor: colors.border }]}><Text style={{ color: colors.textMain }}>{selectedIds.length === eligible.length ? 'Deseleccionar todas' : 'Seleccionar todas'} ({eligible.length})</Text></Pressable>
         <Pressable accessibilityRole="button" disabled={!selectedIds.length || deletingTask !== null} onPress={() => { setDeleteError(''); setDeleteTarget(selectedIds); }} style={[styles.deleteTaskButton, { borderColor: colors.border, opacity: selectedIds.length ? 1 : 0.5 }]}><Text style={{ color: colors.accentRed }}>Borrar seleccionadas ({selectedIds.length})</Text></Pressable>
       </View> : null}
@@ -332,7 +332,6 @@ export function TasksManagerScreen() {
                 ) : null}
                 {canDelete(row) ? (
                   <View style={[styles.deleteActions, { marginTop: 12 }]}>
-                    <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: selected.includes(row.id_tarea) }} onPress={() => setSelected((ids) => ids.includes(row.id_tarea) ? ids.filter((id) => id !== row.id_tarea) : [...ids, row.id_tarea])} style={[styles.deleteTaskButton, { borderColor: colors.border }]}><Ionicons name={selected.includes(row.id_tarea) ? 'checkbox' : 'square-outline'} size={20} color={colors.primary} /><Text style={{ color: colors.textMain }}>Seleccionar</Text></Pressable>
                     {owner ? <Pressable accessibilityRole="button" disabled={saving} onPress={() => startEditing(row)} style={[styles.deleteTaskButton, { borderColor: colors.border }]}><Text style={{ color: colors.textMain }}>Editar tarea</Text></Pressable> : null}
                     <Pressable
                       accessibilityRole="button"
@@ -351,11 +350,12 @@ export function TasksManagerScreen() {
           })}
         </View>
       )}
-      <View style={[styles.deleteActions, { justifyContent: 'center' }]}>
+      {/* La navegación solo es necesaria al superar las diez tareas de una página. */}
+      {rows.length > 10 ? <View style={[styles.deleteActions, { justifyContent: 'center' }]}>
         <Pressable accessibilityRole="button" accessibilityLabel="Página anterior de tareas" disabled={currentPage === 0} onPress={() => setPage(currentPage - 1)} style={[styles.dialogButton, { opacity: currentPage === 0 ? 0.4 : 1 }]}><Ionicons name="chevron-back" size={24} color={colors.primary} /></Pressable>
         <Text style={{ color: colors.textMain, alignSelf: 'center' }}>Página {currentPage + 1} de {totalPages} · {rows.length} tareas</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Página siguiente de tareas" disabled={currentPage + 1 >= totalPages} onPress={() => setPage(currentPage + 1)} style={[styles.dialogButton, { opacity: currentPage + 1 >= totalPages ? 0.4 : 1 }]}><Ionicons name="chevron-forward" size={24} color={colors.primary} /></Pressable>
-      </View>
+      </View> : null}
       {/* El cuadro se ajusta al contenido y sus botones se envuelven en pantallas pequeñas. */}
       <Modal animationType="fade" transparent visible={deleteTarget !== null} onRequestClose={() => { if (deletingTask === null) setDeleteTarget(null); }}>
         <View style={styles.deleteBackdrop}>

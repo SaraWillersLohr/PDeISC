@@ -31,7 +31,7 @@ const part = StyleSheet.create({
       fontWeight: '700',
     },
   moduleDescription: {
-      fontSize: 10.5,
+      fontSize: 13,
       marginTop: 2,
     },
   developmentCard: {
@@ -53,7 +53,7 @@ const part = StyleSheet.create({
   developmentTitle: { fontSize: 20, fontWeight: '800', textAlign: 'center' },
   developmentCopy: { fontSize: 13, lineHeight: 20, marginTop: 9, maxWidth: 380, textAlign: 'center' },
   developmentBadge: { alignItems: 'center', borderRadius: 20, flexDirection: 'row', gap: 6, marginTop: 20, paddingHorizontal: 12, paddingVertical: 8 },
-  developmentBadgeText: { fontSize: 11, fontWeight: '700' },
+  developmentBadgeText: { fontSize: 13, fontWeight: '700' },
   profileGridDesktop: {
       flexDirection: 'row',
       gap: 20,
@@ -79,7 +79,7 @@ const part = StyleSheet.create({
       fontWeight: '800',
     },
   profileMetaText: {
-      fontSize: 11,
+      fontSize: 13,
       marginTop: 2,
     },
   photoActions: {
@@ -96,18 +96,18 @@ const part = StyleSheet.create({
       paddingVertical: 7,
     },
   smallBtnText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '800',
     },
   formLabel: {
-      fontSize: 9,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 1,
       marginBottom: 6,
       marginTop: 14,
     },
   formHelp: {
-      fontSize: 11,
+      fontSize: 13,
       marginTop: 4,
     },
   formInput: {
@@ -126,7 +126,7 @@ const part = StyleSheet.create({
     },
   primaryBtnText: {
       color: '#ffffff',
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '800',
     },
   disabled: {
@@ -137,7 +137,7 @@ const part = StyleSheet.create({
       paddingTop: 16,
     },
   recoveryText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
       textAlign: 'center',
     },
@@ -156,7 +156,7 @@ const part = StyleSheet.create({
       fontWeight: '700',
     },
   appVersion: {
-      fontSize: 9,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 1.5,
       marginTop: 20,
@@ -173,7 +173,7 @@ const part = StyleSheet.create({
       fontWeight: '800',
     },
   requestEmail: {
-      fontSize: 12,
+      fontSize: 13,
       marginTop: 4,
     },
   requestInput: {
@@ -194,11 +194,11 @@ const part = StyleSheet.create({
       paddingHorizontal: 10,
     },
   healthTabText: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '700',
     },
   roleLabel: {
-      fontSize: 9,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 1,
       marginBottom: 6,
@@ -216,7 +216,7 @@ const part = StyleSheet.create({
       paddingVertical: 8,
     },
   roleOptionText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '600',
     },
   requestActions: {

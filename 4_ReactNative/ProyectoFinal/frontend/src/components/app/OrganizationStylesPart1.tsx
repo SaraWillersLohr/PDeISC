@@ -48,8 +48,8 @@ const part = StyleSheet.create({
       marginTop: 24,
     },
   copy: {
-      fontSize: 11.5,
-      lineHeight: 16,
+      fontSize: 13,
+      lineHeight: 18,
       marginTop: 3,
     },
   avatarBadge: {
@@ -65,7 +65,7 @@ const part = StyleSheet.create({
       paddingVertical: 4,
     },
   roleBadgeText: {
-      fontSize: 10,
+      fontSize: 13,
       fontWeight: '800',
       textTransform: 'capitalize',
     },
@@ -79,7 +79,7 @@ const part = StyleSheet.create({
     },
   primaryText: {
       color: '#ffffff',
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '800',
     },
   secondary: {
@@ -90,7 +90,7 @@ const part = StyleSheet.create({
       paddingHorizontal: 14,
     },
   secondaryText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
     },
   deleteIconButton: {
@@ -111,14 +111,14 @@ const part = StyleSheet.create({
     },
   dangerText: {
       color: '#dc2626',
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
     },
   error: {
       backgroundColor: '#fff0ed',
       borderRadius: 10,
       color: '#dc2626',
-      fontSize: 12,
+      fontSize: 13,
       marginBottom: 14,
       padding: 12,
     },
@@ -126,12 +126,12 @@ const part = StyleSheet.create({
       backgroundColor: '#eaf4ec',
       borderRadius: 10,
       color: '#1f4e38',
-      fontSize: 12,
+      fontSize: 13,
       marginVertical: 10,
       padding: 12,
     },
   fieldLabel: {
-      fontSize: 9,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 1,
       marginBottom: 4,
@@ -151,7 +151,7 @@ const part = StyleSheet.create({
       paddingVertical: 8,
     },
   optionText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
     },
   breedList: {
@@ -167,7 +167,7 @@ const part = StyleSheet.create({
       paddingVertical: 5,
     },
   breedChipText: {
-      fontSize: 10.5,
+      fontSize: 13,
       fontWeight: '800',
     },
   overlay: {

@@ -21,14 +21,14 @@ const part = StyleSheet.create({
   notesInput: {
       borderRadius: 10,
       borderWidth: 1,
-      fontSize: 12,
+      fontSize: 13,
       marginTop: 12,
       minHeight: 80,
       padding: 12,
       textAlignVertical: 'top',
     },
   selectLabel: {
-      fontSize: 9,
+      fontSize: 13,
       fontWeight: '800',
       letterSpacing: 1,
       marginBottom: 6,
@@ -41,7 +41,7 @@ const part = StyleSheet.create({
       padding: 12,
     },
   destinationText: {
-      fontSize: 12.5,
+      fontSize: 13,
       fontWeight: '700',
     },
   genderOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 8 },
@@ -58,10 +58,10 @@ const part = StyleSheet.create({
     },
   errorText: {
       color: '#dc2626',
-      fontSize: 11,
+      fontSize: 13,
       marginTop: 8,
     },
-  successText: { color: '#2d6a4f', fontSize: 12, fontWeight: '700', marginBottom: 10 }
+  successText: { color: '#2d6a4f', fontSize: 13, fontWeight: '700', marginBottom: 10 }
 });
 
 export default part;

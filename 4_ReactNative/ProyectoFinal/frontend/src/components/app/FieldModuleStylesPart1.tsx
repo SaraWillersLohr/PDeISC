@@ -9,7 +9,7 @@ const part = StyleSheet.create({
   innerContainer: { width: '100%' },
   innerContainerDesktop: { alignSelf: 'center', maxWidth: 1200, width: '100%' },
   heading: { fontSize: 26, fontWeight: '800', letterSpacing: -0.6 },
-  subtitle: { fontSize: 9.5, fontWeight: '800', letterSpacing: 1.2, marginBottom: 20, marginTop: 4 },
+  subtitle: { fontSize: 13, fontWeight: '800', letterSpacing: 1.2, marginBottom: 20, marginTop: 4 },
   modalCard: {
       alignSelf: 'center',
       marginBottom: 0,
@@ -48,7 +48,7 @@ const part = StyleSheet.create({
     },
   primaryText: {
       color: '#ffffff',
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '800',
     },
   pregnancyButton: {
@@ -63,15 +63,15 @@ const part = StyleSheet.create({
       width: '100%',
     },
   copy: {
-      fontSize: 11.5,
-      lineHeight: 17,
+      fontSize: 13,
+      lineHeight: 18,
       marginTop: 5,
     },
   error: {
       backgroundColor: '#fff0ed',
       borderRadius: 10,
       color: '#dc2626',
-      fontSize: 12,
+      fontSize: 13,
       marginBottom: 14,
       padding: 12,
     },
@@ -94,7 +94,7 @@ const part = StyleSheet.create({
       paddingVertical: 7,
     },
   userChipText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
     },
   statusPill: {
@@ -105,7 +105,7 @@ const part = StyleSheet.create({
       paddingVertical: 4,
     },
   statusPillText: {
-      fontSize: 10,
+      fontSize: 13,
       fontWeight: '800',
       textTransform: 'capitalize',
     },
@@ -113,7 +113,7 @@ const part = StyleSheet.create({
       marginTop: 10,
     },
   actionHint: {
-      fontSize: 10.5,
+      fontSize: 13,
       fontWeight: '800',
       marginTop: 6,
     },

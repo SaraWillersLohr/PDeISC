@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 const part = StyleSheet.create({
   approveText: {
       color: '#ffffff',
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '800',
     },
   rejectButton: {
@@ -18,14 +18,14 @@ const part = StyleSheet.create({
     },
   rejectText: {
       color: '#dc2626',
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '700',
     },
   requestNotice: {
       backgroundColor: '#e8efe5',
       borderRadius: 10,
       color: '#1f4e38',
-      fontSize: 12,
+      fontSize: 13,
       marginBottom: 12,
       padding: 12,
     },
@@ -33,7 +33,7 @@ const part = StyleSheet.create({
       backgroundColor: '#fff0ed',
       borderRadius: 10,
       color: '#9b3d36',
-      fontSize: 12,
+      fontSize: 13,
       marginBottom: 12,
       padding: 12,
     },
@@ -58,7 +58,7 @@ const part = StyleSheet.create({
       textAlign: 'center',
     },
   emptyCopy: {
-      fontSize: 12,
+      fontSize: 13,
       lineHeight: 18,
       marginTop: 6,
       maxWidth: 380,
@@ -95,7 +95,7 @@ const part = StyleSheet.create({
       paddingVertical: 8,
     },
   backBtnText: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '700',
     }
 });

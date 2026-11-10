@@ -12,7 +12,7 @@ export function PasswordInput({ containerStyle, inputStyle, ...inputProps }: Pro
 
   return (
     <View {...{ dataSet: { focusField: 'container' } }} style={[styles.container, containerStyle]}>
-      <TextInput {...inputProps} secureTextEntry={!visible} style={[styles.input, inputStyle]} />
+      <TextInput {...inputProps} underlineColorAndroid="transparent" secureTextEntry={!visible} style={[styles.input, inputStyle, styles.innerField]} />
       <Pressable
         accessibilityLabel={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         accessibilityRole="button"
@@ -29,5 +29,7 @@ export function PasswordInput({ containerStyle, inputStyle, ...inputProps }: Pro
 const styles = StyleSheet.create({
   container: { position: 'relative', width: '100%' },
   input: { paddingRight: 44, width: '100%' },
+  // El contenedor conserva el borde: el campo interno nunca agrega otro al enfocarse.
+  innerField: { borderWidth: 0, backgroundColor: 'transparent' },
   toggle: { alignItems: 'center', bottom: 0, justifyContent: 'center', position: 'absolute', right: 4, top: 0, width: 38 },
 });

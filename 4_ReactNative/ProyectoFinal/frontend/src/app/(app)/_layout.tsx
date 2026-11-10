@@ -45,7 +45,7 @@ function TabIcon({ color, focused, name, activeName }: { color: ColorValue; focu
 const styles = StyleSheet.create({
   hiddenTabBar: { display: 'none' },
   tabItem: { paddingTop: 2 },
-  tabLabel: { fontSize: 9, fontWeight: '600', marginTop: 1 },
+  tabLabel: { fontSize: 13, fontWeight: '600', marginTop: 1 },
   iconBadge: { alignItems: 'center', borderRadius: 14, height: 28, justifyContent: 'center', width: 44 },
   iconBadgeActive: { backgroundColor: '#e8efe5' },
 });

@@ -241,7 +241,7 @@ export function HomeScreen() {
                     </View>
                     <Text style={[s.statBoxNote, { color: colors.textMuted }]}>{item.note}</Text>
                     <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6, marginTop: 10 }}>
-                      <Text style={{ color: colors.primary, flex: 1, fontSize: 12, fontWeight: '700' }}>Ver {item.destination}</Text>
+                      <Text style={{ color: colors.primary, flex: 1, fontSize: 13, fontWeight: '700' }}>Ver {item.destination}</Text>
                       <Ionicons name="arrow-forward" color={colors.primary} size={16} />
                     </View>
                   </Pressable>

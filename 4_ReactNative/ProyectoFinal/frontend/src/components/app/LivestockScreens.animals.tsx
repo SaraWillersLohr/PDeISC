@@ -8,7 +8,6 @@ import { DateField } from './DateField';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
 import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { useLiveChanges } from '../../context/LiveChangesContext';
@@ -71,9 +70,6 @@ export function AnimalsInventoryScreen() {
   const [deactivationReason, setDeactivationReason] = useState<'venta' | 'muerte' | 'otro'>('venta');
   const [deactivationDetail, setDeactivationDetail] = useState('');
   const [deactivatingBusy, setDeactivatingBusy] = useState(false);
-  const [deathLocation, setDeathLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [deathLocationError, setDeathLocationError] = useState('');
-  const [gettingDeathLocation, setGettingDeathLocation] = useState(false);
   const [deathPhoto, setDeathPhoto] = useState<string | null>(null);
   const [reportingIllness, setReportingIllness] = useState(false);
   const [illnessNotes, setIllnessNotes] = useState('');
@@ -332,10 +328,6 @@ export function AnimalsInventoryScreen() {
                 {ownerCanDeactivate && deactivationReason !== 'muerte' ? <><Text style={[style.selectLabel, { color: colors.textMuted }]}>MOTIVO</Text><View style={style.genderOptions}>{(['venta', 'otro'] as const).map((reason) => <Pressable key={reason} accessibilityRole="radio" accessibilityState={{ selected: deactivationReason === reason }} onPress={() => setDeactivationReason(reason)} style={[style.genderOption, { backgroundColor: deactivationReason === reason ? colors.primary : colors.bgCardMuted, borderColor: deactivationReason === reason ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: deactivationReason === reason ? '#fff' : colors.textSecondary }]}>{reason === 'otro' ? 'Otro' : 'Venta'}</Text></Pressable>)}</View></> : <Text style={[style.selectLabel, { color: colors.textMuted }]}>NOTIFICACIÓN DE MUERTE</Text>}
                 <TextInput accessibilityLabel="Detalle opcional de la baja o muerte" maxLength={500} multiline onChangeText={deathForm.change('detail', setDeactivationDetail)} placeholder="Detalle u observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={deactivationDetail} /><FieldError message={deathForm.fields.detail} />
                 {deactivationReason === 'muerte' ? <>
-                  <Text style={[style.selectLabel, { color: colors.textMuted, marginTop: 10 }]}>UBICACIÓN GPS · OBLIGATORIA</Text>
-                  <Pressable disabled={gettingDeathLocation} onPress={() => void captureDeathLocation()} style={[style.cancelButton, { borderColor: colors.border, alignSelf: 'flex-start' }]}><Text style={[style.cancelText, { color: colors.primary }]}>{gettingDeathLocation ? 'Obteniendo ubicación…' : deathLocation ? 'Actualizar ubicación GPS' : 'Obtener ubicación GPS'}</Text></Pressable>
-                  {deathLocation ? <Text style={[style.detail, { color: colors.textSecondary }]}>Ubicación lista · {deathLocation.latitude.toFixed(6)}, {deathLocation.longitude.toFixed(6)}</Text> : null}
-                  {deathLocationError ? <Text style={style.errorText}>{deathLocationError}</Text> : null}
                   <PhotoAttachment value={deathPhoto} onChange={(value) => { setDeathPhoto(value); deathForm.clear('photo'); }} /><FieldError message={deathForm.fields.photo} />
                 </> : null}
                 <FieldError message={deathForm.fields.submit} />
@@ -405,14 +397,14 @@ export function AnimalsInventoryScreen() {
                   <Pressable onPress={() => { const currentNursing = corrals.find((corral) => corral.id_corral === viewing.id_corral && corral.es_enfermeria); const availableNursing = corrals.find((corral) => corral.es_enfermeria && Number(corral.ocupacion) < Number(corral.capacidad)); setIllnessCorralId(currentNursing?.id_corral ?? availableNursing?.id_corral ?? null); setIllnessNotes(''); illnessForm.clear(); setReportingIllness(true); }} style={[style.matingCta, { backgroundColor: '#a8473d' }]}>
                     <Ionicons color="#ffffff" name="medkit-outline" size={16} /><Text style={style.confirmText}>Reportar enfermedad e ingresar a enfermería</Text>
                   </Pressable>
-                  {!ownerCanDeactivate ? <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}>
+                  {!ownerCanDeactivate ? <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}>
                     <Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text>
                   </Pressable> : null}
                 </View> : null}
                 {viewing?.activo && ownerCanDeactivate ? (
                   <View style={style.matingCtas}>
-                    <Pressable onPress={() => { setDeactivationReason('venta'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}><Ionicons color="#ffffff" name="trash-outline" size={16} /><Text style={style.confirmText}>Borrar animal</Text></Pressable>
-                    <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#a83232' }]}><Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text></Pressable>
+                    <Pressable onPress={() => { setDeactivationReason('venta'); setDeactivationDetail(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}><Ionicons color="#ffffff" name="trash-outline" size={16} /><Text style={style.confirmText}>Borrar animal</Text></Pressable>
+                    <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#a83232' }]}><Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text></Pressable>
                   </View>
                 ) : null}
                 <View style={style.modalActions}>
@@ -512,33 +504,21 @@ export function AnimalsInventoryScreen() {
   async function confirmDeactivation(): Promise<void> {
     if (!session || !viewing) return;
     if (!deathForm.validate({ detail: deactivationDetail.length > 500 && 'El detalle admite hasta 500 caracteres.' })) return;
-    if (deactivationReason === 'muerte' && !deathLocation) { setDeathLocationError('Obtené la ubicación GPS antes de notificar la muerte.'); return; }
     setDeactivatingBusy(true); deathForm.clear();
     try {
       if (deactivationReason === 'muerte' && !ownerCanDeactivate) {
         const now = new Date(); const fecha = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const result = await reportAnimal(session, 'muerte', { id_animal: viewing.id_animal, fecha, motivo: deactivationDetail.trim() || undefined, latitud: deathLocation!.latitude, longitud: deathLocation!.longitude, foto: deathPhoto ?? undefined });
+        const result = await reportAnimal(session, 'muerte', { id_animal: viewing.id_animal, fecha, motivo: deactivationDetail.trim() || undefined, foto: deathPhoto ?? undefined });
         setServiceNotice(result.estado === 'pendiente'
           ? `Muerte guardada en el dispositivo. Al sincronizar se dará de baja operativa y quedará pendiente de revisión administrativa. ${result.mensaje}`
-          : 'Muerte notificada con ubicación. La baja operativa quedó registrada y espera revisión administrativa.');
+          : 'Muerte notificada. La baja operativa quedó registrada y espera revisión administrativa.');
       } else {
-        await deactivateAnimal(session, viewing.id_animal, deactivationReason, deactivationDetail.trim(), deactivationReason === 'muerte' ? { ...deathLocation!, foto: deathPhoto ?? undefined } : undefined);
+        await deactivateAnimal(session, viewing.id_animal, deactivationReason, deactivationDetail.trim(), deactivationReason === 'muerte' ? { foto: deathPhoto ?? undefined } : undefined);
         setServiceNotice(deactivationReason === 'muerte' ? 'Muerte registrada y confirmada.' : 'Animal dado de baja; se conservó su ficha e historial.');
       }
       setViewing(null); setDeactivating(false); setLoading(true); await load();
     } catch (cause) { deathForm.serverError(friendlyErrorMessage(cause, 'No se pudo guardar la baja o notificación.'), [['detail', /motivo|detalle|observaci|caracter/i], ['photo', /foto|imagen/i]]); }
     finally { setDeactivatingBusy(false); }
-  }
-
-  async function captureDeathLocation(): Promise<void> {
-    setGettingDeathLocation(true); setDeathLocationError('');
-    try {
-      const permission = await Location.requestForegroundPermissionsAsync();
-      if (!permission.granted) { setDeathLocationError('Dale permiso de ubicación a EstanciaApp para continuar.'); return; }
-      const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-      setDeathLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
-    } catch { setDeathLocationError('No se pudo obtener la ubicación GPS. Revisá el permiso y la señal e intentá de nuevo.'); }
-    finally { setGettingDeathLocation(false); }
   }
 
   async function submitIllnessReport(): Promise<void> {

@@ -259,7 +259,7 @@ export async function deactivateAnimal(
   id: number,
   motivo: "venta" | "muerte" | "otro",
   detalle: string,
-  location?: { latitude: number; longitude: number; foto?: string },
+  location?: { latitude?: number; longitude?: number; foto?: string },
 ): Promise<void> {
   if (!apiUrl) throw new Error(apiConfigurationMessage);
   const response = await apiFetch(`${apiUrl}/animals/${id}/deactivate`, {

@@ -120,8 +120,8 @@ async function reportAnimal(connection: PoolConnection, payload: Record<string, 
   const animal = animals[0];
   if (!animal) rejectOperation('el animal ya no está activo');
   if (kind === 'reporte_muerte') {
-    const lat = Number(payload.latitud); const lon = Number(payload.longitud); const photo = readPhoto(payload.foto);
-    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180 || photo === false) rejectOperation('la muerte requiere una ubicación gps válida y una foto válida si se adjunta');
+    const lat = payload.latitud == null ? null : Number(payload.latitud); const lon = payload.longitud == null ? null : Number(payload.longitud); const photo = readPhoto(payload.foto);
+    if (photo === false) rejectOperation('la foto adjunta no es válida');
     const [created] = await connection.execute<ResultSetHeader>('INSERT INTO reportes_muerte (id_animal,id_usuario,fecha,motivo,latitud,longitud,foto) VALUES (?,?,?,?,?,?,?)', [animalId,userId,date,reason,lat,lon,photo]);
     // La baja operativa es inmediata; el reporte queda pendiente y el administrador puede reactivarlo si lo rechaza.
     await connection.execute('UPDATE animales SET activo=0,version_dato=version_dato+1 WHERE id_animal=?', [animalId]);

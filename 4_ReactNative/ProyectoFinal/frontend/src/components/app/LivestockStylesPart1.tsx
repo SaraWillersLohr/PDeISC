@@ -20,14 +20,14 @@ const part = StyleSheet.create({
       marginBottom: 20,
     },
   heading: { fontSize: 26, fontWeight: '800', letterSpacing: -0.6 },
-  subtitle: { fontSize: 9.5, fontWeight: '800', letterSpacing: 1.2, marginTop: 4 },
+  subtitle: { fontSize: 13, fontWeight: '800', letterSpacing: 1.2, marginTop: 4 },
   countBadge: {
       backgroundColor: 'rgba(134, 239, 172, 0.16)',
       borderRadius: 8,
       paddingHorizontal: 10,
       paddingVertical: 5,
     },
-  countText: { fontSize: 11, fontWeight: '800' },
+  countText: { fontSize: 13, fontWeight: '800' },
   searchRow: {
       flexDirection: 'column',
       gap: 10,
@@ -52,10 +52,10 @@ const part = StyleSheet.create({
       fontSize: 13,
     },
   speciesFilter: { marginBottom: 16 },
-  speciesFilterLabel: { fontSize: 11, fontWeight: '700', marginBottom: 8 },
+  speciesFilterLabel: { fontSize: 13, fontWeight: '700', marginBottom: 8 },
   speciesFilterOptions: { flexDirection: 'row', gap: 8, paddingRight: 4 },
   speciesChip: { borderRadius: 18, borderWidth: 1, minHeight: 34, justifyContent: 'center', paddingHorizontal: 14 },
-  speciesChipText: { fontSize: 11, fontWeight: '700' },
+  speciesChipText: { fontSize: 13, fontWeight: '700' },
   gridContainer: {
       gap: 12,
     },
@@ -90,8 +90,8 @@ const part = StyleSheet.create({
       fontWeight: '800',
     },
   detail: {
-      fontSize: 11,
-      lineHeight: 16,
+      fontSize: 13,
+      lineHeight: 18,
       marginTop: 2,
     },
   statePill: {
@@ -106,7 +106,7 @@ const part = StyleSheet.create({
       backgroundColor: '#fee2e2',
     },
   stateText: {
-      fontSize: 9.5,
+      fontSize: 13,
       fontWeight: '800',
       textTransform: 'capitalize',
     },
@@ -147,11 +147,11 @@ const part = StyleSheet.create({
     },
   noticeText: {
       color: '#92400e',
-      fontSize: 10.5,
+      fontSize: 13,
       fontWeight: '700',
     },
   noticeDate: {
-      fontSize: 10,
+      fontSize: 13,
       marginTop: 2,
     },
   empty: {
@@ -181,7 +181,7 @@ const part = StyleSheet.create({
     },
   retryText: {
       color: '#ffffff',
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '800',
     },
   moveButton: {
@@ -190,7 +190,7 @@ const part = StyleSheet.create({
       paddingVertical: 7,
     },
   moveButtonText: {
-      fontSize: 11,
+      fontSize: 13,
       fontWeight: '800',
     },
   confirmButton: {
@@ -208,7 +208,7 @@ const part = StyleSheet.create({
   matingCta: { alignItems: 'center', borderRadius: 10, flexBasis: '48%', flexDirection: 'row', flexGrow: 1, gap: 8, justifyContent: 'center', minHeight: 44, paddingHorizontal: 14 },
   confirmText: {
       color: '#ffffff',
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '800',
     },
   cancelButton: {
@@ -222,7 +222,7 @@ const part = StyleSheet.create({
       paddingVertical: 10,
     },
   cancelText: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '700',
     },
   disabledButton: {

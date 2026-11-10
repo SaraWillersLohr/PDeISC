@@ -47,5 +47,5 @@ export function PhotoAttachment({ value, onChange, compact = false }: { value: s
 const styles = StyleSheet.create({
   wrap: { marginTop: 8 }, row: { alignItems: 'center', flexDirection: 'row', gap: 8 },
   preview: { borderRadius: 9, borderWidth: 1, height: 56, width: 74 }, previewCompact: { height: 48, width: 64 },
-  button: { alignItems: 'center', borderRadius: 9, borderWidth: 1, flexDirection: 'row', gap: 7, minHeight: 40, paddingHorizontal: 11 }, buttonText: { fontSize: 11, fontWeight: '700' }, remove: { padding: 4 }, error: { color: '#b42318', fontSize: 10, marginTop: 5 },
+  button: { alignItems: 'center', borderRadius: 9, borderWidth: 1, flexDirection: 'row', gap: 7, minHeight: 40, paddingHorizontal: 11 }, buttonText: { fontSize: 13, fontWeight: '700' }, remove: { padding: 4 }, error: { color: '#b42318', fontSize: 13, marginTop: 5 },
 });

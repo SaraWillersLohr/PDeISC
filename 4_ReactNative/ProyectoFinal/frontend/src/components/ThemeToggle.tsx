@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     width: 24,
   },
   pillText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
   },
   pillTextLight: {
@@ -208,13 +208,13 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     color: '#829986',
-    fontSize: 9,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
   mainTitle: {
     color: '#f0fdf4',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     marginTop: 1,
   },

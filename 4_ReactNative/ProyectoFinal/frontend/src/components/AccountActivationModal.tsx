@@ -1,3 +1,4 @@
+import { FieldError, useFieldErrors } from './FieldError';
 // activo una cuenta aprobada desde una ventana compacta sobre el ingreso.
 import { FormDialog } from './FormDialog';
 import { friendlyErrorMessage } from '../services/apiErrors';
@@ -14,29 +15,29 @@ export function AccountActivationModal({ visible, onClose }: Props) {
   const { setSession } = useSession();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [error, setError] = useState('');
+  const form = useFieldErrors();
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
 
   async function submit(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(cleanEmail) || !/^\d{6}$/.test(code)) { setError('Ingresá el correo y el código de seis dígitos.'); return; }
-    setBusy(true); setError('');
+    if (!form.validate({ email: !/^\S+@\S+\.\S+$/.test(cleanEmail) && 'Ingresá un correo electrónico válido.', code: !/^\d{6}$/.test(code) && 'Ingresá los seis dígitos del código recibido.' })) return;
+    setBusy(true); form.clear();
     try {
       const session = await redeemAccountCode(cleanEmail, code);
       await saveSession(session);
       setSession(session);
       router.replace('/(app)/home');
-    } catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo activar el acceso.')); }
+    } catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo activar el acceso.'), [['code', /código|codigo|venci|intentos/i], ['email', /correo|email/i]]); }
     finally { setBusy(false); }
   }
 
   async function resend(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) { setError('Ingresá primero el correo asociado a la solicitud.'); return; }
-    setBusy(true); setError(''); setNotice('');
+    if (!form.validate({ email: !/^\S+@\S+\.\S+$/.test(cleanEmail) && 'Ingresá el correo asociado a la solicitud.' })) return;
+    setBusy(true); form.clear(); setNotice('');
     try { setNotice(await resendAccessCode(cleanEmail)); }
-    catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo reenviar el código.')); }
+    catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo reenviar el código.'), [['email', /correo|email/i]]); }
     finally { setBusy(false); }
   }
 
@@ -50,10 +51,10 @@ export function AccountActivationModal({ visible, onClose }: Props) {
           </View>
           <Text style={s.copy}>Ingresá el correo y el código de seis dígitos que te envió el administrador.</Text>
           <Text style={s.label}>CORREO ELECTRÓNICO</Text>
-          <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
+          <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={form.change('email', setEmail)} placeholder="nombre@correo.com" style={s.input} value={email} /><FieldError message={form.fields.email} />
           <Text style={s.label}>CÓDIGO DE ACCESO</Text>
-          <TextInput accessibilityLabel="Código de acceso de seis dígitos" autoComplete="one-time-code" keyboardType="number-pad" maxLength={6} onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))} onSubmitEditing={() => void submit()} placeholder="000000" style={[s.input, s.code]} value={code} />
-          {notice ? <Text style={s.notice}>{notice}</Text> : null}{error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
+          <TextInput accessibilityLabel="Código de acceso de seis dígitos" autoComplete="one-time-code" keyboardType="number-pad" maxLength={6} onChangeText={(value) => { form.clear('code'); setCode(value.replace(/\D/g, '').slice(0, 6)); }} onSubmitEditing={() => void submit()} placeholder="000000" style={[s.input, s.code]} value={code} /><FieldError message={form.fields.code} />
+          {notice ? <Text style={s.notice}>{notice}</Text> : null}<FieldError message={form.fields.submit} />
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Activar e ingresar</Text>}</Pressable>
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => void resend()} style={s.link}><Text style={s.linkText}>Reenviar código de acceso</Text></Pressable>
         </FormDialog>

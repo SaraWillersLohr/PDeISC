@@ -13,10 +13,10 @@ export async function listTasks(req: Request, res: Response): Promise<void> {
   const userId = req.usuario?.id_usuario ?? 0; const role = req.rolVigente ?? '';
   try {
     const [rows] = await database.execute<RowDataPacket[]>(
-      `SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.fecha_vencimiento,t.estado,
+      `SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.id_creador,t.fecha_vencimiento,t.estado,
               u.nombre AS responsable,u.apellido AS apellido_responsable
        FROM tareas t LEFT JOIN usuarios u ON u.id_usuario=t.id_responsable
-       WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.fecha_vencimiento IS NULL,t.fecha_vencimiento,t.created_at DESC`,
+       WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.created_at DESC,t.id_tarea DESC`,
       [userId, role],
     );
     res.json({ data: rows });
@@ -61,6 +61,81 @@ export async function updateTask(req: Request, res: Response): Promise<void> {
     if (!result.affectedRows) { res.status(404).json({ message: 'tarea no encontrada o no asignada a tu usuario' }); return; }
     res.json({ message: 'tarea actualizada' });
   } catch { res.status(500).json({ message: 'no se pudo actualizar la tarea' }); }
+}
+
+export async function editTask(req: Request, res: Response): Promise<void> {
+  const id = Number(req.params.id);
+  const title = String(req.body.titulo ?? '').trim();
+  const description = String(req.body.descripcion ?? '').trim();
+  const responsible = Number(req.body.id_responsable);
+  const due = req.body.fecha_vencimiento || null;
+  if (!Number.isInteger(id) || id < 1 || !title || title.length > 150) {
+    res.status(400).json({ message: 'El título es obligatorio y admite hasta 150 caracteres.' }); return;
+  }
+  if (due && !validDateOnly(due)) { res.status(400).json({ message: 'Elegí una fecha límite válida.' }); return; }
+  if (!Number.isInteger(responsible) || responsible < 1) { res.status(400).json({ message: 'Elegí un responsable válido.' }); return; }
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [tasks] = await connection.execute<RowDataPacket[]>('SELECT id_creador FROM tareas WHERE id_tarea=? FOR UPDATE', [id]);
+    if (!tasks.length) { await connection.rollback(); res.status(404).json({ message: 'La tarea ya no existe.' }); return; }
+    if (req.rolVigente !== 'dueno' || Number(tasks[0].id_creador) !== req.usuario?.id_usuario) {
+      await connection.rollback(); res.status(403).json({ message: 'Solo podés editar las tareas que creaste.' }); return;
+    }
+    const [users] = await connection.execute<RowDataPacket[]>("SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 AND r.nombre='peon' FOR UPDATE", [responsible]);
+    if (!users.length) { await connection.rollback(); res.status(400).json({ message: 'Elegí un peón activo como responsable.' }); return; }
+    await connection.execute('UPDATE tareas SET titulo=?,descripcion=?,id_responsable=?,fecha_vencimiento=? WHERE id_tarea=?', [title, description || null, responsible, due, id]);
+    await connection.commit();
+    res.json({ message: 'Tarea actualizada.' });
+  } catch { await connection.rollback(); res.status(500).json({ message: 'No se pudo editar la tarea.' }); }
+  finally { connection.release(); }
+}
+
+// El dueño puede corregir las tareas que creó. El peón solo borra las suyas completadas.
+export async function deleteTask(req: Request, res: Response): Promise<void> {
+  // El lote se valida completo antes de borrar; nunca quedan borrados parciales.
+  const rawIds = req.params.id ? [Number(req.params.id)] : req.body.ids;
+  const ids: number[] = Array.isArray(rawIds) ? [...new Set(rawIds)] : [];
+  const userId = req.usuario?.id_usuario;
+  const role = req.rolVigente;
+  if (!ids.length || ids.length > 1000 || ids.some((id) => !Number.isInteger(id) || id < 1) || !userId) {
+    res.status(400).json({ message: 'Elegí tareas válidas (hasta 1000 por vez).' }); return;
+  }
+  const connection = await database.getConnection();
+  try {
+    await connection.beginTransaction();
+    // Bloqueo la fila para volver a comprobar estado y responsable antes del borrado.
+    const [tasks] = await connection.execute<RowDataPacket[]>(
+      `SELECT id_tarea,titulo,estado,id_responsable,id_creador FROM tareas WHERE id_tarea IN (${ids.map(() => '?').join(',')}) ORDER BY id_tarea FOR UPDATE`, ids,
+    );
+    if (tasks.length !== ids.length) {
+      await connection.rollback();
+      res.status(404).json({ message: 'La tarea ya no existe.' }); return;
+    }
+    for (const task of tasks) {
+    const ownerCanDelete = role === 'dueno' && Number(task.id_creador) === userId;
+    const assigneeCanDelete = role === 'peon' && Number(task.id_responsable) === userId;
+    if (!ownerCanDelete && !assigneeCanDelete) {
+      await connection.rollback();
+      res.status(403).json({ message: 'No tenés permiso para borrar esta tarea.' }); return;
+    }
+    if (!ownerCanDelete && task.estado !== 'completada') {
+      await connection.rollback();
+      res.status(409).json({ message: 'Solo podés borrar tus tareas cuando estén completadas.' }); return;
+    }
+    await connection.execute('DELETE FROM tareas WHERE id_tarea=?', [task.id_tarea]);
+    // La auditoría y el borrado se confirman juntos para conservar quién realizó la acción.
+    await connection.execute(
+      'INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)',
+      ['tarea', task.id_tarea, 'borrado_permanente', userId, JSON.stringify(task)],
+    );
+    }
+    await connection.commit();
+    res.json({ message: 'Tareas borradas.' });
+  } catch {
+    await connection.rollback();
+    res.status(500).json({ message: 'No se pudo borrar la tarea. Intentá de nuevo.' });
+  } finally { connection.release(); }
 }
 
 export async function listReproduction(req: Request, res: Response): Promise<void> {

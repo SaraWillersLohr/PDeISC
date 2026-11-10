@@ -1,3 +1,4 @@
+import { FieldError, useFieldErrors } from '../FieldError';
 // consulto la ocupación y administración operativa de corrales.
 // muestro los inventarios de animales y corrales con datos del backend.
 import { FormDialog } from '../FormDialog';
@@ -16,6 +17,7 @@ import { style } from './LivestockStyles';
 // consulto ocupación y capacidad de cada corral activo.
 export function CorralsInventoryScreen() {
   const { session } = useSession();
+  const form = useFieldErrors();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
@@ -66,7 +68,7 @@ export function CorralsInventoryScreen() {
       onRefresh={() => { setRefreshing(true); void load(); }}
       refreshing={refreshing}
       headerAction={canManage ? (
-        <Pressable onPress={() => { setEditing(null); setCorralName(''); setCapacity(''); setActionError(''); }} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
+        <Pressable onPress={() => { setEditing(null); form.clear(); setCorralName(''); setCapacity(''); setActionError(''); }} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
           <Ionicons color="#ffffff" name="add" size={17} style={{ marginRight: 4 }} />
           <Text style={style.confirmText}>Crear corral</Text>
         </Pressable>
@@ -127,7 +129,7 @@ export function CorralsInventoryScreen() {
                 {canManage && !corral.es_enfermeria ? (
                   <View style={{ flexDirection: 'row', gap: 8 }}>
                     <Pressable
-                      onPress={() => { setEditing(corral); setCorralName(corral.nombre); setCapacity(String(corral.capacidad)); setActionError(''); }}
+                      onPress={() => { form.clear(); setEditing(corral); setCorralName(corral.nombre); setCapacity(String(corral.capacidad)); setActionError(''); }}
                       style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}
                     >
                       <Text style={[style.moveButtonText, { color: colors.primary }]}>Editar</Text>
@@ -164,22 +166,22 @@ export function CorralsInventoryScreen() {
             <Text style={[style.modalTitle, { color: colors.textMain }]}>{editing ? 'Editar corral' : 'Nuevo corral'}</Text>
             <Text style={[style.selectLabel, { color: colors.textMuted }]}>NOMBRE</Text>
             <TextInput
-              onChangeText={setCorralName}
+              onChangeText={form.change('name', setCorralName)}
               placeholder="Ej. Potrero norte"
               placeholderTextColor={colors.textMuted}
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={corralName}
-            />
+            /><FieldError message={form.fields.name} />
             <Text style={[style.selectLabel, { color: colors.textMuted }]}>CAPACIDAD DE ANIMALES</Text>
             <TextInput
               keyboardType="number-pad"
-              onChangeText={setCapacity}
+              onChangeText={form.change('capacity', setCapacity)}
               placeholder="Cantidad de animales permitida"
               placeholderTextColor={colors.textMuted}
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={capacity}
-            />
-            {actionError ? <Text style={style.errorText}>{actionError}</Text> : null}
+            /><FieldError message={form.fields.capacity} />
+            <FieldError message={form.fields.submit} />
             <View style={style.modalActions}>
               <Pressable onPress={() => setEditing(false)} style={[style.cancelButton, { borderColor: colors.border }]}>
                 <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
@@ -219,16 +221,17 @@ export function CorralsInventoryScreen() {
   );
 
   async function persist(): Promise<void> {
-    if (!session || !corralName.trim() || !Number.isInteger(Number(capacity)) || Number(capacity) < 1) {
-      setActionError('Ingresá un nombre y una capacidad válida.');
-      return;
-    }
+    if (!session) return;
+    if (!form.validate({
+      name: !corralName.trim() ? 'Ingresá el nombre del corral.' : corralName.trim().length > 80 && 'El nombre admite hasta 80 caracteres.',
+      capacity: !capacity.trim() ? 'Ingresá la capacidad del corral.' : !Number.isInteger(Number(capacity)) || Number(capacity) < 1 ? 'La capacidad debe ser un número entero mayor a cero.' : editing && Number(capacity) < editing.ocupacion && 'La capacidad no puede ser menor a la cantidad de animales alojados.',
+    })) return;
     setSavingCorral(true); setActionError('');
     try {
       await saveCorral(session, { ...(editing ? { id_corral: editing.id_corral } : {}), nombre: corralName.trim(), capacidad: Number(capacity) });
       setEditing(false); await load();
     } catch (cause) {
-      setActionError(friendlyErrorMessage(cause, 'No se pudo guardar el corral.'));
+      form.serverError(friendlyErrorMessage(cause, 'No se pudo guardar el corral.'), [['capacity', /capacidad|ocupación|ocupacion/i], ['name', /nombre/i]]);
     } finally {
       setSavingCorral(false);
     }

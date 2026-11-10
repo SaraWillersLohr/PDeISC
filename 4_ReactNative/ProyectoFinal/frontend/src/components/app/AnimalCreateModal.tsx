@@ -1,5 +1,6 @@
+import { FieldError, useFieldErrors } from '../FieldError';
+import { dateFieldError, personNameError, animalBirthError } from '../../services/formValidation';
 import { FormDialog } from '../FormDialog';
-import { animalBirthError } from '../../services/formValidation';
 import { DateField } from './DateField';
 // Separo opciones y permito envolver acciones en celulares.
 // registro animales usando razas y corrales existentes en la organización.
@@ -10,7 +11,6 @@ import { useSession } from '../../context/SessionContext';
 import { listCatalog, type Breed, type Species } from '../../services/organizationApi';
 import { createAnimal, type AnimalGender, type CorralRecord } from '../../services/livestockApi';
 import { PhotoAttachment } from './PhotoAttachment';
-import { isValidBirthDate } from './LivestockScreens.shared';
 
 const colors = { green: '#214d35', ink: '#202c23', muted: '#748076', line: '#e5eae3', canvas: '#f4f6f1', white: '#fff', pale: '#e8efe5', red: '#a34b43' };
 const genderOptions: { value: AnimalGender; label: string }[] = [
@@ -21,6 +21,7 @@ const genderOptions: { value: AnimalGender; label: string }[] = [
 
 export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { visible: boolean; corrals: CorralRecord[]; onClose: () => void; onCreated: () => void }) {
   const { session } = useSession();
+  const form = useFieldErrors();
   const [species, setSpecies] = useState<Species[]>([]); const [breeds, setBreeds] = useState<Breed[]>([]);
   const [speciesId, setSpeciesId] = useState<number | null>(null); const [breedId, setBreedId] = useState<number | null>(null); const [selectedCorralId, setCorralId] = useState<number | null>(null);
   const [gender, setGender] = useState<AnimalGender | null>(null);
@@ -42,30 +43,31 @@ export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { vi
 
   function close(): void {
     setLoading(true);
-    setMessage('');
+    setMessage(''); form.clear();
     setGender(null);
     setCorralId(null);
     onClose();
   }
 
   async function save(): Promise<void> {
-    if (birth && !isValidBirthDate(birth)) {
-      setMessage('Elegí una fecha de nacimiento válida, de hoy o anterior.'); return;
-    }
-    if (!session || !identifier.trim() || !gender || !breedId || !corralId || (weight && (!Number.isFinite(Number(weight)) || Number(weight) <= 0))) {
-      setMessage('Completá identificador, género, especie, raza y corral. Si ingresás un peso, debe ser mayor a cero.'); return;
-    }
-    if (!availableCorrals.some((corral) => corral.id_corral === corralId)) {
-      setMessage('El corral seleccionado ya no está disponible. Elegí otro corral.'); return;
-    }
-    // Aplico el límite a la especie elegida sin cambiar el registro del animal.
-    const ageError = animalBirthError(birth, species.find((item) => item.id_especie === speciesId)?.nombre ?? '');
-    if (ageError) { setMessage(ageError); return; }
+    if (!session) return;
+    const selectedSpecies = species.find((item) => item.id_especie === speciesId)?.nombre ?? '';
+    if (!form.validate({
+      identifier: !identifier.trim() ? 'Ingresá el identificador o caravana.' : identifier.trim().length > 50 && 'El identificador admite hasta 50 caracteres.',
+      name: name.trim() && personNameError(name, 'el nombre'),
+      gender: !gender && 'Elegí el género del animal.',
+      species: !speciesId && 'Elegí la especie.',
+      breed: !breedId && 'Elegí la raza.',
+      corral: !corralId ? 'Elegí el corral inicial.' : !availableCorrals.some((item) => item.id_corral === corralId) && 'El corral ya no tiene lugar. Elegí otro.',
+      birth: dateFieldError(birth, false, true) || animalBirthError(birth, selectedSpecies),
+      weight: weight !== '' && (!Number.isFinite(Number(weight)) || Number(weight) <= 0) && 'El peso debe ser un número mayor a cero.',
+    })) return;
+    if (!gender || !breedId || !corralId) return;
     setSaving(true); setMessage('');
     try {
       await createAnimal(session, { identificador: identifier.trim(), nombre: name.trim() || undefined, foto: photo, genero: gender, id_raza: breedId, id_corral: corralId, fecha_nacimiento: birth || undefined, peso_kg: weight ? Number(weight) : undefined });
       setIdentifier(''); setName(''); setBirth(''); setWeight(''); setPhoto(null); setGender(null); onCreated(); close();
-    } catch (cause) { setMessage(friendlyErrorMessage(cause, 'No se pudo registrar el animal.')); }
+    } catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo registrar el animal.'), [['identifier', /identificador|caravana/i], ['name', /nombre/i], ['birth', /fecha|nacimiento/i], ['corral', /corral|capacidad|lugar/i], ['breed', /raza/i], ['gender', /género|genero/i], ['weight', /peso/i], ['photo', /foto|imagen/i]]); }
     finally { setSaving(false); }
   }
 
@@ -73,23 +75,27 @@ export function AnimalCreateModal({ visible, corrals, onClose, onCreated }: { vi
     <View style={s.backdrop}><FormDialog style={s.modal}><Text style={s.title}>Agregar animal</Text><Text style={s.intro}>Completá la identificación y elegí su raza y ubicación inicial.</Text>
       {loading ? <ActivityIndicator color={colors.green} /> : <>
         <Text style={s.label}>IDENTIFICACIÓN</Text>
-        <TextInput accessibilityLabel="Identificador o número de caravana, obligatorio" autoCapitalize="characters" maxLength={50} onChangeText={setIdentifier} placeholder="Caravana o identificador *" style={s.input} value={identifier} />
-        <TextInput accessibilityLabel="Nombre o alias, opcional" onChangeText={setName} placeholder="Nombre o alias (opcional)" style={s.input} value={name} />
-        <PhotoAttachment value={photo} onChange={setPhoto} />
+        <TextInput accessibilityLabel="Identificador o número de caravana, obligatorio" autoCapitalize="characters" maxLength={50} onChangeText={form.change('identifier', setIdentifier)} placeholder="Caravana o identificador *" style={s.input} value={identifier} /><FieldError message={form.fields.identifier} />
+        <TextInput accessibilityLabel="Nombre o alias, opcional" onChangeText={form.change('name', setName)} placeholder="Nombre o alias (opcional)" style={s.input} value={name} /><FieldError message={form.fields.name} />
+        <PhotoAttachment value={photo} onChange={(value) => { setPhoto(value); form.clear('photo'); }} /><FieldError message={form.fields.photo} />
         <Text style={s.label}>GÉNERO *</Text>
-        <View style={s.options}>{genderOptions.map((item) => <Pressable accessibilityRole="radio" accessibilityState={{ selected: gender === item.value }} key={item.value} onPress={() => setGender(item.value)} style={[s.option, gender === item.value && s.selected]}><Text style={[s.optionText, gender === item.value && s.selectedText]}>{item.label}</Text></Pressable>)}</View>
-        <Text style={s.label}>ESPECIE Y RAZA</Text>
-        {species.length ? <View style={s.options}>{species.map((item) => <Pressable accessibilityRole="button" accessibilityState={{ selected: speciesId === item.id_especie }} key={item.id_especie} onPress={() => { setSpeciesId(item.id_especie); setBreedId(breeds.find((breed) => breed.id_especie === item.id_especie)?.id_raza ?? null); }} style={[s.option, speciesId === item.id_especie && s.selected]}><Text style={[s.optionText, speciesId === item.id_especie && s.selectedText]}>{item.nombre}</Text></Pressable>)}</View> : <Text style={s.hint}>No hay especies cargadas. Primero agregá una en “Especies y razas”.</Text>}
-        {availableBreeds.length ? <View style={s.options}>{availableBreeds.map((item) => <Pressable accessibilityRole="button" accessibilityState={{ selected: breedId === item.id_raza }} key={item.id_raza} onPress={() => setBreedId(item.id_raza)} style={[s.option, breedId === item.id_raza && s.selected]}><Text style={[s.optionText, breedId === item.id_raza && s.selectedText]}>{item.nombre}</Text></Pressable>)}</View> : <Text style={s.hint}>{speciesId ? 'Esta especie todavía no tiene razas. Agregá o proponé una desde “Especies y razas”.' : 'Elegí una especie para ver sus razas.'}</Text>}
+        <View style={s.options}>{genderOptions.map((item) => <Pressable accessibilityRole="radio" accessibilityState={{ selected: gender === item.value }} key={item.value} onPress={() => { setGender(item.value); form.clear('gender'); }} style={[s.option, gender === item.value && s.selected]}><Text style={[s.optionText, gender === item.value && s.selectedText]}>{item.label}</Text></Pressable>)}</View>
+        <FieldError message={form.fields.gender} /><Text style={s.label}>ESPECIE Y RAZA</Text>
+        {species.length ? <View style={s.options}>{species.map((item) => <Pressable accessibilityRole="button" accessibilityState={{ selected: speciesId === item.id_especie }} key={item.id_especie} onPress={() => { form.clear('species'); form.clear('breed'); setSpeciesId(item.id_especie); setBreedId(breeds.find((breed) => breed.id_especie === item.id_especie)?.id_raza ?? null); }} style={[s.option, speciesId === item.id_especie && s.selected]}><Text style={[s.optionText, speciesId === item.id_especie && s.selectedText]}>{item.nombre}</Text></Pressable>)}</View> : <Text style={s.hint}>No hay especies cargadas. Primero agregá una en “Especies y razas”.</Text>}
+        <FieldError message={form.fields.species} />
+        {availableBreeds.length ? <View style={s.options}>{availableBreeds.map((item) => <Pressable accessibilityRole="button" accessibilityState={{ selected: breedId === item.id_raza }} key={item.id_raza} onPress={() => { setBreedId(item.id_raza); form.clear('breed'); }} style={[s.option, breedId === item.id_raza && s.selected]}><Text style={[s.optionText, breedId === item.id_raza && s.selectedText]}>{item.nombre}</Text></Pressable>)}</View> : <Text style={s.hint}>{speciesId ? 'Esta especie todavía no tiene razas. Agregá o proponé una desde “Especies y razas”.' : 'Elegí una especie para ver sus razas.'}</Text>}
+        <FieldError message={form.fields.breed} />
         <Text style={s.label}>EDAD Y PESO</Text>
-        <DateField accessibilityLabel="Fecha de nacimiento aproximada u exacta" maximumDate={new Date()} onChangeText={setBirth} placeholder="Fecha de nacimiento (opcional)" showCalendarIcon style={s.input} value={birth} />
+        <DateField accessibilityLabel="Fecha de nacimiento aproximada u exacta" maximumDate={new Date()} onChangeText={form.change('birth', setBirth)} placeholder="Fecha de nacimiento (opcional)" showCalendarIcon style={s.input} value={birth} /><FieldError message={form.fields.birth} />
         <Text style={s.hint}>La edad se calcula a partir de la fecha de nacimiento.</Text>
-        <TextInput accessibilityLabel="Peso en kilogramos, opcional" keyboardType="decimal-pad" onChangeText={setWeight} placeholder="Peso en kg (opcional)" style={s.input} value={weight} />
+        <TextInput accessibilityLabel="Peso en kilogramos, opcional" keyboardType="decimal-pad" onChangeText={form.change('weight', setWeight)} placeholder="Peso en kg (opcional)" style={s.input} value={weight} /><FieldError message={form.fields.weight} />
         <Text style={s.label}>UBICACIÓN INICIAL</Text>
-        {availableCorrals.length ? <View style={s.options}>{availableCorrals.map((item) => <Pressable accessibilityRole="button" accessibilityState={{ selected: corralId === item.id_corral }} key={item.id_corral} onPress={() => setCorralId(item.id_corral)} style={[s.option, corralId === item.id_corral && s.selected]}><Text style={[s.optionText, corralId === item.id_corral && s.selectedText]}>{item.nombre} · {item.ocupacion}/{item.capacidad}</Text></Pressable>)}</View> : <Text style={s.hint}>No hay corrales generales con capacidad disponible. El animal se puede agregar cuando haya lugar.</Text>}
+        {availableCorrals.length ? <View style={s.options}>{availableCorrals.map((item) => <Pressable accessibilityRole="button" accessibilityState={{ selected: corralId === item.id_corral }} key={item.id_corral} onPress={() => { setCorralId(item.id_corral); form.clear('corral'); }} style={[s.option, corralId === item.id_corral && s.selected]}><Text style={[s.optionText, corralId === item.id_corral && s.selectedText]}>{item.nombre} · {item.ocupacion}/{item.capacidad}</Text></Pressable>)}</View> : <Text style={s.hint}>No hay corrales generales con capacidad disponible. El animal se puede agregar cuando haya lugar.</Text>}
+        <FieldError message={form.fields.corral} />
       </>}
+      <FieldError message={form.fields.submit} />
       {message ? <Text style={s.error}>{message}</Text> : null}
-      <View style={s.actions}><Pressable disabled={saving || loading || !gender || availableCorrals.length === 0 || species.length === 0} onPress={() => void save()} style={[s.save, (saving || loading || !gender || availableCorrals.length === 0 || species.length === 0) && s.disabled]}><Text style={s.saveText}>{saving ? 'Guardando…' : 'Guardar animal'}</Text></Pressable><Pressable onPress={close} style={s.cancel}><Text style={s.cancelText}>Cancelar</Text></Pressable></View>
+      <View style={s.actions}><Pressable disabled={saving || loading} onPress={() => void save()} style={[s.save, (saving || loading) && s.disabled]}><Text style={s.saveText}>{saving ? 'Guardando…' : 'Guardar animal'}</Text></Pressable><Pressable onPress={close} style={s.cancel}><Text style={s.cancelText}>Cancelar</Text></Pressable></View>
     </FormDialog></View>
   </Modal>;
 }

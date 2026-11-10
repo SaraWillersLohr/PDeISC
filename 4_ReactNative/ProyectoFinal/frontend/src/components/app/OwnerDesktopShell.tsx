@@ -57,6 +57,8 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
 
   const rawRole = session?.usuario.rol.toLowerCase() ?? '';
   const role = rawRole;
+  // El gestor tiene pocos accesos y los muestra juntos, sin categorías de campo.
+  const isUserManager = role === 'gestor_usuarios';
   const isDesktop = Platform.OS === 'web' && width >= 860;
   const visibleSections = sections.filter((item) => item.roles.includes(role));
 
@@ -154,7 +156,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
               </View>
 
               <ScrollView contentContainerStyle={styles.mobileNav} showsVerticalScrollIndicator={false}>
-                <Text style={styles.categoryTitle}>OPERACIONES Y GESTIÓN</Text>
+                {!isUserManager ? <Text style={styles.categoryTitle}>OPERACIONES Y GESTIÓN</Text> : null}
                 {visibleSections.map((item) => {
                   const active = isSectionActive(item);
                   return (
@@ -234,7 +236,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
 
         {/* Navigation items grouped */}
         <ScrollView contentContainerStyle={styles.navContainer} showsVerticalScrollIndicator={false} style={styles.navScroll}>
-          <Text style={styles.categoryTitle}>OPERACIONES</Text>
+          {!isUserManager ? <Text style={styles.categoryTitle}>OPERACIONES</Text> : null}
           {visibleSections
             .filter((item) => item.category === 'operaciones')
             .map((item) => {
@@ -267,7 +269,7 @@ export function OwnerDesktopShell({ children }: React.PropsWithChildren) {
 
           {visibleSections.some((item) => item.category === 'gestion') ? (
             <>
-              <Text style={styles.categoryTitle}>GESTIÓN DE CAMPO</Text>
+              {!isUserManager ? <Text style={styles.categoryTitle}>GESTIÓN DE CAMPO</Text> : null}
               {visibleSections
                 .filter((item) => item.category === 'gestion')
                 .map((item) => {

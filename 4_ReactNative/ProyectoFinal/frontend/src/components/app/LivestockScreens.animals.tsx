@@ -1,6 +1,7 @@
+import { FieldError, useFieldErrors } from '../FieldError';
+import { dateFieldError, personNameError, animalBirthError } from '../../services/formValidation';
 import { FormDialog } from '../FormDialog';
 import { AppSectionIcon } from './AppSectionIcon';
-import { animalBirthError } from '../../services/formValidation';
 import { DateField } from './DateField';
 // muestro la ficha ganadera y sus operaciones desde el inventario.
 // muestro los inventarios de animales y corrales con datos del backend.
@@ -19,7 +20,7 @@ import { AnimalCreateModal } from './AnimalCreateModal';
 import { AnimalWeightModal } from './AnimalWeightModal';
 import { BirthForm } from './BirthForm';
 import { PhotoAttachment } from './PhotoAttachment';
-import { InventoryPage , SpeciesFilterChip , formatAnimalAge , Empty , isValidBirthDate } from './LivestockScreens.shared';
+import { InventoryPage , SpeciesFilterChip , formatAnimalAge , Empty } from './LivestockScreens.shared';
 import { style } from './LivestockStyles';
 import { MatingServiceForm } from './MatingServiceForm';
 
@@ -36,6 +37,10 @@ export function genderLabel(gender: AnimalGender): string {
 // consulto animales y aplico búsqueda local sobre la respuesta vigente.
 export function AnimalsInventoryScreen() {
   const { session } = useSession();
+  const editForm = useFieldErrors();
+  const moveForm = useFieldErrors();
+  const illnessForm = useFieldErrors();
+  const deathForm = useFieldErrors();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
@@ -59,14 +64,12 @@ export function AnimalsInventoryScreen() {
   const [moving, setMoving] = useState<AnimalRecord | null>(null);
   const [destination, setDestination] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [moveError, setMoveError] = useState('');
   const [editing, setEditing] = useState<AnimalRecord | null>(null);
   const [openedAnimal, setViewing] = useState<AnimalRecord | null>(null);
   const viewing = openedAnimal ? rows.find((animal) => animal.id_animal === openedAnimal.id_animal) ?? { ...openedAnimal, activo: 0 } : null;
   const [deactivating, setDeactivating] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState<'venta' | 'muerte' | 'otro'>('venta');
   const [deactivationDetail, setDeactivationDetail] = useState('');
-  const [deactivationError, setDeactivationError] = useState('');
   const [deactivatingBusy, setDeactivatingBusy] = useState(false);
   const [deathLocation, setDeathLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [deathLocationError, setDeathLocationError] = useState('');
@@ -75,7 +78,6 @@ export function AnimalsInventoryScreen() {
   const [reportingIllness, setReportingIllness] = useState(false);
   const [illnessNotes, setIllnessNotes] = useState('');
   const [illnessCorralId, setIllnessCorralId] = useState<number | null>(null);
-  const [illnessError, setIllnessError] = useState('');
   const [illnessSaving, setIllnessSaving] = useState(false);
   const [registeringMating, setRegisteringMating] = useState(false);
   const [registeringBirth, setRegisteringBirth] = useState(false);
@@ -86,7 +88,6 @@ export function AnimalsInventoryScreen() {
   const [editIdentifier, setEditIdentifier] = useState('');
   const [editBirth, setEditBirth] = useState('');
   const [editGender, setEditGender] = useState<AnimalGender>('no_especificado');
-  const [editError, setEditError] = useState('');
   const [corralError, setCorralError] = useState('');
 
   const load = useCallback(async () => {
@@ -217,7 +218,7 @@ export function AnimalsInventoryScreen() {
                 </Text>
               </View>
               {canEdit && Boolean(animal.activo) ? (
-                <Pressable onPress={() => { setEditing(animal); setEditName(animal.nombre ?? ''); setEditIdentifier(animal.identificador); setEditBirth(animal.fecha_nacimiento?.slice(0, 10) ?? ''); setEditGender(animal.genero); setEditError(''); }} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
+                <Pressable onPress={() => { setEditing(animal); setEditName(animal.nombre ?? ''); setEditIdentifier(animal.identificador); setEditBirth(animal.fecha_nacimiento?.slice(0, 10) ?? ''); setEditGender(animal.genero); editForm.clear(); }} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
                   <Text style={[style.moveButtonText, { color: colors.primary }]}>Editar</Text>
                 </Pressable>
               ) : null}
@@ -227,7 +228,7 @@ export function AnimalsInventoryScreen() {
                 </Pressable>
               ) : null}
               {canMove && Boolean(animal.activo) ? (
-                <Pressable onPress={() => { setMoving(animal); setDestination(null); setMoveError(''); }} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
+                <Pressable onPress={() => { setMoving(animal); setDestination(null); moveForm.clear(); }} style={[style.moveButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' }]}>
                   <Text style={[style.moveButtonText, { color: colors.primary }]}>Mover</Text>
                 </Pressable>
               ) : null}
@@ -239,7 +240,7 @@ export function AnimalsInventoryScreen() {
             {animal.activo && animal.alta_pendiente_traslado ? (
               <View style={style.noticeBanner}>
                 <Ionicons color="#b45309" name="alert-circle" size={14} style={{ marginRight: 6 }} />
-                <Text style={style.noticeText}>Alta veterinaria lista · pendiente de traslado por el peón</Text>
+                <Text style={style.noticeText}>Alta veterinaria lista · usá Mover para elegir el corral de destino</Text>
               </View>
             ) : null}
           </View>
@@ -260,38 +261,38 @@ export function AnimalsInventoryScreen() {
             <Text style={[style.modalTitle, { color: colors.textMain }]}>Editar ficha del animal</Text>
             <TextInput
               accessibilityLabel="Nombre"
-              onChangeText={setEditName}
+              onChangeText={editForm.change('name', setEditName)}
               placeholder="Nombre"
               placeholderTextColor={colors.textMuted}
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={editName}
-            />
+            /><FieldError message={editForm.fields.name} />
             <TextInput
               accessibilityLabel="Identificador"
-              onChangeText={setEditIdentifier}
+              onChangeText={editForm.change('identifier', setEditIdentifier)}
               placeholder="Identificador"
               placeholderTextColor={colors.textMuted}
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={editIdentifier}
-            />
+            /><FieldError message={editForm.fields.identifier} />
             <DateField
               accessibilityLabel="Fecha de nacimiento"
               maximumDate={new Date()}
-              onChangeText={setEditBirth}
+              onChangeText={editForm.change('birth', setEditBirth)}
               placeholder="Fecha de nacimiento"
               placeholderTextColor={colors.textMuted}
               showCalendarIcon
               style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={editBirth}
-            />
+            /><FieldError message={editForm.fields.birth} />
             <Text style={[style.selectLabel, { color: colors.textMuted }]}>GÉNERO</Text>
             <View style={style.genderOptions}>
               {genderOptions.map((option) => {
                 const active = editGender === option.value;
-                return <Pressable accessibilityRole="radio" accessibilityState={{ selected: active }} key={option.value} onPress={() => setEditGender(option.value)} style={[style.genderOption, { backgroundColor: active ? colors.primary : colors.bgCardMuted, borderColor: active ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: active ? '#ffffff' : colors.textSecondary }]}>{option.label}</Text></Pressable>;
+                return <Pressable accessibilityRole="radio" accessibilityState={{ selected: active }} key={option.value} onPress={() => { setEditGender(option.value); editForm.clear('gender'); }} style={[style.genderOption, { backgroundColor: active ? colors.primary : colors.bgCardMuted, borderColor: active ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: active ? '#ffffff' : colors.textSecondary }]}>{option.label}</Text></Pressable>;
               })}
             </View>
-            {editError ? <Text style={style.errorText}>{editError}</Text> : null}
+            <FieldError message={editForm.fields.gender} /><FieldError message={editForm.fields.submit} />
             <View style={style.modalActions}>
               <Pressable onPress={() => void persistAnimal()} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
                 <Text style={style.confirmText}>Guardar cambios</Text>
@@ -314,13 +315,13 @@ export function AnimalsInventoryScreen() {
                 <Text style={[style.detail, { color: colors.textSecondary, marginBottom: 12 }]}>{viewing.nombre || viewing.identificador} · se registrará el problema y el traslado físico a enfermería.</Text>
                 <Text style={[style.selectLabel, { color: colors.textMuted }]}>CORRAL DE ENFERMERÍA</Text>
                 <View style={style.genderOptions}>
-                  {corrals.filter((corral) => corral.es_enfermeria && (corral.id_corral === viewing.id_corral || Number(corral.ocupacion) < Number(corral.capacidad))).map((corral) => <Pressable key={corral.id_corral} accessibilityRole="radio" accessibilityState={{ selected: illnessCorralId === corral.id_corral }} onPress={() => setIllnessCorralId(corral.id_corral)} style={[style.genderOption, { backgroundColor: illnessCorralId === corral.id_corral ? colors.primary : colors.bgCardMuted, borderColor: illnessCorralId === corral.id_corral ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: illnessCorralId === corral.id_corral ? '#fff' : colors.textSecondary }]}>{corral.nombre} · {corral.ocupacion}/{corral.capacidad}</Text></Pressable>)}
+                  {corrals.filter((corral) => corral.es_enfermeria && (corral.id_corral === viewing.id_corral || Number(corral.ocupacion) < Number(corral.capacidad))).map((corral) => <Pressable key={corral.id_corral} accessibilityRole="radio" accessibilityState={{ selected: illnessCorralId === corral.id_corral }} onPress={() => { setIllnessCorralId(corral.id_corral); illnessForm.clear('corral'); }} style={[style.genderOption, { backgroundColor: illnessCorralId === corral.id_corral ? colors.primary : colors.bgCardMuted, borderColor: illnessCorralId === corral.id_corral ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: illnessCorralId === corral.id_corral ? '#fff' : colors.textSecondary }]}>{corral.nombre} · {corral.ocupacion}/{corral.capacidad}</Text></Pressable>)}
                 </View>
                 {!corrals.some((corral) => corral.es_enfermeria && (corral.id_corral === viewing.id_corral || Number(corral.ocupacion) < Number(corral.capacidad))) ? <Text style={[style.detail, { color: '#b42318' }]}>No hay lugar disponible en enfermería.</Text> : null}
-                <TextInput accessibilityLabel="Observaciones de enfermedad" maxLength={500} multiline onChangeText={setIllnessNotes} placeholder="Síntomas u observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={illnessNotes} />
-                {illnessError ? <Text style={style.errorText}>{illnessError}</Text> : null}
+                <FieldError message={illnessForm.fields.corral} /><TextInput accessibilityLabel="Observaciones de enfermedad" maxLength={500} multiline onChangeText={illnessForm.change('notes', setIllnessNotes)} placeholder="Síntomas u observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={illnessNotes} /><FieldError message={illnessForm.fields.notes} />
+                <FieldError message={illnessForm.fields.submit} />
                 <View style={style.modalActions}>
-                  <Pressable disabled={illnessSaving || !illnessCorralId} onPress={() => void submitIllnessReport()} style={[style.confirmButton, { backgroundColor: colors.primary }, (illnessSaving || !illnessCorralId) && style.disabledButton]}><Text style={style.confirmText}>{illnessSaving ? 'Guardando…' : 'Reportar e ingresar'}</Text></Pressable>
+                  <Pressable disabled={illnessSaving} onPress={() => void submitIllnessReport()} style={[style.confirmButton, { backgroundColor: colors.primary }, (illnessSaving) && style.disabledButton]}><Text style={style.confirmText}>{illnessSaving ? 'Guardando…' : 'Reportar e ingresar'}</Text></Pressable>
                   <Pressable disabled={illnessSaving} onPress={() => setReportingIllness(false)} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver</Text></Pressable>
                 </View>
               </>
@@ -329,15 +330,15 @@ export function AnimalsInventoryScreen() {
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>{deactivationReason === 'muerte' ? `Notificar muerte · ${viewing.nombre || viewing.identificador}` : `Dar de baja ${viewing.nombre || viewing.identificador}`}</Text>
                 <Text style={[style.detail, { color: colors.textSecondary, marginBottom: 12 }]}>{deactivationReason === 'muerte' ? ownerCanDeactivate ? 'La muerte quedará registrada y la ficha se conservará.' : 'La muerte quedará notificada para revisión administrativa y la ficha se conservará.' : 'El animal dejará de aparecer en el inventario activo. Su ficha y su historial se conservarán.'}</Text>
                 {ownerCanDeactivate && deactivationReason !== 'muerte' ? <><Text style={[style.selectLabel, { color: colors.textMuted }]}>MOTIVO</Text><View style={style.genderOptions}>{(['venta', 'otro'] as const).map((reason) => <Pressable key={reason} accessibilityRole="radio" accessibilityState={{ selected: deactivationReason === reason }} onPress={() => setDeactivationReason(reason)} style={[style.genderOption, { backgroundColor: deactivationReason === reason ? colors.primary : colors.bgCardMuted, borderColor: deactivationReason === reason ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: deactivationReason === reason ? '#fff' : colors.textSecondary }]}>{reason === 'otro' ? 'Otro' : 'Venta'}</Text></Pressable>)}</View></> : <Text style={[style.selectLabel, { color: colors.textMuted }]}>NOTIFICACIÓN DE MUERTE</Text>}
-                <TextInput accessibilityLabel="Detalle opcional de la baja o muerte" maxLength={500} multiline onChangeText={setDeactivationDetail} placeholder="Detalle u observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={deactivationDetail} />
+                <TextInput accessibilityLabel="Detalle opcional de la baja o muerte" maxLength={500} multiline onChangeText={deathForm.change('detail', setDeactivationDetail)} placeholder="Detalle u observaciones (opcional)" placeholderTextColor={colors.textMuted} style={[style.modalInput, style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]} value={deactivationDetail} /><FieldError message={deathForm.fields.detail} />
                 {deactivationReason === 'muerte' ? <>
                   <Text style={[style.selectLabel, { color: colors.textMuted, marginTop: 10 }]}>UBICACIÓN GPS · OBLIGATORIA</Text>
                   <Pressable disabled={gettingDeathLocation} onPress={() => void captureDeathLocation()} style={[style.cancelButton, { borderColor: colors.border, alignSelf: 'flex-start' }]}><Text style={[style.cancelText, { color: colors.primary }]}>{gettingDeathLocation ? 'Obteniendo ubicación…' : deathLocation ? 'Actualizar ubicación GPS' : 'Obtener ubicación GPS'}</Text></Pressable>
                   {deathLocation ? <Text style={[style.detail, { color: colors.textSecondary }]}>Ubicación lista · {deathLocation.latitude.toFixed(6)}, {deathLocation.longitude.toFixed(6)}</Text> : null}
-                  <PhotoAttachment value={deathPhoto} onChange={setDeathPhoto} />
                   {deathLocationError ? <Text style={style.errorText}>{deathLocationError}</Text> : null}
+                  <PhotoAttachment value={deathPhoto} onChange={(value) => { setDeathPhoto(value); deathForm.clear('photo'); }} /><FieldError message={deathForm.fields.photo} />
                 </> : null}
-                {deactivationError ? <Text style={style.errorText}>{deactivationError}</Text> : null}
+                <FieldError message={deathForm.fields.submit} />
                 <View style={style.modalActions}>
                   <Pressable disabled={deactivatingBusy} onPress={() => void confirmDeactivation()} style={[style.confirmButton, { backgroundColor: '#dc2626' }, deactivatingBusy && style.disabledButton]}><Text style={style.confirmText}>{deactivatingBusy ? 'Guardando…' : deactivationReason === 'muerte' ? ownerCanDeactivate ? 'Confirmar muerte' : 'Notificar muerte' : 'Confirmar baja'}</Text></Pressable>
                   <Pressable disabled={deactivatingBusy} onPress={() => setDeactivating(false)} style={[style.cancelButton, { borderColor: colors.border }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Volver</Text></Pressable>
@@ -380,7 +381,7 @@ export function AnimalsInventoryScreen() {
                 <Text style={[style.detail, { color: colors.textSecondary }]}>Último peso registrado · {viewing?.peso_kg == null ? 'No registrado' : `${viewing.peso_kg} kg`}</Text>
                 {viewing?.activo && viewing.alta_pendiente_traslado ? (
                   <View style={style.noticeBanner}>
-                    <Text style={style.noticeText}>Alta veterinaria registrada · pendiente de traslado físico por el peón.</Text>
+                    <Text style={style.noticeText}>Alta veterinaria registrada. Ya podés trasladar al animal desde la opción Mover.</Text>
                   </View>
                 ) : null}
                 {viewing?.activo && canEdit && viewing.genero === 'no_especificado' ? (
@@ -401,27 +402,20 @@ export function AnimalsInventoryScreen() {
                   </View>
                 ) : null}
                 {viewing?.activo && canMove ? <View style={style.matingCtas}>
-                  <Pressable onPress={() => { const currentNursing = corrals.find((corral) => corral.id_corral === viewing.id_corral && corral.es_enfermeria); const availableNursing = corrals.find((corral) => corral.es_enfermeria && Number(corral.ocupacion) < Number(corral.capacidad)); setIllnessCorralId(currentNursing?.id_corral ?? availableNursing?.id_corral ?? null); setIllnessNotes(''); setIllnessError(''); setReportingIllness(true); }} style={[style.matingCta, { backgroundColor: '#a8473d' }]}>
+                  <Pressable onPress={() => { const currentNursing = corrals.find((corral) => corral.id_corral === viewing.id_corral && corral.es_enfermeria); const availableNursing = corrals.find((corral) => corral.es_enfermeria && Number(corral.ocupacion) < Number(corral.capacidad)); setIllnessCorralId(currentNursing?.id_corral ?? availableNursing?.id_corral ?? null); setIllnessNotes(''); illnessForm.clear(); setReportingIllness(true); }} style={[style.matingCta, { backgroundColor: '#a8473d' }]}>
                     <Ionicons color="#ffffff" name="medkit-outline" size={16} /><Text style={style.confirmText}>Reportar enfermedad e ingresar a enfermería</Text>
                   </Pressable>
-                  {!ownerCanDeactivate ? <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); setDeactivationError(''); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}>
+                  {!ownerCanDeactivate ? <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}>
                     <Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text>
                   </Pressable> : null}
                 </View> : null}
                 {viewing?.activo && ownerCanDeactivate ? (
                   <View style={style.matingCtas}>
-                    <Pressable onPress={() => { setDeactivationReason('venta'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); setDeactivationError(''); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}><Ionicons color="#ffffff" name="trash-outline" size={16} /><Text style={style.confirmText}>Borrar animal</Text></Pressable>
-                    <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); setDeactivationError(''); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#a83232' }]}><Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text></Pressable>
+                    <Pressable onPress={() => { setDeactivationReason('venta'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#dc2626' }]}><Ionicons color="#ffffff" name="trash-outline" size={16} /><Text style={style.confirmText}>Borrar animal</Text></Pressable>
+                    <Pressable onPress={() => { setDeactivationReason('muerte'); setDeactivationDetail(''); setDeathLocation(null); setDeathLocationError(''); setDeathPhoto(null); deathForm.clear(); setDeactivating(true); }} style={[style.matingCta, { backgroundColor: '#a83232' }]}><Ionicons color="#ffffff" name="heart-dislike-outline" size={16} /><Text style={style.confirmText}>Notificar muerte</Text></Pressable>
                   </View>
                 ) : null}
                 <View style={style.modalActions}>
-                  <Pressable
-                disabled={!destination || saving}
-                onPress={() => void saveMovement()}
-                style={[style.confirmButton, { backgroundColor: colors.primary }, (!destination || saving) && style.disabledButton]}
-              >
-                <Text style={style.confirmText}>{saving ? 'Guardando…' : 'Confirmar traslado'}</Text>
-              </Pressable>
               <Pressable onPress={() => setViewing(null)} style={[style.confirmButton, { backgroundColor: colors.primary }]}>
                     <Text style={style.confirmText}>Cerrar ficha</Text>
                   </Pressable>
@@ -433,7 +427,7 @@ export function AnimalsInventoryScreen() {
       </Modal>
 
       {/* Move Animal Modal */}
-      <Modal animationType="fade" onRequestClose={() => setMoving(null)} transparent visible={Boolean(moving)}>
+      <Modal animationType="fade" onRequestClose={() => { if (!saving) setMoving(null); }} transparent visible={Boolean(moving)}>
         <View style={style.backdrop}>
           <FormDialog style={[style.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
             <Text style={[style.modalTitle, { color: colors.textMain }]}>Mover animal</Text>
@@ -442,7 +436,7 @@ export function AnimalsInventoryScreen() {
             </Text>
             {corrals.find((corral) => corral.id_corral === moving?.id_corral)?.es_enfermeria ? (
               <View style={style.noticeBanner}>
-                <Text style={style.noticeText}>El alta veterinaria debe estar confirmada antes de trasladar el animal fuera de enfermería.</Text>
+                <Text style={style.noticeText}>{moving?.alta_pendiente_traslado ? 'Alta veterinaria registrada. Elegí el corral de destino para completar la salida de enfermería.' : 'El veterinario debe registrar el alta antes de trasladar al animal fuera de enfermería.'}</Text>
               </View>
             ) : null}
             <Text style={[style.selectLabel, { color: colors.textMuted }]}>SELECCIONÁ EL CORRAL DE DESTINO</Text>
@@ -451,7 +445,7 @@ export function AnimalsInventoryScreen() {
               .map((corral) => (
                 <Pressable
                   key={corral.id_corral}
-                  onPress={() => setDestination(corral.id_corral)}
+                  onPress={() => { setDestination(corral.id_corral); moveForm.clear('corral'); }}
                   style={[
                     style.destination,
                     { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#f8faf7', borderColor: colors.borderLight },
@@ -466,9 +460,13 @@ export function AnimalsInventoryScreen() {
                   </Text>
                 </Pressable>
               ))}
-            {moveError ? <Text style={style.errorText}>{moveError}</Text> : null}
+            <FieldError message={moveForm.fields.corral} /><FieldError message={moveForm.fields.submit} />
+            {/* El movimiento común también completa el traslado posterior al alta; no hay un paso separado en la ficha. */}
             <View style={style.modalActions}>
-              <Pressable onPress={() => setMoving(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
+              <Pressable accessibilityRole="button" disabled={saving} onPress={() => void saveMovement()} style={[style.confirmButton, { backgroundColor: colors.primary }, saving && style.disabledButton]}>
+                <Text style={style.confirmText}>{saving ? 'Guardando…' : 'Mover animal'}</Text>
+              </Pressable>
+              <Pressable disabled={saving} onPress={() => setMoving(null)} style={[style.cancelButton, { borderColor: colors.border }]}>
                 <Text style={[style.cancelText, { color: colors.textMuted }]}>Cancelar</Text>
               </Pressable>
             </View>
@@ -482,34 +480,40 @@ export function AnimalsInventoryScreen() {
   );
 
   async function saveMovement(): Promise<void> {
-    if (!session || !moving || !destination) return;
-    setSaving(true); setMoveError('');
+    if (!session || !moving || saving) return;
+    if (!moveForm.validate({ corral: !destination && 'Elegí el corral de destino.' })) return;
+    if (!destination) return;
+    setSaving(true); moveForm.clear();
     try {
       const result = await moveAnimal(session, moving.id_animal, destination);
       if (result.estado === 'pendiente') setServiceNotice(`Traslado guardado en el dispositivo. ${result.mensaje}`);
       setMoving(null); setLoading(true); await load();
     }
-    catch (cause) { setMoveError(friendlyErrorMessage(cause, 'No se pudo registrar el traslado.')); }
+    catch (cause) { moveForm.serverError(friendlyErrorMessage(cause, 'No se pudo registrar el traslado.'), [['corral', /corral|capacidad|lugar|enfermería|enfermeria/i]]); }
     finally { setSaving(false); }
   }
 
   async function persistAnimal(): Promise<void> {
-    if (!session || !editing || !editIdentifier.trim() || (editBirth.trim() && (!isValidBirthDate(editBirth.trim()) || Boolean(animalBirthError(editBirth.trim(), editing.especie))))) {
-      setEditError('El identificador es obligatorio. Revisá que la fecha de nacimiento sea real y no futura.');
-      return;
-    }
+    if (!session || !editing) return;
+    if (!editForm.validate({
+      identifier: !editIdentifier.trim() ? 'Ingresá el identificador.' : editIdentifier.trim().length > 50 && 'El identificador admite hasta 50 caracteres.',
+      name: editName.trim() && personNameError(editName, 'el nombre'),
+      birth: dateFieldError(editBirth.trim(), false, true) || animalBirthError(editBirth.trim(), editing.especie),
+      gender: !editGender && 'Elegí el género del animal.',
+    })) return;
     try {
       await updateAnimal(session, editing, { nombre: editName.trim(), identificador: editIdentifier.trim(), fecha_nacimiento: editBirth.trim(), genero: editGender });
       setEditing(null); setLoading(true); await load();
     } catch (cause) {
-      setEditError(friendlyErrorMessage(cause, 'No se pudo guardar la ficha.'));
+      editForm.serverError(friendlyErrorMessage(cause, 'No se pudo guardar la ficha.'), [['identifier', /identificador|caravana/i], ['name', /nombre/i], ['birth', /fecha|nacimiento/i], ['gender', /género|genero/i]]);
     }
   }
 
   async function confirmDeactivation(): Promise<void> {
     if (!session || !viewing) return;
+    if (!deathForm.validate({ detail: deactivationDetail.length > 500 && 'El detalle admite hasta 500 caracteres.' })) return;
     if (deactivationReason === 'muerte' && !deathLocation) { setDeathLocationError('Obtené la ubicación GPS antes de notificar la muerte.'); return; }
-    setDeactivatingBusy(true); setDeactivationError('');
+    setDeactivatingBusy(true); deathForm.clear();
     try {
       if (deactivationReason === 'muerte' && !ownerCanDeactivate) {
         const now = new Date(); const fecha = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -522,7 +526,7 @@ export function AnimalsInventoryScreen() {
         setServiceNotice(deactivationReason === 'muerte' ? 'Muerte registrada y confirmada.' : 'Animal dado de baja; se conservó su ficha e historial.');
       }
       setViewing(null); setDeactivating(false); setLoading(true); await load();
-    } catch (cause) { setDeactivationError(friendlyErrorMessage(cause, 'No se pudo guardar la baja o notificación.')); }
+    } catch (cause) { deathForm.serverError(friendlyErrorMessage(cause, 'No se pudo guardar la baja o notificación.'), [['detail', /motivo|detalle|observaci|caracter/i], ['photo', /foto|imagen/i]]); }
     finally { setDeactivatingBusy(false); }
   }
 
@@ -538,14 +542,19 @@ export function AnimalsInventoryScreen() {
   }
 
   async function submitIllnessReport(): Promise<void> {
-    if (!session || !viewing || !illnessCorralId) { setIllnessError('Elegí un corral de enfermería con lugar disponible.'); return; }
+    if (!session || !viewing) return;
+    if (!illnessForm.validate({
+      corral: !illnessCorralId && 'Elegí un corral de enfermería con lugar disponible.',
+      notes: illnessNotes.length > 500 && 'Las observaciones admiten hasta 500 caracteres.',
+    })) return;
+    if (!illnessCorralId) return;
     const now = new Date(); const fecha = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    setIllnessSaving(true); setIllnessError('');
+    setIllnessSaving(true); illnessForm.clear();
     try {
       const result = await reportAnimal(session, 'sanitario', { id_animal: viewing.id_animal, fecha, motivo: illnessNotes.trim() || undefined, id_corral_destino: illnessCorralId });
       setServiceNotice(result.estado === 'pendiente' ? `Reporte sanitario guardado en el dispositivo. ${result.mensaje}` : 'Enfermedad registrada y animal ingresado a enfermería.');
       setViewing(null); setReportingIllness(false); setLoading(true); await load();
-    } catch (cause) { setIllnessError(friendlyErrorMessage(cause, 'No se pudo ingresar el animal a enfermería.')); }
+    } catch (cause) { illnessForm.serverError(friendlyErrorMessage(cause, 'No se pudo ingresar el animal a enfermería.'), [['corral', /corral|capacidad|lugar|destino/i], ['notes', /observaci|motivo|caracter/i]]); }
     finally { setIllnessSaving(false); }
   }
 

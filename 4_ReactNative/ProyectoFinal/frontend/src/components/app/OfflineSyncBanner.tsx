@@ -1,3 +1,4 @@
+import { ConfirmDelete } from '../ConfirmDelete';
 // informo cuántos cambios locales esperan la confirmación del servidor.
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -12,6 +13,7 @@ export function OfflineSyncBanner() {
   const [count, setCount] = useState(0);
   const [error, setError] = useState('');
   const [rejectedCount, setRejectedCount] = useState(0);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [discarding, setDiscarding] = useState(false);
 
   useEffect(() => {
@@ -50,6 +52,7 @@ export function OfflineSyncBanner() {
       for (const operation of rejected) await removePendingOperation(operation.id_operacion);
       const remaining = await getPendingOperations(session.usuario.id_usuario);
       setCount(remaining.length);
+      setConfirmDiscard(false);
       const stillRejected = remaining.filter((operation) => operation.ultimo_error);
       setRejectedCount(stillRejected.length);
       setError(stillRejected[0]?.ultimo_error ?? '');
@@ -63,12 +66,13 @@ export function OfflineSyncBanner() {
   if (!count) return null;
   return (
     <View accessibilityLiveRegion="polite" style={[styles.wrap, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+      <ConfirmDelete visible={confirmDiscard} detail="Se descartarán los cambios rechazados guardados en este dispositivo." busy={discarding} error={error} onCancel={() => setConfirmDiscard(false)} onConfirm={() => void discardRejected()} />
       <View style={{ flex: 1 }}>
         <Text style={[styles.title, { color: colors.textMain }]}>{count} cambio{count === 1 ? '' : 's'} esperando sincronización</Text>
         <Text style={[styles.copy, { color: error ? colors.accentRed : colors.textMuted }]}>{error || 'Guardados en este dispositivo; se enviarán al recuperar conexión.'}</Text>
       </View>
       <View style={styles.actions}>
-        {rejectedCount > 0 ? <Pressable accessibilityRole="button" accessibilityLabel="Descartar cambios rechazados" disabled={discarding} onPress={() => void discardRejected()} style={[styles.discardButton, { borderColor: colors.border }]}>
+        {rejectedCount > 0 ? <Pressable accessibilityRole="button" accessibilityLabel="Descartar cambios rechazados" disabled={discarding} onPress={() => setConfirmDiscard(true)} style={[styles.discardButton, { borderColor: colors.border }]}>
           <Text style={[styles.discardText, { color: colors.accentRed }]}>{discarding ? 'Borrando…' : 'Descartar'}</Text>
         </Pressable> : null}
         <Pressable accessibilityRole="button" onPress={() => void retry()} style={[styles.button, { backgroundColor: colors.primary }]}>
@@ -80,7 +84,7 @@ export function OfflineSyncBanner() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { alignItems: 'center', borderRadius: 12, borderWidth: 1, flexDirection: 'row', gap: 12, margin: 12, padding: 12 },
+  wrap: { alignItems: 'center', borderRadius: 12, borderWidth: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 12, margin: 12, padding: 12 },
   title: { fontSize: 12, fontWeight: '800' },
   copy: { fontSize: 11, marginTop: 3 },
   button: { borderRadius: 8, paddingHorizontal: 12, paddingVertical: 9 },

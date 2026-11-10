@@ -92,12 +92,12 @@ export function HomeScreen() {
   ] : null;
 
   const statistics = metrics ? [
-    { label: 'Crías del año', value: metrics.crias_ano, color: '#3d9458', icon: 'leaf-outline' as const, note: 'Nacimientos registrados' },
-    { label: 'Hembras preñadas', value: metrics.hembras_prenadas, color: '#d9822b', icon: 'heart-circle-outline' as const, note: 'Diagnóstico confirmado' },
-    { label: 'Servicios · 90 días', value: metrics.servicios_90_dias, color: '#3f78b8', icon: 'git-network-outline' as const, note: 'Actividad de monta' },
-    { label: 'Ventas · año', value: metrics.ventas_ano, color: '#8a5c32', icon: 'pricetag-outline' as const, note: 'Animales dados de baja por venta' },
-    { label: 'Muertes · año', value: metrics.muertes_ano, color: '#9d3b3b', icon: 'heart-dislike-outline' as const, note: 'Muertes confirmadas' },
-    { label: role === 'dueno' ? 'Muertes pendientes' : 'Alertas sanitarias', value: role === 'dueno' ? metrics.muertes_pendientes : metrics.alertas_sanitarias, color: '#c74c3e', icon: 'alert-circle-outline' as const, note: 'Requieren atención' },
+    { label: 'Crías del año', value: metrics.crias_ano, color: '#3d9458', icon: 'leaf-outline' as const, note: 'Nacimientos registrados', route: '/(app)/reproduccion' as const, destination: 'Reproducción' },
+    { label: 'Hembras preñadas', value: metrics.hembras_prenadas, color: '#d9822b', icon: 'heart-circle-outline' as const, note: 'Diagnóstico confirmado', route: '/(app)/reproduccion' as const, destination: 'Reproducción' },
+    { label: 'Servicios · 90 días', value: metrics.servicios_90_dias, color: '#3f78b8', icon: 'git-network-outline' as const, note: 'Actividad de monta', route: '/(app)/reproduccion' as const, destination: 'Reproducción' },
+    { label: 'Ventas · año', value: metrics.ventas_ano, color: '#8a5c32', icon: 'pricetag-outline' as const, note: 'Animales dados de baja por venta', route: '/(app)/animals' as const, destination: 'Mis animales' },
+    { label: 'Muertes · año', value: metrics.muertes_ano, color: '#9d3b3b', icon: 'heart-dislike-outline' as const, note: 'Muertes confirmadas', route: '/(app)/health' as const, destination: 'Sanidad y enfermería' },
+    { label: role === 'dueno' ? 'Muertes pendientes' : 'Alertas sanitarias', value: role === 'dueno' ? metrics.muertes_pendientes : metrics.alertas_sanitarias, color: '#c74c3e', icon: 'alert-circle-outline' as const, note: 'Requieren atención', route: '/(app)/health' as const, destination: 'Sanidad y enfermería' },
   ] : [];
 
   return (
@@ -221,7 +221,14 @@ export function HomeScreen() {
               {statistics.map((item) => {
                 const max = Math.max(1, ...statistics.map((entry) => entry.value));
                 return (
-                  <View key={item.label} style={[s.statBox, isDesktop && s.statBoxDesktop, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8faf7', borderColor: colors.borderLight }]}>
+                  // Toda la estadística funciona como acceso al módulo, también con teclado.
+                  <Pressable
+                    key={item.label}
+                    accessibilityRole="link"
+                    accessibilityLabel={`${item.label}: ${item.value}. Abrir ${item.destination}`}
+                    onPress={() => router.push(item.route)}
+                    style={({ pressed }) => [s.statBox, isDesktop && s.statBoxDesktop, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8faf7', borderColor: colors.borderLight }, pressed && { opacity: 0.75 }]}
+                  >
                     <View style={s.statBoxTop}>
                       <View style={[s.statIconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#edf4ec' }]}>
                         <Ionicons color={item.color} name={item.icon} size={18} />
@@ -233,7 +240,11 @@ export function HomeScreen() {
                       <View style={[s.statBar, { backgroundColor: item.color, width: `${Math.max(item.value > 0 ? 10 : 0, (item.value / max) * 100)}%` }]} />
                     </View>
                     <Text style={[s.statBoxNote, { color: colors.textMuted }]}>{item.note}</Text>
-                  </View>
+                    <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6, marginTop: 10 }}>
+                      <Text style={{ color: colors.primary, flex: 1, fontSize: 12, fontWeight: '700' }}>Ver {item.destination}</Text>
+                      <Ionicons name="arrow-forward" color={colors.primary} size={16} />
+                    </View>
+                  </Pressable>
                 );
               })}
             </View>

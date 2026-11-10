@@ -1,3 +1,4 @@
+import { FieldError, useFieldErrors } from '../FieldError';
 // conecto los accesos de navegación con animales, tareas y sanidad.
 // presento los resúmenes y accesos principales según el perfil activo.
 import { friendlyErrorMessage } from '../../services/apiErrors';
@@ -56,6 +57,7 @@ export function OwnerHealthScreen() {
 
 // El dueño confirma o rechaza las bajas conservando el historial del reporte.
 export function DeathReviewScreen({ headerContent }: { headerContent?: React.ReactNode } = {}) {
+  const form = useFieldErrors();
   const { session } = useSession();
   const revision = useLiveChanges();
   const { colors } = useTheme();
@@ -80,13 +82,15 @@ export function DeathReviewScreen({ headerContent }: { headerContent?: React.Rea
     if (!session) return;
     try {
       const reason = rejectionReasons[row.id_reporte]?.trim();
-      if (decision === 'rechazar' && !reason) { setMessage('Escribí el motivo para rechazar el reporte.'); return; }
+      if (!form.validate({
+        ['reason_' + row.id_reporte]: decision === 'rechazar' && !reason ? 'Escribí por qué rechazás este reporte de muerte.' : Boolean(reason && reason.length > 500) && 'El motivo admite hasta 500 caracteres.',
+      })) return;
       await reviewDeath(session, row.id_reporte, decision, reason);
       setRejectionReasons((current) => { const next = { ...current }; delete next[row.id_reporte]; return next; });
       setMessage(decision === 'confirmar' ? 'Muerte confirmada.' : 'Animal reactivado; reporte conservado.');
       await load();
     } catch (cause) {
-      setMessage(friendlyErrorMessage(cause, 'No se pudo revisar el reporte.'));
+      form.serverError(friendlyErrorMessage(cause, 'No se pudo revisar el reporte.'), [['reason_' + row.id_reporte, /motivo|rechazo|caracter/i], ['submit_' + row.id_reporte, /./]]);
     }
   }
 
@@ -115,6 +119,8 @@ export function DeathReviewScreen({ headerContent }: { headerContent?: React.Rea
               style={[s.requestInput, { borderColor: colors.border, color: colors.textMain }]}
               value={rejectionReasons[row.id_reporte] ?? ''}
             />
+            <FieldError message={form.fields['reason_' + row.id_reporte]} />
+            <FieldError message={form.fields['submit_' + row.id_reporte]} />
             <View style={s.requestActions}>
               <Pressable onPress={() => void decide(row, 'rechazar')} style={s.rejectButton}>
                 <Text style={s.rejectText}>Rechazar y reactivar</Text>

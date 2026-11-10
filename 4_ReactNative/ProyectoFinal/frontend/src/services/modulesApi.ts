@@ -4,7 +4,7 @@ import { apiConfigurationMessage, apiFetch, friendlyApiMessage } from './apiErro
 import type { Session } from '../types/auth';
 import type { AnimalGender } from './livestockApi';
 
-export interface TaskRecord { id_tarea: number; id_responsable: number; titulo: string; descripcion: string | null; fecha_vencimiento: string | null; estado: string; responsable: string | null; apellido_responsable: string | null; }
+export interface TaskRecord { id_tarea: number; id_responsable: number; id_creador: number; titulo: string; descripcion: string | null; fecha_vencimiento: string | null; estado: string; responsable: string | null; apellido_responsable: string | null; }
 export interface MatingService { id_servicio: number; fecha: string; metodo: string; estado: string; observaciones: string | null; fecha_estimada_nacimiento: string | null; prenez_confirmada_en: string | null; especie: string; madre: string; nombre_madre: string | null; madre_activa?: number; padre: string | null; padre_texto: string | null; }
 export interface BirthRecord { id_nacimiento: number; fecha: string; observaciones: string | null; cria: string; nombre_cria: string | null; madre: string | null; madre_texto: string | null; padre: string | null; padre_texto: string | null; }
 export interface ReproductionData { servicios: MatingService[]; nacimientos: BirthRecord[]; }
@@ -23,6 +23,7 @@ async function request<T>(session: Session, path: string, method = 'GET', body?:
 export function listTasks(session: Session): Promise<TaskRecord[]> { return request(session, '/tasks'); }
 export function createTask(session: Session, input: { titulo: string; descripcion?: string; fecha_vencimiento?: string; id_responsable: number }): Promise<void> { return request(session, '/tasks', 'POST', input); }
 export function updateTask(session: Session, id: number, estado: string): Promise<void> { return request(session, `/tasks/${id}`, 'PATCH', { estado }); }
+export function deleteTask(session: Session, id: number): Promise<void> { return request(session, `/tasks/${id}`, 'DELETE'); }
 export function listReproduction(session: Session): Promise<ReproductionData> { return request(session, '/reproduction'); }
 export function createMatingService(session: Session, input: { id_madre: number; id_padre?: number; padre_texto?: string; fecha: string; metodo: string; observaciones?: string }): Promise<void> { return request(session, '/reproduction/mating-services', 'POST', input); }
 export function confirmPregnancy(session: Session, id: number): Promise<{ fecha_estimada_nacimiento: string; ya_confirmada?: boolean }> { return request(session, `/reproduction/mating-services/${id}/confirm-pregnancy`, 'POST'); }
@@ -30,3 +31,6 @@ export function createBirth(session: Session, input: { identificador: string; no
 export function deleteMatingService(session: Session, id: number): Promise<void> { return request(session, `/reproduction/mating-services/${id}`, 'DELETE'); }
 export function deleteBirthRecord(session: Session, id: number): Promise<void> { return request(session, `/reproduction/births/${id}`, 'DELETE'); }
 export function listFieldEvents(session: Session, todos = false): Promise<FieldEventsData> { return request(session, `/events${todos ? '?todos=1' : ''}`); }
+
+export function editTask(session: Session, id: number, input: { titulo: string; descripcion: string; id_responsable: number; fecha_vencimiento: string | null }): Promise<void> { return request(session, `/tasks/${id}`, 'PUT', input); }
+export function deleteTasks(session: Session, ids: number[]): Promise<void> { return request(session, '/tasks/delete', 'POST', { ids }); }

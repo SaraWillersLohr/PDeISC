@@ -1,3 +1,5 @@
+import { FieldError, useFieldErrors } from '../FieldError';
+import { personNameError } from '../../services/formValidation';
 // administro las cuentas y los accesos del equipo.
 // hago operativas la consulta del equipo y la aprobación del catálogo.
 import { FormDialog } from '../FormDialog';
@@ -15,6 +17,8 @@ import { st } from './OrganizationStyles';
 
 export function TeamScreen() {
   const { session } = useSession();
+  const form = useFieldErrors();
+  const removalForm = useFieldErrors();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
@@ -57,17 +61,19 @@ export function TeamScreen() {
   }, [session, revision]);
 
   async function saveUser(): Promise<void> {
-    if (!session || !selected || !name.trim() || !surname.trim()) {
-      setError('Completá nombre y apellido.');
-      return;
-    }
+    if (!session || !selected) return;
+    if (!form.validate({
+      name: personNameError(name, 'el nombre'),
+      surname: personNameError(surname, 'el apellido'),
+      role: !editableRoles.includes(roleDraft) && 'Elegí un rol que puedas asignar.',
+    })) return;
     setBusy(true);
     try {
       await updateOrganizationUser(session, { ...selected, nombre: name.trim(), apellido: surname.trim() }, roleDraft);
       setSelected(null);
       await load();
     } catch (e) {
-      setError(friendlyErrorMessage(e, 'No se pudo editar el usuario.'));
+      form.serverError(friendlyErrorMessage(e, 'No se pudo editar el usuario.'), [['name', /nombre/i], ['surname', /apellido/i], ['role', /rol|perfil|gestor|dueño/i]]);
     } finally {
       setBusy(false);
     }
@@ -82,7 +88,7 @@ export function TeamScreen() {
       setReassignmentId(null);
       await load();
     } catch (e) {
-      setError(friendlyErrorMessage(e, 'No se pudo dar de baja el usuario.'));
+      removalForm.serverError(friendlyErrorMessage(e, 'No se pudo dar de baja el usuario.'), [['responsible', /reasign|responsable|reemplazo|peón|peon|tareas/i]]);
     } finally {
       setBusy(false);
     }
@@ -137,7 +143,7 @@ export function TeamScreen() {
                 <View style={[st.rowWrap, { justifyContent: 'flex-end', marginTop: 14 }]}>
                   <Pressable
                     onPress={() => {
-                      setSelected(user);
+                      form.clear(); setSelected(user);
                       setName(user.nombre);
                       setSurname(user.apellido);
                       setRoleDraft(user.rol);
@@ -147,7 +153,7 @@ export function TeamScreen() {
                     <Text style={[st.secondaryText, { color: colors.primary }]}>Editar usuario</Text>
                   </Pressable>
                   {user.id_usuario !== session?.usuario.id_usuario ? (
-                    <Pressable onPress={() => { setReassignmentId(null); setConfirmDelete(user); }} style={st.danger}>
+                    <Pressable onPress={() => { removalForm.clear(); setReassignmentId(null); setConfirmDelete(user); }} style={st.danger}>
                       <Text style={st.dangerText}>Dar de baja</Text>
                     </Pressable>
                   ) : null}
@@ -165,20 +171,20 @@ export function TeamScreen() {
             <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>Editar usuario</Text>
             <TextInput
               accessibilityLabel="Nombre"
-              onChangeText={setName}
+              onChangeText={form.change('name', setName)}
               placeholder="Nombre"
               placeholderTextColor={colors.textMuted}
               style={[st.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={name}
-            />
+            /><FieldError message={form.fields.name} />
             <TextInput
               accessibilityLabel="Apellido"
-              onChangeText={setSurname}
+              onChangeText={form.change('surname', setSurname)}
               placeholder="Apellido"
               placeholderTextColor={colors.textMuted}
               style={[st.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={surname}
-            />
+            /><FieldError message={form.fields.surname} />
             <Text style={[st.copy, { color: colors.textSecondary, marginTop: 12 }]}>Rol en la estancia</Text>
             <View style={st.rowWrap}>
               {editableRoles.map((role) => (
@@ -186,7 +192,7 @@ export function TeamScreen() {
                   key={role}
                   accessibilityRole="radio"
                   accessibilityState={{ checked: roleDraft === role }}
-                  onPress={() => setRoleDraft(role)}
+                  onPress={() => { setRoleDraft(role); form.clear('role'); }}
                   style={[
                     st.option,
                     { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' },
@@ -199,6 +205,7 @@ export function TeamScreen() {
                 </Pressable>
               ))}
             </View>
+            <FieldError message={form.fields.role} /><FieldError message={form.fields.submit} />
             <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
               <Pressable
                 disabled={busy}
@@ -226,11 +233,12 @@ export function TeamScreen() {
             <Text style={[st.copy, { color: colors.textMain, fontWeight: '700', marginTop: 14 }]}>Si tiene tareas pendientes, elegí quién las recibe:</Text>
             <View style={[st.row, { flexWrap: 'wrap', marginTop: 8 }]}>
               {users.filter((user) => user.activo && user.rol === 'peon' && user.id_usuario !== confirmDelete?.id_usuario).map((user) => (
-                <Pressable key={user.id_usuario} onPress={() => setReassignmentId(user.id_usuario)} style={[st.option, { backgroundColor: reassignmentId === user.id_usuario ? colors.primary : colors.bgCardMuted }]}>
+                <Pressable key={user.id_usuario} onPress={() => { setReassignmentId(user.id_usuario); removalForm.clear('responsible'); }} style={[st.option, { backgroundColor: reassignmentId === user.id_usuario ? colors.primary : colors.bgCardMuted }]}>
                   <Text style={[st.optionText, { color: reassignmentId === user.id_usuario ? '#fff' : colors.textMain }]}>{user.nombre} {user.apellido}</Text>
                 </Pressable>
               ))}
             </View>
+            <FieldError message={removalForm.fields.responsible} /><FieldError message={removalForm.fields.submit} />
             {reassignmentId !== null ? <Pressable onPress={() => setReassignmentId(null)}><Text style={[st.copy, { color: colors.primary, marginTop: 8 }]}>Quitar responsable seleccionado</Text></Pressable> : null}
             <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
               <Pressable onPress={() => { setConfirmDelete(null); setReassignmentId(null); }} style={[st.secondary, { borderColor: colors.border }]}>

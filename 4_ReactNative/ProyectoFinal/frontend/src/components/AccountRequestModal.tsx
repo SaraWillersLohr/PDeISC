@@ -1,20 +1,22 @@
+import { FieldError, useFieldErrors } from './FieldError';
+import { personNameError } from '../services/formValidation';
 // solicito una cuenta de equipo desde una ventana compacta sobre el ingreso.
 import { FormDialog } from './FormDialog';
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { useState } from 'react';
-import { router } from 'expo-router';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { requestAccount } from '../services/authApi';
 import { PasswordInput } from './PasswordInput';
 
-type Props = { visible: boolean; onClose: () => void };
+type Props = { visible: boolean; onClose: () => void; onVerification: (email: string) => void };
 
 const dialogMaxWidth = 560;
 const gutter = 14;
 
-export function AccountRequestModal({ visible, onClose }: Props) {
+export function AccountRequestModal({ visible, onClose, onVerification }: Props) {
   const { width, fontScale } = useWindowDimensions();
+  const form = useFieldErrors();
   const dialogWidth = Math.min(width - 2 * gutter, dialogMaxWidth);
   const stacked = dialogWidth < 492 * Math.max(1, fontScale);
   const [nombre, setNombre] = useState('');
@@ -22,22 +24,23 @@ export function AccountRequestModal({ visible, onClose }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   async function submit(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
-    if (!nombre.trim() || !apellido.trim() || !/^\S+@\S+\.\S+$/.test(cleanEmail) || password.length < 10) {
-      setError('Completá nombre, apellido y correo válido. La contraseña debe tener al menos 10 caracteres.');
-      return;
-    }
-    if (password !== confirm) { setError('Las contraseñas no coinciden.'); return; }
-    setBusy(true); setError('');
+    if (!form.validate({
+      name: personNameError(nombre, 'tu nombre'),
+      surname: personNameError(apellido, 'tu apellido'),
+      email: !/^\S+@\S+\.\S+$/.test(cleanEmail) && 'Ingresá un correo electrónico válido.',
+      password: password.length < 10 && 'La contraseña debe tener al menos 10 caracteres.',
+      confirm: !confirm ? 'Repetí la contraseña.' : password !== confirm && 'Las contraseñas no coinciden.',
+    })) return;
+    setBusy(true);
     try {
       await requestAccount({ nombre: nombre.trim(), apellido: apellido.trim(), email: cleanEmail, password });
       onClose();
-      router.push({ pathname: '/verify', params: { email: cleanEmail } });
-    } catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo enviar la solicitud.')); }
+      onVerification(cleanEmail);
+    } catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo enviar la solicitud.'), [['email', /correo|email|solicitud existente/i], ['name', /nombre/i], ['surname', /apellido/i], ['password', /contraseña/i]]); }
     finally { setBusy(false); }
   }
 
@@ -51,16 +54,16 @@ export function AccountRequestModal({ visible, onClose }: Props) {
           </View>
           <Text style={s.copy}>Completá tus datos y verificá tu correo. Te avisaremos cuando se resuelva tu solicitud.</Text>
           <View style={!stacked && s.row}>
-            <View style={!stacked && s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={setNombre} placeholder="Tu nombre" style={s.input} value={nombre} /></View>
-            <View style={!stacked && s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={setApellido} placeholder="Tu apellido" style={s.input} value={apellido} /></View>
+            <View style={!stacked && s.half}><Text style={s.label}>NOMBRE</Text><TextInput accessibilityLabel="Nombre" autoCapitalize="words" onChangeText={form.change('name', setNombre)} placeholder="Tu nombre" style={s.input} value={nombre} /><FieldError message={form.fields.name} /></View>
+            <View style={!stacked && s.half}><Text style={s.label}>APELLIDO</Text><TextInput accessibilityLabel="Apellido" autoCapitalize="words" onChangeText={form.change('surname', setApellido)} placeholder="Tu apellido" style={s.input} value={apellido} /><FieldError message={form.fields.surname} /></View>
           </View>
           <Text style={s.label}>CORREO ELECTRÓNICO</Text>
-          <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@correo.com" style={s.input} value={email} />
+          <TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={form.change('email', setEmail)} placeholder="nombre@correo.com" style={s.input} value={email} /><FieldError message={form.fields.email} />
           <View style={!stacked && s.row}>
-            <View style={!stacked && s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={setPassword} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /></View>
-            <View style={!stacked && s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={setConfirm} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></View>
+            <View style={!stacked && s.half}><Text style={s.label}>CONTRASEÑA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoComplete="new-password" onChangeText={form.change('password', setPassword)} placeholder="10 caracteres mínimo" containerStyle={s.input} inputStyle={s.passwordText} value={password} /><FieldError message={form.fields.password} /></View>
+            <View style={!stacked && s.half}><Text style={s.label}>REPETIR CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña" autoComplete="new-password" onChangeText={form.change('confirm', setConfirm)} placeholder="Repetir" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /><FieldError message={form.fields.confirm} /></View>
           </View>
-          {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
+          <FieldError message={form.fields.submit} />
           <Pressable accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>Enviar solicitud</Text>}</Pressable>
         </FormDialog>
       </KeyboardAvoidingView>

@@ -73,9 +73,13 @@ export async function createVeterinaryRecord(req: Request, res: Response): Promi
   const animalId = Number(req.params.id); const userId = req.usuario?.id_usuario;
   const date = String(req.body.fecha ?? ''); const type = String(req.body.tipo ?? 'nota'); const detail = String(req.body.detalle ?? '').trim();
   const photo = readPhoto(req.body.foto);
-  if (!Number.isInteger(animalId) || animalId < 1 || !userId || !validBirthDate(date) || !['tratamiento', 'nota'].includes(type) || !detail || detail.length > 5000 || photo === false) {
-    res.status(400).json({ message: 'completá una fecha válida y una nota de hasta 5.000 caracteres; la foto debe ser válida y no superar 1,5 MB' }); return;
-  }
+  if (!Number.isInteger(animalId) || animalId < 1 || !userId) { res.status(400).json({ message: 'Elegí un animal válido para registrar la evolución.' }); return; }
+  // Cada rechazo identifica el dato concreto para mostrarlo debajo del campo.
+  if (!validBirthDate(date)) { res.status(400).json({ message: 'La fecha de la evolución debe existir y ser de hoy o anterior.' }); return; }
+  if (!['tratamiento', 'nota'].includes(type)) { res.status(400).json({ message: 'Elegí Tratamiento o Nota como tipo de evolución.' }); return; }
+  if (!detail) { res.status(400).json({ message: 'Escribí el detalle del tratamiento o de la nota.' }); return; }
+  if (detail.length > 5000) { res.status(400).json({ message: 'El detalle de la evolución admite hasta 5.000 caracteres.' }); return; }
+  if (photo === false) { res.status(400).json({ message: 'La foto debe ser JPG, PNG o WebP y no superar 1,5 MB.' }); return; }
   const connection = await database.getConnection();
   try {
     await connection.beginTransaction();

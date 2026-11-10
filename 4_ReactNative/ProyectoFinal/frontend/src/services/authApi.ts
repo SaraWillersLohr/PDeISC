@@ -13,6 +13,11 @@ async function getErrorMessage(response: Response): Promise<string> {
   return apiErrorMessage(response, 'No se pudo completar la solicitud.');
 }
 
+// Distingo la verificación pendiente sin depender del texto visible ni crear una sesión.
+export class EmailVerificationRequiredError extends Error {
+  constructor() { super('Te falta verificar tu correo para terminar el registro.'); this.name = 'EmailVerificationRequiredError'; }
+}
+
 // envío las credenciales al backend y devuelvo una sesión válida.
 export async function login(credentials: LoginCredentials): Promise<Session> {
   if (!apiUrl) {
@@ -26,7 +31,9 @@ export async function login(credentials: LoginCredentials): Promise<Session> {
   });
 
   if (!response.ok) {
-    throw new Error(await getErrorMessage(response));
+    const body = await response.json().catch(() => null) as { code?: string; message?: string } | null;
+    if (response.status === 409 && body?.code === 'EMAIL_VERIFICATION_REQUIRED') throw new EmailVerificationRequiredError();
+    throw new Error(friendlyApiMessage(body?.message, response.status, 'No se pudo iniciar sesión.'));
   }
 
   try { return (await response.json()) as Session; }

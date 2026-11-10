@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode, type ComponentRef } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { FieldErrorContent } from './FieldError';
 
 type Props = {
   children: ReactNode;
@@ -8,17 +9,20 @@ type Props = {
 };
 
 export function FormDialog({ children, style, contentContainerStyle }: Props) {
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+
   return (
     // El cuadro crece hasta el contenido. El desplazamiento aparece al faltar altura.
     // En iOS compenso el teclado; Android usa el ajuste de ventana del sistema.
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
       <View accessibilityViewIsModal style={[styles.card, style]}>
         <ScrollView
+          ref={scroll}
           contentContainerStyle={contentContainerStyle}
           keyboardShouldPersistTaps="handled"
           style={styles.scroll}
         >
-          {children}
+          <FieldErrorContent scrollRef={scroll}>{children}</FieldErrorContent>
         </ScrollView>
       </View>
     </KeyboardAvoidingView>

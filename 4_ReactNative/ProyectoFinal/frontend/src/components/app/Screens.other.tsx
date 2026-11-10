@@ -134,7 +134,7 @@ export function AdminRequestsScreen() {
       </Pressable>
 
       {notice ? <Text style={s.requestNotice}>{notice}</Text> : null}
-      {error ? <Text style={s.requestError}>{error}</Text> : null}
+      {error && !decision ? <Text style={s.requestError}>{error}</Text> : null}
 
       {requests.length ? (
         requests.map((request) => (
@@ -191,6 +191,7 @@ export function AdminRequestsScreen() {
                 ? `\nRol asignado: ${roleOptions.find((option) => option.role === (selectedRoles[decision.request.id_solicitud] ?? 'peon'))?.label}. La persona podrá iniciar sesión con su contraseña.`
                 : '\nNo se creará una cuenta activa.'}
             </Text>
+            {error ? <Text accessibilityRole="alert" style={s.requestError}>{error}</Text> : null}
             <View style={s.requestActions}>
               <Pressable onPress={() => setDecision(null)} style={s.rejectButton}>
                 <Text style={s.rejectText}>Cancelar</Text>

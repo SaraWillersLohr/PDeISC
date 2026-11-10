@@ -1,3 +1,5 @@
+import { FieldError, useFieldErrors } from '../FieldError';
+import { dateFieldError } from '../../services/formValidation';
 import { FormDialog } from '../FormDialog';
 import { DateField } from './DateField';
 // presento el seguimiento clínico y el alta veterinaria.
@@ -31,6 +33,10 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historySaving, setHistorySaving] = useState(false);
   const [historyError, setHistoryError] = useState('');
+  const evolutionErrors = useFieldErrors();
+  const dischargeErrors = useFieldErrors();
+  const diagnosisErrors = useFieldErrors();
+  const [evolutionNotice, setEvolutionNotice] = useState('');
   const [recordDate, setRecordDate] = useState(new Date().toISOString().slice(0, 10));
   const [recordType, setRecordType] = useState<'tratamiento' | 'nota'>('tratamiento');
   const [recordDetail, setRecordDetail] = useState('');
@@ -71,12 +77,13 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
 
   async function confirmDischarge(): Promise<void> {
     if (!session || !selected) return;
-    setSaving(true); setError('');
+    if (!dischargeErrors.validate({ notes: notes.length > 500 && 'Las indicaciones no pueden superar los 500 caracteres.' })) return;
+    setSaving(true);
     try {
       await dischargeAnimal(session, selected.id_animal, notes);
       setSelected(null); setNotes(''); setLoading(true); await load();
     } catch (cause) {
-      setError(friendlyErrorMessage(cause, 'No se pudo registrar el alta.'));
+      dischargeErrors.serverError(friendlyErrorMessage(cause, 'No se pudo registrar el alta.'), [['notes', /observaci|indicaci|caracter/i]]);
     } finally {
       setSaving(false);
     }
@@ -85,24 +92,29 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
   function openHistory(animal: NursingAnimalRecord): void {
     if (!session) return;
     setDiagnosis(animal.estado_salud === 'herido' ? 'herido' : 'enfermo');
+    evolutionErrors.clear(); diagnosisErrors.clear(); setEvolutionNotice('');
     setHistoryAnimal(animal); setHistory([]); setHistoryError(''); setHistoryLoading(true);
   }
 
   async function saveEvolution(): Promise<void> {
-    if (!session || !historyAnimal || !recordDetail.trim()) { setHistoryError('Escribí el tratamiento o la nota para guardar.'); return; }
-    setHistorySaving(true); setHistoryError('');
+    if (!session || !historyAnimal) return;
+    if (!evolutionErrors.validate({
+      detail: !recordDetail.trim() ? 'Escribí el tratamiento realizado o el contenido de la nota.' : recordDetail.trim().length > 5000 && 'El detalle no puede superar los 5.000 caracteres.',
+      date: dateFieldError(recordDate),
+    })) return;
+    setHistorySaving(true); setEvolutionNotice('');
     try {
       const result = await createVeterinaryRecord(session, historyAnimal.id_animal, { fecha: recordDate, tipo: recordType, detalle: recordDetail.trim(), foto: recordPhoto });
       setRecordDetail(''); setRecordPhoto(null); setRecordType('tratamiento'); setRecordDate(new Date().toISOString().slice(0, 10));
-      if (result.estado === 'pendiente') setHistoryError(`Evolución guardada en el dispositivo. ${result.mensaje}`);
+      if (result.estado === 'pendiente') setEvolutionNotice(`Evolución guardada en el dispositivo. ${result.mensaje}`);
       setHistory(await listVeterinaryRecords(session, historyAnimal.id_animal));
-    } catch (cause) { setHistoryError(friendlyErrorMessage(cause, 'No se pudo guardar la evolución veterinaria.')); }
+    } catch (cause) { evolutionErrors.serverError(friendlyErrorMessage(cause, 'No se pudo guardar la evolución veterinaria.'), [['date', /fecha/i], ['detail', /detalle|descripci|5.000|nota/i], ['photo', /foto|imagen/i]]); }
     finally { setHistorySaving(false); }
   }
 
   async function saveDiagnosis(): Promise<void> {
     if (!session || !historyAnimal) return;
-    setDiagnosisSaving(true); setHistoryError('');
+    setDiagnosisSaving(true); diagnosisErrors.clear();
     try {
       await updateNursingHealthStatus(session, historyAnimal.id_animal, diagnosis);
       const updatedRows = await listNursingAnimals(session);
@@ -110,7 +122,7 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
       const updatedAnimal = updatedRows.find((row) => row.id_animal === historyAnimal.id_animal);
       if (updatedAnimal) setHistoryAnimal(updatedAnimal);
       setHistory(await listVeterinaryRecords(session, historyAnimal.id_animal));
-    } catch (cause) { setHistoryError(friendlyErrorMessage(cause, 'No se pudo guardar el diagnóstico.')); }
+    } catch (cause) { diagnosisErrors.serverError(friendlyErrorMessage(cause, 'No se pudo guardar el diagnóstico.'), [['status', /estado|enfermo|herido/i]]); }
     finally { setDiagnosisSaving(false); }
   }
 
@@ -172,7 +184,7 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
               </View>
             ) : canAddEvolution ? (
               <Pressable
-                onPress={() => { setSelected(animal); setNotes(''); setError(''); }}
+                onPress={() => { setSelected(animal); setNotes(''); dischargeErrors.clear(); }}
                 style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 12 }]}
               >
                 <Ionicons color="#ffffff" name="checkmark-done" size={16} style={{ marginRight: 6 }} />
@@ -199,13 +211,16 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
             </Text>
             <TextInput
               accessibilityLabel="Observaciones del alta"
+              maxLength={500}
               multiline
-              onChangeText={setNotes}
+              onChangeText={dischargeErrors.change('notes', setNotes)}
               placeholder="Indicaciones para el equipo de campo (medicación, cuidados)"
               placeholderTextColor={colors.textMuted}
               style={[style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={notes}
             />
+            <FieldError message={dischargeErrors.fields.notes} />
+            <FieldError message={dischargeErrors.fields.submit} />
             <View style={style.modalActions}>
               <Pressable
                 disabled={saving}
@@ -242,14 +257,21 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
                 {(['enfermo', 'herido'] as const).map((status) => <Pressable key={status} onPress={() => setDiagnosis(status)} style={[style.destination, { backgroundColor: diagnosis === status ? colors.primary : colors.bgCardMuted, borderColor: diagnosis === status ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: diagnosis === status ? '#fff' : colors.textSecondary }]}>{status === 'enfermo' ? 'Enfermo' : 'Herido'}</Text></Pressable>)}
               </View>
+              <FieldError message={diagnosisErrors.fields.status} />
+              <FieldError message={diagnosisErrors.fields.submit} />
               <Pressable disabled={diagnosisSaving} onPress={() => void saveDiagnosis()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 9 }]}><Text style={style.confirmText}>{diagnosisSaving ? 'Guardando…' : 'Guardar diagnóstico y avisar'}</Text></Pressable>
               <Text style={[style.title, { color: colors.textMain }]}>Agregar evolución</Text>
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 9 }}>
                 {(['tratamiento', 'nota'] as const).map((type) => <Pressable key={type} onPress={() => setRecordType(type)} style={[style.destination, { backgroundColor: recordType === type ? colors.primary : colors.bgCardMuted, borderColor: recordType === type ? colors.primary : colors.border }]}><Text style={[style.destinationText, { color: recordType === type ? '#fff' : colors.textSecondary }]}>{type === 'tratamiento' ? 'Tratamiento' : 'Nota'}</Text></Pressable>)}
               </View>
-              <DateField accessibilityLabel="Fecha del tratamiento o nota" onChangeText={setRecordDate} placeholder="Fecha · AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, marginTop: 9 }]} value={recordDate} />
-              <TextInput accessibilityLabel="Detalle de la evolución veterinaria" multiline onChangeText={setRecordDetail} placeholder="Tratamiento realizado, observaciones y evolución" placeholderTextColor={colors.textMuted} style={[style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, minHeight: 88 }]} value={recordDetail} />
-              <PhotoAttachment compact value={recordPhoto} onChange={setRecordPhoto} />
+              <DateField accessibilityLabel="Fecha del tratamiento o nota" onChangeText={evolutionErrors.change('date', setRecordDate)} placeholder="Fecha · AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[style.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, marginTop: 9 }]} value={recordDate} />
+              <FieldError message={evolutionErrors.fields.date} />
+              <TextInput accessibilityLabel="Detalle de la evolución veterinaria" multiline onChangeText={evolutionErrors.change('detail', setRecordDetail)} placeholder="Tratamiento realizado, observaciones y evolución" placeholderTextColor={colors.textMuted} style={[style.notesInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText, minHeight: 88 }]} value={recordDetail} />
+              <FieldError message={evolutionErrors.fields.detail} />
+              <PhotoAttachment compact value={recordPhoto} onChange={(value) => { setRecordPhoto(value); evolutionErrors.clear('photo'); }} />
+              <FieldError message={evolutionErrors.fields.photo} />
+              {evolutionNotice ? <Text style={[style.detail, { color: colors.primary }]}>{evolutionNotice}</Text> : null}
+              <FieldError message={evolutionErrors.fields.submit} />
               <Pressable disabled={historySaving} onPress={() => void saveEvolution()} style={[style.confirmButton, { backgroundColor: colors.primary, marginTop: 12 }]}><Text style={style.confirmText}>{historySaving ? 'Guardando…' : 'Guardar en la evolución'}</Text></Pressable>
             </View> : null}
             <Pressable onPress={() => setHistoryAnimal(null)} style={[style.cancelButton, { alignSelf: 'flex-end', borderColor: colors.border, marginTop: 14 }]}><Text style={[style.cancelText, { color: colors.textMuted }]}>Cerrar</Text></Pressable>

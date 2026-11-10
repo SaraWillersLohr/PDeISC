@@ -1,6 +1,7 @@
+import { FieldErrorContent } from '../FieldError';
 // reúno tipos y elementos visuales compartidos entre las pantallas principales.
 import type { AppSectionIconName } from './AppSectionIcon';
-import { useRef, useState } from 'react';
+import { useRef, useState, type ComponentRef } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../context/SessionContext';
@@ -43,15 +44,16 @@ export function Page({ children }: { children: React.ReactNode }) {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
+  const formScroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const scrollToTop = useRef<() => void>(() => {});
   const [showScrollTop, setShowScrollTop] = useState(false);
   function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) { setShowScrollTop(event.nativeEvent.contentOffset.y > 320); }
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} style={[s.safe, { backgroundColor: colors.bgCanvas }]}>
-      <ScrollView ref={(instance) => { scrollToTop.current = () => instance?.scrollTo({ y: 0, animated: true }); }} onScroll={handleScroll} scrollEventThrottle={16} contentContainerStyle={[s.page, isDesktop && s.pageDesktop]} showsVerticalScrollIndicator={false}>
-        <View style={[s.contentContainer, isDesktop && s.contentContainerDesktop]}>
+      <ScrollView ref={(instance) => { formScroll.current = instance; scrollToTop.current = () => instance?.scrollTo({ y: 0, animated: true }); }} onScroll={handleScroll} scrollEventThrottle={16} contentContainerStyle={[s.page, isDesktop && s.pageDesktop]} showsVerticalScrollIndicator={false}>
+        <FieldErrorContent scrollRef={formScroll} style={[s.contentContainer, isDesktop && s.contentContainerDesktop]}>
           {children}
-        </View>
+        </FieldErrorContent>
       </ScrollView>
       <ScrollToTop visible={showScrollTop} onPress={() => scrollToTop.current()} />
     </SafeAreaView>

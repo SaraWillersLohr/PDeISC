@@ -112,6 +112,9 @@ export async function login(req: Request, res: Response): Promise<void> {
     const session = await authService.login({ email, password });
     res.status(200).json(session);
   } catch (error) {
+    if (error instanceof authService.RegistrationPendingError) {
+      res.status(409).json({ code: error.code, message: error.message }); return;
+    }
     if (isDatabaseFailure(error)) { res.status(503).json({ message: 'la base de datos no está disponible; intentá nuevamente en unos segundos' }); return; }
     const message = error instanceof Error ? error.message : 'no se pudo iniciar sesión';
     res.status(401).json({ message });

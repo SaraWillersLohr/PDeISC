@@ -55,7 +55,7 @@ export async function createRegistrationRequest(input: RegistrationInput): Promi
   try {
     await connection.beginTransaction();
     const [existing] = await connection.query<RowDataPacket[]>('SELECT id_solicitud, estado FROM solicitudes_registro WHERE email = ? LIMIT 1 FOR UPDATE', [email]);
-    if (existing.length && existing[0].estado !== 'rechazada') throw new Error('ya existe una solicitud para ese correo; revisá tu correo o pedí otro código');
+    if (existing.length && existing[0].estado !== 'rechazada') throw new Error('Ya existe una solicitud para ese correo. Ingresá con tu correo y contraseña para continuar el registro.');
     if (existing.length) {
       idRequest = Number(existing[0].id_solicitud);
       await connection.execute(

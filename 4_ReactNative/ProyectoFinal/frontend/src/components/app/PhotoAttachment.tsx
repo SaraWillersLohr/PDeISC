@@ -1,3 +1,5 @@
+import { ConfirmDelete } from '../ConfirmDelete';
+import { FieldError } from '../FieldError';
 // adjunto una imagen comprimida opcional a formularios ganaderos.
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,6 +12,7 @@ const MAX_BASE64_LENGTH = 1_350_000;
 export function PhotoAttachment({ value, onChange, compact = false }: { value: string | null; onChange: (photo: string | null) => void; compact?: boolean }) {
   const { colors } = useTheme();
   const [busy, setBusy] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const [error, setError] = useState('');
 
   async function choosePhoto(): Promise<void> {
@@ -34,9 +37,10 @@ export function PhotoAttachment({ value, onChange, compact = false }: { value: s
         {busy ? <ActivityIndicator color={colors.primary} size="small" /> : <Ionicons color={colors.primary} name="image-outline" size={16} />}
         <Text style={[styles.buttonText, { color: colors.primary }]}>{value ? 'Cambiar foto' : 'Agregar foto (opcional)'}</Text>
       </Pressable>
-      {value ? <Pressable accessibilityLabel="Quitar foto" accessibilityRole="button" onPress={() => { onChange(null); setError(''); }} style={styles.remove}><Ionicons color={colors.textMuted} name="close-circle" size={20} /></Pressable> : null}
+      <ConfirmDelete visible={confirmRemove} detail="Se quitará la foto adjunta de este formulario." onCancel={() => setConfirmRemove(false)} onConfirm={() => { onChange(null); setError(''); setConfirmRemove(false); }} />
+      {value ? <Pressable accessibilityLabel="Quitar foto" accessibilityRole="button" onPress={() => setConfirmRemove(true)} style={styles.remove}><Ionicons color={colors.textMuted} name="close-circle" size={20} /></Pressable> : null}
     </View>
-    {error ? <Text style={styles.error}>{error}</Text> : null}
+    <FieldError message={error} />
   </View>;
 }
 

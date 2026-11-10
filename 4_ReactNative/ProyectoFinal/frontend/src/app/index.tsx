@@ -1,3 +1,4 @@
+import { EmailVerificationModal } from '../components/EmailVerificationModal';
 import { friendlyErrorMessage } from '../services/apiErrors';
 import { forest, s } from './LoginStyles';
 import NetInfo from "@react-native-community/netinfo";
@@ -24,7 +25,7 @@ import { AccountRequestModal } from "../components/AccountRequestModal";
 import { SocialLoginButton } from "../components/SocialLoginButton";
 import { useSession } from "../context/SessionContext";
 import { initializeOfflineDatabase } from "../services/offlineDatabase";
-import { login } from "../services/authApi";
+import { EmailVerificationRequiredError, login } from "../services/authApi";
 import { removeSession, saveSession } from "../services/sessionStorage";
 
 /**
@@ -45,6 +46,7 @@ export default function LoginScreen() {
   const [online, setOnline] = useState(true);
   const [error, setError] = useState("");
   const [recoveryVisible, setRecoveryVisible] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const [accountRequestVisible, setAccountRequestVisible] = useState(false);
 
   // Inicializa la base de datos local y escucha cambios en la conexión a internet.
@@ -81,6 +83,9 @@ export default function LoginScreen() {
       setSession(nextSession);
       setPassword("");
     } catch (cause) {
+      if (cause instanceof EmailVerificationRequiredError) {
+        setVerificationEmail(cleanEmail); setPassword(''); return;
+      }
       setError(
         cause instanceof Error
           ? friendlyErrorMessage(cause, 'No se pudo iniciar sesión. Revisá tus datos e intentá de nuevo.')
@@ -356,7 +361,9 @@ export default function LoginScreen() {
           onClose={() => setRecoveryVisible(false)}
         />
       ) : null}
+      {verificationEmail !== null ? <EmailVerificationModal key={verificationEmail} email={verificationEmail} onClose={() => setVerificationEmail(null)} /> : null}
       <AccountRequestModal
+        onVerification={(address) => { setEmail(address); setVerificationEmail(address); }}
         onClose={() => setAccountRequestVisible(false)}
         visible={accountRequestVisible}
       />

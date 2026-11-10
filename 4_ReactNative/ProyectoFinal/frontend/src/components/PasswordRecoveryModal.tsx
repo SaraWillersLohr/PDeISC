@@ -1,3 +1,4 @@
+import { FieldError, useFieldErrors } from './FieldError';
 // presento el flujo de recuperación como una ventana sobre el ingreso.
 import { FormDialog } from './FormDialog';
 import { friendlyErrorMessage } from '../services/apiErrors';
@@ -13,6 +14,7 @@ type Props = { initialEmail: string; onClose: () => void };
 
 export function PasswordRecoveryModal({ initialEmail, onClose }: Props) {
   const { setSession } = useSession();
+  const form = useFieldErrors();
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState('');
   const [resetToken, setResetToken] = useState('');
@@ -20,41 +22,42 @@ export function PasswordRecoveryModal({ initialEmail, onClose }: Props) {
   const [confirm, setConfirm] = useState('');
   const [requested, setRequested] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
   async function requestCode(): Promise<void> {
     const cleanEmail = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) { setError('Ingresá un correo válido.'); return; }
-    setBusy(true); setError(''); setNotice('');
+    if (!form.validate({ email: !/^\S+@\S+\.\S+$/.test(cleanEmail) && 'Ingresá un correo electrónico válido.' })) return;
+    setBusy(true); form.clear(); setNotice('');
     try { setNotice(await requestPasswordRecovery(cleanEmail)); setEmail(cleanEmail); setRequested(true); }
-    catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo solicitar el código.')); }
+    catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo solicitar el código.'), [['email', /correo|email/i]]); }
     finally { setBusy(false); }
   }
 
   async function redeemCode(): Promise<void> {
-    if (!/^\d{6}$/.test(code)) { setError('Ingresá el código de seis dígitos.'); return; }
-    setBusy(true); setError('');
+    if (!form.validate({ code: !/^\d{6}$/.test(code) && 'Ingresá los seis dígitos del código recibido.' })) return;
+    setBusy(true); form.clear();
     try { setResetToken(await redeemPasswordRecoveryCode(email.trim().toLowerCase(), code)); }
-    catch (cause) { setError(friendlyErrorMessage(cause, 'El código no es válido o venció.')); }
+    catch (cause) { form.serverError(friendlyErrorMessage(cause, 'El código no es válido o venció.'), [['code', /código|codigo|venci|intentos/i]]); }
     finally { setBusy(false); }
   }
 
   async function saveNewPassword(): Promise<void> {
-    if (password.length < 10) { setError('La contraseña nueva debe tener al menos 10 caracteres.'); return; }
-    if (password !== confirm) { setError('Las contraseñas no coinciden.'); return; }
-    setBusy(true); setError('');
+    if (!form.validate({
+      password: password.length < 10 && 'La contraseña nueva debe tener al menos 10 caracteres.',
+      confirm: !confirm ? 'Repetí la contraseña nueva.' : password !== confirm && 'Las contraseñas no coinciden.',
+    })) return;
+    setBusy(true); form.clear();
     try {
       const session = await completePasswordRecovery(resetToken, password);
       await saveSession(session);
       setSession(session);
       router.replace('/(app)/home');
-    } catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo cambiar la contraseña.')); }
+    } catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo cambiar la contraseña.'), [['password', /contraseña|caracteres/i]]); }
     finally { setBusy(false); }
   }
 
   function changeEmail(): void {
-    setRequested(false); setResetToken(''); setCode(''); setPassword(''); setConfirm(''); setError(''); setNotice('');
+    setRequested(false); setResetToken(''); setCode(''); setPassword(''); setConfirm(''); form.clear(); setNotice('');
   }
 
   return (
@@ -70,10 +73,10 @@ export function PasswordRecoveryModal({ initialEmail, onClose }: Props) {
               <Pressable accessibilityLabel="Cerrar recuperación" accessibilityRole="button" onPress={onClose} style={s.close}><Text style={s.closeText}>×</Text></Pressable>
             </View>
             <Text style={s.copy}>{resetToken ? 'Elegí una contraseña de al menos 10 caracteres para volver a ingresar.' : requested ? `Ingresá el código de seis dígitos que enviamos a ${email}.` : 'Te enviaremos un código temporal al correo asociado a tu cuenta.'}</Text>
-            {!requested ? <><Text style={s.label}>CORREO ELECTRÓNICO</Text><TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={setEmail} placeholder="nombre@estancia.com" style={s.input} value={email} /></> : null}
-            {requested && !resetToken ? <><Text style={s.label}>CÓDIGO DE RECUPERACIÓN</Text><TextInput accessibilityLabel="Código de recuperación de seis dígitos" autoComplete="one-time-code" keyboardType="number-pad" maxLength={6} onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" style={[s.input, s.code]} value={code} /><Pressable disabled={busy} onPress={changeEmail} style={s.link}><Text style={s.linkText}>Cambiar correo</Text></Pressable></> : null}
-            {resetToken ? <><Text style={s.label}>CONTRASEÑA NUEVA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoCapitalize="none" autoComplete="new-password" onChangeText={setPassword} placeholder="Al menos 10 caracteres" containerStyle={s.input} inputStyle={s.passwordText} value={password} /><Text style={s.label}>REPETÍ LA CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña nueva" autoCapitalize="none" autoComplete="new-password" onChangeText={setConfirm} onSubmitEditing={() => void saveNewPassword()} placeholder="Volvé a escribirla" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /></> : null}
-            {notice ? <Text style={s.notice}>{notice}</Text> : null}{error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
+            {!requested ? <><Text style={s.label}>CORREO ELECTRÓNICO</Text><TextInput accessibilityLabel="Correo electrónico" autoCapitalize="none" autoComplete="email" keyboardType="email-address" onChangeText={form.change('email', setEmail)} placeholder="nombre@estancia.com" style={s.input} value={email} /><FieldError message={form.fields.email} /></> : null}
+            {requested && !resetToken ? <><Text style={s.label}>CÓDIGO DE RECUPERACIÓN</Text><TextInput accessibilityLabel="Código de recuperación de seis dígitos" autoComplete="one-time-code" keyboardType="number-pad" maxLength={6} onChangeText={(value) => { form.clear('code'); setCode(value.replace(/\D/g, '').slice(0, 6)); }} placeholder="000000" style={[s.input, s.code]} value={code} /><FieldError message={form.fields.code} /><Pressable disabled={busy} onPress={changeEmail} style={s.link}><Text style={s.linkText}>Cambiar correo</Text></Pressable></> : null}
+            {resetToken ? <><Text style={s.label}>CONTRASEÑA NUEVA</Text><PasswordInput accessibilityLabel="Contraseña nueva" autoCapitalize="none" autoComplete="new-password" onChangeText={form.change('password', setPassword)} placeholder="Al menos 10 caracteres" containerStyle={s.input} inputStyle={s.passwordText} value={password} /><FieldError message={form.fields.password} /><Text style={s.label}>REPETÍ LA CONTRASEÑA</Text><PasswordInput accessibilityLabel="Repetir contraseña nueva" autoCapitalize="none" autoComplete="new-password" onChangeText={form.change('confirm', setConfirm)} onSubmitEditing={() => void saveNewPassword()} placeholder="Volvé a escribirla" containerStyle={s.input} inputStyle={s.passwordText} value={confirm} /><FieldError message={form.fields.confirm} /></> : null}
+            {notice ? <Text style={s.notice}>{notice}</Text> : null}<FieldError message={form.fields.submit} />
             <Pressable accessibilityRole="button" disabled={busy} onPress={() => void (resetToken ? saveNewPassword() : requested ? redeemCode() : requestCode())} style={[s.primary, busy && s.disabled]}>{busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryText}>{resetToken ? 'Cambiar contraseña y entrar' : requested ? 'Validar código' : 'Enviar código'}</Text>}</Pressable>
             {requested && !resetToken ? <Pressable accessibilityRole="button" disabled={busy} onPress={() => void requestCode()} style={s.link}><Text style={s.linkText}>Reenviar código</Text></Pressable> : null}
             <Pressable accessibilityRole="button" onPress={onClose} style={s.link}><Text style={s.linkText}>Volver al ingreso</Text></Pressable>

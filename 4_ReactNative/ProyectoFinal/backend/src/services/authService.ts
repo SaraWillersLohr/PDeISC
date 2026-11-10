@@ -52,6 +52,16 @@ function digestMatches(expectedHex: string, receivedHex: string): boolean {
   return expected.length === received.length && timingSafeEqual(expected, received);
 }
 
+// Solo expongo el paso pendiente después de comprobar la contraseña de la solicitud.
+export class RegistrationPendingError extends Error {
+  constructor(readonly code: 'EMAIL_VERIFICATION_REQUIRED' | 'REGISTRATION_APPROVAL_PENDING') {
+    super(code === 'EMAIL_VERIFICATION_REQUIRED'
+      ? 'Tu registro todavía no está completo. Verificá tu correo para continuarlo.'
+      : 'Tu correo ya está verificado. Tu solicitud está esperando aprobación. Te avisaremos por correo.');
+    this.name = 'RegistrationPendingError';
+  }
+}
+
 // inicio sesión después de comprobar la contraseña hasheada.
 export async function login(input: LoginInput) {
   const [rows] = await database.execute<UserRow[]>(
@@ -64,9 +74,18 @@ export async function login(input: LoginInput) {
   );
   const user = rows[0];
 
-  if (!user || !(await bcrypt.compare(input.password, user.password_hash))) {
+  if (!user) {
+    const [requests] = await database.execute<RowDataPacket[]>(
+      "SELECT password_hash,estado FROM solicitudes_registro WHERE email=? AND estado IN ('pendiente_verificacion','pendiente_aprobacion') LIMIT 1",
+      [input.email.trim().toLowerCase()],
+    );
+    const request = requests[0];
+    if (request && await bcrypt.compare(input.password, String(request.password_hash))) {
+      throw new RegistrationPendingError(request.estado === 'pendiente_verificacion' ? 'EMAIL_VERIFICATION_REQUIRED' : 'REGISTRATION_APPROVAL_PENDING');
+    }
     throw new Error('correo o contraseña incorrectos');
   }
+  if (!(await bcrypt.compare(input.password, user.password_hash))) throw new Error('correo o contraseña incorrectos');
 
   const sessionUser: AuthenticatedUser = {
     id_usuario: user.id_usuario,

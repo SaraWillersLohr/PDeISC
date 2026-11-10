@@ -1,3 +1,5 @@
+import { FieldError, useFieldErrors } from '../FieldError';
+import { personNameError } from '../../services/formValidation';
 // consulto y gestiono especies, razas y propuestas del catálogo.
 // hago operativas la consulta del equipo y la aprobación del catálogo.
 import { FormDialog } from '../FormDialog';
@@ -14,6 +16,7 @@ import { st } from './OrganizationStyles';
 
 export function CatalogScreen() {
   const { session } = useSession();
+  const form = useFieldErrors();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
   const { width } = useWindowDimensions();
@@ -61,14 +64,15 @@ export function CatalogScreen() {
   function openForm(nextKind: 'especie' | 'raza', species?: Species): void {
     setKind(nextKind);
     setSpeciesId(species?.id_especie ?? null);
-    setName(''); setError(''); setMessage(''); setModalOpen(true);
+    form.clear(); setName(''); setError(''); setMessage(''); setModalOpen(true);
   }
 
   async function submit(): Promise<void> {
-    if (!session || !name.trim() || (kind === 'raza' && !speciesId)) {
-      setError(kind === 'raza' ? 'Elegí la especie e ingresá el nombre de la raza.' : 'Ingresá el nombre de la especie.');
-      return;
-    }
+    if (!session) return;
+    if (!form.validate({
+      name: !name.trim() ? (kind === 'especie' ? 'Ingresá el nombre de la especie.' : 'Ingresá el nombre de la raza.') : name.trim().length > 80 ? 'El nombre admite hasta 80 caracteres.' : personNameError(name, 'el nombre'),
+      species: kind === 'raza' && !speciesId && 'Elegí la especie a la que pertenece la raza.',
+    })) return;
     setBusy(true); setError(''); setMessage('');
     try {
       if (canCreate) {
@@ -80,7 +84,7 @@ export function CatalogScreen() {
         setModalOpen(false); setName(''); setMessage('Propuesta enviada al dueño para su revisión.');
       }
     } catch (e) {
-      setError(friendlyErrorMessage(e, 'No se pudo guardar el cambio.'));
+      form.serverError(friendlyErrorMessage(e, 'No se pudo guardar el cambio.'), [['name', /nombre|duplicad|existe/i], ['species', /especie/i]]);
     } finally {
       setBusy(false);
     }
@@ -263,7 +267,7 @@ export function CatalogScreen() {
                   {data.especies.map((species) => (
                     <Pressable
                       key={species.id_especie}
-                      onPress={() => setSpeciesId(species.id_especie)}
+                      onPress={() => { setSpeciesId(species.id_especie); form.clear('species'); }}
                       style={[
                         st.option,
                         { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#edf4ec' },
@@ -279,6 +283,7 @@ export function CatalogScreen() {
               </>
             ) : null}
 
+            <FieldError message={form.fields.species} />
             <Text style={[st.fieldLabel, { color: colors.textMuted }]}>
               {kind === 'especie' ? 'NOMBRE DE LA ESPECIE' : `NOMBRE DE LA RAZA${speciesId ? ` · ${data.especies.find((item) => item.id_especie === speciesId)?.nombre ?? ''}` : ''}`}
             </Text>
@@ -286,15 +291,15 @@ export function CatalogScreen() {
               accessibilityLabel={kind === 'especie' ? 'Nombre de la especie' : 'Nombre de la raza'}
               autoCapitalize="words"
               maxLength={80}
-              onChangeText={setName}
+              onChangeText={form.change('name', setName)}
               onSubmitEditing={() => void submit()}
               placeholder={kind === 'especie' ? 'Ej. Bovino, Ovino, Equino' : 'Ej. Angus, Hereford, Criollo'}
               placeholderTextColor={colors.textMuted}
               style={[st.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.inputText }]}
               value={name}
-            />
+            /><FieldError message={form.fields.name} />
 
-            {error ? <Text accessibilityRole="alert" style={st.error}>{error}</Text> : null}
+            <FieldError message={form.fields.submit} />
 
             <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
               <Pressable disabled={busy} onPress={() => setModalOpen(false)} style={[st.secondary, { borderColor: colors.border }]}>

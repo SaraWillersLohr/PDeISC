@@ -1,3 +1,4 @@
+import { ConfirmDelete } from '../ConfirmDelete';
 // centralizo las notificaciones en una campana disponible en todas las secciones.
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -13,6 +14,7 @@ export function NotificationBell() {
   const { session } = useSession();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
+  const [deleteTarget, setDeleteTarget] = useState<NotificationRecord | null>(null);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationRecord[]>([]);
   const [olderThan, setOlderThan] = useState<number | null>(null);
@@ -81,7 +83,7 @@ export function NotificationBell() {
     setBusyId(item.id_notificacion); setError('');
     try {
       await updateNotification(session, item.id_notificacion, action);
-      if (action === 'delete') setItems((current) => current.filter((row) => row.id_notificacion !== item.id_notificacion));
+      if (action === 'delete') { setItems((current) => current.filter((row) => row.id_notificacion !== item.id_notificacion)); setDeleteTarget(null); }
       else setItems((current) => current.map((row) => row.id_notificacion === item.id_notificacion
         ? { ...row, leida: 1, estado_respuesta: action === 'accept' ? 'aceptada' : action === 'reject' ? 'rechazada' : row.estado_respuesta }
         : row));
@@ -107,6 +109,7 @@ export function NotificationBell() {
   }
 
   return <>
+
     <View>
       <Pressable accessibilityLabel={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'} accessibilityRole="button" onPress={() => setOpen(true)} style={[styles.bell, { backgroundColor: isDark ? '#26392c' : '#eaf2eb' }]}>
         <Ionicons color={isDark ? '#b9e7c2' : '#214d35'} name="notifications-outline" size={21} />
@@ -136,7 +139,7 @@ export function NotificationBell() {
                     <Text style={[styles.title, { color: colors.textMain }]}>{item.titulo}</Text>
                     <Text style={[styles.date, { color: colors.textMuted }]}>{new Date(item.created_at).toLocaleString('es-AR')}</Text>
                   </View>
-                  <Pressable accessibilityLabel="Eliminar notificación" disabled={busyId === item.id_notificacion} onPress={() => void act(item, 'delete')} hitSlop={8}><Ionicons color={colors.textMuted} name="trash-outline" size={18} /></Pressable>
+                  <Pressable accessibilityLabel="Eliminar notificación" disabled={busyId === item.id_notificacion} onPress={() => { setError(''); setDeleteTarget(item); }} hitSlop={8}><Ionicons color={colors.textMuted} name="trash-outline" size={18} /></Pressable>
                 </View>
                 <Text style={[styles.message, { color: colors.textSecondary }]}>{item.mensaje}</Text>
                 {request ? <View style={styles.actions}>
@@ -156,6 +159,7 @@ export function NotificationBell() {
         </View>
       </View>
     </Modal>
+    <ConfirmDelete visible={deleteTarget !== null} detail={deleteTarget?.titulo ?? ''} busy={busyId !== null} error={error} onCancel={() => setDeleteTarget(null)} onConfirm={() => { if (deleteTarget) void act(deleteTarget, 'delete'); }} />
   </>;
 }
 

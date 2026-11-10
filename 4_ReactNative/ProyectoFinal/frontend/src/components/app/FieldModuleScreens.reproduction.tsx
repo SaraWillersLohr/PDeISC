@@ -1,10 +1,10 @@
 // registro servicios reproductivos, preñeces y nacimientos.
 // muestro operaciones de campo conectadas a las APIs productivas.
-import { FormDialog } from '../FormDialog';
+import { ConfirmDelete } from '../ConfirmDelete';
 import { friendlyErrorMessage } from '../../services/apiErrors';
 import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Modal, Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useSession } from '../../context/SessionContext';
 import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -46,7 +46,7 @@ export function ReproductionScreen() {
   }, [session, revision]);
 
   async function removeRecord(): Promise<void> {
-    if (!session || !deleteTarget) return;
+    if (!session || !deleteTarget || busy) return;
     setBusy(true); setMessage('');
     try {
       if (deleteTarget.type === 'servicio') await deleteMatingService(session, deleteTarget.id);
@@ -66,7 +66,7 @@ export function ReproductionScreen() {
 
   return (
     <Frame title="Reproducción" subtitle="SERVICIOS DE MONTA, PREÑECES Y NACIMIENTOS">
-      {message ? <Text style={s.error}>{message}</Text> : null}
+      {message && !deleteTarget ? <Text style={s.error}>{message}</Text> : null}
 
       {loading ? (
         <ActivityIndicator color={colors.primary} size="large" style={{ marginVertical: 20 }} />
@@ -92,7 +92,7 @@ export function ReproductionScreen() {
                     <Text style={[s.copy, { color: colors.textSecondary }]}>Padre: {item.padre || item.padre_texto || 'Sin identificar'} · {item.metodo} · {item.especie}</Text>
                     {item.fecha_estimada_nacimiento ? <Text style={[s.copy, { color: colors.accentLime, marginTop: 5 }]}>Preñez confirmada · nacimiento estimado {item.fecha_estimada_nacimiento.slice(0, 10)}</Text> : null}
                   </View>
-                  {owner ? <Pressable accessibilityRole="button" accessibilityLabel="Borrar servicio reproductivo" disabled={busy} onPress={() => setDeleteTarget({ type: 'servicio', id: item.id_servicio, label: `${item.nombre_madre || item.madre} · ${item.fecha.slice(0, 10)}` })}><Ionicons color="#dc2626" name="trash-outline" size={18} /></Pressable> : null}
+                  {owner ? <Pressable accessibilityRole="button" accessibilityLabel="Borrar servicio reproductivo" disabled={busy} onPress={() => { setMessage(''); setDeleteTarget({ type: 'servicio', id: item.id_servicio, label: `${item.nombre_madre || item.madre} · ${item.fecha.slice(0, 10)}` }); }}><Ionicons color="#dc2626" name="trash-outline" size={18} /></Pressable> : null}
                 </View>
                 {item.observaciones ? <Text style={[s.copy, { color: colors.textMuted, marginTop: 6 }]}>{item.observaciones}</Text> : null}
                 {canConfirmPregnancy && item.madre_activa !== 0 && !item.fecha_estimada_nacimiento ? (
@@ -130,23 +130,22 @@ export function ReproductionScreen() {
                     <Text style={[s.cardTitle, { color: colors.textMain }]}>{item.nombre_cria || item.cria} · {item.fecha.slice(0, 10)}</Text>
                     <Text style={[s.copy, { color: colors.textSecondary }]}>Madre: {item.madre || item.madre_texto || 'Sin informar'} · Padre: {item.padre || item.padre_texto || 'Sin informar'}</Text>
                   </View>
-                  {owner ? <Pressable accessibilityRole="button" accessibilityLabel="Borrar registro de nacimiento" disabled={busy} onPress={() => setDeleteTarget({ type: 'nacimiento', id: item.id_nacimiento, label: `${item.nombre_cria || item.cria} · ${item.fecha.slice(0, 10)}` })}><Ionicons color="#dc2626" name="trash-outline" size={18} /></Pressable> : null}
+                  {owner ? <Pressable accessibilityRole="button" accessibilityLabel="Borrar registro de nacimiento" disabled={busy} onPress={() => { setMessage(''); setDeleteTarget({ type: 'nacimiento', id: item.id_nacimiento, label: `${item.nombre_cria || item.cria} · ${item.fecha.slice(0, 10)}` }); }}><Ionicons color="#dc2626" name="trash-outline" size={18} /></Pressable> : null}
                 </View>
               </View>
             ))}
           </View>
         </>
       )}
-      <Modal animationType="fade" onRequestClose={() => { if (!busy) setDeleteTarget(null); }} transparent visible={Boolean(deleteTarget)}>
-        <View style={s.overlay}><FormDialog style={[s.card, s.modalCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-          <Text style={[s.cardTitle, { color: colors.textMain, fontSize: 17 }]}>¿Estás seguro de que querés borrar este registro?</Text>
-          <Text style={[s.copy, { color: colors.textSecondary, marginTop: 8 }]}>{deleteTarget?.label}{'\n'}Este elemento se eliminará de forma permanente.{deleteTarget?.type === 'nacimiento' ? ' La ficha de la cría se conservará.' : ''}</Text>
-          <View style={[s.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>
-            <Pressable disabled={busy} onPress={() => setDeleteTarget(null)} style={[s.primary, { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1, marginTop: 0 }]}><Text style={[s.copy, { color: colors.textMuted }]}>No, cancelar</Text></Pressable>
-            <Pressable disabled={busy} onPress={() => void removeRecord()} style={[s.primary, { backgroundColor: '#dc2626' }, busy && { opacity: 0.6 }]}><Text style={s.primaryText}>{busy ? 'Borrando…' : 'Sí, borrar'}</Text></Pressable>
-          </View>
-        </FormDialog></View>
-      </Modal>
+      {/* Comparto el modal para mantener botones alineados y legibles en ambos temas. */}
+      <ConfirmDelete
+        visible={Boolean(deleteTarget)}
+        busy={busy}
+        error={message}
+        detail={`${deleteTarget?.label ?? ''}\nEste elemento se eliminará de forma permanente.${deleteTarget?.type === 'nacimiento' ? ' La ficha de la cría se conservará.' : ''}`}
+        onCancel={() => { setDeleteTarget(null); setMessage(''); }}
+        onConfirm={() => void removeRecord()}
+      />
     </Frame>
   );
 }

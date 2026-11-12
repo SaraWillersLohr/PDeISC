@@ -20,8 +20,9 @@ export function CatalogScreen() {
   const form = useFieldErrors();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, fontScale } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
+  const stackSpeciesActions = width / fontScale < 400;
 
   const role = session?.usuario.rol.toLowerCase();
   const admin = role === 'dueno';
@@ -163,18 +164,18 @@ export function CatalogScreen() {
                   isDesktop && st.cardDesktop,
                 ]}
               >
-                <View style={st.row}>
+                <View style={[st.row, stackSpeciesActions && { flexWrap: 'wrap' }]}>
                   <View style={[st.avatarBadge, { backgroundColor: isDark ? 'rgba(52, 211, 153, 0.15)' : '#ecfdf5' }]}>
                     <AppSectionIcon color={isDark ? '#34d399' : '#059669'} name="horseshoe" size={18} />
                   </View>
-                  <View style={{ flex: 1 }}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[st.title, { color: colors.textMain }]}>{species.nombre}</Text>
                     <Text style={[st.copy, { color: colors.textMuted }]}>
                       {breeds.length ? `${breeds.length} ${breeds.length === 1 ? 'raza registrada' : 'razas registradas'}` : 'Sin razas aún'}
                     </Text>
                   </View>
                   {canCreate ? (
-                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, width: stackSpeciesActions ? '100%' : undefined }}>
                       <Pressable accessibilityRole="button" onPress={() => openForm('raza', species)} style={[st.secondary, { backgroundColor: isDark ? colors.bgCardMuted : colors.bgCard, borderColor: colors.border }]}><Text style={[st.secondaryText, { color: isDark ? colors.accentLime : colors.primary }]}>＋ Raza</Text></Pressable>
                       <Pressable accessibilityRole="button" accessibilityLabel={`Borrar especie ${species.nombre}`} onPress={() => setDeleteTarget({ type: 'especie', id: species.id_especie, name: species.nombre })} style={[st.deleteIconButton, { backgroundColor: colors.accentRedBg, borderColor: isDark ? 'rgba(226,107,96,0.45)' : '#fecaca' }]}><Ionicons color={isDark ? '#ff8b80' : '#dc2626'} name="trash-outline" size={18} /></Pressable>
                     </View>
@@ -183,7 +184,7 @@ export function CatalogScreen() {
                     <Pressable
                       accessibilityRole="button"
                       onPress={() => openForm('raza', species)}
-                      style={[st.secondary, { borderColor: colors.border }]}
+                      style={[st.secondary, { borderColor: colors.border }, stackSpeciesActions && { width: '100%' }]}
                     >
                       <Text style={[st.secondaryText, { color: colors.primary }]}>Proponer</Text>
                     </Pressable>

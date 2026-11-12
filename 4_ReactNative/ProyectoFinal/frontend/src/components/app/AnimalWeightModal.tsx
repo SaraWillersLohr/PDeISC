@@ -12,28 +12,29 @@ import type { AnimalRecord } from '../../services/livestockApi';
 
 const green = '#214d35';
 
-export function AnimalWeightModal({ animal, onClose, onSaved }: { animal: AnimalRecord | null; onClose: () => void; onSaved: () => void }) {
+export function AnimalWeightModal({ animal, onClose, onSaved }: { animal: AnimalRecord | null; onClose: () => void; onSaved: (notice: string) => void }) {
   const form = useFieldErrors();
-  const { session } = useSession(); const [weight, setWeight] = useState(''); const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); const [error, setError] = useState(''); const [saving, setSaving] = useState(false);
+  const { session } = useSession(); const [weight, setWeight] = useState(''); const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); const [saving, setSaving] = useState(false);
   async function save(): Promise<void> {
     const value = Number(weight);
-    if (!session || !animal) return;
+    if (!session || !animal || saving) return;
     if (!form.validate({
       weight: !weight.trim() ? 'Ingresá el peso en kilogramos.' : (!Number.isFinite(value) || value <= 0) && 'El peso debe ser un número mayor a cero.',
       date: dateFieldError(date),
     })) return;
-    setSaving(true); setError('');
+    setSaving(true);
     try {
       const result = await recordWeight(session, animal.id_animal, value, date);
-      onSaved();
-      if (result.estado === 'pendiente') { setError(`Pesaje guardado en el dispositivo. ${result.mensaje}`); return; }
+      setWeight('');
+      setDate(new Date().toISOString().slice(0, 10));
       onClose();
+      onSaved(result.estado === 'pendiente' ? `Pesaje guardado en el dispositivo. ${result.mensaje}` : 'Pesaje registrado.');
     }
     catch (cause) { form.serverError(friendlyErrorMessage(cause, 'No se pudo guardar el pesaje.'), [['weight', /peso|kg/i], ['date', /fecha/i]]); }
     finally { setSaving(false); }
   }
-  return <Modal animationType="fade" onRequestClose={onClose} transparent visible={Boolean(animal)}><View style={s.backdrop}><FormDialog style={s.card}><Text style={s.title}>Registrar pesaje</Text><Text style={s.copy}>{animal?.nombre || animal?.identificador}</Text><TextInput accessibilityLabel="Peso en kilogramos" keyboardType="decimal-pad" onChangeText={form.change('weight', setWeight)} placeholder="Peso en kg" style={s.input} value={weight} /><FieldError message={form.fields.weight} /><DateField accessibilityLabel="Fecha del pesaje" onChangeText={form.change('date', setDate)} placeholder="AAAA-MM-DD" style={s.input} value={date} /><FieldError message={form.fields.date} /><FieldError message={form.fields.submit} />{error ? <Text style={s.error}>{error}</Text> : null}<View style={s.actions}><Pressable disabled={saving} onPress={() => void save()} style={s.confirm}><Text style={s.confirmText}>{saving ? 'Guardando…' : 'Guardar pesaje'}</Text></Pressable><Pressable onPress={onClose} style={s.cancel}><Text style={s.cancelText}>Cancelar</Text></Pressable></View></FormDialog></View></Modal>;
+  return <Modal animationType="fade" onRequestClose={onClose} transparent visible={Boolean(animal)}><View style={s.backdrop}><FormDialog style={s.card}><Text style={s.title}>Registrar pesaje</Text><Text style={s.copy}>{animal?.nombre || animal?.identificador}</Text><TextInput accessibilityLabel="Peso en kilogramos" keyboardType="decimal-pad" onChangeText={form.change('weight', setWeight)} placeholder="Peso en kg" style={s.input} value={weight} /><FieldError message={form.fields.weight} /><DateField accessibilityLabel="Fecha del pesaje" onChangeText={form.change('date', setDate)} placeholder="AAAA-MM-DD" style={s.input} value={date} /><FieldError message={form.fields.date} /><FieldError message={form.fields.submit} /><View style={s.actions}><Pressable disabled={saving} onPress={() => void save()} style={s.confirm}><Text style={s.confirmText}>{saving ? 'Guardando…' : 'Guardar pesaje'}</Text></Pressable><Pressable onPress={onClose} style={s.cancel}><Text style={s.cancelText}>Cancelar</Text></Pressable></View></FormDialog></View></Modal>;
 }
 
-const s = StyleSheet.create({ backdrop: { alignItems: 'center', backgroundColor: 'rgba(20,35,25,.5)', flex: 1, justifyContent: 'center', padding: 20 }, card: { alignSelf: 'center', backgroundColor: '#fff', borderRadius: 16, maxWidth: 440, padding: 18, width: '100%' }, title: { color: '#202c23', fontSize: 17, fontWeight: '800' }, copy: { color: '#748076', fontSize: 13, marginTop: 6 }, input: { backgroundColor: '#f4f6f1', borderColor: '#e5eae3', borderRadius: 9, borderWidth: 1, color: '#202c23', height: 43, marginTop: 10, paddingHorizontal: 11 }, error: { color: '#a34b43', fontSize: 13, marginTop: 8 }, actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end', marginTop: 14 }, cancel: { borderColor: '#e5eae3', borderRadius: 8, borderWidth: 1, justifyContent: 'center', paddingHorizontal: 11 }, cancelText: { color: '#748076', fontSize: 13, fontWeight: '700' }, confirm: { backgroundColor: green, borderRadius: 8, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 10 }, confirmText: { color: '#fff', fontSize: 13, fontWeight: '700' } });
+const s = StyleSheet.create({ backdrop: { alignItems: 'center', backgroundColor: 'rgba(20,35,25,.5)', flex: 1, justifyContent: 'center', padding: 20 }, card: { alignSelf: 'center', backgroundColor: '#fff', borderRadius: 16, maxWidth: 440, padding: 18, width: '100%' }, title: { color: '#202c23', fontSize: 17, fontWeight: '800' }, copy: { color: '#748076', fontSize: 13, marginTop: 6 }, input: { backgroundColor: '#f4f6f1', borderColor: '#e5eae3', borderRadius: 9, borderWidth: 1, color: '#202c23', height: 43, marginTop: 10, paddingHorizontal: 11 }, actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end', marginTop: 14 }, cancel: { borderColor: '#e5eae3', borderRadius: 8, borderWidth: 1, justifyContent: 'center', paddingHorizontal: 11 }, cancelText: { color: '#748076', fontSize: 13, fontWeight: '700' }, confirm: { backgroundColor: green, borderRadius: 8, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 10 }, confirmText: { color: '#fff', fontSize: 13, fontWeight: '700' } });
 

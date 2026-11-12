@@ -32,6 +32,7 @@ export function MoreScreen() {
   const [photo, setPhoto] = useState<string | null>(session?.usuario.foto_perfil ?? null);
   const [photoError, setPhotoError] = useState('');
   const photoPending = photo !== (session?.usuario.foto_perfil ?? null);
+  const [changingPassword, setChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -87,6 +88,7 @@ export function MoreScreen() {
     setBusy(true); setMessage('');
     try {
       setMessage(await changeMyPassword(session, currentPassword, newPassword));
+      setChangingPassword(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -146,44 +148,51 @@ export function MoreScreen() {
         {/* Password / Security Card */}
         <View style={[s.profileCard, isDesktop && s.profileColumn, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <Text style={[s.sectionTitle, { color: colors.textMain }]}>Cambiar contraseña</Text>
-          <Text style={[s.formHelp, { color: colors.textMuted }]}>Para proteger tu acceso, primero ingresá tu contraseña actual.</Text>
+          {changingPassword ? <>
+            <Text style={[s.formHelp, { color: colors.textMuted }]}>Para proteger tu acceso, primero ingresá tu contraseña actual.</Text>
 
-          <Text style={[s.formLabel, { color: colors.textMuted }]}>CONTRASEÑA ACTUAL</Text>
-          <PasswordInput
-            accessibilityLabel="Contraseña actual"
-            autoCapitalize="none"
-            onChangeText={passwordForm.change('current', setCurrentPassword)}
-            containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
-            inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
-            value={currentPassword}
-          /><FieldError message={passwordForm.fields.current} />
+            <Text style={[s.formLabel, { color: colors.textMuted }]}>CONTRASEÑA ACTUAL</Text>
+            <PasswordInput
+              accessibilityLabel="Contraseña actual"
+              autoCapitalize="none"
+              onChangeText={passwordForm.change('current', setCurrentPassword)}
+              containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
+              inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
+              value={currentPassword}
+            /><FieldError message={passwordForm.fields.current} />
 
-          <Text style={[s.formLabel, { color: colors.textMuted }]}>CONTRASEÑA NUEVA</Text>
-          <PasswordInput
-            accessibilityLabel="Contraseña nueva"
-            autoCapitalize="none"
-            onChangeText={passwordForm.change('password', setNewPassword)}
-            placeholder="Al menos 10 caracteres"
-            containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
-            inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
-            placeholderTextColor={colors.textMuted}
-            value={newPassword}
-          /><FieldError message={passwordForm.fields.password} />
+            <Text style={[s.formLabel, { color: colors.textMuted }]}>CONTRASEÑA NUEVA</Text>
+            <PasswordInput
+              accessibilityLabel="Contraseña nueva"
+              autoCapitalize="none"
+              onChangeText={passwordForm.change('password', setNewPassword)}
+              placeholder="Al menos 10 caracteres"
+              containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
+              inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
+              placeholderTextColor={colors.textMuted}
+              value={newPassword}
+            /><FieldError message={passwordForm.fields.password} />
 
-          <Text style={[s.formLabel, { color: colors.textMuted }]}>REPETIR CONTRASEÑA</Text>
-          <PasswordInput
-            accessibilityLabel="Repetir contraseña nueva"
-            autoCapitalize="none"
-            onChangeText={passwordForm.change('confirm', setConfirmPassword)}
-            containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
-            inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
-            value={confirmPassword}
-          /><FieldError message={passwordForm.fields.confirm} />
+            <Text style={[s.formLabel, { color: colors.textMuted }]}>REPETIR CONTRASEÑA</Text>
+            <PasswordInput
+              accessibilityLabel="Repetir contraseña nueva"
+              autoCapitalize="none"
+              onChangeText={passwordForm.change('confirm', setConfirmPassword)}
+              containerStyle={[s.formInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}
+              inputStyle={{ color: colors.inputText, fontSize: 13, height: 46, paddingLeft: 12 }}
+              value={confirmPassword}
+            /><FieldError message={passwordForm.fields.confirm} />
 
-          <FieldError message={passwordForm.fields.submit} />
-          <Pressable disabled={busy} onPress={() => void savePassword()} style={[s.primaryBtn, { backgroundColor: colors.primary }, busy && s.disabled]}>
-            <Text style={s.primaryBtnText}>Cambiar contraseña</Text>
-          </Pressable>
+            <FieldError message={passwordForm.fields.submit} />
+            <Pressable disabled={busy} onPress={() => void savePassword()} style={[s.primaryBtn, { backgroundColor: colors.primary }, busy && s.disabled]}>
+              <Text style={s.primaryBtnText}>Cambiar contraseña</Text>
+            </Pressable>
+
+          </> : (
+            <Pressable accessibilityRole="button" disabled={busy} onPress={() => { passwordForm.clear(); setMessage(''); setChangingPassword(true); }} style={[s.primaryBtn, { backgroundColor: colors.primary }, busy && s.disabled]}>
+              <Text style={s.primaryBtnText}>Cambiar contraseña</Text>
+            </Pressable>
+          )}
 
           <Pressable onPress={() => router.push({ pathname: '/recover', params: { email: session?.usuario.email ?? '' } })} style={s.recoveryLink}>
             <Text style={[s.recoveryText, { color: colors.accentLime }]}>¿No recordás tu contraseña? Usar código de recuperación</Text>
@@ -191,7 +200,7 @@ export function MoreScreen() {
         </View>
       </View>
 
-      {message ? <Text style={s.requestNotice}>{message}</Text> : null}
+      {message ? <Text accessibilityLiveRegion="polite" style={s.requestNotice}>{message}</Text> : null}
 
       <Pressable onPress={() => void logout()} style={[s.logoutBtn, { borderColor: isDark ? '#4b2e2b' : '#e7d9d7' }]}>
         <Ionicons color="#dc2626" name="log-out-outline" size={17} style={{ marginRight: 6 }} />

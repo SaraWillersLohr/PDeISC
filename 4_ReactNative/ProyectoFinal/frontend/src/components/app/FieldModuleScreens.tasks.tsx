@@ -46,6 +46,8 @@ export function TasksManagerScreen() {
   const [deleteTarget, setDeleteTarget] = useState<number[] | null>(null);
   const [selected, setSelected] = useState<number[]>([]);
   const [page, setPage] = useState(0);
+  const [creating, setCreating] = useState(false);
+  const [savedNotice, setSavedNotice] = useState('');
   const [editing, setEditing] = useState<number | null>(null);
   const [deletingTask, setDeletingTask] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState('');
@@ -69,6 +71,7 @@ export function TasksManagerScreen() {
     ? 'Alguna tarea cambió o ya no está disponible. Cancelá y revisá la selección.' : '';
 
   function startEditing(row: TaskRecord): void {
+    setSavedNotice('');
     setEditing(row.id_tarea); setTitle(row.titulo); setNotes(row.descripcion ?? '');
     setDue(row.fecha_vencimiento?.slice(0, 10) ?? ''); setResponsible(row.id_responsable); form.clear();
   }
@@ -121,14 +124,21 @@ export function TasksManagerScreen() {
         id_responsable: responsible,
         ...(due ? { fecha_vencimiento: due } : {}),
       }));
-      setEditing(null);
-      setTitle(''); setNotes(''); setDue('');
+      setSavedNotice(editing !== null ? 'Tarea actualizada.' : 'Tarea creada y asignada.');
+      closeTaskForm();
       await load();
     } catch (e) {
-      form.serverError(friendlyErrorMessage(e, 'No se pudo crear la tarea.'), [['title', /título|titulo/i], ['due', /fecha|vencimiento/i], ['responsible', /responsable|peón|peon/i]]);
+      form.serverError(friendlyErrorMessage(e, 'No se pudo guardar la tarea.'), [['title', /título|titulo/i], ['due', /fecha|vencimiento/i], ['responsible', /responsable|peón|peon/i]]);
     } finally {
       setSaving(false);
     }
+  }
+
+  function closeTaskForm(): void {
+    setCreating(false);
+    setEditing(null);
+    form.clear();
+    setTitle(''); setNotes(''); setDue('');
   }
 
   async function change(row: TaskRecord, next: TaskState): Promise<void> {
@@ -230,17 +240,18 @@ export function TasksManagerScreen() {
             onPress={() => void add()}
             style={[s.primary, { backgroundColor: colors.primary }, (saving) && { opacity: 0.6 }]}
           >
-            <Text style={s.primaryText}>{saving ? 'Guardando…' : 'Crear y asignar tarea'}</Text>
+            <Text style={s.primaryText}>{saving ? 'Guardando…' : editing !== null ? 'Guardar cambios' : 'Crear y asignar tarea'}</Text>
           </Pressable>
-          {editing !== null ? <Pressable accessibilityRole="button" disabled={saving} onPress={() => { setEditing(null); setTitle(''); setNotes(''); setDue(''); form.clear(); }} style={styles.dialogButton}><Text style={{ color: colors.textMain }}>Cancelar edición</Text></Pressable> : null}
+          <Pressable accessibilityRole="button" disabled={saving} onPress={closeTaskForm} style={styles.dialogButton}><Text style={{ color: colors.textMain }}>Cancelar</Text></Pressable>
         </View>
 
   );
 
   return (
     <Frame title="Tareas" subtitle="TRABAJO DIARIO DEL EQUIPO DE CAMPO">
-      {owner && editing === null ? taskForm : null}
-      <Modal transparent visible={owner && editing !== null} animationType="fade" onRequestClose={() => { if (!saving) { setEditing(null); setTitle(''); setNotes(''); setDue(''); form.clear(); } }}>
+      {owner ? <Pressable accessibilityRole="button" onPress={() => { setSavedNotice(''); setCreating(true); }} style={[s.primary, { backgroundColor: colors.primary }]}><Text style={s.primaryText}>Crear tarea</Text></Pressable> : null}
+      {savedNotice ? <Text accessibilityLiveRegion="polite" style={{ color: colors.primary, marginVertical: 8 }}>{savedNotice}</Text> : null}
+      <Modal transparent visible={owner && (creating || editing !== null)} animationType="fade" onRequestClose={() => { if (!saving) closeTaskForm(); }}>
         <View style={styles.deleteBackdrop}><FormDialog style={[styles.deleteDialog, { backgroundColor: colors.bgCard }]}>{taskForm}</FormDialog></View>
       </Modal>
 

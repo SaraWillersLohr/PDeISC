@@ -160,7 +160,7 @@ export function AnimalsInventoryScreen() {
       )}
     >
       {corralError ? <Text style={style.errorText}>No se pudieron cargar los corrales para traslados: {corralError}</Text> : null}
-      {serviceNotice ? <Text style={style.successText}>{serviceNotice}</Text> : null}
+      {serviceNotice ? <Text accessibilityLiveRegion="polite" style={style.successText}>{serviceNotice}</Text> : null}
 
       <View style={style.speciesFilter}>
         <Text style={[style.speciesFilterLabel, { color: colors.textSecondary }]}>Filtrar por especie</Text>
@@ -185,7 +185,7 @@ export function AnimalsInventoryScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`Ver ficha de ${animal.nombre || animal.identificador}`}
-              onPress={() => { setViewing(animal); setRegisteringMating(false); setRegisteringBirth(false); }}
+              onPress={() => { setServiceNotice(''); setViewing(animal); setRegisteringMating(false); setRegisteringBirth(false); }}
               style={({ pressed }) => [StyleSheet.absoluteFill, { zIndex: 1, borderRadius: 16 }, pressed && { backgroundColor: 'rgba(45,106,79,0.08)' }]}
             />
             <View style={style.row}>
@@ -341,14 +341,14 @@ export function AnimalsInventoryScreen() {
                   animals={rows}
                   mother={viewing}
                   onBack={() => setRegisteringMating(false)}
-                  onSaved={() => { setServiceNotice('Servicio reproductivo registrado.'); setViewing(null); setRegisteringMating(false); }}
+                  onSaved={() => { setServiceNotice('Servicio reproductivo registrado.'); setRegisteringMating(false); }}
                 />
             ) : registeringBirth && viewing?.activo ? (
               <>
                 <BirthForm
                   embedded
                   initialMother={openedAnimal ?? undefined}
-                  onSaved={() => { setServiceNotice('Nacimiento registrado.'); setViewing(null); setRegisteringBirth(false); }}
+                  onSaved={() => { setServiceNotice('Nacimiento registrado.'); setRegisteringBirth(false); void load(); }}
                 />
                 <View style={style.matingActions}>
                   <Pressable onPress={() => setRegisteringBirth(false)} style={[style.matingActionButton, { borderColor: colors.border }]}>
@@ -360,6 +360,7 @@ export function AnimalsInventoryScreen() {
 
               <>
                 <Text style={[style.modalTitle, { color: colors.textMain }]}>{viewing?.nombre || 'Ficha del animal'}</Text>
+                {serviceNotice ? <Text accessibilityLiveRegion="polite" style={style.successText}>{serviceNotice}</Text> : null}
                 <Text style={[style.detail, { color: colors.textMuted }]}>Identificador · {viewing?.identificador}</Text>
                 <View style={[style.divider, { backgroundColor: colors.borderLight }]} />
                 <Text style={[style.detail, { color: colors.textSecondary }]}>Especie y raza · {viewing?.especie} · {viewing?.raza}</Text>
@@ -466,8 +467,8 @@ export function AnimalsInventoryScreen() {
         </View>
       </Modal>
 
-      <AnimalCreateModal visible={creating} corrals={corrals} onClose={() => setCreating(false)} onCreated={() => { setLoading(true); void load(); }} />
-      <AnimalWeightModal animal={weighing} onClose={() => setWeighing(null)} onSaved={() => { setLoading(true); void load(); }} />
+      <AnimalCreateModal visible={creating} corrals={corrals} onClose={() => setCreating(false)} onCreated={() => { setServiceNotice('Animal agregado.'); setLoading(true); void load(); }} />
+      <AnimalWeightModal animal={weighing} onClose={() => setWeighing(null)} onSaved={(notice) => { setServiceNotice(notice); setLoading(true); void load(); }} />
     </InventoryPage>
   );
 

@@ -341,9 +341,15 @@ export function TasksManagerScreen() {
                     <FieldError message={statusErrors.fields['task_' + row.id_tarea]} />
                   </>
                 ) : null}
+                {owner ? (
+                  <View style={[styles.deleteActions, { marginTop: 12 }]}>
+                    <Pressable accessibilityRole="button" disabled={saving} onPress={() => startEditing(row)} style={[styles.deleteTaskButton, { borderColor: colors.border }]}>
+                      <Text style={{ color: colors.textMain }}>Editar tarea</Text>
+                    </Pressable>
+                  </View>
+                ) : null}
                 {canDelete(row) ? (
                   <View style={[styles.deleteActions, { marginTop: 12 }]}>
-                    {owner ? <Pressable accessibilityRole="button" disabled={saving} onPress={() => startEditing(row)} style={[styles.deleteTaskButton, { borderColor: colors.border }]}><Text style={{ color: colors.textMain }}>Editar tarea</Text></Pressable> : null}
                     <Pressable
                       accessibilityRole="button"
                       accessibilityLabel={`Borrar tarea: ${row.titulo}`}

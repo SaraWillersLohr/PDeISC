@@ -77,11 +77,8 @@ export async function editTask(req: Request, res: Response): Promise<void> {
   const connection = await database.getConnection();
   try {
     await connection.beginTransaction();
-    const [tasks] = await connection.execute<RowDataPacket[]>('SELECT id_creador FROM tareas WHERE id_tarea=? FOR UPDATE', [id]);
+    const [tasks] = await connection.execute<RowDataPacket[]>('SELECT id_tarea FROM tareas WHERE id_tarea=? FOR UPDATE', [id]);
     if (!tasks.length) { await connection.rollback(); res.status(404).json({ message: 'La tarea ya no existe.' }); return; }
-    if (req.rolVigente !== 'dueno' || Number(tasks[0].id_creador) !== req.usuario?.id_usuario) {
-      await connection.rollback(); res.status(403).json({ message: 'Solo podés editar las tareas que creaste.' }); return;
-    }
     const [users] = await connection.execute<RowDataPacket[]>("SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 AND r.nombre='peon' FOR UPDATE", [responsible]);
     if (!users.length) { await connection.rollback(); res.status(400).json({ message: 'Elegí un peón activo como responsable.' }); return; }
     await connection.execute('UPDATE tareas SET titulo=?,descripcion=?,id_responsable=?,fecha_vencimiento=? WHERE id_tarea=?', [title, description || null, responsible, due, id]);

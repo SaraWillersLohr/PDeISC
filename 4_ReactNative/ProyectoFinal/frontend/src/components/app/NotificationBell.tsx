@@ -113,7 +113,11 @@ export function NotificationBell() {
     <View>
       <Pressable accessibilityLabel={unread ? `Notificaciones, ${unread} sin leer` : 'Notificaciones'} accessibilityRole="button" onPress={() => setOpen(true)} style={[styles.bell, { backgroundColor: isDark ? '#26392c' : '#eaf2eb' }]}>
         <Ionicons color={isDark ? '#b9e7c2' : '#214d35'} name="notifications-outline" size={21} />
-        {unread > 0 ? <View style={styles.count}><Text style={styles.countText}>{unread > 9 ? '9+' : unread}</Text></View> : null}
+        {unread > 0 ? (
+          <View style={styles.count}>
+            <Text maxFontSizeMultiplier={1} numberOfLines={1} style={styles.countText}>{unread > 9 ? '9+' : unread}</Text>
+          </View>
+        ) : null}
       </Pressable>
     </View>
     <Modal animationType="fade" onRequestClose={() => setOpen(false)} transparent visible={open}>
@@ -164,9 +168,9 @@ export function NotificationBell() {
 }
 
 const styles = StyleSheet.create({
-  bell: { alignItems: 'center', borderRadius: 18, height: 36, justifyContent: 'center', width: 38 },
-  count: { alignItems: 'center', backgroundColor: '#dc3f36', borderColor: '#fff', borderRadius: 9, borderWidth: 1.5, height: 18, justifyContent: 'center', minWidth: 18, paddingHorizontal: 3, position: 'absolute', right: -2, top: -3 },
-  countText: { color: '#fff', fontSize: 13, fontWeight: '800' },
+  bell: { alignItems: 'center', borderRadius: 19, height: 38, justifyContent: 'center', width: 38 },
+  count: { alignItems: 'center', backgroundColor: '#dc3f36', borderColor: '#fff', borderRadius: 9, borderWidth: 1.5, height: 18, justifyContent: 'center', minWidth: 18, paddingHorizontal: 3, position: 'absolute', right: -3, top: -4 },
+  countText: { color: '#fff', fontSize: 10, fontWeight: '800', includeFontPadding: false, lineHeight: 12, textAlign: 'center' },
   overlay: { alignItems: 'flex-end', backgroundColor: 'rgba(12, 22, 15, 0.25)', flex: 1, paddingTop: 62, paddingRight: 16 },
   panel: { borderRadius: 16, borderWidth: 1, elevation: 14, maxHeight: '82%', maxWidth: 440, overflow: 'hidden', width: '100%', shadowColor: '#102014', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 18 },
   head: { alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth, flexDirection: 'row', paddingHorizontal: 17, paddingVertical: 14 },

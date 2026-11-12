@@ -63,6 +63,7 @@ const part = StyleSheet.create({
       marginBottom: 24,
       padding: 18,
     },
+  // Distribución del gráfico de Inicio: eje vertical, cuadrícula, barras y etiquetas.
   verticalChart: { marginTop: 12 },
   verticalChartRow: { flexDirection: 'row', height: 228 },
   yAxis: { justifyContent: 'space-between', paddingBottom: 32, paddingRight: 8, width: 32 },

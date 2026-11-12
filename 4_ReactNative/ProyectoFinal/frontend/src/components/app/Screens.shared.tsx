@@ -60,8 +60,10 @@ export function Page({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Dibuja una columna por cada especie que recibe de HomeScreen.
 export function SpeciesBarChart({ data, isDark, textColor }: { data: { species: string; count: number }[]; isDark: boolean; textColor: string }) {
   const colors = ['#1a6b3b', '#3f78b8', '#d9822b', '#7659a8', '#c74c3e', '#0f9d9a', '#a16207', '#db2777'];
+  // Dividir el eje vertical en cuatro intervalos enteros que cubran la barra más alta.
   const step = Math.max(1, Math.ceil(Math.max(...data.map((item) => item.count)) / 4));
   const max = step * 4;
   const ticks = [max, step * 3, step * 2, step, 0];
@@ -77,6 +79,7 @@ export function SpeciesBarChart({ data, isDark, textColor }: { data: { species: 
           <View style={s.columns}>
             {data.map((item, index) => <View key={item.species} style={s.chartColumn}>
               <View style={s.barSlot}>
+                {/* El mismo porcentaje fija la altura de la barra y ubica su número encima. */}
                 <Text style={[s.barValue, { color: textColor, bottom: `${(item.count / max) * 100}%` }]}>{item.count}</Text>
                 <View style={[s.verticalBar, { backgroundColor: colors[index % colors.length], height: `${(item.count / max) * 100}%` }]} />
               </View>

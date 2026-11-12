@@ -114,7 +114,8 @@ async function invalidateInventory(session: Session): Promise<void> {
   ]);
 }
 
-// solicito un recurso y convierto respuestas fallidas en mensajes legibles.
+// Lee una lista de la API y guarda una copia por usuario, rol y ruta.
+// Si falta la URL, falla la conexión o el servidor devuelve un error 5xx, intenta usar esa copia.
 async function getData<T>(path: string, session: Session): Promise<T[]> {
   const cacheKey = `${session.usuario.id_usuario}:${session.usuario.rol}:${path}`;
   const readCache = async (): Promise<T[] | null> => {
@@ -165,7 +166,7 @@ async function getData<T>(path: string, session: Session): Promise<T[]> {
   }).catch(() => undefined);
   return data;
 }
-// consulto animales y corrales, creo y edito fichas, registro movimientos y eventos veterinarios.
+// Inicio llama a listAnimals sin incluir inactivos y agrupa las fichas que recibe por especie.
 export function listAnimals(
   session: Session,
   includeInactive = false,

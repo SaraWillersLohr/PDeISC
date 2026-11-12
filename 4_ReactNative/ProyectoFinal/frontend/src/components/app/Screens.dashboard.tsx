@@ -22,6 +22,7 @@ export function HomeScreen() {
   const { width, fontScale } = useWindowDimensions();
   const { colors, isDark } = useTheme();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  // Cada elemento representa una barra del gráfico de Inicio del dueño.
   const [speciesCounts, setSpeciesCounts] = useState<{ species: string; count: number }[]>([]);
   const [breedCountsLoaded, setBreedCountsLoaded] = useState(false);
   const [metricsError, setMetricsError] = useState('');
@@ -44,12 +45,14 @@ export function HomeScreen() {
     if (!session || !isManager) return;
     let active = true;
     getDashboard(session).then((data) => { if (active) setMetrics(data); }).catch((cause: unknown) => { if (active) setMetricsError(friendlyErrorMessage(cause, 'No se pudieron cargar las estadísticas.')); });
+    // La API entrega las fichas individuales. Inicio arma el conteo por especie.
     listAnimals(session).then((animals) => {
       if (!active) return;
       const counts = new Map<string, number>();
       animals.filter((animal) => animal.activo === 1).forEach((animal) => {
         counts.set(animal.especie, (counts.get(animal.especie) ?? 0) + 1);
       });
+      // Mostrar primero las especies con más animales. Si empatan, ordenar por nombre.
       setSpeciesCounts([...counts.entries()].map(([species, count]) => ({ species, count })).sort((a, b) => b.count - a.count || a.species.localeCompare(b.species, 'es')));
       setBreedCountsLoaded(true);
     }).catch((cause: unknown) => { if (active) { setBreedCountsLoaded(true); setMetricsError(friendlyErrorMessage(cause, 'No se pudieron cargar los animales por raza.')); } });
@@ -199,11 +202,12 @@ export function HomeScreen() {
             </View>
             <View style={s.dateChip}><Text style={s.dateChipText}>{speciesCounts.reduce((sum, item) => sum + item.count, 0)} ANIMALES</Text></View>
           </View>
+          {/* Mientras la lista esté vacía, el mensaje depende de si terminó la carga. */}
           {speciesCounts.length ? <SpeciesBarChart data={speciesCounts} isDark={isDark} textColor={colors.textMuted} /> : <Text style={[s.sectionCopy, { color: colors.textMuted }]}>{breedCountsLoaded ? 'Todavía no hay animales activos para mostrar.' : 'Cargando animales por especie…'}</Text>}
         </View>
       ) : null}
 
-      {/* Productive statistics below the breed chart */}
+      {/* Estadísticas productivas debajo del gráfico por especie. */}
       {isManager ? (
         <View style={[s.statsCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <View style={s.sectionHead}>

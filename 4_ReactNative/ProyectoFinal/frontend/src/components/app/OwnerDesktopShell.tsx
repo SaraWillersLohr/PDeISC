@@ -29,7 +29,7 @@ const sections: SectionItem[] = [
   { key: 'estancia', label: 'Mi estancia', icon: 'home-outline', activeIcon: 'home', category: 'operaciones', roles: ['dueno', 'peon'] },
   { key: 'animales', label: 'Mis animales', icon: 'horseshoe', activeIcon: 'horseshoe', category: 'operaciones', roles: ['dueno', 'peon'] },
   { key: 'tareas', label: 'Tareas', icon: 'checkbox-outline', activeIcon: 'checkbox', category: 'operaciones', roles: ['dueno', 'peon'] },
-  { key: 'sanidad', label: 'Sanidad y Enfermería', icon: 'medkit-outline', activeIcon: 'medkit', category: 'operaciones', roles: ['dueno', 'veterinario'] },
+  { key: 'sanidad', label: 'Sanidad y Enfermería', icon: 'medkit-outline', activeIcon: 'medkit', category: 'operaciones', roles: ['dueno'] },
   { key: 'reproduccion', label: 'Reproducción', icon: 'git-branch-outline', activeIcon: 'git-branch', category: 'operaciones', roles: ['dueno', 'peon'] },
 
   // Gestión de estancia

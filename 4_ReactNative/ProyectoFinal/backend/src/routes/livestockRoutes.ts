@@ -7,6 +7,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 
 export const livestockRouter = Router();
 livestockRouter.use(requireAuthentication);
+// GET /api/animals entrega las fichas que usa Inicio para contar animales por especie.
 livestockRouter.get('/animals', requireRoles('dueno', 'peon'), asyncHandler(livestockController.listAnimals));
 livestockRouter.post('/animals', requireRoles('dueno', 'peon'), asyncHandler(livestockController.createAnimal));
 livestockRouter.get('/corrals', requireRoles('dueno', 'peon'), asyncHandler(livestockController.listCorrals));

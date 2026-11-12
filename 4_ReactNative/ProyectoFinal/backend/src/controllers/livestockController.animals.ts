@@ -9,7 +9,7 @@ import { readPhoto } from './livestockController.shared.js';
 import { validBirthDate } from './livestockController.shared.js';
 import { CorralRow } from './livestockController.shared.js';
 
-// devuelvo animales activos con su ubicación operativa actual.
+// Devuelve las fichas con su corral, raza y especie. Por defecto incluye animales activos en corrales activos.
 export async function listAnimals(req: Request, res: Response): Promise<void> {
   const includeInactive = req.query.incluir_inactivos;
   if (includeInactive !== undefined && includeInactive !== 'true' && includeInactive !== 'false') {

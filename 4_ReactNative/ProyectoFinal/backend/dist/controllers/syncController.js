@@ -1,4 +1,5 @@
 import { database } from '../config/database.js';
+import { validDateOnly as validDate } from '../utils/dateOnly.js';
 export async function synchronizeOperations(req, res) {
     const userId = req.usuario?.id_usuario;
     const role = req.rolVigente ?? '';
@@ -139,11 +140,11 @@ async function reportAnimal(connection, payload, animalId, userId, kind) {
     if (!animal)
         rejectOperation('el animal ya no está activo');
     if (kind === 'reporte_muerte') {
-        const lat = Number(payload.latitud);
-        const lon = Number(payload.longitud);
+        const lat = payload.latitud == null ? null : Number(payload.latitud);
+        const lon = payload.longitud == null ? null : Number(payload.longitud);
         const photo = readPhoto(payload.foto);
-        if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180 || photo === false)
-            rejectOperation('la muerte requiere una ubicación gps válida y una foto válida si se adjunta');
+        if (photo === false)
+            rejectOperation('la foto adjunta no es válida');
         const [created] = await connection.execute('INSERT INTO reportes_muerte (id_animal,id_usuario,fecha,motivo,latitud,longitud,foto) VALUES (?,?,?,?,?,?,?)', [animalId, userId, date, reason, lat, lon, photo]);
         // La baja operativa es inmediata; el reporte queda pendiente y el administrador puede reactivarlo si lo rechaza.
         await connection.execute('UPDATE animales SET activo=0,version_dato=version_dato+1 WHERE id_animal=?', [animalId]);
@@ -182,12 +183,6 @@ function asObject(value) {
     return parsed;
 }
 function positiveInteger(value) { const number = Number(value); return Number.isInteger(number) && number > 0 ? number : null; }
-function validDate(value) {
-    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value))
-        return null;
-    const date = new Date(`${value}T00:00:00.000Z`);
-    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value ? value : null;
-}
 function shortText(value, limit) { return typeof value === 'string' ? value.trim().slice(0, limit) : ''; }
 function readPhoto(value) {
     if (value == null || value === '')

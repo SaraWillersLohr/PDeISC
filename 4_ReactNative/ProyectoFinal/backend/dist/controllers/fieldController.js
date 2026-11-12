@@ -3,7 +3,9 @@ import { database } from '../config/database.js';
 export async function dashboard(_req, res) {
     try {
         const [rows] = await database.execute(`SELECT (SELECT COUNT(*) FROM nacimientos WHERE YEAR(fecha) = YEAR(CURRENT_DATE())) AS crias_ano,
-       (SELECT COUNT(*) FROM servicios_monta WHERE estado = 'realizado' AND fecha >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)) AS servicios_90_dias,
+       (SELECT COUNT(*) FROM servicios_monta
+        WHERE estado IN ('realizado', 'preñada')
+          AND fecha BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 89 DAY) AND CURRENT_DATE()) AS servicios_90_dias,
        (SELECT COUNT(*) FROM reportes_muerte WHERE estado = 'pendiente') AS muertes_pendientes,
        (SELECT COUNT(*) FROM reportes_muerte WHERE estado = 'confirmado' AND YEAR(fecha) = YEAR(CURRENT_DATE())) AS muertes_ano,
        (SELECT COUNT(*) FROM bajas_animales WHERE motivo = 'venta' AND YEAR(fecha) = YEAR(CURRENT_DATE())) AS ventas_ano,
@@ -71,8 +73,6 @@ export async function createReport(req, res) {
         if (kind === 'muerte') {
             const lat = req.body.latitud == null ? null : Number(req.body.latitud);
             const lon = req.body.longitud == null ? null : Number(req.body.longitud);
-            if (lat === null || lon === null || !Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180)
-                throw new Error('la ubicación GPS es obligatoria y debe ser válida');
             await connection.execute('INSERT INTO reportes_muerte (id_animal, id_usuario, fecha, motivo, latitud, longitud, foto) VALUES (?, ?, ?, ?, ?, ?, ?)', [animalId, userId, fecha, motivo || 'Muerte notificada desde la ficha', lat, lon, photo]);
             await connection.execute('UPDATE animales SET activo = 0, version_dato = version_dato + 1 WHERE id_animal = ?', [animalId]);
         }

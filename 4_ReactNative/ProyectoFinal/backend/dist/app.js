@@ -24,7 +24,7 @@ app.get('/api/health', (_request, response) => response.status(200).json({ statu
 app.get('/api/changes', requireAuthentication, waitForLiveChanges);
 app.use('/api', (req, res, next) => {
     const writesData = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
-    const changesVisibleData = !req.path.startsWith('/auth/') || ['/auth/verify-email', '/auth/profile'].includes(req.path);
+    const changesVisibleData = !req.path.startsWith('/auth/') || req.path === '/auth/profile';
     if (writesData && changesVisibleData) {
         res.once('finish', () => {
             if (res.statusCode >= 200 && res.statusCode < 300)

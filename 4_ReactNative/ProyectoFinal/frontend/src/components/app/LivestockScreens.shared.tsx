@@ -35,7 +35,7 @@ export function InventoryPage({
 }: {
   title: string;
   subtitle: string;
-  count: number;
+  count?: number;
   search: string;
   onSearch: (value: string) => void;
   loading: boolean;
@@ -48,9 +48,10 @@ export function InventoryPage({
   showSearch?: boolean;
   children: React.ReactNode;
 }) {
-  const { colors } = useTheme();
-  const { width } = useWindowDimensions();
+  const { colors, isDark } = useTheme();
+  const { width, fontScale } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
+  const inlineSearch = isDesktop && width / fontScale >= 860;
   const scrollToTop = useRef<() => void>(() => {});
   const [showScrollTop, setShowScrollTop] = useState(false);
   function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) { setShowScrollTop(event.nativeEvent.contentOffset.y > 320); }
@@ -68,18 +69,22 @@ export function InventoryPage({
         <View style={[style.innerWrapper, isDesktop && style.innerWrapperDesktop]}>
           {headerContent}
           <View style={[style.pageHead, isDesktop && style.pageHeadDesktop]}>
-            <View>
-              <Text style={[style.heading, { color: colors.textMain }]}>{title}</Text>
+            <View style={isDesktop && style.pageHeadText}>
+              <Text accessibilityRole="header" style={[style.heading, { color: colors.textMain }]}>{title}</Text>
               <Text style={[style.subtitle, { color: colors.textMuted }]}>{subtitle}</Text>
             </View>
-            <View style={style.countBadge}>
-              <Text style={[style.countText, { color: colors.primary }]}>{count} registros</Text>
-            </View>
+            {count !== undefined && !loading && !error ? (
+              <View style={style.countBadge}>
+                <Text style={[style.countText, { color: isDark ? colors.accentLime : colors.primary }]}>
+                  {count} {count === 1 ? 'registro' : 'registros'}
+                </Text>
+              </View>
+            ) : null}
           </View>
 
           {/* Solo muestro búsqueda cuando la pantalla tiene un filtro funcional. */}
-          {showSearch || headerAction ? <View style={[style.searchRow, isDesktop && style.searchRowDesktop]}>
-            {showSearch ? <View {...{ dataSet: { focusField: 'container' } }} style={[style.searchBox, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+          {showSearch || headerAction ? <View style={[style.searchRow, inlineSearch && style.searchRowDesktop]}>
+            {showSearch ? <View {...{ dataSet: { focusField: 'container' } }} style={[style.searchBox, inlineSearch && style.searchBoxDesktop, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
               <Ionicons color={colors.textMuted} name="search-outline" size={18} style={{ marginRight: 8 }} />
               <TextInput
                 accessibilityLabel={`Buscar ${title.toLowerCase()}`}

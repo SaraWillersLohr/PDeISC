@@ -4,6 +4,7 @@ import { env } from './config/env.js';
 import { publishBirthReminders } from './controllers/modulesController.js';
 import { synchronizeAssociationEvents } from './services/eventSources.js';
 import { publishLiveChange } from './services/liveChanges.js';
+import { publishTaskDeadlineReminders } from './services/taskDeadlineReminders.js';
 app.listen(env.port, '0.0.0.0', () => {
     console.info(`api disponible en el puerto ${env.port}`);
     const publish = () => {
@@ -14,6 +15,14 @@ app.listen(env.port, '0.0.0.0', () => {
     };
     publish();
     setInterval(publish, 60 * 60 * 1000);
+    const publishTaskDeadlines = () => {
+        void publishTaskDeadlineReminders().catch((error) => {
+            const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : 'UNKNOWN';
+            console.error(`No se pudieron procesar los avisos de tareas vencidas (${code}).`);
+        });
+    };
+    publishTaskDeadlines();
+    setInterval(publishTaskDeadlines, 5 * 60 * 1000);
     const syncEvents = () => {
         void synchronizeAssociationEvents().then(publishLiveChange).catch((error) => {
             const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : 'UNKNOWN';

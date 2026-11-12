@@ -5,7 +5,7 @@ const codeTtlMinutes = 10;
 const resendCooldownSeconds = 60;
 const maxDailyEmails = 5;
 export const maxCodeAttempts = 5;
-const allowedRoles = ['dueno', 'peon', 'veterinario'];
+const allowedRoles = ['peon', 'veterinario', 'gestor_usuarios'];
 // detengo los flujos de correo si falta configuración segura.
 export function assertMailConfiguration() {
     const { provider, smtpHost, smtpUser, smtpPassword, mailFrom, gmailClientId, gmailClientSecret, gmailRefreshToken, verificationCodeSecret } = env.email;

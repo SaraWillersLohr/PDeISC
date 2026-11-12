@@ -1,4 +1,4 @@
-// centralizo los estilos de este módulo para separar presentación y comportamiento.
+// Estilos del inicio de sesión, fuera del directorio de rutas.
 import { StyleSheet } from 'react-native';
 
 export const forest = '#123824';
@@ -11,7 +11,6 @@ export const s = StyleSheet.create({
   page: {
     backgroundColor: "rgba(18, 56, 36, 0.38)",
     flexGrow: 1,
-    minHeight: "100%",
   },
   desktopPage: {
     alignItems: "center",
@@ -87,6 +86,8 @@ export const s = StyleSheet.create({
     marginBottom: 8,
     marginTop: 12,
   },
+  // Recorta el resaltado de autocompletado con el mismo radio del campo.
+  fieldClip: { borderRadius: 15, overflow: "hidden" },
   input: {
     backgroundColor: "#fff",
     borderColor: "#dce3db",
@@ -105,6 +106,7 @@ export const s = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     height: 48,
+    overflow: "hidden",
     paddingRight: 14,
   },
   passwordInput: {
@@ -112,6 +114,7 @@ export const s = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     height: "100%",
+    minWidth: 0,
     paddingHorizontal: 17,
   },
   eye: {
@@ -194,6 +197,7 @@ export const s = StyleSheet.create({
   socialButtons: {
     alignItems: "center",
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 16,
     justifyContent: "center",
     marginTop: 8,

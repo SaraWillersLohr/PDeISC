@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { database } from '../config/database.js';
+import { publishLiveChange } from './liveChanges.js';
 import { sendAccessCode, sendApprovalNotice, sendNewRequestNotice, sendRegistrationRejection, sendVerificationCode } from './emailService.js';
 import { createAccessToken, createRefreshToken, getTokenExpirationTimestamp } from '../utils/jwt.js';
 import { assertMailConfiguration, digest, issueCode, matchesDigest, maxCodeAttempts, isRequestedRole } from './registrationCodeService.js';
@@ -27,7 +28,7 @@ export async function createRegistrationRequest(input) {
         await connection.beginTransaction();
         const [existing] = await connection.query('SELECT id_solicitud, estado FROM solicitudes_registro WHERE email = ? LIMIT 1 FOR UPDATE', [email]);
         if (existing.length && existing[0].estado !== 'rechazada')
-            throw new Error('ya existe una solicitud para ese correo; revisá tu correo o pedí otro código');
+            throw new Error('Ya existe una solicitud para ese correo. Ingresá con tu correo y contraseña para continuar el registro.');
         if (existing.length) {
             idRequest = Number(existing[0].id_solicitud);
             await connection.execute(`UPDATE solicitudes_registro SET nombre = ?, apellido = ?, password_hash = ?, estado = 'pendiente_verificacion',
@@ -78,7 +79,11 @@ export async function verifyRegistrationEmail(emailInput, code) {
             await connection.execute('UPDATE codigos_verificacion_solicitud SET consumido_at = NOW() WHERE id_codigo = ?', [codes[0].id_codigo]);
             await connection.execute("UPDATE solicitudes_registro SET estado = 'pendiente_aprobacion', email_verificado_at = NOW() WHERE id_solicitud = ?", [request.id_solicitud]);
             requestName = `${request.nombre} ${request.apellido}`;
+            await connection.execute(`INSERT INTO notificaciones (titulo, mensaje, tipo, rol_destino)
+         VALUES (?, ?, 'registro_pendiente', 'dueno'), (?, ?, 'registro_pendiente', 'gestor_usuarios')`, ['Nueva solicitud de acceso', `${requestName} verificó su correo y espera aprobación.`,
+                'Nueva solicitud de acceso', `${requestName} verificó su correo y espera aprobación.`]);
             await connection.commit();
+            publishLiveChange();
         }
     }
     catch (error) {
@@ -93,15 +98,13 @@ export async function verifyRegistrationEmail(emailInput, code) {
     }
     if (wrongCode)
         throw new Error('el código ingresado no es correcto');
-    const [admins] = await database.query(`SELECT u.email FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol
-     WHERE r.nombre IN ('dueno', 'gestor_usuarios') AND u.activo = 1 AND u.estado_cuenta = 'activo'`);
-    for (const admin of admins) {
-        try {
-            await sendNewRequestNotice(String(admin.email), requestName, email);
-        }
-        catch {
-            console.error('[auth] no se pudo enviar el aviso de una nueva solicitud.');
-        }
+    try {
+        const [recipients] = await database.query(`SELECT u.email FROM usuarios u JOIN roles r ON r.id_rol = u.id_rol
+       WHERE r.nombre IN ('dueno', 'gestor_usuarios') AND u.activo = 1 AND u.estado_cuenta = 'activo'`);
+        await Promise.allSettled(recipients.map((recipient) => sendNewRequestNotice(String(recipient.email), requestName, email)));
+    }
+    catch {
+        console.error('[auth] no se pudo consultar a quién enviar el aviso de solicitud.');
     }
 }
 // reenvía el código de verificación solo a solicitudes que aún no confirmaron el correo.

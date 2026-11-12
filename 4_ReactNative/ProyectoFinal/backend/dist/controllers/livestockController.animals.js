@@ -119,13 +119,8 @@ export async function deactivateAnimal(req, res) {
     const lon = req.body.longitud == null ? null : Number(req.body.longitud);
     const photoValue = req.body.foto;
     const photo = photoValue == null || photoValue === '' ? null : typeof photoValue === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photoValue) && Buffer.byteLength(photoValue, 'utf8') <= 1_500_000 ? photoValue : false;
-    const validLocation = lat !== null && lon !== null && Number.isFinite(lat) && Math.abs(lat) <= 90 && Number.isFinite(lon) && Math.abs(lon) <= 180;
     if (!Number.isInteger(id) || id < 1 || !userId || !['venta', 'muerte', 'otro'].includes(reason) || notes.length > 500) {
         res.status(400).json({ message: 'elegí venta, muerte u otro y escribí un detalle de hasta 500 caracteres' });
-        return;
-    }
-    if (reason === 'muerte' && !validLocation) {
-        res.status(400).json({ message: 'la ubicación GPS es obligatoria para notificar una muerte' });
         return;
     }
     if (photo === false) {

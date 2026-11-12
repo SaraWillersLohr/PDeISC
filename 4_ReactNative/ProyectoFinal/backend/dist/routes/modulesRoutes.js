@@ -9,6 +9,7 @@ modulesRouter.use(requireAuthentication);
 modulesRouter.get('/tasks', requireRoles('dueno', 'peon'), asyncHandler(modules.listTasks));
 modulesRouter.post('/tasks', requireRoles('dueno'), asyncHandler(modules.createTask));
 modulesRouter.patch('/tasks/:id', requireRoles('dueno', 'peon'), asyncHandler(modules.updateTask));
+modulesRouter.delete('/tasks/:id', requireRoles('dueno', 'peon'), asyncHandler(modules.deleteTask));
 modulesRouter.get('/reproduction', requireRoles('dueno', 'peon'), asyncHandler(modules.listReproduction));
 modulesRouter.post('/reproduction/mating-services', requireRoles('dueno', 'peon'), asyncHandler(modules.createMatingService));
 modulesRouter.post('/reproduction/mating-services/:id/confirm-pregnancy', requireRoles('dueno', 'peon'), asyncHandler(modules.confirmPregnancy));
@@ -16,3 +17,5 @@ modulesRouter.post('/reproduction/births', requireRoles('dueno', 'peon'), asyncH
 modulesRouter.delete('/reproduction/mating-services/:id', requireRoles('dueno'), asyncHandler(modules.deleteMatingService));
 modulesRouter.delete('/reproduction/births/:id', requireRoles('dueno'), asyncHandler(modules.deleteBirthRecord));
 modulesRouter.get('/events', requireRoles('dueno'), asyncHandler(modules.listEvents));
+modulesRouter.put('/tasks/:id', requireRoles('dueno'), asyncHandler(modules.editTask));
+modulesRouter.post('/tasks/delete', requireRoles('dueno', 'peon'), asyncHandler(modules.deleteTask));

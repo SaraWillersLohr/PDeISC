@@ -192,7 +192,7 @@ export function AnimalsInventoryScreen() {
               <View style={[style.badge, { backgroundColor: isDark ? 'rgba(134,239,172,0.14)' : '#e8f5ed' }]}>
                 {animal.foto ? <Image source={{ uri: animal.foto }} style={style.animalPhoto} /> : <AppSectionIcon color={isDark ? '#86efac' : '#2d6a4f'} name="horseshoe" size={18} />}
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={[style.title, { color: colors.textMain }]}>{animal.nombre || animal.identificador}</Text>
                 <Text style={[style.detail, { color: colors.textMuted }]}>{animal.identificador} · {animal.especie} {animal.raza} · {genderLabel(animal.genero)}</Text>
               </View>
@@ -201,15 +201,15 @@ export function AnimalsInventoryScreen() {
                   {animal.activo ? animal.estado_salud.replaceAll('_', ' ') : 'Inactivo'}
                 </Text>
               </View>
-              <Ionicons color={colors.textMuted} name="chevron-up" size={17} />
+              <Ionicons color={colors.textMuted} name="chevron-forward" size={17} />
             </View>
 
             <View style={[style.divider, { backgroundColor: colors.borderLight }]} />
 
             <View pointerEvents="box-none" style={[style.row, { zIndex: 2, flexWrap: 'wrap' }]}>
-              <View pointerEvents="none" style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View pointerEvents="none" style={{ flexBasis: 130, flexGrow: 1, flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <Ionicons color={colors.textMuted} name="location-outline" size={14} />
-                <Text style={[style.detail, { color: colors.textSecondary }]}>
+                <Text style={[style.detail, { color: colors.textSecondary, flexShrink: 1 }]}>
                   {animal.corral}  ·  {animal.peso_kg == null ? 'Sin peso' : `${animal.peso_kg} kg`}
                 </Text>
               </View>

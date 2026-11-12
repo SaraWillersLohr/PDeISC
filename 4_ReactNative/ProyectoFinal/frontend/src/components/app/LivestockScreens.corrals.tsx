@@ -39,7 +39,10 @@ export function CorralsInventoryScreen() {
 
   const load = useCallback(async () => {
     if (!session) return;
-    try { setRows(await listCorrals(session)); }
+    try {
+      setRows(await listCorrals(session));
+      setError('');
+    }
     catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo cargar la lista de corrales.')); }
     finally { setLoading(false); setRefreshing(false); }
   }, [session]);
@@ -47,7 +50,12 @@ export function CorralsInventoryScreen() {
   useEffect(() => {
     if (!session) return;
     let active = true;
-    listCorrals(session).then((data) => { if (active) setRows(data); })
+    listCorrals(session).then((data) => {
+      if (active) {
+        setRows(data);
+        setError('');
+      }
+    })
       .catch((cause: unknown) => { if (active) setError(friendlyErrorMessage(cause, 'No se pudo cargar la lista de corrales.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };

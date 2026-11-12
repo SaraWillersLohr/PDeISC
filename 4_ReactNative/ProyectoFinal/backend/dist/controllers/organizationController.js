@@ -1,8 +1,30 @@
 import { database } from '../config/database.js';
-// devuelvo miembros con su rol actual para el dueño y el gestor de usuarios.
-export async function listUsers(_req, res) {
+// Cuento las cuentas directamente en la base. Un rol sin cuentas devuelve cero real.
+export async function userStatistics(_req, res) {
     try {
-        const [data] = await database.execute(`SELECT u.id_usuario,u.nombre,u.apellido,u.email,u.activo,r.nombre AS rol FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol ORDER BY u.activo DESC,u.apellido`);
+        const [rows] = await database.execute(`SELECT r.nombre AS rol, COUNT(u.id_usuario) AS total,
+              COALESCE(SUM(u.activo=1 AND u.estado_cuenta='activo'), 0) AS activos
+       FROM roles r LEFT JOIN usuarios u ON u.id_rol=r.id_rol
+       GROUP BY r.id_rol,r.nombre ORDER BY r.id_rol`);
+        const roles = rows.map((row) => ({
+            rol: String(row.rol), total: Number(row.total), activos: Number(row.activos),
+            sin_acceso: Number(row.total) - Number(row.activos),
+        }));
+        // Los totales generales se obtienen de la misma consulta para mantenerlos consistentes.
+        const total = roles.reduce((sum, role) => sum + role.total, 0);
+        const activos = roles.reduce((sum, role) => sum + role.activos, 0);
+        res.json({ data: { total, activos, sin_acceso: total - activos, roles } });
+    }
+    catch {
+        res.status(503).json({ message: 'No se pudieron consultar las estadísticas de usuarios.' });
+    }
+}
+// devuelvo miembros con su rol actual para el dueño y el gestor de usuarios.
+export async function listUsers(req, res) {
+    // La vista de equipo pide las fotos; los selectores de responsables solo necesitan los nombres.
+    const photoColumn = req.query.fotos === '1' ? ',u.foto_perfil' : '';
+    try {
+        const [data] = await database.execute(`SELECT u.id_usuario,u.nombre,u.apellido,u.email,u.activo,r.nombre AS rol${photoColumn} FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol ORDER BY u.activo DESC,u.apellido`);
         res.json({ data });
     }
     catch {

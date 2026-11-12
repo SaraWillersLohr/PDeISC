@@ -6,6 +6,7 @@ import { requireRoles } from '../middleware/roleMiddleware.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 export const organizationRouter = Router();
 organizationRouter.use(requireAuthentication);
+organizationRouter.get('/users/statistics', requireRoles('dueno', 'gestor_usuarios'), asyncHandler(organization.userStatistics));
 organizationRouter.get('/users', requireRoles('dueno', 'gestor_usuarios'), asyncHandler(organization.listUsers));
 organizationRouter.put('/users/:id', requireRoles('dueno', 'gestor_usuarios'), asyncHandler(organization.updateUser));
 organizationRouter.delete('/users/:id', requireRoles('dueno', 'gestor_usuarios'), asyncHandler(organization.deactivateUser));

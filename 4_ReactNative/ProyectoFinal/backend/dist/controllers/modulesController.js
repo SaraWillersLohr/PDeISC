@@ -1,15 +1,19 @@
 import { database } from '../config/database.js';
+import { validDateOnly } from '../utils/dateOnly.js';
+import { validBirthDate } from './livestockController.shared.js';
 import { publishLiveChange } from '../services/liveChanges.js';
+import { todayAtEstancia } from '../services/taskDeadlineReminders.js';
 const animalGenders = ['hembra', 'macho', 'no_especificado'];
 function isAnimalGender(value) { return animalGenders.includes(value); }
 export async function listTasks(req, res) {
     const userId = req.usuario?.id_usuario ?? 0;
     const role = req.rolVigente ?? '';
     try {
-        const [rows] = await database.execute(`SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.fecha_vencimiento,t.estado,
+        const [rows] = await database.execute(`SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.id_creador,t.fecha_vencimiento,t.estado,
+              COALESCE(t.fecha_vencimiento < ?, 0) AS plazo_vencido,
               u.nombre AS responsable,u.apellido AS apellido_responsable
        FROM tareas t LEFT JOIN usuarios u ON u.id_usuario=t.id_responsable
-       WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.fecha_vencimiento IS NULL,t.fecha_vencimiento,t.created_at DESC`, [userId, role]);
+       WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.created_at DESC,t.id_tarea DESC`, [todayAtEstancia(), userId, role]);
         res.json({ data: rows });
     }
     catch {
@@ -21,9 +25,14 @@ export async function createTask(req, res) {
     const title = String(req.body.titulo ?? '').trim();
     const description = String(req.body.descripcion ?? '').trim();
     const responsible = Number(req.body.id_responsable ?? userId);
-    const dueDate = req.body.fecha_vencimiento || null;
-    if (!userId || !title || title.length > 150 || !Number.isInteger(responsible) || (dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(String(dueDate)))) {
-        res.status(400).json({ message: 'indicá título y fecha válida para la tarea' });
+    const dueDate = req.body.fecha_vencimiento;
+    if (!userId || !title || title.length > 150 || !Number.isInteger(responsible)) {
+        res.status(400).json({ message: 'indicá un título y un responsable para la tarea' });
+        return;
+    }
+    const hasDueDate = dueDate != null && dueDate !== '';
+    if (hasDueDate && !validDateOnly(dueDate)) {
+        res.status(400).json({ message: 'Elegí una fecha límite válida en el calendario.' });
         return;
     }
     try {
@@ -32,7 +41,7 @@ export async function createTask(req, res) {
             res.status(400).json({ message: 'asigná la tarea a un peón activo' });
             return;
         }
-        const [result] = await database.execute('INSERT INTO tareas (titulo,descripcion,id_responsable,fecha_vencimiento,id_creador) VALUES (?,?,?,?,?)', [title, description || null, responsible, dueDate, userId]);
+        const [result] = await database.execute('INSERT INTO tareas (titulo,descripcion,id_responsable,fecha_vencimiento,id_creador) VALUES (?,?,?,?,?)', [title, description || null, responsible, hasDueDate ? dueDate : null, userId]);
         res.status(201).json({ data: { id_tarea: result.insertId } });
     }
     catch {
@@ -59,10 +68,106 @@ export async function updateTask(req, res) {
         res.status(500).json({ message: 'no se pudo actualizar la tarea' });
     }
 }
+export async function editTask(req, res) {
+    const id = Number(req.params.id);
+    const title = String(req.body.titulo ?? '').trim();
+    const description = String(req.body.descripcion ?? '').trim();
+    const responsible = Number(req.body.id_responsable);
+    const due = req.body.fecha_vencimiento || null;
+    if (!Number.isInteger(id) || id < 1 || !title || title.length > 150) {
+        res.status(400).json({ message: 'El título es obligatorio y admite hasta 150 caracteres.' });
+        return;
+    }
+    if (due && !validDateOnly(due)) {
+        res.status(400).json({ message: 'Elegí una fecha límite válida.' });
+        return;
+    }
+    if (!Number.isInteger(responsible) || responsible < 1) {
+        res.status(400).json({ message: 'Elegí un responsable válido.' });
+        return;
+    }
+    const connection = await database.getConnection();
+    try {
+        await connection.beginTransaction();
+        const [tasks] = await connection.execute('SELECT id_tarea FROM tareas WHERE id_tarea=? FOR UPDATE', [id]);
+        if (!tasks.length) {
+            await connection.rollback();
+            res.status(404).json({ message: 'La tarea ya no existe.' });
+            return;
+        }
+        const [users] = await connection.execute("SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 AND r.nombre='peon' FOR UPDATE", [responsible]);
+        if (!users.length) {
+            await connection.rollback();
+            res.status(400).json({ message: 'Elegí un peón activo como responsable.' });
+            return;
+        }
+        await connection.execute(`UPDATE tareas
+       SET vencimiento_notificado_en=IF(fecha_vencimiento <=> ?, vencimiento_notificado_en, NULL),
+           titulo=?,descripcion=?,id_responsable=?,fecha_vencimiento=? WHERE id_tarea=?`, [due, title, description || null, responsible, due, id]);
+        await connection.commit();
+        res.json({ message: 'Tarea actualizada.' });
+    }
+    catch {
+        await connection.rollback();
+        res.status(500).json({ message: 'No se pudo editar la tarea.' });
+    }
+    finally {
+        connection.release();
+    }
+}
+// El dueño puede borrar las tareas del equipo. El peón solo borra las suyas completadas.
+export async function deleteTask(req, res) {
+    // El lote se valida completo antes de borrar; nunca quedan borrados parciales.
+    const rawIds = req.params.id ? [Number(req.params.id)] : req.body.ids;
+    const ids = Array.isArray(rawIds) ? [...new Set(rawIds)] : [];
+    const userId = req.usuario?.id_usuario;
+    const role = req.rolVigente;
+    if (!ids.length || ids.length > 1000 || ids.some((id) => !Number.isInteger(id) || id < 1) || !userId) {
+        res.status(400).json({ message: 'Elegí tareas válidas (hasta 1000 por vez).' });
+        return;
+    }
+    const connection = await database.getConnection();
+    try {
+        await connection.beginTransaction();
+        // Bloqueo la fila para volver a comprobar estado y responsable antes del borrado.
+        const [tasks] = await connection.execute(`SELECT id_tarea,titulo,estado,id_responsable,id_creador FROM tareas WHERE id_tarea IN (${ids.map(() => '?').join(',')}) ORDER BY id_tarea FOR UPDATE`, ids);
+        if (tasks.length !== ids.length) {
+            await connection.rollback();
+            res.status(404).json({ message: 'La tarea ya no existe.' });
+            return;
+        }
+        for (const task of tasks) {
+            const ownerCanDelete = role === 'dueno';
+            const assigneeCanDelete = role === 'peon' && Number(task.id_responsable) === userId;
+            if (!ownerCanDelete && !assigneeCanDelete) {
+                await connection.rollback();
+                res.status(403).json({ message: 'No tenés permiso para borrar esta tarea.' });
+                return;
+            }
+            if (!ownerCanDelete && task.estado !== 'completada') {
+                await connection.rollback();
+                res.status(409).json({ message: 'Solo podés borrar tus tareas cuando estén completadas.' });
+                return;
+            }
+            await connection.execute('DELETE FROM tareas WHERE id_tarea=?', [task.id_tarea]);
+            // La auditoría y el borrado se confirman juntos para conservar quién realizó la acción.
+            await connection.execute('INSERT INTO auditoria_cambios (entidad,id_entidad,accion,id_usuario,detalle) VALUES (?,?,?,?,?)', ['tarea', task.id_tarea, 'borrado_permanente', userId, JSON.stringify(task)]);
+        }
+        await connection.commit();
+        res.json({ message: 'Tareas borradas.' });
+    }
+    catch {
+        await connection.rollback();
+        res.status(500).json({ message: 'No se pudo borrar la tarea. Intentá de nuevo.' });
+    }
+    finally {
+        connection.release();
+    }
+}
 export async function listReproduction(req, res) {
     try {
         const [services] = await database.execute(`SELECT s.id_servicio,s.fecha,s.metodo,s.estado,s.observaciones,s.fecha_estimada_nacimiento,s.prenez_confirmada_en,
-              m.identificador AS madre,m.nombre AS nombre_madre,e.nombre AS especie,p.identificador AS padre,s.padre_texto
+              m.identificador AS madre,m.nombre AS nombre_madre,m.activo AS madre_activa,e.nombre AS especie,p.identificador AS padre,s.padre_texto
        FROM servicios_monta s JOIN animales m ON m.id_animal=s.id_madre
        JOIN razas r ON r.id_raza=m.id_raza JOIN especies e ON e.id_especie=r.id_especie
        LEFT JOIN animales p ON p.id_animal=s.id_padre ORDER BY s.fecha DESC LIMIT 200`);
@@ -189,7 +294,7 @@ export async function confirmPregnancy(req, res) {
     try {
         await connection.beginTransaction();
         const [rows] = await connection.execute(`SELECT s.id_servicio,s.id_madre,s.fecha_estimada_nacimiento,e.nombre AS especie,s.prenez_confirmada_en,
-              COALESCE(a.nombre,a.identificador) AS madre
+              COALESCE(a.nombre,a.identificador) AS madre,a.activo AS madre_activa
        FROM servicios_monta s JOIN animales a ON a.id_animal=s.id_madre
        JOIN razas r ON r.id_raza=a.id_raza JOIN especies e ON e.id_especie=r.id_especie
        WHERE s.id_servicio=? FOR UPDATE`, [id]);
@@ -201,6 +306,11 @@ export async function confirmPregnancy(req, res) {
         if (rows[0].prenez_confirmada_en) {
             await connection.commit();
             res.json({ data: { fecha_estimada_nacimiento: toDateOnly(rows[0].fecha_estimada_nacimiento), ya_confirmada: true } });
+            return;
+        }
+        if (!rows[0].madre_activa) {
+            await connection.rollback();
+            res.status(409).json({ message: 'La madre está inactiva. La preñez no se registró.' });
             return;
         }
         const days = gestationDays(String(rows[0].especie));
@@ -234,7 +344,7 @@ export async function publishBirthReminders() {
         await connection.beginTransaction();
         const [due] = await connection.execute(`SELECT s.id_servicio,s.id_madre,s.fecha_estimada_nacimiento,COALESCE(m.nombre,m.identificador) AS madre
        FROM servicios_monta s JOIN animales m ON m.id_animal=s.id_madre
-       WHERE s.prenez_confirmada_en IS NOT NULL AND s.recordatorio_nacimiento_en IS NULL
+       WHERE m.activo=1 AND s.prenez_confirmada_en IS NOT NULL AND s.recordatorio_nacimiento_en IS NULL
        AND DATE_SUB(s.fecha_estimada_nacimiento, INTERVAL 1 MONTH)=CURRENT_DATE() FOR UPDATE`);
         for (const row of due) {
             await connection.execute(`INSERT INTO notificaciones (id_animal,titulo,mensaje,tipo,rol_destino) VALUES (?,?,?,'reproduccion',NULL)`, [row.id_madre, 'Nacimiento próximo', `Falta un mes para el nacimiento estimado de ${row.madre} (${String(row.fecha_estimada_nacimiento).slice(0, 10)}).`]);
@@ -276,7 +386,11 @@ export async function createBirth(req, res) {
         res.status(400).json({ message: 'elegí un género válido para la cría' });
         return;
     }
-    if (!userId || !identifier || identifier.length > 50 || !Number.isInteger(breedId) || !Number.isInteger(corralId) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || (!motherId && !motherText) || (!fatherId && !fatherText) || (motherId && !Number.isInteger(motherId)) || (fatherId && !Number.isInteger(fatherId))) {
+    if (!validBirthDate(date)) {
+        res.status(400).json({ message: 'Elegí una fecha de nacimiento válida, de hoy o anterior.' });
+        return;
+    }
+    if (!userId || !identifier || identifier.length > 50 || !Number.isInteger(breedId) || !Number.isInteger(corralId) || (!motherId && !motherText) || (!fatherId && !fatherText) || (motherId && !Number.isInteger(motherId)) || (fatherId && !Number.isInteger(fatherId))) {
         res.status(400).json({ message: 'completá identificador, raza, corral, fecha y ambos progenitores (animal o nombre)' });
         return;
     }
@@ -294,11 +408,13 @@ export async function createBirth(req, res) {
             throw new Error('la raza seleccionada no existe');
         if (motherId !== null && fatherId !== null && motherId === fatherId)
             throw new Error('la madre y el padre no pueden ser el mismo animal');
-        const [parents] = await connection.execute(`SELECT a.id_animal,a.genero,r.id_especie
+        const [parents] = await connection.execute(`SELECT a.id_animal,a.genero,a.activo,r.id_especie
        FROM animales a JOIN razas r ON r.id_raza=a.id_raza
-       WHERE a.id_animal IN (?,?)`, [motherId ?? 0, fatherId ?? 0]);
+       WHERE a.id_animal IN (?,?) FOR UPDATE`, [motherId ?? 0, fatherId ?? 0]);
         const dam = motherId === null ? undefined : parents.find((parent) => Number(parent.id_animal) === motherId);
         const sire = fatherId === null ? undefined : parents.find((parent) => Number(parent.id_animal) === fatherId);
+        if ((dam && !dam.activo) || (sire && !sire.activo))
+            throw new Error('Uno de los animales seleccionados está inactivo. El nacimiento no se registró.');
         if (motherId !== null && (!dam || dam.genero !== 'hembra' || Number(dam.id_especie) !== Number(breedRows[0].id_especie))) {
             throw new Error('la madre registrada debe ser hembra y de la misma especie que la cría');
         }

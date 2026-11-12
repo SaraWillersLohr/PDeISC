@@ -20,12 +20,10 @@ export function CatalogScreen() {
   const form = useFieldErrors();
   const revision = useLiveChanges();
   const { colors, isDark } = useTheme();
-  const { width, fontScale } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width >= 860;
-  const stackSpeciesActions = width / fontScale < 400;
 
   const role = session?.usuario.rol.toLowerCase();
-  const admin = role === 'dueno';
   const owner = role === 'dueno';
   const canCreate = owner;
   const peon = role === 'peon';
@@ -144,7 +142,7 @@ export function CatalogScreen() {
             onPress={() => openForm('especie')}
             style={[st.secondary, { borderColor: colors.border }]}
           >
-            <Text style={[st.secondaryText, { color: colors.primary }]}>Proponer especie o raza</Text>
+            <Text style={[st.secondaryText, { color: colors.primary }]}>Proponer especie</Text>
           </Pressable>
         ) : null}
       </View>
@@ -164,7 +162,8 @@ export function CatalogScreen() {
                   isDesktop && st.cardDesktop,
                 ]}
               >
-                <View style={[st.row, stackSpeciesActions && { flexWrap: 'wrap' }]}>
+                {/* El encabezado reúne las acciones de la especie. Las razas se gestionan debajo. */}
+                <View style={[st.row, st.speciesHeader]}>
                   <View style={[st.avatarBadge, { backgroundColor: isDark ? 'rgba(52, 211, 153, 0.15)' : '#ecfdf5' }]}>
                     <AppSectionIcon color={isDark ? '#34d399' : '#059669'} name="horseshoe" size={18} />
                   </View>
@@ -175,21 +174,30 @@ export function CatalogScreen() {
                     </Text>
                   </View>
                   {canCreate ? (
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, width: stackSpeciesActions ? '100%' : undefined }}>
-                      <Pressable accessibilityRole="button" onPress={() => openForm('raza', species)} style={[st.secondary, { backgroundColor: isDark ? colors.bgCardMuted : colors.bgCard, borderColor: colors.border }]}><Text style={[st.secondaryText, { color: isDark ? colors.accentLime : colors.primary }]}>＋ Raza</Text></Pressable>
-                      <Pressable accessibilityRole="button" accessibilityLabel={`Borrar especie ${species.nombre}`} onPress={() => setDeleteTarget({ type: 'especie', id: species.id_especie, name: species.nombre })} style={[st.deleteIconButton, { backgroundColor: colors.accentRedBg, borderColor: isDark ? 'rgba(226,107,96,0.45)' : '#fecaca' }]}><Ionicons color={isDark ? '#ff8b80' : '#dc2626'} name="trash-outline" size={18} /></Pressable>
-                    </View>
-                  ) : null}
-                  {peon ? (
                     <Pressable
                       accessibilityRole="button"
-                      onPress={() => openForm('raza', species)}
-                      style={[st.secondary, { borderColor: colors.border }, stackSpeciesActions && { width: '100%' }]}
+                      accessibilityLabel={`Borrar especie ${species.nombre}`}
+                      onPress={() => { setError(''); setDeleteTarget({ type: 'especie', id: species.id_especie, name: species.nombre }); }}
+                      style={[st.deleteSpeciesButton, { backgroundColor: colors.accentRedBg, borderColor: isDark ? 'rgba(226,107,96,0.45)' : '#fecaca' }]}
                     >
-                      <Text style={[st.secondaryText, { color: colors.primary }]}>Proponer</Text>
+                      <Ionicons color={isDark ? '#ff8b80' : '#b91c1c'} name="trash-outline" size={16} />
+                      <Text style={[st.deleteSpeciesText, { color: isDark ? '#ff8b80' : '#b91c1c' }]}>Borrar especie</Text>
                     </Pressable>
                   ) : null}
                 </View>
+
+                {canCreate || peon ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`${canCreate ? 'Agregar' : 'Proponer'} raza para ${species.nombre}`}
+                    onPress={() => openForm('raza', species)}
+                    style={[st.secondary, st.addBreedButton, { backgroundColor: isDark ? colors.bgCardMuted : colors.bgCard, borderColor: colors.border }]}
+                  >
+                    <Text style={[st.secondaryText, { color: isDark ? colors.accentLime : colors.primary }]}>
+                      {canCreate ? '＋ Raza' : 'Proponer raza'}
+                    </Text>
+                  </Pressable>
+                ) : null}
 
                 <View style={st.breedList}>
                   {breeds.length ? (
@@ -202,7 +210,7 @@ export function CatalogScreen() {
                         ]}
                       >
                         <Text style={[st.breedChipText, { color: isDark ? '#86efac' : '#2d6a4f' }]}>{breed.nombre}</Text>
-                        {owner ? <Pressable accessibilityRole="button" accessibilityLabel={`Borrar raza ${breed.nombre}`} hitSlop={6} onPress={() => setDeleteTarget({ type: 'raza', id: breed.id_raza, name: breed.nombre })}><Ionicons color={isDark ? '#ff8b80' : '#dc2626'} name="close-circle" size={17} /></Pressable> : null}
+                        {owner ? <Pressable accessibilityRole="button" accessibilityLabel={`Borrar raza ${breed.nombre}`} hitSlop={6} onPress={() => { setError(''); setDeleteTarget({ type: 'raza', id: breed.id_raza, name: breed.nombre }); }}><Ionicons color={isDark ? '#ff8b80' : '#dc2626'} name="close-circle" size={17} /></Pressable> : null}
                       </View>
                     ))
                   ) : (
@@ -222,7 +230,7 @@ export function CatalogScreen() {
         </View>
       ) : null}
 
-      {(admin || owner) && data.pendientes.length ? (
+      {owner && data.pendientes.length ? (
         <>
           <Text style={[st.sectionTitle, { color: colors.textMain }]}>Solicitudes de catálogo pendientes</Text>
           <View style={[st.gridWrap, isDesktop && st.gridWrapDesktop]}>
@@ -241,10 +249,10 @@ export function CatalogScreen() {
                 <Text style={[st.copy, { color: colors.textSecondary }]}>
                   {item.tipo === 'raza' ? `Especie: ${item.especie ?? 'sin identificar'}` : 'Nueva especie propuesta por el personal'}
                 </Text>
-                {owner ? <View style={[st.row, { justifyContent: 'flex-end', marginTop: 14 }]}>
+                <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 14 }]}>
                   <Pressable disabled={busy} onPress={() => void decide(item.id_solicitud_catalogo, 'rechazar')} style={st.danger}><Text style={st.dangerText}>Rechazar</Text></Pressable>
                   <Pressable disabled={busy} onPress={() => void decide(item.id_solicitud_catalogo, 'aprobar')} style={[st.primary, { backgroundColor: isDark ? colors.primaryLight : colors.primary }]}><Text style={st.primaryText}>Aprobar</Text></Pressable>
-                </View> : <Text style={[st.copy, { color: colors.textMuted, marginTop: 10 }]}>Pendiente de revisión del dueño.</Text>}
+                </View>
               </View>
             ))}
           </View>
@@ -322,7 +330,7 @@ export function CatalogScreen() {
 
       <Modal animationType="fade" onRequestClose={() => { if (!busy) setDeleteTarget(null); }} transparent visible={Boolean(deleteTarget)}>
         <View style={st.overlay}><FormDialog style={[st.modal, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
-          <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>¿Estás seguro de que querés borrar {deleteTarget?.type === 'especie' ? 'esta especie' : 'esta raza'}?</Text>
+          <Text style={[st.title, { color: colors.textMain, fontSize: 17 }]}>¿Borrar {deleteTarget?.type} «{deleteTarget?.name}»?</Text>
           <Text style={[st.copy, { color: colors.textSecondary, marginTop: 8 }]}>Este elemento se eliminará de forma permanente. {deleteTarget?.type === 'especie' ? 'También se borrarán sus razas si no tienen animales asociados.' : ''}</Text>
           {error ? <Text accessibilityRole="alert" style={st.error}>{error}</Text> : null}
           <View style={[st.row, { flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 18 }]}>

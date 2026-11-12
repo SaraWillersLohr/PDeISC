@@ -1,10 +1,10 @@
 import { EmailVerificationModal } from '../components/EmailVerificationModal';
 import { friendlyErrorMessage } from '../services/apiErrors';
-import { forest, s } from './LoginStyles';
+import { forest, s } from '../styles/login';
 import NetInfo from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Redirect } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import {
   ActivityIndicator,
   ImageBackground,
@@ -38,6 +38,9 @@ export default function LoginScreen() {
   const { width, height } = useWindowDimensions();
   const desktop = Platform.OS === "web" && width >= 900;
   const compact = width < 430;
+  const passwordInput = useRef<ComponentRef<typeof TextInput>>(null);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -54,7 +57,7 @@ export default function LoginScreen() {
   useEffect(() => {
     void initializeOfflineDatabase().catch(() => undefined);
     const unsubscribe = NetInfo.addEventListener((state) =>
-      setOnline(Boolean(state.isConnected)),
+      setOnline(state.isConnected !== false),
     );
     return unsubscribe;
   }, []);
@@ -65,6 +68,7 @@ export default function LoginScreen() {
    * informa errores y mantiene el estado de carga actualizado.
    */
   async function submit(): Promise<void> {
+    if (busy || !online) return;
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
       setError("Ingresá un correo electrónico válido.");
@@ -128,6 +132,12 @@ export default function LoginScreen() {
           style={s.flex}
         >
           <ScrollView
+            bounces={false}
+            overScrollMode="never"
+            onLayout={({ nativeEvent }) => setViewportHeight(nativeEvent.layout.height)}
+            onContentSizeChange={(_, measuredHeight) => setContentHeight(measuredHeight)}
+            // El formulario queda fijo si entra. El teclado o una pantalla baja pueden reducir el espacio.
+            scrollEnabled={viewportHeight > 0 && contentHeight > viewportHeight + 1}
             contentContainerStyle={[
               s.page,
               desktop ? s.desktopPage : s.mobilePage,
@@ -167,7 +177,7 @@ export default function LoginScreen() {
                 </Text>
 
                 {!online ? (
-                  <Text style={s.offline}>
+                  <Text accessibilityRole="alert" style={s.offline}>
                     Sin conexión. Para iniciar sesión necesitás conectarte a
                     internet.
                   </Text>
@@ -175,28 +185,32 @@ export default function LoginScreen() {
                 <Text style={[s.label, desktop && s.desktopCompactLabel]}>
                   CORREO ELECTRÓNICO
                 </Text>
-                <TextInput
-                  accessibilityLabel="Correo electrónico"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  onChangeText={(value) => {
-                    setEmail(value);
-                    setError("");
-                  }}
-                  onSubmitEditing={() => void submit()}
-                  placeholder="nombre@estancia.com"
-                  placeholderTextColor="#9aa49b"
-                  returnKeyType="next"
-                  style={[
-                    s.input,
-                    desktop && s.desktopCompactInput,
-                    desktop && s.desktopInputText,
-                  ]}
-                  textContentType="emailAddress"
-                  value={email}
-                />
+                <View style={[s.fieldClip, desktop && s.desktopCompactInput]}>
+                  <TextInput
+                    accessibilityLabel="Correo electrónico"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    autoCorrect={false}
+                    keyboardType="email-address"
+                    onChangeText={(value) => {
+                      setEmail(value);
+                      setError("");
+                    }}
+                    onSubmitEditing={() => passwordInput.current?.focus()}
+                    placeholder="nombre@estancia.com"
+                    placeholderTextColor="#9aa49b"
+                    returnKeyType="next"
+                    submitBehavior="submit"
+                    underlineColorAndroid="transparent"
+                    style={[
+                      s.input,
+                      desktop && s.desktopCompactInput,
+                      desktop && s.desktopInputText,
+                    ]}
+                    textContentType="emailAddress"
+                    value={email}
+                  />
+                </View>
 
                 <Text style={[s.label, desktop && s.desktopCompactLabel]}>
                   CONTRASEÑA
@@ -206,6 +220,7 @@ export default function LoginScreen() {
                   style={[s.passwordWrap, desktop && s.desktopCompactInput]}
                 >
                   <TextInput
+                    ref={passwordInput}
                     accessibilityLabel="Contraseña"
                     autoCapitalize="none"
                     autoComplete="current-password"
@@ -220,6 +235,7 @@ export default function LoginScreen() {
                     secureTextEntry={!showPassword}
                     style={[s.passwordInput, desktop && s.desktopInputText]}
                     textContentType="password"
+                    underlineColorAndroid="transparent"
                     value={password}
                   />
                   <Pressable
@@ -287,12 +303,12 @@ export default function LoginScreen() {
                 ) : null}
                 <Pressable
                   accessibilityRole="button"
-                  disabled={busy}
+                  disabled={busy || !online}
                   onPress={() => void submit()}
                   style={[
                     s.primary,
                     desktop && s.desktopCompactPrimary,
-                    busy && s.disabled,
+                    (busy || !online) && s.disabled,
                   ]}
                 >
                   {busy ? (

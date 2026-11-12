@@ -51,7 +51,10 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
 
   const load = useCallback(async () => {
     if (!session) return;
-    try { setRows(await listNursingAnimals(session)); }
+    try {
+      setRows(await listNursingAnimals(session));
+      setError('');
+    }
     catch (cause) { setError(friendlyErrorMessage(cause, 'No se pudo cargar enfermería.')); }
     finally { setLoading(false); }
   }, [session]);
@@ -59,7 +62,12 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
   useEffect(() => {
     if (!session) return;
     let active = true;
-    listNursingAnimals(session).then((data) => { if (active) setRows(data); })
+    listNursingAnimals(session).then((data) => {
+      if (active) {
+        setRows(data);
+        setError('');
+      }
+    })
       .catch((cause: unknown) => { if (active) setError(friendlyErrorMessage(cause, 'No se pudo cargar enfermería.')); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -137,7 +145,7 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
       headerContent={headerContent}
       showSearch={false}
       subtitle="SEGUIMIENTO VETERINARIO Y ALTAS CLÍNICAS"
-      count={rows.length}
+      count={role === 'veterinario' ? rows.length : undefined}
       search=""
       onSearch={() => undefined}
       loading={loading}
@@ -160,7 +168,7 @@ export function NursingScreen({ headerContent }: { headerContent?: React.ReactNo
               <View style={[style.badge, { backgroundColor: isDark ? 'rgba(239,68,68,0.18)' : '#faecea' }]}>
                 {animal.foto ? <Image source={{ uri: animal.foto }} style={style.animalPhoto} /> : <Ionicons color="#ef4444" name="medkit" size={18} />}
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={[style.title, { color: colors.textMain }]}>{animal.nombre || animal.identificador}</Text>
                 <Text style={[style.detail, { color: colors.textMuted }]}>{animal.identificador} · {animal.especie} {animal.raza}</Text>
               </View>

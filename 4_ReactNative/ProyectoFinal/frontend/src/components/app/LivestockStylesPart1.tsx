@@ -11,19 +11,23 @@ const part = StyleSheet.create({
   innerWrapperDesktop: { alignSelf: 'center', maxWidth: 1200, width: '100%' },
   pageHead: {
       alignItems: 'flex-start',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      gap: 8,
       marginBottom: 16,
     },
   pageHeadDesktop: {
       alignItems: 'center',
+      flexDirection: 'row',
+      gap: 16,
       marginBottom: 20,
     },
+  // En móvil el contador pasa debajo del subtítulo y conserva todo su ancho.
+  pageHeadText: { flex: 1, minWidth: 0 },
   heading: { fontSize: 26, fontWeight: '800', letterSpacing: -0.6 },
   subtitle: { fontSize: 13, fontWeight: '800', letterSpacing: 1.2, marginTop: 4 },
   countBadge: {
       backgroundColor: 'rgba(134, 239, 172, 0.16)',
       borderRadius: 8,
+      maxWidth: '100%',
       paddingHorizontal: 10,
       paddingVertical: 5,
     },
@@ -36,20 +40,22 @@ const part = StyleSheet.create({
   searchRowDesktop: {
       alignItems: 'center',
       flexDirection: 'row',
+      flexWrap: 'wrap',
     },
   inventoryActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   searchBox: {
       alignItems: 'center',
       borderRadius: 12,
       borderWidth: 1,
-      flex: 1,
       flexDirection: 'row',
       height: 46,
       paddingHorizontal: 12,
     },
+  searchBoxDesktop: { flexBasis: 240, flexGrow: 1 },
   searchInput: {
       flex: 1,
       fontSize: 13,
+      minWidth: 0,
     },
   speciesFilter: { marginBottom: 16 },
   speciesFilterLabel: { fontSize: 13, fontWeight: '700', marginBottom: 8 },
@@ -96,6 +102,7 @@ const part = StyleSheet.create({
     },
   statePill: {
       borderRadius: 12,
+      maxWidth: '42%',
       paddingHorizontal: 9,
       paddingVertical: 4,
     },

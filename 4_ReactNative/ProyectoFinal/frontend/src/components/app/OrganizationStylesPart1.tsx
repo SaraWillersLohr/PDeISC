@@ -162,11 +162,16 @@ const part = StyleSheet.create({
       marginTop: 14,
     },
   breedChip: {
+      alignItems: 'center',
       borderRadius: 14,
+      flexDirection: 'row',
+      gap: 6,
+      maxWidth: '100%',
       paddingHorizontal: 11,
       paddingVertical: 5,
     },
   breedChipText: {
+      flexShrink: 1,
       fontSize: 13,
       fontWeight: '800',
     },

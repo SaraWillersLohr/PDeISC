@@ -11,6 +11,7 @@ import { useSession } from '../../context/SessionContext';
 import { useLiveChanges } from '../../context/LiveChangesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { createBreed, createSpecies, deleteBreed, deleteSpecies, listCatalog, requestCatalog, reviewCatalog, type CatalogData, type Species } from '../../services/organizationApi';
+import { AppSectionIcon } from './AppSectionIcon';
 import { Screen } from './OrganizationScreens.shared';
 import { st } from './OrganizationStyles';
 
@@ -164,7 +165,7 @@ export function CatalogScreen() {
               >
                 <View style={st.row}>
                   <View style={[st.avatarBadge, { backgroundColor: isDark ? 'rgba(52, 211, 153, 0.15)' : '#ecfdf5' }]}>
-                    <Ionicons color={isDark ? '#34d399' : '#059669'} name="paw" size={18} />
+                    <AppSectionIcon color={isDark ? '#34d399' : '#059669'} name="horseshoe" size={18} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={[st.title, { color: colors.textMain }]}>{species.nombre}</Text>

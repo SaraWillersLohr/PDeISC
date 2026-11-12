@@ -91,8 +91,9 @@ export function NotificationBell() {
     finally { setBusyId(null); }
   }
 
-  function destinationFor(item: NotificationRecord): '/(app)/animals' | '/(app)/health' | '/(app)/team' | null {
+  function destinationFor(item: NotificationRecord): '/(app)/animals' | '/(app)/health' | '/(app)/team' | '/(app)/tasks' | null {
     const role = session?.usuario.rol.toLowerCase() ?? '';
+    if (item.tipo === 'tarea_vencida' && ['dueno', 'peon'].includes(role)) return '/(app)/tasks';
     if (item.tipo === 'registro_pendiente' && ['dueno', 'gestor_usuarios'].includes(role)) return '/(app)/team';
     return item.tipo === 'alta_enfermeria' && ['peon', 'dueno'].includes(role)
       ? '/(app)/animals'

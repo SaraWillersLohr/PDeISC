@@ -5,6 +5,7 @@ import { database } from '../config/database.js';
 import { validDateOnly } from '../utils/dateOnly.js';
 import { validBirthDate } from './livestockController.shared.js';
 import { publishLiveChange } from '../services/liveChanges.js';
+import { todayAtEstancia } from '../services/taskDeadlineReminders.js';
 
 const animalGenders = ['hembra', 'macho', 'no_especificado'] as const;
 function isAnimalGender(value: string): boolean { return (animalGenders as readonly string[]).includes(value); }
@@ -14,10 +15,11 @@ export async function listTasks(req: Request, res: Response): Promise<void> {
   try {
     const [rows] = await database.execute<RowDataPacket[]>(
       `SELECT t.id_tarea,t.titulo,t.descripcion,t.id_responsable,t.id_creador,t.fecha_vencimiento,t.estado,
+              COALESCE(t.fecha_vencimiento < ?, 0) AS plazo_vencido,
               u.nombre AS responsable,u.apellido AS apellido_responsable
        FROM tareas t LEFT JOIN usuarios u ON u.id_usuario=t.id_responsable
        WHERE t.id_responsable=? OR ?='dueno' ORDER BY t.created_at DESC,t.id_tarea DESC`,
-      [userId, role],
+      [todayAtEstancia(), userId, role],
     );
     res.json({ data: rows });
   } catch { res.status(500).json({ message: 'No se pudieron cargar las tareas. Intentá de nuevo más tarde.' }); }
@@ -81,14 +83,19 @@ export async function editTask(req: Request, res: Response): Promise<void> {
     if (!tasks.length) { await connection.rollback(); res.status(404).json({ message: 'La tarea ya no existe.' }); return; }
     const [users] = await connection.execute<RowDataPacket[]>("SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol WHERE u.id_usuario=? AND u.activo=1 AND r.nombre='peon' FOR UPDATE", [responsible]);
     if (!users.length) { await connection.rollback(); res.status(400).json({ message: 'Elegí un peón activo como responsable.' }); return; }
-    await connection.execute('UPDATE tareas SET titulo=?,descripcion=?,id_responsable=?,fecha_vencimiento=? WHERE id_tarea=?', [title, description || null, responsible, due, id]);
+    await connection.execute(
+      `UPDATE tareas
+       SET vencimiento_notificado_en=IF(fecha_vencimiento <=> ?, vencimiento_notificado_en, NULL),
+           titulo=?,descripcion=?,id_responsable=?,fecha_vencimiento=? WHERE id_tarea=?`,
+      [due, title, description || null, responsible, due, id],
+    );
     await connection.commit();
     res.json({ message: 'Tarea actualizada.' });
   } catch { await connection.rollback(); res.status(500).json({ message: 'No se pudo editar la tarea.' }); }
   finally { connection.release(); }
 }
 
-// El dueño puede corregir las tareas que creó. El peón solo borra las suyas completadas.
+// El dueño puede borrar las tareas del equipo. El peón solo borra las suyas completadas.
 export async function deleteTask(req: Request, res: Response): Promise<void> {
   // El lote se valida completo antes de borrar; nunca quedan borrados parciales.
   const rawIds = req.params.id ? [Number(req.params.id)] : req.body.ids;
@@ -110,7 +117,7 @@ export async function deleteTask(req: Request, res: Response): Promise<void> {
       res.status(404).json({ message: 'La tarea ya no existe.' }); return;
     }
     for (const task of tasks) {
-    const ownerCanDelete = role === 'dueno' && Number(task.id_creador) === userId;
+    const ownerCanDelete = role === 'dueno';
     const assigneeCanDelete = role === 'peon' && Number(task.id_responsable) === userId;
     if (!ownerCanDelete && !assigneeCanDelete) {
       await connection.rollback();

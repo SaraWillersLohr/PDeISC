@@ -21,6 +21,7 @@ const migrations = [
   '2026-10-26-offline-sync.sql',
   '2026-10-26-events-calendar.sql',
   '2026-10-26-event-source-expansion.sql',
+  '2026-11-12-task-deadline-notifications.sql',
 ];
 
 async function applyStatement(connection: PoolConnection, statement: string): Promise<void> {

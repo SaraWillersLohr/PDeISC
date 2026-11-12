@@ -57,9 +57,7 @@ export function TasksManagerScreen() {
   // Aplico el mismo criterio que el servidor y lo vuelvo a evaluar si la tarea cambia.
   function canDelete(row: TaskRecord): boolean {
     if (!session) return false;
-    return owner
-      ? row.id_creador === session.usuario.id_usuario
-      : session.usuario.rol === 'peon' && row.id_responsable === session.usuario.id_usuario && row.estado === 'completada';
+    return owner || (session.usuario.rol === 'peon' && row.id_responsable === session.usuario.id_usuario && row.estado === 'completada');
   }
   // Seleccionar todas abarca todas las páginas, únicamente entre las tareas permitidas.
   const eligible = rows.filter(canDelete);
@@ -249,7 +247,7 @@ export function TasksManagerScreen() {
 
   return (
     <Frame title="Tareas" subtitle="TRABAJO DIARIO DEL EQUIPO DE CAMPO">
-      {owner ? <Pressable accessibilityRole="button" onPress={() => { setSavedNotice(''); setCreating(true); }} style={[s.primary, { backgroundColor: colors.primary }]}><Text style={s.primaryText}>Crear tarea</Text></Pressable> : null}
+      {owner ? <Pressable accessibilityRole="button" onPress={() => { setSavedNotice(''); setCreating(true); }} style={[s.primary, styles.createTaskButton, { backgroundColor: colors.primary }]}><Text style={s.primaryText}>Crear tarea</Text></Pressable> : null}
       {savedNotice ? <Text accessibilityLiveRegion="polite" style={{ color: colors.primary, marginVertical: 8 }}>{savedNotice}</Text> : null}
       <Modal transparent visible={owner && (creating || editing !== null)} animationType="fade" onRequestClose={() => { if (!saving) closeTaskForm(); }}>
         <View style={styles.deleteBackdrop}><FormDialog style={[styles.deleteDialog, { backgroundColor: colors.bgCard }]}>{taskForm}</FormDialog></View>
@@ -269,6 +267,7 @@ export function TasksManagerScreen() {
             const canChange = row.id_responsable === session?.usuario.id_usuario && row.estado !== 'cancelada';
             const isDone = row.estado === 'completada';
             const inProgress = row.estado === 'en_progreso';
+            const overdue = row.plazo_vencido && (row.estado === 'pendiente' || inProgress);
             return (
               <View
                 key={row.id_tarea}
@@ -309,6 +308,17 @@ export function TasksManagerScreen() {
                       {taskStates[row.estado as TaskState] ?? (row.estado === 'cancelada' ? 'Cancelada' : row.estado)}
                     </Text>
                   </View>
+                  {owner ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Editar tarea: ${row.titulo}`}
+                      disabled={saving}
+                      onPress={() => startEditing(row)}
+                      style={[styles.editTaskButton, { backgroundColor: colors.bgCardMuted, borderColor: colors.border }]}
+                    >
+                      <Ionicons name="pencil-outline" size={19} color={colors.textMain} />
+                    </Pressable>
+                  ) : null}
                 </View>
 
                 {row.descripcion ? (
@@ -321,6 +331,11 @@ export function TasksManagerScreen() {
                     {row.fecha_vencimiento ? ` · vence ${String(row.fecha_vencimiento).slice(0, 10)}` : ''}
                   </Text>
                 </View>
+                {overdue ? (
+                  <Text style={[s.copy, { color: colors.accentRed, fontWeight: '700' }]}>
+                    Plazo vencido · La tarea sigue sin completar.
+                  </Text>
+                ) : null}
                 {canChange ? (
                   <>
                     <Text style={[s.section, { color: colors.textSecondary }]}>{changingTask === row.id_tarea ? 'Guardando estado…' : 'Cambiar estado'}</Text>
@@ -340,13 +355,6 @@ export function TasksManagerScreen() {
                     </View>
                     <FieldError message={statusErrors.fields['task_' + row.id_tarea]} />
                   </>
-                ) : null}
-                {owner ? (
-                  <View style={[styles.deleteActions, { marginTop: 12 }]}>
-                    <Pressable accessibilityRole="button" disabled={saving} onPress={() => startEditing(row)} style={[styles.deleteTaskButton, { borderColor: colors.border }]}>
-                      <Text style={{ color: colors.textMain }}>Editar tarea</Text>
-                    </Pressable>
-                  </View>
                 ) : null}
                 {canDelete(row) ? (
                   <View style={[styles.deleteActions, { marginTop: 12 }]}>
@@ -402,6 +410,8 @@ export function TasksManagerScreen() {
 }
 
 const styles = StyleSheet.create({
+  createTaskButton: { marginBottom: 16 },
+  editTaskButton: { alignItems: 'center', borderRadius: 10, borderWidth: 1, height: 44, justifyContent: 'center', width: 44 },
   deleteTaskRow: { alignItems: 'flex-start', marginTop: 12 },
   deleteTaskButton: { alignItems: 'center', borderRadius: 10, borderWidth: 1, flexDirection: 'row', gap: 8, maxWidth: '100%', minHeight: 44, paddingHorizontal: 12, paddingVertical: 10 },
   deleteTaskText: { flexShrink: 1, fontSize: 13, fontWeight: '700' },
